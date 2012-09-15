@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ======================================================================= -->
+<!--                                                                         -->
+<!--   Copyright (c) 2012, The ATTOPARSER team (http://www.attoparser.org)   -->
+<!--                                                                         -->
+<!--   Licensed under the Apache License, Version 2.0 (the "License");       -->
+<!--   you may not use this file except in compliance with the License.      -->
+<!--   You may obtain a copy of the License at                               -->
+<!--                                                                         -->
+<!--       http://www.apache.org/licenses/LICENSE-2.0                        -->
+<!--                                                                         -->
+<!--   Unless required by applicable law or agreed to in writing, software   -->
+<!--   distributed under the License is distributed on an "AS IS" BASIS,     -->
+<!--   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or       -->
+<!--   implied. See the License for the specific language governing          -->
+<!--   permissions and limitations under the License.                        -->
+<!--                                                                         -->
+<!-- ======================================================================= -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.attoparser</groupId>
+  <artifactId>attoparser</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>attoparser</name>
+  <url>http://www.attoparser.org</url>
+
+  <description>Minimum and fast markup parser for Java</description>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <organization>
+    <name>The ATTOPARSER team</name>
+    <url>http://www.attoparser.org</url>
+  </organization>
+  
+  <scm>
+    <url>scm:git:git@github.com:attoparser/attoparser.git</url>
+    <connection>scm:git:git@github.com:attoparser/attoparser.git</connection>
+    <developerConnection>scm:git:git@github.com:attoparser/attoparser.git</developerConnection>
+  </scm>
+  
+  <developers>
+    <developer>
+      <id>dfernandez</id>
+      <name>Daniel Fernandez</name>
+      <email>daniel.fernandez AT 11thlabs DOT org</email>
+      <roles>
+        <role>Project admin</role>
+      </roles>
+    </developer>
+  </developers>
+  
+  <distributionManagement>
+    <snapshotRepository>
+      <id>sonatype-nexus-snapshots</id>
+      <name>Sonatype Nexus Snapshots</name>
+      <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>sonatype-nexus-snapshots</id>
+      <name>Sonatype Nexus Snapshots</name>
+      <url>http://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+    </repository>
+  </distributionManagement>
+
+
+  <build>
+  
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+    
+      <resource>
+          <directory>.</directory>
+          <targetPath>META-INF</targetPath>
+          <includes>
+              <include>LICENSE.txt</include>
+              <include>NOTICE.txt</include>
+          </includes>
+      </resource>
+      
+    </resources>
+    
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+      </testResource>
+    </testResources>
+    
+    <plugins>
+    
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+		<version>2.4</version>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+		<version>2.8.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <noqualifier>java.lang</noqualifier>
+          <overview>${basedir}/src/main/javadoc/overview.html</overview>
+          <javadocDirectory>${basedir}/src/main/javadoc</javadocDirectory>
+          <reportOutputDirectory>${project.reporting.outputDirectory}/api/${project.artifactId}/apidocs</reportOutputDirectory>
+        </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+		<version>2.1.2</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+		<version>1.4</version>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+       
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.2</version>
+        <configuration>
+          <descriptors>
+            <descriptor>src/assembly/dist.xml</descriptor>
+          </descriptors>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly-deps</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.3</version>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.1</version>
+		<configuration>
+          <reportPlugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-project-info-reports-plugin</artifactId>
+              <version>2.2</version>
+              <reports>
+                <report>license</report>
+              </reports>
+            </plugin>
+          </reportPlugins>
+        </configuration>
+
+      </plugin>
+
+
+    </plugins>
+    
+  </build>
+
+
+
+
+  <dependencies>
+    
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+      <version>2.5</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.8.2</version>
+      <scope>test</scope>
+    </dependency>
+    
+    
+  </dependencies>
+
+  
+</project>

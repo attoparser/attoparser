@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<assembly>
+
+  <id>dist</id>
+  
+  <formats>
+    <format>zip</format>
+  </formats>
+  
+  <fileSets>
+    <fileSet>
+      <directory>${basedir}/../attoparser/target/apidocs/</directory>
+      <outputDirectory>/apidocs</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${basedir}/../attoparser/target/</directory>
+      <outputDirectory>/dist</outputDirectory>
+      <includes>
+        <include>attoparser-${version}.jar</include>
+        <include>attoparser-${version}-javadoc.jar</include>
+        <include>attoparser-${version}-sources.jar</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${basedir}/</directory>
+      <outputDirectory>/</outputDirectory>
+      <includes>
+        <include>LICENSE.txt</include>
+        <include>README.txt</include>
+        <include>NOTICE.txt</include>
+      </includes>
+    </fileSet>
+  </fileSets>
+    
+    
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>/lib</outputDirectory>
+      <unpack>false</unpack>
+      <scope>runtime</scope>
+    </dependencySet>
+  </dependencySets> 
+  
+  
+</assembly>
