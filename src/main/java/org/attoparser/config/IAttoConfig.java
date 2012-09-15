@@ -21,6 +21,13 @@ package org.attoparser.config;
 
 
 
+/**
+ * 
+ * @author Daniel Fern&aacute;ndez
+ * 
+ * @since 1.0
+ *
+ */
 public interface IAttoConfig {
 
     public boolean allowUnbalancedTags();

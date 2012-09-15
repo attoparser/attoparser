@@ -22,6 +22,13 @@ package org.attoparser.content;
 import org.attoparser.exception.AttoParseException;
 
 
+/**
+ * 
+ * @author Daniel Fern&aacute;ndez
+ * 
+ * @since 1.0
+ *
+ */
 public interface IAttoContentHandler {
 
     public void startDocument()

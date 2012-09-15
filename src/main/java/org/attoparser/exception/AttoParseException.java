@@ -19,6 +19,15 @@
  */
 package org.attoparser.exception;
 
+
+
+/**
+ * 
+ * @author Daniel Fern&aacute;ndez
+ * 
+ * @since 1.0
+ *
+ */
 public class AttoParseException extends Exception {
 
     private static final long serialVersionUID = -7951733720511589140L;

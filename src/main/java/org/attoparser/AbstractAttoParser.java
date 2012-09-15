@@ -25,6 +25,14 @@ import org.attoparser.content.IAttoContentHandler;
 import org.attoparser.exception.AttoParseException;
 
 
+
+/**
+ * 
+ * @author Daniel Fern&aacute;ndez
+ * 
+ * @since 1.0
+ *
+ */
 public abstract class AbstractAttoParser implements IAttoParser {
 
     

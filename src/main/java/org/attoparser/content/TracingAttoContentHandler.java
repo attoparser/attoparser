@@ -24,6 +24,15 @@ import java.io.Writer;
 
 import org.attoparser.exception.AttoParseException;
 
+
+
+/**
+ * 
+ * @author Daniel Fern&aacute;ndez
+ * 
+ * @since 1.0
+ *
+ */
 public final class TracingAttoContentHandler implements IAttoContentHandler {
 
     

@@ -27,6 +27,15 @@ import org.attoparser.content.IAttoContentHandler;
 import org.attoparser.content.TracingAttoContentHandler;
 import org.attoparser.exception.AttoParseException;
 
+
+
+/**
+ * 
+ * @author Daniel Fern&aacute;ndez
+ * 
+ * @since 1.0
+ *
+ */
 public class MarkupAttoParserTest extends TestCase {
 
     
