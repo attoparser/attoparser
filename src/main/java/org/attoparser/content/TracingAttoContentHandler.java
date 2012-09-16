@@ -66,20 +66,18 @@ public final class TracingAttoContentHandler implements IAttoContentHandler {
     }
 
     
-    public void startElement(char[] elementName, int offset, int len,
-            boolean isMinimized, int line, int pos)
+    public void startElement(char[] buffer, int offset, int len,
+            boolean hasBody, int line, int pos)
             throws AttoParseException {
         
         try {
             
             this.writer.write('E');
-            if (isMinimized) {
-                this.writer.write('M');
-            } else {
+            if (hasBody) {
                 this.writer.write('S');
             }
             this.writer.write('(');
-            this.writer.write(elementName, offset, len);
+            this.writer.write(buffer, offset, len);
             this.writer.write(')');
             writePosition(this.writer, line, pos);
             
@@ -90,7 +88,7 @@ public final class TracingAttoContentHandler implements IAttoContentHandler {
     }
 
     
-    public void endElement(char[] elementName, int offset, int len,
+    public void endElement(char[] buffer, int offset, int len,
             int line, int pos)
             throws AttoParseException {
         
@@ -99,7 +97,7 @@ public final class TracingAttoContentHandler implements IAttoContentHandler {
             this.writer.write('E');
             this.writer.write('E');
             this.writer.write('(');
-            this.writer.write(elementName, offset, len);
+            this.writer.write(buffer, offset, len);
             this.writer.write(')');
             writePosition(this.writer, line, pos);
             
@@ -111,8 +109,8 @@ public final class TracingAttoContentHandler implements IAttoContentHandler {
 
     
     public void attribute(
-            char[] attributeName, int nameOffset, int nameLen, 
-            char[] attributeValue, int valueOffset, int valueLen, 
+            char[] nameBuffer, int nameOffset, int nameLen, 
+            char[] valueBuffer, int valueOffset, int valueLen, 
             int line, int pos)
             throws AttoParseException {
 
@@ -121,10 +119,10 @@ public final class TracingAttoContentHandler implements IAttoContentHandler {
             
             this.writer.write('A');
             this.writer.write('(');
-            this.writer.write(attributeName, nameOffset, nameLen);
+            this.writer.write(nameBuffer, nameOffset, nameLen);
             this.writer.write('=');
             this.writer.write('"');
-            this.writer.write(attributeValue, valueOffset, valueLen);
+            this.writer.write(valueBuffer, valueOffset, valueLen);
             this.writer.write('"');
             this.writer.write(')');
             writePosition(this.writer, line, pos);
@@ -136,14 +134,14 @@ public final class TracingAttoContentHandler implements IAttoContentHandler {
     }
 
     
-    public void text(final char[] text, final int offset, final int len, final int line, final int pos)
+    public void text(final char[] buffer, final int offset, final int len, final int line, final int pos)
             throws AttoParseException {
         
         try {
             
             this.writer.write('T');
             this.writer.write('(');
-            this.writer.write(text, offset, len);
+            this.writer.write(buffer, offset, len);
             this.writer.write(')');
             writePosition(this.writer, line, pos);
             
@@ -154,14 +152,14 @@ public final class TracingAttoContentHandler implements IAttoContentHandler {
     }
 
     
-    public void comment(final char[] comment, final int offset, final int len, final int line, final int pos)
+    public void comment(final char[] buffer, final int offset, final int len, final int line, final int pos)
             throws AttoParseException {
         
         try {
             
             this.writer.write('C');
             this.writer.write('(');
-            this.writer.write(comment, offset, len);
+            this.writer.write(buffer, offset, len);
             this.writer.write(')');
             writePosition(this.writer, line, pos);
             

@@ -37,29 +37,29 @@ public interface IAttoContentHandler {
     public void endDocument()
             throws AttoParseException;
     
-    public void startElement(char[] elementName, final int offset, final int len, final boolean isMinimized,
+    public void startElement(char[] buffer, final int offset, final int len, final boolean hasBody,
             final int line, final int pos)
             throws AttoParseException;
     
-    public void endElement(char[] elementName, final int offset, final int len,
+    public void endElement(char[] buffer, final int offset, final int len,
             final int line, final int pos)
             throws AttoParseException;
 
     public void attribute(
-            char[] attributeName, final int nameOffset, final int nameLen,
-            char[] attributeValue, final int valueOffset, final int valueLen,
+            char[] nameBuffer, final int nameOffset, final int nameLen,
+            char[] valueBuffer, final int valueOffset, final int valueLen,
             final int line, final int pos)
             throws AttoParseException;
     
-    public void text(final char[] text, final int offset, final int len, 
+    public void text(final char[] buffer, final int offset, final int len, 
             final int line, final int pos)
             throws AttoParseException;
     
-    public void comment(final char[] comment, final int offset, final int len, 
+    public void comment(final char[] buffer, final int offset, final int len, 
             final int line, final int pos)
             throws AttoParseException;
     
-    public void cdata(final char[] cdata, final int offset, final int len, 
+    public void cdata(final char[] buffer, final int offset, final int len, 
             final int line, final int pos) 
             throws AttoParseException;
     

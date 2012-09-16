@@ -19,7 +19,8 @@
  */
 package org.attoparser;
 
-import org.attoparser.config.IAttoConfig;
+import java.io.Reader;
+
 import org.attoparser.content.IAttoContentHandler;
 import org.attoparser.exception.AttoParseException;
 
@@ -36,9 +37,10 @@ public final class MarkupAttoParser extends AbstractAttoParser {
 
     
     private static final char CHAR_WHITESPACE_WILDCARD = '\u01F7';
+    private static final int BUFFER_SIZE = 4096;
     private static final char[] EMPTY_CHAR_ARRAY = new char[0];
-    
-    
+
+
     
     public MarkupAttoParser() {
         super();
@@ -48,9 +50,106 @@ public final class MarkupAttoParser extends AbstractAttoParser {
     
     
     public final void parse(
-            final char[] document, final int offset, final int len, final IAttoContentHandler handler, final IAttoConfig config) 
+            final Reader reader, final IAttoContentHandler handler) 
             throws AttoParseException {
-        parseDocument(document, offset, len, handler, config);
+        
+        if (reader == null) {
+            throw new IllegalArgumentException("Reader cannot be null");
+        }
+        if (handler == null) {
+            throw new IllegalArgumentException("Handler cannot be null");
+        }
+        
+        parseDocument(reader, handler, BUFFER_SIZE);
+        
+    }
+
+
+
+    
+    static final void parseDocument(
+            final Reader reader, final IAttoContentHandler handler, final int initialBufferSize) 
+            throws AttoParseException {
+
+
+        try {
+
+            handler.startDocument();
+            
+            int bufferSize = initialBufferSize;
+            char[] buffer = new char[bufferSize];
+            BufferStatus status = new BufferStatus();
+            
+            int read = reader.read(buffer);
+            int bufferContentSize = read;
+            int lastArtifactStart = -1;
+            
+            while (read != -1) {
+                
+                parseBuffer(buffer, 0, read, handler, status);
+                
+                int readOffset = 0;
+                int readLen = bufferSize;
+                lastArtifactStart = status.getLastArtifactStart();
+                BufferStatus newStatus = null;
+                
+                if (lastArtifactStart == 0) {
+                    
+                    if (read == bufferSize) {
+                        // Buffer is not big enough, double it! 
+                        
+                        bufferSize *= 2;
+                        final char[] newBuffer = new char[bufferSize];
+                        System.arraycopy(buffer, 0, newBuffer, 0, read);
+                        buffer = newBuffer;
+                        
+                        readOffset = read;
+                        readLen = bufferSize - readOffset;
+                        newStatus = new BufferStatus(status.getLastLine(), status.getLastPos());
+                        
+                    }
+                    
+                } else if (lastArtifactStart < read) {
+                    
+                    for (int i = lastArtifactStart; i < read; i++) {
+                        buffer[i - lastArtifactStart] = buffer[i];
+                    }
+                    
+                    readOffset = read - lastArtifactStart;
+                    readLen = bufferSize - readOffset;
+                    
+                    lastArtifactStart = 0;
+                    bufferContentSize = readOffset;
+                    
+                    newStatus = new BufferStatus(status.getLastLine(), status.getLastPos());
+                    
+                }
+                
+                read = reader.read(buffer, readOffset, readLen);
+                if (read != -1) {
+                    bufferContentSize = readOffset + read;
+                    read += readOffset;
+                    if (newStatus != null) {
+                        status = newStatus;
+                    }
+                }
+
+            }
+            
+            final int lastStart = lastArtifactStart;
+            final int lastLen = bufferContentSize - lastStart; 
+            if (lastLen > 0) {
+                handler.text(buffer, lastStart, lastLen, status.getLastLine(), status.getLastPos());
+            }
+            
+            handler.endDocument();
+            
+        } catch (final AttoParseException e) {
+            throw e;
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        }
+        
     }
 
     
@@ -58,59 +157,46 @@ public final class MarkupAttoParser extends AbstractAttoParser {
     
     
     
-    private static final void parseDocument(
-            final char[] document, final int offset, final int len, final IAttoContentHandler handler, final IAttoConfig config) 
+    
+    private static final void parseBuffer(
+            final char[] buffer, final int offset, final int len, 
+            final IAttoContentHandler handler, final BufferStatus status) 
             throws AttoParseException {
 
-        if (document == null) {
-            throw new IllegalArgumentException("Document cannot be null");
-        }
-        if (handler == null) {
-            throw new IllegalArgumentException("Handler cannot be null");
-        }
-        if (offset < 0 || len < 0) {
-            throw new IllegalArgumentException(
-                    "Neither document offset (" + offset + ") nor document length (" + 
-                    len + ") can be less than zero");
-        }
-
-        handler.startDocument();
         
-        if (len == 0) {
-            handler.endDocument();
-            return;
-        }
-        
-        final Locator locator = new Locator();
-        int currentLine = locator.getLine();
-        int currentPos = locator.getPos();
+        int currentLine = status.getLine();
+        int currentPos = status.getPos();
         
         final int maxi = offset + len;
         int i = offset;
         int current = i;
+        
         boolean inTag = false;
+        boolean inClosingTag = false;
+        boolean inComment = false;
+        boolean inCdata = false;
+        
+        int tagStart;
+        int tagEnd;
         
         while (i < maxi) {
             
-            currentLine = locator.getLine();
-            currentPos = locator.getPos();
+            currentLine = status.getLine();
+            currentPos = status.getPos();
             
             if (!inTag) {
                 
-                final int tagStart = findNext(document, i, maxi, '<', locator);
+                tagStart = findNext(buffer, i, maxi, '<', inTag, status);
                 
                 if (tagStart == -1) {
-                    handler.text(
-                            document, current, (maxi - current), 
-                            currentLine, currentPos);
-                    i = maxi;
-                    continue;
+                    status.reportBufferStatus(current, currentLine, currentPos);
+                    return;
                 }
             
                 if (tagStart > current) {
                     // We avoid empty-string text events
                     handler.text(
-                            document, current, (tagStart - current), 
+                            buffer, current, (tagStart - current), 
                             currentLine, currentPos);
                 }
                 
@@ -119,47 +205,68 @@ public final class MarkupAttoParser extends AbstractAttoParser {
                 inTag = true;
                 
             } else {
+
+                inClosingTag = false;
+                inComment = false;
+                inCdata = false;
                 
-                int tagEnd = findNext(document, i, maxi, '>', locator);
+                if (maxi - current > 1 &&
+                        buffer[current + 1] == '/') {
+
+                    inClosingTag = true;
+                    inTag = false;
+                    
+                } else if (maxi - current > 3 &&
+                        buffer[current + 1] == '!' && 
+                        buffer[current + 2] == '-' && 
+                        buffer[current + 3] == '-') {
+                    
+                    inComment = true;
+                    inTag = false;
+                    
+                } else if (maxi - current > 8 &&
+                        buffer[current + 1] == '!' && 
+                        buffer[current + 2] == '[' && 
+                        buffer[current + 3] == 'C' &&
+                        buffer[current + 4] == 'D' &&
+                        buffer[current + 5] == 'A' &&
+                        buffer[current + 6] == 'T' &&
+                        buffer[current + 7] == 'A' &&
+                        buffer[current + 8] == '[') {
+                    
+                    inCdata = true;
+                    inTag = false;
+                    
+                }
+                        
+                
+                tagEnd = findNext(buffer, i, maxi, '>', inTag, status);
                 
                 if (tagEnd == -1) {
-                    
-                    if (!config.returnUnfinishedTagsAsText()) {
-                        throw new AttoParseException(
-                                "Unfinished tag: " + (new String(document, current, (maxi-current))), 
-                                currentLine, currentPos);
-                    }
-                    
-                    handler.text(
-                            document, current, (maxi - current), 
-                            currentLine, currentPos);
-                    i = maxi;
-                    continue;
+                    // This is an unfinished structure
+                    status.reportBufferStatus(current, currentLine, currentPos);
+                    return;
                 }
                 
-                if (document[current + 1] == '/') {
+                if (inClosingTag) {
                     // This is a closing tag
                     
                     handler.endElement(
-                            document, (current + 2), (tagEnd - (current + 2)), 
+                            buffer, (current + 2), (tagEnd - (current + 2)), 
                             currentLine, currentPos);
                     
-                } else if ((tagEnd - current >= 7) && 
-                           document[current + 1] == '!' && 
-                           document[current + 2] == '-' && 
-                           document[current + 3] == '-') {
-                    //This is a Comment!
+                } else if (inComment) {
+                    // This is a comment! (obviously ;-))
                     
-                    while (document[tagEnd - 1] != '-' || document[tagEnd - 2] != '-') {
+                    while (tagEnd - current < 7 || buffer[tagEnd - 1] != '-' || buffer[tagEnd - 2] != '-') {
                         // the '>' we chose is not the comment-closing one. Let's find again
                         
-                        countChar(document[tagEnd], locator);
-                        tagEnd = findNext(document, tagEnd + 1, maxi, '>', locator);
+                        countChar(buffer[tagEnd], status);
+                        tagEnd = findNext(buffer, tagEnd + 1, maxi, '>', false, status);
                         
                         if (tagEnd == -1) {
-                            handler.text(document, current, (maxi - current), currentLine, currentPos);
-                            i = maxi;
-                            continue;
+                            status.reportBufferStatus(current, currentLine, currentPos);
+                            return;
                         }
                         
                     }
@@ -167,29 +274,20 @@ public final class MarkupAttoParser extends AbstractAttoParser {
                     final int commentContentOffset = current + 4;
                     final int commentContentLen = tagEnd - (current + 6);
 
-                    handler.comment(document, commentContentOffset, commentContentLen, currentLine, currentPos);
+                    handler.comment(buffer, commentContentOffset, commentContentLen, currentLine, currentPos);
                     
-                } else if ((tagEnd - current >= 12) &&
-                           document[current + 1] == '!' && 
-                           document[current + 2] == '[' && 
-                           document[current + 3] == 'C' &&
-                           document[current + 4] == 'D' &&
-                           document[current + 5] == 'A' &&
-                           document[current + 6] == 'T' &&
-                           document[current + 7] == 'A' &&
-                           document[current + 8] == '[') {
-                    //This is a CDATA section!
+                } else if (inCdata) {
+                    // This is a CDATA section
                     
-                    while (document[tagEnd - 1] != ']' || document[tagEnd - 2] != ']') {
+                    while (tagEnd - current < 12 || buffer[tagEnd - 1] != ']' || buffer[tagEnd - 2] != ']') {
                         // the '>' we chose is not the comment-closing one. Let's find again
                         
-                        countChar(document[tagEnd], locator);
-                        tagEnd = findNext(document, tagEnd + 1, maxi, '>', locator);
+                        countChar(buffer[tagEnd], status);
+                        tagEnd = findNext(buffer, tagEnd + 1, maxi, '>', false, status);
                         
                         if (tagEnd == -1) {
-                            handler.text(document, current, (maxi - current), currentLine, currentPos);
-                            i = maxi;
-                            continue;
+                            status.reportBufferStatus(current, currentLine, currentPos);
+                            return;
                         }
                         
                     }
@@ -197,22 +295,22 @@ public final class MarkupAttoParser extends AbstractAttoParser {
                     final int cdataContentOffset = current + 9;
                     final int cdataContentLen = tagEnd - (current + 11);
 
-                    handler.cdata(document, cdataContentOffset, cdataContentLen, currentLine, currentPos);
+                    handler.cdata(buffer, cdataContentOffset, cdataContentLen, currentLine, currentPos);
                     
                 } else {
 
-                    final boolean minimized = (document[tagEnd - 1] == '/');
+                    final boolean hasBody = (buffer[tagEnd - 1] != '/');
                     final int tagContentOffset = current + 1;
-                    final int tagContentLen = tagEnd - (current + (minimized? 2 : 1)); 
+                    final int tagContentLen = tagEnd - (current + (hasBody? 1 : 2)); 
                     
                     parseStartTag(
-                            document, tagContentOffset, tagContentLen, handler, minimized,
+                            buffer, tagContentOffset, tagContentLen, handler, hasBody,
                             currentLine, currentPos);
                     
                 }
                 
                 // The '>' char will be considered as processed too
-                countChar(document[tagEnd], locator);
+                countChar(buffer[tagEnd], status);
                 
                 current = tagEnd + 1;
                 i = current;
@@ -222,54 +320,57 @@ public final class MarkupAttoParser extends AbstractAttoParser {
             
         }
         
-        handler.endDocument();
+        status.reportBufferStatus(current, currentLine, currentPos);
         
     }
     
     
+    
     private static void parseStartTag(
             final char[] document, final int offset, final int len, 
-            final IAttoContentHandler handler, final boolean minimized,
+            final IAttoContentHandler handler, final boolean hasBody,
             final int currentLine, final int currentPos)
             throws AttoParseException {
 
         final int maxi = offset + len;
         
-        final Locator attributeLocator = new Locator(currentLine, currentPos + 1);
+        final BufferStatus attributeStatus = new BufferStatus(currentLine, currentPos + 1);
         
         /*
          * Extract the element name first 
          */
         
         final int elementNameEnd = 
-            findNext(document, offset, maxi, CHAR_WHITESPACE_WILDCARD, attributeLocator);
+            findNext(document, offset, maxi, CHAR_WHITESPACE_WILDCARD, true, attributeStatus);
         
         if (elementNameEnd == -1) {
             handler.startElement(
-                    document, offset, len, minimized,
+                    document, offset, len, hasBody,
                     currentLine, currentPos);
             return;
         }
 
         
         handler.startElement(
-                document, offset, (elementNameEnd - offset), minimized,
+                document, offset, (elementNameEnd - offset), hasBody,
                 currentLine, currentPos);
 
         int i = elementNameEnd + 1;
         int current = i;
-        countChar(document[elementNameEnd], attributeLocator);
+        countChar(document[elementNameEnd], attributeStatus);
 
-        int currentAttributeLine = attributeLocator.getLine();
-        int currentAttributePos = attributeLocator.getPos();
+        int currentAttributeLine = attributeStatus.getLine();
+        int currentAttributePos = attributeStatus.getPos();
+        
+        int attributeEnd = -1;
         
         while (i < maxi) {
             
-            currentAttributeLine = attributeLocator.getLine();
-            currentAttributePos = attributeLocator.getPos();
+            currentAttributeLine = attributeStatus.getLine();
+            currentAttributePos = attributeStatus.getPos();
             
-            final int attributeEnd = 
-                findNext(document, i, maxi, CHAR_WHITESPACE_WILDCARD, attributeLocator);
+            attributeEnd = 
+                findNext(document, i, maxi, CHAR_WHITESPACE_WILDCARD, true, attributeStatus);
             
             if (attributeEnd == -1) {
                 
@@ -286,7 +387,7 @@ public final class MarkupAttoParser extends AbstractAttoParser {
                 final int attributeOffset = current;
                 final int attributeLen = attributeEnd - current;
                 parseAttribute(document, attributeOffset, attributeLen, handler, currentAttributeLine, currentAttributePos);
-                countChar(document[attributeEnd], attributeLocator);
+                countChar(document[attributeEnd], attributeStatus);
                 i = attributeEnd + 1;
                 current = i;
                 continue;
@@ -294,7 +395,7 @@ public final class MarkupAttoParser extends AbstractAttoParser {
             }
             
             // skip any contiguous whitespaces
-            countChar(document[current], attributeLocator);
+            countChar(document[current], attributeStatus);
             i++;
             current = i;
             
@@ -312,7 +413,7 @@ public final class MarkupAttoParser extends AbstractAttoParser {
 
         final int maxi = offset + len;
 
-        final int attributeNameEnd = findNext(document, offset, maxi, '=', null);
+        final int attributeNameEnd = findNext(document, offset, maxi, '=', true, null);
         
         if (attributeNameEnd == -1) {
             // This is a no-value attribute, equivalent to value = ""
@@ -359,7 +460,7 @@ public final class MarkupAttoParser extends AbstractAttoParser {
     
     private static int findNext(
             final char[] text, final int offset, final int maxi, final char target,
-            final Locator locator) {
+            final boolean inTag, final BufferStatus context) {
         
         boolean inValue = false;
 
@@ -367,13 +468,13 @@ public final class MarkupAttoParser extends AbstractAttoParser {
             
             final char c = text[i];
             
-            if (c == '"') {
+            if (inTag && c == '"') {
                 inValue = !inValue;
             } else if (!inValue && (c == target || (target == CHAR_WHITESPACE_WILDCARD && Character.isWhitespace(c)))) {
                 return i;
             }
 
-            countChar(c, locator);
+            countChar(c, context);
             
         }
             
@@ -385,27 +486,32 @@ public final class MarkupAttoParser extends AbstractAttoParser {
 
     
     
-    private static void countChar(final char c, final Locator locator) {
-        if (locator != null) {
-            locator.countChar(c);
+    private static void countChar(final char c, final BufferStatus context) {
+        if (context != null) {
+            context.countChar(c);
         }
     }
 
     
     
     
-    private static final class Locator {
+    private static final class BufferStatus {
         
         private int line;
         private int pos;
         
-        Locator() {
+        private int lastArtifactStart = -1;
+        private int lastLine = -1;
+        private int lastPos = -1;
+        
+        
+        BufferStatus() {
             super();
             this.line = 1;
             this.pos = 1;
         }
         
-        Locator(final int line, final int pos) {
+        BufferStatus(final int line, final int pos) {
             super();
             this.line = line;
             this.pos = pos;
@@ -426,6 +532,24 @@ public final class MarkupAttoParser extends AbstractAttoParser {
             } else {
                 this.pos++;
             }
+        }
+        
+        public int getLastArtifactStart() {
+            return this.lastArtifactStart;
+        }
+
+        public int getLastLine() {
+            return this.lastLine;
+        }
+
+        public int getLastPos() {
+            return this.lastPos;
+        }
+
+        public void reportBufferStatus(final int newLastArtifactStart, final int newLastLine, final int newLastPos) {
+            this.lastArtifactStart = newLastArtifactStart;
+            this.lastLine = newLastLine;
+            this.lastPos = newLastPos;
         }
         
     }
