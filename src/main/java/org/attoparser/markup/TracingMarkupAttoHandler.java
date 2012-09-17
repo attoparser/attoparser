@@ -17,7 +17,7 @@
  * 
  * =============================================================================
  */
-package org.attoparser.content;
+package org.attoparser.markup;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -33,19 +33,21 @@ import org.attoparser.exception.AttoParseException;
  * @since 1.0
  *
  */
-public final class TracingAttoContentHandler implements IAttoContentHandler {
+public final class TracingMarkupAttoHandler extends AbstractMarkupAttoHandler {
 
     
     private final Writer writer;
     
     
-    public TracingAttoContentHandler(final Writer writer) {
+    public TracingMarkupAttoHandler(final Writer writer) {
         super();
         this.writer = writer;
     }
     
     
     
+    
+    @Override
     public void startDocument()
             throws AttoParseException {
         try {
@@ -56,6 +58,8 @@ public final class TracingAttoContentHandler implements IAttoContentHandler {
     }
 
     
+    
+    @Override
     public void endDocument()
             throws AttoParseException {
         try {
@@ -65,21 +69,63 @@ public final class TracingAttoContentHandler implements IAttoContentHandler {
         }
     }
 
-    
-    public void startElement(char[] buffer, int offset, int len,
-            boolean hasBody, int line, int pos)
+
+
+    @Override
+    public void standaloneElementName(final char[] buffer, final int offset, final int len,
+            final int line, final int col)
             throws AttoParseException {
         
         try {
             
             this.writer.write('E');
-            if (hasBody) {
-                this.writer.write('S');
-            }
             this.writer.write('(');
             this.writer.write(buffer, offset, len);
             this.writer.write(')');
-            writePosition(this.writer, line, pos);
+            writePosition(this.writer, line, col);
+            
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        }
+        
+    }
+    
+    
+    
+    @Override
+    public void openElementName(final char[] buffer, final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException {
+        
+        try {
+            
+            this.writer.write('E');
+            this.writer.write('S');
+            this.writer.write('(');
+            this.writer.write(buffer, offset, len);
+            this.writer.write(')');
+            writePosition(this.writer, line, col);
+            
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        }
+        
+    }
+
+
+    @Override
+    public void closeElementName(final char[] buffer, final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException {
+        
+        try {
+            
+            this.writer.write('E');
+            this.writer.write('E');
+            this.writer.write('(');
+            this.writer.write(buffer, offset, len);
+            this.writer.write(')');
+            writePosition(this.writer, line, col);
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -88,30 +134,12 @@ public final class TracingAttoContentHandler implements IAttoContentHandler {
     }
 
     
-    public void endElement(char[] buffer, int offset, int len,
-            int line, int pos)
-            throws AttoParseException {
-        
-        try {
-            
-            this.writer.write('E');
-            this.writer.write('E');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, pos);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
-    }
-
     
-    public void attribute(
-            char[] nameBuffer, int nameOffset, int nameLen, 
-            char[] valueBuffer, int valueOffset, int valueLen, 
-            int line, int pos)
+    @Override
+    public void elementAttribute(
+            final char[] nameBuffer, final int nameOffset, final int nameLen, 
+            final char[] valueBuffer, final int valueOffset, final int valueLen, 
+            final int line, final int col)
             throws AttoParseException {
 
         
@@ -125,7 +153,7 @@ public final class TracingAttoContentHandler implements IAttoContentHandler {
             this.writer.write(valueBuffer, valueOffset, valueLen);
             this.writer.write('"');
             this.writer.write(')');
-            writePosition(this.writer, line, pos);
+            writePosition(this.writer, line, col);
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -134,7 +162,10 @@ public final class TracingAttoContentHandler implements IAttoContentHandler {
     }
 
     
-    public void text(final char[] buffer, final int offset, final int len, final int line, final int pos)
+    
+    @Override
+    public void text(final char[] buffer, final int offset, final int len, 
+            final int line, final int col)
             throws AttoParseException {
         
         try {
@@ -143,7 +174,7 @@ public final class TracingAttoContentHandler implements IAttoContentHandler {
             this.writer.write('(');
             this.writer.write(buffer, offset, len);
             this.writer.write(')');
-            writePosition(this.writer, line, pos);
+            writePosition(this.writer, line, col);
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -151,8 +182,11 @@ public final class TracingAttoContentHandler implements IAttoContentHandler {
         
     }
 
+
     
-    public void comment(final char[] buffer, final int offset, final int len, final int line, final int pos)
+    @Override
+    public void comment(final char[] buffer, final int offset, final int len, 
+            final int line, final int col)
             throws AttoParseException {
         
         try {
@@ -161,7 +195,7 @@ public final class TracingAttoContentHandler implements IAttoContentHandler {
             this.writer.write('(');
             this.writer.write(buffer, offset, len);
             this.writer.write(')');
-            writePosition(this.writer, line, pos);
+            writePosition(this.writer, line, col);
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -170,7 +204,9 @@ public final class TracingAttoContentHandler implements IAttoContentHandler {
     }
 
     
-    public void cdata(final char[] cdata, final int offset, final int len, final int line, final int pos)
+    @Override
+    public void cdata(final char[] cdata, final int offset, final int len,
+            final int line, final int col)
             throws AttoParseException {
         
         try {
@@ -179,7 +215,7 @@ public final class TracingAttoContentHandler implements IAttoContentHandler {
             this.writer.write('(');
             this.writer.write(cdata, offset, len);
             this.writer.write(')');
-            writePosition(this.writer, line, pos);
+            writePosition(this.writer, line, col);
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -189,13 +225,14 @@ public final class TracingAttoContentHandler implements IAttoContentHandler {
 
     
     
-    private static void writePosition(final Writer writer, final int line, final int pos) throws IOException {
+    private static void writePosition(final Writer writer, final int line, final int col) throws IOException {
         writer.write('{');
         writer.write(String.valueOf(line));
         writer.write(',');
-        writer.write(String.valueOf(pos));
+        writer.write(String.valueOf(col));
         writer.write('}');
     }
+
     
     
 }

@@ -17,12 +17,9 @@
  * 
  * =============================================================================
  */
-package org.attoparser;
-
-import java.io.Reader;
+package org.attoparser.markup;
 
 import org.attoparser.exception.AttoParseException;
-
 
 
 /**
@@ -32,21 +29,25 @@ import org.attoparser.exception.AttoParseException;
  * @since 1.0
  *
  */
-public interface IAttoParser {
-    
-    
-    public void parse(final String document, final IAttoHandler handler) 
-            throws AttoParseException;
-    
-    public void parse(final char[] document, final IAttoHandler handler) 
-            throws AttoParseException;
-    
-    public void parse(final char[] document, final int offset, final int len, final IAttoHandler handler) 
-            throws AttoParseException;
-    
-    public void parse(final Reader reader, final IAttoHandler handler) 
-            throws AttoParseException;
+public interface IElementNameAndAttributeAwareHandling {
 
 
+    public void standaloneElementName(char[] buffer, final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException;
+    
+    public void openElementName(char[] buffer, final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException;
+    
+    public void closeElementName(char[] buffer, final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException;
+
+    public void elementAttribute(
+            char[] nameBuffer, final int nameOffset, final int nameLen,
+            char[] valueBuffer, final int valueOffset, final int valueLen,
+            final int line, final int col)
+            throws AttoParseException;
     
 }

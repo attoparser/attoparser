@@ -25,9 +25,9 @@ import java.io.StringWriter;
 import junit.framework.ComparisonFailure;
 import junit.framework.TestCase;
 
-import org.attoparser.content.IAttoContentHandler;
-import org.attoparser.content.TracingAttoContentHandler;
 import org.attoparser.exception.AttoParseException;
+import org.attoparser.markup.MarkupAttoParser;
+import org.attoparser.markup.TracingMarkupAttoHandler;
 
 
 
@@ -38,14 +38,12 @@ import org.attoparser.exception.AttoParseException;
  * @since 1.0
  *
  */
-public class MarkupAttoParserTest extends TestCase {
+public class AttoParserTest extends TestCase {
 
     private static int totalTestExecutions = 0;
     
 
     public void test() throws Exception {
-
-        
 
         testDoc( 
             "Hello, <p>lala</p>",
@@ -375,7 +373,8 @@ public class MarkupAttoParserTest extends TestCase {
     
     static void testDoc(final char[] input, final String output, final int offset, final int len) throws AttoParseException {
 
-        for (int bufferSize = 1; bufferSize < 16384; bufferSize++) {
+        final int maxBufferSize = 16384;
+        for (int bufferSize = 1; bufferSize < maxBufferSize; bufferSize++) {
             testDoc(input, output, offset, len, bufferSize);
         }
         
@@ -388,11 +387,12 @@ public class MarkupAttoParserTest extends TestCase {
         try {
             
             final StringWriter sw = new StringWriter(); 
-            final IAttoContentHandler handler = new TracingAttoContentHandler(sw);
+            final IAttoHandler handler = new TracingMarkupAttoHandler(sw);
+            final IAttoParser parser = new MarkupAttoParser();
             if (offset == 0 && len == input.length) {
-                MarkupAttoParser.parseDocument(new CharArrayReader(input), handler, bufferSize);
+                ((AbstractBufferedAttoParser)parser).parseDocument(new CharArrayReader(input), handler, bufferSize);
             } else { 
-                MarkupAttoParser.parseDocument(new CharArrayReader(input, offset, len), handler, bufferSize);
+                ((AbstractBufferedAttoParser)parser).parseDocument(new CharArrayReader(input, offset, len), handler, bufferSize);
             }
             final String result = sw.toString();
             assertEquals(output, result);

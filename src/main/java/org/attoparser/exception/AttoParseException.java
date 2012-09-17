@@ -33,62 +33,62 @@ public class AttoParseException extends Exception {
     private static final long serialVersionUID = -7951733720511589140L;
 
     private final Integer line;
-    private final Integer pos;
+    private final Integer col;
 
     
 
     public AttoParseException() {
         super();
         this.line = null;
-        this.pos = null;
+        this.col = null;
     }
 
     public AttoParseException(final String message, final Throwable throwable) {
         super(message, throwable);
         this.line = null;
-        this.pos = null;
+        this.col = null;
     }
 
     public AttoParseException(final String message) {
         super(message);
         this.line = null;
-        this.pos = null;
+        this.col = null;
     }
 
     public AttoParseException(final Throwable throwable) {
         super(throwable);
         this.line = null;
-        this.pos = null;
+        this.col = null;
     }
     
 
-    public AttoParseException(final int line, final int pos) {
-        super(messagePrefix(line, pos));
+    public AttoParseException(final int line, final int col) {
+        super(messagePrefix(line, col));
         this.line = Integer.valueOf(line);
-        this.pos = Integer.valueOf(pos);
+        this.col = Integer.valueOf(col);
     }
 
-    public AttoParseException(final String message, final Throwable throwable, final int line, final int pos) {
-        super(messagePrefix(line, pos) + " " + message, throwable);
+    public AttoParseException(final String message, final Throwable throwable, final int line, final int col) {
+        super(messagePrefix(line, col) + " " + message, throwable);
         this.line = Integer.valueOf(line);
-        this.pos = Integer.valueOf(pos);
+        this.col = Integer.valueOf(col);
     }
 
-    public AttoParseException(final String message, final int line, final int pos) {
-        super(messagePrefix(line, pos) + " " + message);
+    public AttoParseException(final String message, final int line, final int col) {
+        super(messagePrefix(line, col) + " " + message);
         this.line = Integer.valueOf(line);
-        this.pos = Integer.valueOf(pos);
+        this.col = Integer.valueOf(col);
     }
 
-    public AttoParseException(final Throwable throwable, final int line, final int pos) {
-        super(messagePrefix(line, pos), throwable);
+    public AttoParseException(final Throwable throwable, final int line, final int col) {
+        super(messagePrefix(line, col), throwable);
         this.line = Integer.valueOf(line);
-        this.pos = Integer.valueOf(pos);
+        this.col = Integer.valueOf(col);
     }
 
     
-    private static String messagePrefix(final int line, final int pos) {
-        return "(Line = " + line + ", Position = " + pos + ")"; 
+    private static String messagePrefix(final int line, final int col) {
+        return "(Line = " + line + ", Column = " + col + ")"; 
     }
     
     
@@ -97,8 +97,8 @@ public class AttoParseException extends Exception {
         return this.line;
     }
 
-    public Integer getPos() {
-        return this.pos;
+    public Integer getCol() {
+        return this.col;
     }
 
     

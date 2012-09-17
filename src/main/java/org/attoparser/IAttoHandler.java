@@ -17,7 +17,7 @@
  * 
  * =============================================================================
  */
-package org.attoparser.content;
+package org.attoparser;
 
 import org.attoparser.exception.AttoParseException;
 
@@ -29,7 +29,7 @@ import org.attoparser.exception.AttoParseException;
  * @since 1.0
  *
  */
-public interface IAttoContentHandler {
+public interface IAttoHandler {
 
     public void startDocument()
             throws AttoParseException;
@@ -37,30 +37,12 @@ public interface IAttoContentHandler {
     public void endDocument()
             throws AttoParseException;
     
-    public void startElement(char[] buffer, final int offset, final int len, final boolean hasBody,
-            final int line, final int pos)
-            throws AttoParseException;
-    
-    public void endElement(char[] buffer, final int offset, final int len,
-            final int line, final int pos)
-            throws AttoParseException;
-
-    public void attribute(
-            char[] nameBuffer, final int nameOffset, final int nameLen,
-            char[] valueBuffer, final int valueOffset, final int valueLen,
-            final int line, final int pos)
-            throws AttoParseException;
-    
     public void text(final char[] buffer, final int offset, final int len, 
-            final int line, final int pos)
+            final int line, final int col)
             throws AttoParseException;
     
-    public void comment(final char[] buffer, final int offset, final int len, 
-            final int line, final int pos)
-            throws AttoParseException;
-    
-    public void cdata(final char[] buffer, final int offset, final int len, 
-            final int line, final int pos) 
+    public void structure(final char[] buffer, final int offset, final int len, 
+            final int line, final int col)
             throws AttoParseException;
     
 }

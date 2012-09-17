@@ -22,7 +22,6 @@ package org.attoparser;
 import java.io.CharArrayReader;
 import java.io.StringReader;
 
-import org.attoparser.content.IAttoContentHandler;
 import org.attoparser.exception.AttoParseException;
 
 
@@ -39,25 +38,25 @@ public abstract class AbstractAttoParser implements IAttoParser {
 
     
     
-    public AbstractAttoParser() {
+    protected AbstractAttoParser() {
         super();
     }
     
 
     
     
-    public final void parse(final String document, final IAttoContentHandler handler) 
+    public final void parse(final String document, final IAttoHandler handler) 
             throws AttoParseException  {
         parse(new StringReader(document), handler);
     }
     
-    public final void parse(final char[] document, final IAttoContentHandler handler) 
+    public final void parse(final char[] document, final IAttoHandler handler) 
             throws AttoParseException {
         parse(new CharArrayReader(document), handler);
     }
     
     public final void parse(
-            final char[] document, final int offset, final int len, final IAttoContentHandler handler) 
+            final char[] document, final int offset, final int len, final IAttoHandler handler) 
             throws AttoParseException {
         if (offset < 0 || len < 0) {
             throw new IllegalArgumentException(
