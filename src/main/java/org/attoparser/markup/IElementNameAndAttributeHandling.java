@@ -29,7 +29,7 @@ import org.attoparser.exception.AttoParseException;
  * @since 1.0
  *
  */
-public interface IElementNameAndAttributeAwareHandling {
+public interface IElementNameAndAttributeHandling {
 
 
     public void standaloneElementName(char[] buffer, final int offset, final int len,

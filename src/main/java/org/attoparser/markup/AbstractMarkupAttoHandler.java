@@ -35,7 +35,7 @@ import org.attoparser.exception.AttoParseException;
  */
 public abstract class AbstractMarkupAttoHandler 
         extends AbstractBasicMarkupAttoHandler
-        implements IElementNameAndAttributeAwareHandling {
+        implements IElementNameAndAttributeHandling {
 
 
     

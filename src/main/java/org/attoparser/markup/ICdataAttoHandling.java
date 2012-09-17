@@ -29,18 +29,10 @@ import org.attoparser.exception.AttoParseException;
  * @since 1.0
  *
  */
-public interface IElementAwareAttoHandling {
+public interface ICdataAttoHandling {
 
-    public void standaloneElement(char[] buffer, final int offset, final int len,
-            final int line, final int col)
-            throws AttoParseException;
-    
-    public void openElement(char[] buffer, final int offset, final int len,
-            final int line, final int col)
-            throws AttoParseException;
-    
-    public void closeElement(char[] buffer, final int offset, final int len,
-            final int line, final int col)
+    public void cdata(final char[] buffer, final int offset, final int len, 
+            final int line, final int col) 
             throws AttoParseException;
     
 }

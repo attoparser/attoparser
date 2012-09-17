@@ -35,7 +35,7 @@ import org.attoparser.exception.AttoParseException;
  */
 public abstract class AbstractBasicMarkupAttoHandler 
         extends AbstractAttoHandler
-        implements ICdataAwareAttoHandling, ICommentAwareAttoHandling, IElementAwareAttoHandling {
+        implements ICdataAttoHandling, ICommentAttoHandling, IElementAttoHandling {
 
 
     
@@ -50,11 +50,7 @@ public abstract class AbstractBasicMarkupAttoHandler
             final int line, final int col)
             throws AttoParseException {
         
-        if (!MarkupAttoParserUtil.parseElement(buffer, offset, len, line, col, this)) {
-            if (!MarkupAttoParserUtil.parseComment(buffer, offset, len, line, col, this)) {
-                MarkupAttoParserUtil.parseCdata(buffer, offset, len, line, col, this);
-            }
-        }
+        MarkupAttoParserUtil.parseStructure(buffer, offset, len, line, col, this);
         
     }
     

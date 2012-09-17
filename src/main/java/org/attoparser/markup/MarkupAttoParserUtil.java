@@ -48,9 +48,25 @@ final class MarkupAttoParserUtil {
     
     
     
+    public static <T extends IAttoHandler & ICommentAttoHandling
+                                          & ICdataAttoHandling
+                                          & IElementAttoHandling> 
+            void parseStructure(
+            final char[] buffer, final int offset, final int len, 
+            final int line, final int col, final T handler)
+            throws AttoParseException {
+        
+        if (!MarkupAttoParserUtil.parseElement(buffer, offset, len, line, col, handler)) {
+            if (!MarkupAttoParserUtil.parseComment(buffer, offset, len, line, col, handler)) {
+                MarkupAttoParserUtil.parseCdata(buffer, offset, len, line, col, handler );
+            }
+        }
+        
+    }
     
     
-    public static <T extends IAttoHandler & ICommentAwareAttoHandling> boolean parseComment(
+    
+    public static <T extends IAttoHandler & ICommentAttoHandling> boolean parseComment(
             final char[] buffer, final int offset, final int len, 
             final int line, final int col, final T handler)
             throws AttoParseException {
@@ -72,7 +88,7 @@ final class MarkupAttoParserUtil {
 
     
     
-    public static <T extends IAttoHandler & ICdataAwareAttoHandling> boolean parseCdata(
+    public static <T extends IAttoHandler & ICdataAttoHandling> boolean parseCdata(
             final char[] buffer, final int offset, final int len, 
             final int line, final int col, final T handler)
             throws AttoParseException {
@@ -99,7 +115,7 @@ final class MarkupAttoParserUtil {
     
     
     
-    public static <T extends IAttoHandler & IElementAwareAttoHandling> boolean parseElement(
+    public static <T extends IAttoHandler & IElementAttoHandling> boolean parseElement(
             final char[] buffer, final int offset, final int len, 
             final int line, final int col, final T handler)
             throws AttoParseException {
@@ -123,7 +139,7 @@ final class MarkupAttoParserUtil {
     
     
     
-    public static <T extends IAttoHandler & IElementNameAndAttributeAwareHandling> 
+    public static <T extends IAttoHandler & IElementNameAndAttributeHandling> 
             boolean parseStandaloneElementNameAndAttributes(
             final char[] buffer, final int offset, final int len, 
             final int line, final int col, final T handler)
@@ -132,7 +148,7 @@ final class MarkupAttoParserUtil {
     }
     
     
-    public static <T extends IAttoHandler & IElementNameAndAttributeAwareHandling> 
+    public static <T extends IAttoHandler & IElementNameAndAttributeHandling> 
             boolean parseOpenElementNameAndAttributes(
             final char[] buffer, final int offset, final int len, 
             final int line, final int col, final T handler)
@@ -141,7 +157,7 @@ final class MarkupAttoParserUtil {
     }
     
     
-    public static <T extends IAttoHandler & IElementNameAndAttributeAwareHandling> 
+    public static <T extends IAttoHandler & IElementNameAndAttributeHandling> 
             boolean parseCloseElementNameAndAttributes(
             final char[] buffer, final int offset, final int len, 
             final int line, final int col, final T handler)
@@ -153,7 +169,7 @@ final class MarkupAttoParserUtil {
     }
     
     
-    private static <T extends IAttoHandler & IElementNameAndAttributeAwareHandling> 
+    private static <T extends IAttoHandler & IElementNameAndAttributeHandling> 
             boolean parseElementNameAndAttributes(
             final char[] buffer, final int offset, final int len, 
             final int line, final int col, final T handler, 
@@ -249,7 +265,7 @@ final class MarkupAttoParserUtil {
 
     
     
-    private static <T extends IAttoHandler & IElementNameAndAttributeAwareHandling> 
+    private static <T extends IAttoHandler & IElementNameAndAttributeHandling> 
             void parseAttribute(
             final char[] buffer, final int offset, final int len, final T handler, 
             final int attributeLine, final int attributeCol)

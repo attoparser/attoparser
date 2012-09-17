@@ -29,7 +29,7 @@ import org.attoparser.exception.AttoParseException;
  * @since 1.0
  *
  */
-public interface ICommentAwareAttoHandling {
+public interface ICommentAttoHandling {
 
     public void comment(final char[] buffer, final int offset, final int len, 
             final int line, final int col)
