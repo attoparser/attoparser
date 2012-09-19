@@ -19,7 +19,6 @@
  */
 package org.attoparser;
 
-import org.attoparser.exception.AttoParseException;
 
 
 

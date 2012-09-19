@@ -34,6 +34,10 @@ final class MarkupParsingLocator {
     private int col;
     
     
+    /*
+     * TODO Maybe removing the getters on line and col could make this faster?
+     */
+    
     MarkupParsingLocator() {
         super();
         this.line = 1;

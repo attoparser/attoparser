@@ -25,7 +25,6 @@ import java.io.StringWriter;
 import junit.framework.ComparisonFailure;
 import junit.framework.TestCase;
 
-import org.attoparser.exception.AttoParseException;
 import org.attoparser.markup.MarkupAttoParser;
 import org.attoparser.markup.TracingMarkupAttoHandler;
 
@@ -45,10 +44,12 @@ public class AttoParserTest extends TestCase {
 
     public void test() throws Exception {
 
+//        testDoc( 
+//                "Hello, <p>lala</p><?xml version=\"1.0\"?>",
+//                "[T(o, ){1,1}T(<p){1,4}]");
         testDoc( 
-            "Hello, <p>lala</p>",
-            "[T(o, ){1,1}T(<p){1,4}]",
-            4, 5);
+            "<h1>Hello</ h1>",
+            "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}T(Hello</ h1>){1,5}]");
         testDoc( 
             "Hello, World!",
             "[T(Hello, World!){1,1}]");
@@ -57,7 +58,28 @@ public class AttoParserTest extends TestCase {
             "[]");
         testDoc( 
             "<p>Hello</p>",
-            "[ES(p){1,1}T(Hello){1,4}EE(p){1,9}]");
+            "[OES(<){1,1}OEN(p){1,2}OEE(>){1,3}T(Hello){1,4}CES(</){1,9}CEN(p){1,11}CEE(>){1,12}]");
+        testDoc( 
+            "<h1>Hello</h1>",
+            "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}T(Hello){1,5}CES(</){1,10}CEN(h1){1,12}CEE(>){1,14}]");
+        testDoc( 
+            "<h1>Hello</h1 >",
+            "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}T(Hello){1,5}CES(</){1,10}CEN(h1){1,12}EW( ){1,14}CEE(>){1,15}]");
+        testDoc( 
+            "<h1>Hello</h1 \n\n>",
+            "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}T(Hello){1,5}CES(</){1,10}CEN(h1){1,12}EW( \n\n){1,14}CEE(>){3,1}]");
+        testDoc( 
+            "<\np  >Hello</p>",
+            "[T(<\np  >Hello){1,1}CES(</){2,10}CEN(p){2,12}CEE(>){2,13}]");
+        testDoc( 
+            "< h1  >Hello</h1>",
+            "[T(< h1  >Hello){1,1}CES(</){1,13}CEN(h1){1,15}CEE(>){1,17}]");
+        testDoc( 
+            "<h1>Hello</ h1>",
+            "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}T(Hello</ h1>){1,5}]");
+        testDoc( 
+            "< h1>Hello</ h1>",
+            "[T(< h1>Hello</ h1>){1,1}]");
         testDoc( 
             "Hello, World!",
             "[T(ello, Worl){1,1}]",
@@ -68,10 +90,10 @@ public class AttoParserTest extends TestCase {
             1, 1);
         testDoc( 
             "Hello, <p>lala</p>",
-            "[T(Hello, ){1,1}ES(p){1,8}T(lala){1,11}EE(p){1,15}]");
+            "[T(Hello, ){1,1}OES(<){1,8}OEN(p){1,9}OEE(>){1,10}T(lala){1,11}CES(</){1,15}CEN(p){1,17}CEE(>){1,18}]");
         testDoc( 
             "Hello, <p>lala</p>",
-            "[T(o, ){1,1}ES(p){1,4}T(l){1,7}]",
+            "[T(o, ){1,1}OES(<){1,4}OEN(p){1,5}OEE(>){1,6}T(l){1,7}]",
             4, 7);
         testDoc( 
             "Hello, <br/>",
@@ -87,13 +109,13 @@ public class AttoParserTest extends TestCase {
             "[T(Hello, ){1,1}E(br){1,8}A(th:text=\"ll\"){2,1}]");
         testDoc( 
             "Hello, World! <br/>\n<div\n l\n     a=\"12 3\" zas    o=\"\"  b=\"lelo\n  = s\">lala</div> <p th=\"lala\" >liool</p>",
-            "[T(Hello, World! ){1,1}E(br){1,15}T(\n){1,20}ES(div){2,1}A(l=\"\"){3,2}A(a=\"12 3\"){4,6}A(zas=\"\"){4,15}A(o=\"\"){4,22}A(b=\"lelo\n  = s\"){4,28}T(lala){5,8}EE(div){5,12}T( ){5,18}ES(p){5,19}A(th=\"lala\"){5,22}T(liool){5,33}EE(p){5,38}]");
+            "[T(Hello, World! ){1,1}E(br){1,15}T(\n){1,20}OES(<){1,1}OEN(div){2,1}A(l=\"\"){3,2}A(a=\"12 3\"){4,6}A(zas=\"\"){4,15}A(o=\"\"){4,22}A(b=\"lelo\n  = s\"){4,28}T(lala){5,8}OES(<){1,1}OEN(div){5,12}T( ){5,18}OES(<){1,1}OEN(p){5,19}A(th=\"lala\"){5,22}T(liool){5,33}OES(<){1,1}OEN(p){5,38}]");
         testDoc( 
             "Hello, World! <br/>\n<div\n l\n \n\n    a=\"12 3\" zas    o=\"\"  b=\"lelo\n  = s\">lala</div> <p th=\"lala\" >liool</p>",
-            "[T(Hello, World! ){1,1}E(br){1,15}T(\n){1,20}ES(div){2,1}A(l=\"\"){3,2}A(a=\"12 3\"){6,5}A(zas=\"\"){6,14}A(o=\"\"){6,21}A(b=\"lelo\n  = s\"){6,27}T(lala){7,8}EE(div){7,12}T( ){7,18}ES(p){7,19}A(th=\"lala\"){7,22}T(liool){7,33}EE(p){7,38}]");
+            "[T(Hello, World! ){1,1}E(br){1,15}T(\n){1,20}OES(<){1,1}OEN(div){2,1}A(l=\"\"){3,2}A(a=\"12 3\"){6,5}A(zas=\"\"){6,14}A(o=\"\"){6,21}A(b=\"lelo\n  = s\"){6,27}T(lala){7,8}OES(<){1,1}OEN(div){7,12}T( ){7,18}OES(<){1,1}OEN(p){7,19}A(th=\"lala\"){7,22}T(liool){7,33}OES(<){1,1}OEN(p){7,38}]");
         testDoc( 
             "Hello, World! <br/>\n<div\n l\n \n\n    a=\"12 3\" zas    o=\"\"\nb=\"lelo\n  = s\">lala</div> <p th=\"lala\" >liool</p>",
-            "[T(Hello, World! ){1,1}E(br){1,15}T(\n){1,20}ES(div){2,1}A(l=\"\"){3,2}A(a=\"12 3\"){6,5}A(zas=\"\"){6,14}A(o=\"\"){6,21}A(b=\"lelo\n  = s\"){7,1}T(lala){8,8}EE(div){8,12}T( ){8,18}ES(p){8,19}A(th=\"lala\"){8,22}T(liool){8,33}EE(p){8,38}]");
+            "[T(Hello, World! ){1,1}E(br){1,15}T(\n){1,20}OES(<){1,1}OEN(div){2,1}A(l=\"\"){3,2}A(a=\"12 3\"){6,5}A(zas=\"\"){6,14}A(o=\"\"){6,21}A(b=\"lelo\n  = s\"){7,1}T(lala){8,8}OES(<){1,1}OEN(div){8,12}T( ){8,18}OES(<){1,1}OEN(p){8,19}A(th=\"lala\"){8,22}T(liool){8,33}OES(<){1,1}OEN(p){8,38}]");
 
         testDoc( 
             "Hello<!--hi!-->, <br/>",
@@ -309,13 +331,13 @@ public class AttoParserTest extends TestCase {
                 "la \n&aacute; lasd &amp; aiass da & asdll . asi ua&$\" khj askjh 1 kh ak hhjh" +
                 "kljasdl kjaslkj asjqq9k fiuh 23kj hdfkjh assdflkjh lkjh fdfa\nsdfkjlh dfs" +
                 "llkd8u u \nhkkj asyu 4lk vl jhksajhd889p3rk sl a, alkj a9))sad l\nkjsalkja aslk" +
-                "la &aacute;\n lasd &amp;){1,1}ES(p){11,12}T( aiass da & asdll . asi ua&$\" khj askjh 1 kh ak hh\njh" +
+                "la &aacute;\n lasd &amp;){1,1}OES(<){1,1}OEN(p){11,12}T( aiass da & asdll . asi ua&$\" khj askjh 1 kh ak hh\njh" +
                 "kl\njasdl kjaslkj asjqq9\nk fiuh 23kj hdfkjh assd\nflkjh lkjh fdfasdfkjlh dfs" +
                 "llk\nd8u u hkkj asyu 4lk vl jhksajhd889p3rk sl a, alkj a9\n))sad lkjsalkja aslk" +
                 "la \n&aacute; lasd &amp; aiass da & asdll . asi ua&$\" khj askjh 1 kh ak hhjh" +
                 "kljasdl kjaslkj asjqq9k fiuh 23kj hdfkjh assdflkjh lkjh fdfa\nsdfkjlh dfs" +
                 "llkd8u u \nhkkj asyu 4lk vl jhksajhd889p3rk sl a, alkj a9))sad l\nkjsalkja aslk" +
-                "la &aacute;\n lasd &amp; aiass da & asdll . asi ua&$\"){11,15}EE(p){22,41}T( khj askjh 1 kh ak hh\njh" +
+                "la &aacute;\n lasd &amp; aiass da & asdll . asi ua&$\"){11,15}OES(<){1,1}OEN(p){22,41}T( khj askjh 1 kh ak hh\njh" +
                 "kl\njasdl kjaslkj asjqq9\nk fiuh 23kj hdfkjh assd\nflkjh lkjh fdfasdfkjlh dfs" +
                 "llk\nd8u u hkkj asyu 4lk vl jhksajhd889p3rk sl a, alkj a9\n))sad lkjsalkja aslk" +
                 "la \n&aacute; lasd &amp; aiass da & asdll . asi ua&$\" khj askjh 1 kh ak hhjh" +
@@ -348,7 +370,61 @@ public class AttoParserTest extends TestCase {
                 "la &aacute;\n lasd &amp; aiass da & asdll . asi ua&$\" khj askjh 1 kh ak hh\njh" +
                 "){22,45}]");
 
+        try {
+            testDoc( 
+                "Hello, <p>lala</p>",
+                "[T(o, ){1,1}T(<p){1,4}]",
+                4, 5);
+            
+            throw new ComparisonFailure(null, "exception", "no exception");
+            
+        } catch (final AttoParseException e) {
+            assertEquals(Integer.valueOf(1), e.getLine());
+            assertEquals(Integer.valueOf(4), e.getCol());
+        }
+        
+        try {
+            testDoc( 
+                "Hello, <!--lala-->",
+                "[T(o, ){1,1}T(<p){1,4}]",
+                4, 8);
+            
+            throw new ComparisonFailure(null, "exception", "no exception");
+            
+        } catch (final AttoParseException e) {
+            assertEquals(Integer.valueOf(1), e.getLine());
+            assertEquals(Integer.valueOf(4), e.getCol());
+        }
+        
+        testDoc( 
+            "Hello, <![CDATA[lala]]>",
+            "[T(o, <![CD){1,1}]",
+            4, 8);
+        try {
+            testDoc( 
+                "Hello, <![CDATA[lala]]>",
+                "[T(o, <![CDATA[){1,1}]",
+                4, 12);
+            
+            throw new ComparisonFailure(null, "exception", "no exception");
+            
+        } catch (final AttoParseException e) {
+            assertEquals(Integer.valueOf(1), e.getLine());
+            assertEquals(Integer.valueOf(4), e.getCol());
+        }
 
+        
+        testDoc( 
+                "<div class = \"lala\">",
+                "[OES(<){1,1}OEN(div){1,1}A(class){1,6}( = ){1,11}(\"lala\"){1,14}]");
+        testDoc( 
+                "<div class \n\n= \n\"lala\" li=\nlla>",
+                "[OES(<){1,1}OEN(div){1,1}A(class){1,6}( \n\n= \n){1,11}(\"lala\"){4,1}A(li){4,8}(=\n){4,10}(lla){5,1}]");
+        testDoc( 
+                "<div class \n\n= \n\"lala\"li=\nlla>",
+                "[OES(<){1,1}OEN(div){1,1}A(class){1,6}( \n\n= \n){1,11}(\"lala\"){4,1}A(li){4,7}(=\n){4,9}(lla){5,1}]");
+        
+        
         System.out.println("TOTAL Test executions: " + totalTestExecutions);
         
     }

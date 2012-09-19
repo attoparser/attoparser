@@ -19,7 +19,7 @@
  */
 package org.attoparser.markup;
 
-import org.attoparser.exception.AttoParseException;
+import org.attoparser.AttoParseException;
 
 
 /**
@@ -29,9 +29,12 @@ import org.attoparser.exception.AttoParseException;
  * @since 1.0
  *
  */
-public interface ICommentAttoHandling {
+public interface ICommentHandling {
 
-    public void comment(final char[] buffer, final int offset, final int len, 
+    public void comment(
+            final char[] buffer, 
+            final int innerOffset, final int innerLen,
+            final int outerOffset, final int outerLen,
             final int line, final int col)
             throws AttoParseException;
     

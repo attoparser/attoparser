@@ -21,7 +21,6 @@ package org.attoparser;
 
 import java.io.Reader;
 
-import org.attoparser.exception.AttoParseException;
 
 
 

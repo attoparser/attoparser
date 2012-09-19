@@ -21,7 +21,6 @@ package org.attoparser;
 
 import java.io.Reader;
 
-import org.attoparser.exception.AttoParseException;
 
 
 
@@ -79,23 +78,25 @@ public abstract class AbstractBufferedAttoParser extends AbstractAttoParser {
             int bufferContentSize = reader.read(buffer);
             boolean cont = (bufferContentSize != -1);
             
-            int lastArtifactStart = -1;
-            int lastArtifactLine = 1;
-            int lastArtifactCol = 1;
+            int bufferParseOffset = -1;
+            int bufferParseLine = 1;
+            int bufferParseCol = 1;
+            boolean bufferParseInStructure = false;
             
             while (cont) {
 
                 final BufferParseResult bufferParseResult = 
-                        parseBuffer(buffer, 0, bufferContentSize, handler, lastArtifactLine, lastArtifactCol);
+                        parseBuffer(buffer, 0, bufferContentSize, handler, bufferParseLine, bufferParseCol);
 
                 int readOffset = 0;
                 int readLen = bufferSize;
                 
-                lastArtifactStart = bufferParseResult.getLastArtifactStart();
-                lastArtifactLine = bufferParseResult.getLastArtifactLine();
-                lastArtifactCol = bufferParseResult.getLastArtifactCol();
+                bufferParseOffset = bufferParseResult.getOffset();
+                bufferParseLine = bufferParseResult.getLine();
+                bufferParseCol = bufferParseResult.getCol();
+                bufferParseInStructure = bufferParseResult.isInStructure();
                 
-                if (lastArtifactStart == 0) {
+                if (bufferParseOffset == 0) {
                     
                     if (bufferContentSize == bufferSize) {
                         // Buffer is not big enough, double it! 
@@ -110,16 +111,16 @@ public abstract class AbstractBufferedAttoParser extends AbstractAttoParser {
                         
                     }
                     
-                } else if (lastArtifactStart < bufferContentSize) {
+                } else if (bufferParseOffset < bufferContentSize) {
                     
-                    for (int i = lastArtifactStart; i < bufferContentSize; i++) {
-                        buffer[i - lastArtifactStart] = buffer[i];
+                    for (int i = bufferParseOffset; i < bufferContentSize; i++) {
+                        buffer[i - bufferParseOffset] = buffer[i];
                     }
                     
-                    readOffset = bufferContentSize - lastArtifactStart;
+                    readOffset = bufferContentSize - bufferParseOffset;
                     readLen = bufferSize - readOffset;
                     
-                    lastArtifactStart = 0;
+                    bufferParseOffset = 0;
                     bufferContentSize = readOffset;
                     
                 }
@@ -133,10 +134,14 @@ public abstract class AbstractBufferedAttoParser extends AbstractAttoParser {
 
             }
 
-            final int lastStart = lastArtifactStart;
+            final int lastStart = bufferParseOffset;
             final int lastLen = bufferContentSize - lastStart; 
             if (lastLen > 0) {
-                handler.text(buffer, lastStart, lastLen, lastArtifactLine, lastArtifactCol);
+                if (bufferParseInStructure) {
+                    throw new AttoParseException(
+                            "Incomplete structure: \"" + new String(buffer, lastStart, lastLen) + "\"", bufferParseLine, bufferParseCol);
+                }
+                handler.text(buffer, lastStart, lastLen, bufferParseLine, bufferParseCol);
             }
             
             handler.endDocument();
@@ -165,30 +170,36 @@ public abstract class AbstractBufferedAttoParser extends AbstractAttoParser {
     
     
 
-    protected static final class BufferParseResult {
+    public static final class BufferParseResult {
         
-        private final int lastArtifactStart;
-        private final int lastArtifactLine;
-        private final int lastArtifactCol;
+        private final int offset;
+        private final int line;
+        private final int col;
+        private final boolean inStructure;
         
         
-        public BufferParseResult(final int lastArtifactStart, final int lastArtifactLine, final int lastArtifactCol) {
+        public BufferParseResult(final int offset, final int line, final int col, final boolean inStructure) {
             super();
-            this.lastArtifactStart = lastArtifactStart;
-            this.lastArtifactLine = lastArtifactLine;
-            this.lastArtifactCol = lastArtifactCol;
+            this.offset = offset;
+            this.line = line;
+            this.col = col;
+            this.inStructure = inStructure;
         }
         
-        public int getLastArtifactStart() {
-            return this.lastArtifactStart;
+        public int getOffset() {
+            return this.offset;
         }
 
-        public int getLastArtifactLine() {
-            return this.lastArtifactLine;
+        public int getLine() {
+            return this.line;
         }
 
-        public int getLastArtifactCol() {
-            return this.lastArtifactCol;
+        public int getCol() {
+            return this.col;
+        }
+
+        public boolean isInStructure() {
+            return this.inStructure;
         }
     
     }

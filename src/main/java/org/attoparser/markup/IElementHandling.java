@@ -19,7 +19,7 @@
  */
 package org.attoparser.markup;
 
-import org.attoparser.exception.AttoParseException;
+import org.attoparser.AttoParseException;
 
 
 /**
@@ -29,10 +29,27 @@ import org.attoparser.exception.AttoParseException;
  * @since 1.0
  *
  */
-public interface ICdataAttoHandling {
+public interface IElementHandling {
 
-    public void cdata(final char[] buffer, final int offset, final int len, 
-            final int line, final int col) 
+    public void standaloneElement(
+            final char[] buffer, 
+            final int innerOffset, final int innerLen,
+            final int outerOffset, final int outerLen,
+            final int line, final int col)
+            throws AttoParseException;
+    
+    public void openElement(
+            final char[] buffer, 
+            final int innerOffset, final int innerLen,
+            final int outerOffset, final int outerLen,
+            final int line, final int col)
+            throws AttoParseException;
+    
+    public void closeElement(
+            final char[] buffer, 
+            final int innerOffset, final int innerLen,
+            final int outerOffset, final int outerLen,
+            final int line, final int col)
             throws AttoParseException;
     
 }

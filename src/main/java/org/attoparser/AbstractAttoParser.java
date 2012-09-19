@@ -22,7 +22,6 @@ package org.attoparser;
 import java.io.CharArrayReader;
 import java.io.StringReader;
 
-import org.attoparser.exception.AttoParseException;
 
 
 

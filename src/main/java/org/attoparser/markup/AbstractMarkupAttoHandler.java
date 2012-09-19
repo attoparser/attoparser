@@ -19,8 +19,8 @@
  */
 package org.attoparser.markup;
 
-import org.attoparser.exception.AttoParseException;
-
+import org.attoparser.AbstractAttoHandler;
+import org.attoparser.AttoParseException;
 
 
 
@@ -34,8 +34,8 @@ import org.attoparser.exception.AttoParseException;
  *
  */
 public abstract class AbstractMarkupAttoHandler 
-        extends AbstractBasicMarkupAttoHandler
-        implements IElementNameAndAttributeHandling {
+        extends AbstractAttoHandler
+        implements ICdataHandling, ICommentHandling, IElementHandling {
 
 
     
@@ -43,70 +43,80 @@ public abstract class AbstractMarkupAttoHandler
         super();
     }
 
-    
+
+
     @Override
-    public final void standaloneElement(final char[] buffer, final int offset, final int len, 
-            final int line, final int col) 
-            throws AttoParseException {
-
-        MarkupAttoParserUtil.parseStandaloneElementNameAndAttributes(buffer, offset, len, line, col, this);
-        
-    }
-
-    
-    @Override
-    public final void openElement(final char[] buffer, final int offset, final int len, 
-            final int line, final int col) 
-            throws AttoParseException {
-
-        MarkupAttoParserUtil.parseOpenElementNameAndAttributes(buffer, offset, len, line, col, this);
-        
-    }
-
-    
-    @Override
-    public final void closeElement(final char[] buffer, final int offset, final int len, 
+    public final void structure(
+            final char[] buffer,
+            final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
-
-        MarkupAttoParserUtil.parseCloseElementNameAndAttributes(buffer, offset, len, line, col, this);
-
+        MarkupParsingUtil.parseStructure(buffer, offset, len, line, col, this);
     }
-
     
-
     
-    public void standaloneElementName(
-            final char[] buffer, final int offset, final int len,
-            final int line, final int col) 
+    
+    public void standaloneElement(
+            final char[] buffer, 
+            final int innerOffset, final int innerLen,
+            final int outerOffset, final int outerLen, 
+            final int line, final int col)
             throws AttoParseException {
-        // Nothing to be done here
+        // Nothing to be done here, meant to be overridden if required
+    }
+
+
+    public void openElement(
+            final char[] buffer, 
+            final int innerOffset, final int innerLen,
+            final int outerOffset, final int outerLen,
+            final int line, final int col)
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
     }
 
     
-    public void openElementName(
-            final char[] buffer, final int offset, final int len, 
-            final int line, final int col) 
+    public void closeElement(
+            final char[] buffer, 
+            final int innerOffset, final int innerLen,
+            final int outerOffset, final int outerLen, 
+            final int line, final int col)
             throws AttoParseException {
-        // Nothing to be done here
+        // Nothing to be done here, meant to be overridden if required
     }
 
     
-    public void closeElementName(
-            final char[] buffer, final int offset, final int len, 
-            final int line, final int col) 
+    public void comment(
+            final char[] buffer, 
+            final int innerOffset, final int innerLen,
+            final int outerOffset, final int outerLen, 
+            final int line, final int col)
             throws AttoParseException {
-        // Nothing to be done here
+        // Nothing to be done here, meant to be overridden if required
     }
 
     
-    public void elementAttribute(
-            final char[] nameBuffer, final int nameOffset, final int nameLen, 
-            final char[] valueBuffer, final int valueOffset, final int valueLen,
-            final int line, final int col) 
+    public void cdata(
+            final char[] buffer, 
+            final int innerOffset, final int innerLen,
+            final int outerOffset, final int outerLen, 
+            final int line, final int col)
             throws AttoParseException {
-        // Nothing to be done here
+        // Nothing to be done here, meant to be overridden if required
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     

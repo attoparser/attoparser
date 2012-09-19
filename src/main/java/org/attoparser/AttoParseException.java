@@ -17,7 +17,7 @@
  * 
  * =============================================================================
  */
-package org.attoparser.exception;
+package org.attoparser;
 
 
 
@@ -44,9 +44,17 @@ public class AttoParseException extends Exception {
     }
 
     public AttoParseException(final String message, final Throwable throwable) {
-        super(message, throwable);
-        this.line = null;
-        this.col = null;
+        
+        super(message(message, throwable), throwable);
+        
+        if (throwable != null && throwable instanceof AttoParseException) {
+            this.line = ((AttoParseException)throwable).getLine();
+            this.col = ((AttoParseException)throwable).getCol();
+        } else {
+            this.line = null;
+            this.col = null;
+        }
+        
     }
 
     public AttoParseException(final String message) {
@@ -56,9 +64,17 @@ public class AttoParseException extends Exception {
     }
 
     public AttoParseException(final Throwable throwable) {
-        super(throwable);
-        this.line = null;
-        this.col = null;
+        
+        super(message(null, throwable), throwable);
+        
+        if (throwable != null && throwable instanceof AttoParseException) {
+            this.line = ((AttoParseException)throwable).getLine();
+            this.col = ((AttoParseException)throwable).getCol();
+        } else {
+            this.line = null;
+            this.col = null;
+        }
+        
     }
     
 
@@ -87,9 +103,36 @@ public class AttoParseException extends Exception {
     }
 
     
+    
+    
     private static String messagePrefix(final int line, final int col) {
         return "(Line = " + line + ", Column = " + col + ")"; 
     }
+    
+    
+    
+    private static String message(final String message, final Throwable throwable) {
+        
+        if (throwable != null && throwable instanceof AttoParseException) {
+            
+            final AttoParseException exception = (AttoParseException)throwable;
+            if (exception.getLine() != null && exception.getCol() != null) {
+                return "(Line = " + exception.getLine() + ", Column = " + exception.getCol() + ")" + 
+                        (message != null? (" " + message) : throwable.getMessage()); 
+            }
+
+        }
+        if (message != null) {
+            return message;
+        }
+        if (throwable != null) {
+            return throwable.getMessage();
+        }
+        return null;
+        
+    }
+    
+    
     
     
     
