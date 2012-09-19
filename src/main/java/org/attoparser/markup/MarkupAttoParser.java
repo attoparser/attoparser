@@ -54,8 +54,8 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
 
         MarkupParsingLocator locator = new MarkupParsingLocator(line, col);
         
-        int currentLine = locator.getLine();
-        int currentCol = locator.getCol();
+        int currentLine = locator.line;
+        int currentCol = locator.col;
         
         final int maxi = offset + len;
         int i = offset;
@@ -73,8 +73,8 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
         
         while (i < maxi) {
             
-            currentLine = locator.getLine();
-            currentCol = locator.getCol();
+            currentLine = locator.line;
+            currentCol = locator.col;
             
             inStructure =
                     (inOpenElement || inCloseElement || inComment || inCdata);
@@ -106,7 +106,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                     // We found a '<', but it cannot be considered a tag because it is not
                     // the beginning of any known structure
                     
-                    locator.countChar(buffer[tagStart]);
+                    MarkupParsingLocator.countChar(locator, buffer[tagStart]);
                     tagStart = MarkupParsingUtil.findNext(buffer, tagStart + 1, maxi, '<', false, locator);
                     
                     if (tagStart == -1) {
@@ -171,7 +171,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                     while (tagEnd - current < 7 || buffer[tagEnd - 1] != '-' || buffer[tagEnd - 2] != '-') {
                         // the '>' we chose is not the comment-closing one. Let's find again
                         
-                        locator.countChar(buffer[tagEnd]);
+                        MarkupParsingLocator.countChar(locator, buffer[tagEnd]);
                         tagEnd = MarkupParsingUtil.findNext(buffer, tagEnd + 1, maxi, '>', false, locator);
                         
                         if (tagEnd == -1) {
@@ -189,7 +189,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                     while (tagEnd - current < 12 || buffer[tagEnd - 1] != ']' || buffer[tagEnd - 2] != ']') {
                         // the '>' we chose is not the comment-closing one. Let's find again
                         
-                        locator.countChar(buffer[tagEnd]);
+                        MarkupParsingLocator.countChar(locator, buffer[tagEnd]);
                         tagEnd = MarkupParsingUtil.findNext(buffer, tagEnd + 1, maxi, '>', false, locator);
                         
                         if (tagEnd == -1) {
@@ -209,7 +209,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                 }
                 
                 // The '>' char will be considered as processed too
-                locator.countChar(buffer[tagEnd]);
+                MarkupParsingLocator.countChar(locator, buffer[tagEnd]);
                 
                 current = tagEnd + 1;
                 i = current;
@@ -218,7 +218,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
             
         }
         
-        return new BufferParseResult(current, locator.getLine(), locator.getCol(), false);
+        return new BufferParseResult(current, locator.line, locator.col, false);
         
     }
     

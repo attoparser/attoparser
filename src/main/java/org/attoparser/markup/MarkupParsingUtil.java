@@ -33,11 +33,6 @@ import org.attoparser.AttoParseException;
 public final class MarkupParsingUtil {
 
     
-    static final char CHAR_OPERATOR_WILDCARD = '\u02AC';
-    static final char CHAR_NONOPERATOR_WILDCARD = '\u02AD';
-    static final char CHAR_NONWHITESPACE_WILDCARD = '\u02AE';
-    static final char CHAR_WHITESPACE_WILDCARD = '\u02AF';
-
     static final char[] EMPTY_CHAR_ARRAY = new char[0];
 
 
@@ -350,7 +345,7 @@ public final class MarkupParsingUtil {
          */
         
         final int elementNameEnd = 
-            findNext(buffer, innerOffset, maxi, CHAR_WHITESPACE_WILDCARD, true, elementBreakdownLocator);
+            findNextWhitespaceCharWildcard(buffer, innerOffset, maxi, true, elementBreakdownLocator);
         
         if (elementNameEnd == -1) {
             // The buffer only contains the element name
@@ -361,14 +356,14 @@ public final class MarkupParsingUtil {
                         line, col + 1);
                 handler.standaloneElementEnd(
                         buffer, (outerOffset + outerLen - 2), 2, 
-                        elementBreakdownLocator.getLine(), elementBreakdownLocator.getCol());
+                        elementBreakdownLocator.line, elementBreakdownLocator.col);
             } else {
                 handler.openElementName(
                         buffer, innerOffset, innerLen, 
                         line, col + 1);
                 handler.openElementEnd(
                         buffer, (outerOffset + outerLen - 1), 1, 
-                        elementBreakdownLocator.getLine(), elementBreakdownLocator.getCol());
+                        elementBreakdownLocator.line, elementBreakdownLocator.col);
             }
             
             return true;
@@ -390,8 +385,8 @@ public final class MarkupParsingUtil {
         int i = elementNameEnd;
         int current = i;
 
-        int currentArtifactLine = elementBreakdownLocator.getLine();
-        int currentArtifactCol = elementBreakdownLocator.getCol();
+        int currentArtifactLine = elementBreakdownLocator.line;
+        int currentArtifactCol = elementBreakdownLocator.col;
         
         while (i < maxi) {
 
@@ -399,11 +394,11 @@ public final class MarkupParsingUtil {
              * STEP ONE: Look for whitespaces between attributes
              */
 
-            currentArtifactLine = elementBreakdownLocator.getLine();
-            currentArtifactCol = elementBreakdownLocator.getCol();
+            currentArtifactLine = elementBreakdownLocator.line;
+            currentArtifactCol = elementBreakdownLocator.col;
             
             final int wsEnd = 
-                    findNext(buffer, i, maxi, CHAR_NONWHITESPACE_WILDCARD, false, elementBreakdownLocator);
+                    findNextNonWhitespaceCharWildcard(buffer, i, maxi, elementBreakdownLocator);
             
             if (wsEnd == -1) {
                 // Everything is whitespace until the end of the tag
@@ -432,11 +427,11 @@ public final class MarkupParsingUtil {
              */
 
             
-            currentArtifactLine = elementBreakdownLocator.getLine();
-            currentArtifactCol = elementBreakdownLocator.getCol();
+            currentArtifactLine = elementBreakdownLocator.line;
+            currentArtifactCol = elementBreakdownLocator.col;
             
             final int attributeNameEnd = 
-                findNext(buffer, i, maxi, CHAR_OPERATOR_WILDCARD, false, elementBreakdownLocator);
+                    findNextOperatorCharWildcard(buffer, i, maxi, elementBreakdownLocator);
             
             if (attributeNameEnd == -1) {
                 // This is a no-value and no-equals-sign attribute, equivalent to value = ""
@@ -449,10 +444,10 @@ public final class MarkupParsingUtil {
                         currentArtifactLine, currentArtifactCol,                              // name
                         EMPTY_CHAR_ARRAY,                                                     // operator
                         0, 0,                                                                 // operator
-                        elementBreakdownLocator.getLine(), elementBreakdownLocator.getCol(),  // operator
+                        elementBreakdownLocator.line, elementBreakdownLocator.col,  // operator
                         EMPTY_CHAR_ARRAY,                                                     // value
                         0, 0, 0, 0,                                                           // value
-                        elementBreakdownLocator.getLine(), elementBreakdownLocator.getCol()); // value
+                        elementBreakdownLocator.line, elementBreakdownLocator.col); // value
                 i = maxi;
                 continue;
                 
@@ -478,11 +473,11 @@ public final class MarkupParsingUtil {
              */
 
             
-            currentArtifactLine = elementBreakdownLocator.getLine();
-            currentArtifactCol = elementBreakdownLocator.getCol();
+            currentArtifactLine = elementBreakdownLocator.line;
+            currentArtifactCol = elementBreakdownLocator.col;
 
             final int operatorEnd = 
-                findNext(buffer, i, maxi, CHAR_NONOPERATOR_WILDCARD, false, elementBreakdownLocator);
+                    findNextNonOperatorCharWildcard(buffer, i, maxi, elementBreakdownLocator);
             
             if (operatorEnd == -1) {
                 // This could be: 
@@ -513,7 +508,7 @@ public final class MarkupParsingUtil {
                             currentArtifactLine, currentArtifactCol,                               // operator
                             EMPTY_CHAR_ARRAY,                                                      // value
                             0, 0, 0, 0,                                                            // value
-                            elementBreakdownLocator.getLine(), elementBreakdownLocator.getCol());  // value
+                            elementBreakdownLocator.line, elementBreakdownLocator.col);  // value
                     
                 } else {
                     // There is no "=", so we will first output the attribute with no
@@ -544,13 +539,47 @@ public final class MarkupParsingUtil {
             }
 
             
+            boolean equalsPresent = false;
+            for (int j = current; j < operatorEnd; j++) {
+                if (buffer[j] == '=') {
+                    equalsPresent = true;
+                    break;
+                }
+            }
+            
+            if (!equalsPresent) {
+                // It is not an operator, but a whitespace between this and the next attribute,
+                // so we will first output the attribute with no operator and then a whitespace
+                
+                handler.elementAttribute(
+                        buffer,                                                                // name 
+                        attributeNameOffset, attributeNameLen,                                 // name 
+                        attributeNameLine, attributeNameCol,                                   // name
+                        EMPTY_CHAR_ARRAY,                                                      // operator
+                        0, 0,                                                                  // operator 
+                        currentArtifactLine, currentArtifactCol,                               // operator
+                        EMPTY_CHAR_ARRAY,                                                      // value
+                        0, 0, 0, 0,                                                            // value
+                        currentArtifactLine, currentArtifactCol);                              // value
+                
+                handler.elementWhitespace(
+                        buffer, 
+                        current, (operatorEnd - current), 
+                        currentArtifactLine, currentArtifactCol);
+                
+                i = operatorEnd;
+                current = i;
+                continue;
+                
+            }
+
+            
             final int operatorOffset = current;
             final int operatorLen = operatorEnd - current;
             final int operatorLine = currentArtifactLine;
             final int operatorCol = currentArtifactCol;
             i = operatorEnd;
             current = i;
-            
             
 
             
@@ -559,11 +588,14 @@ public final class MarkupParsingUtil {
              */
 
             
-            currentArtifactLine = elementBreakdownLocator.getLine();
-            currentArtifactCol = elementBreakdownLocator.getCol();
+            currentArtifactLine = elementBreakdownLocator.line;
+            currentArtifactCol = elementBreakdownLocator.col;
 
-            final int valueEnd = 
-                findNext(buffer, i, maxi, CHAR_WHITESPACE_WILDCARD, true, elementBreakdownLocator);
+            final boolean attributeEndsWithQuotes = (i < maxi && buffer[current] == '"');
+            final int valueEnd =
+                (attributeEndsWithQuotes?
+                        findNextAnyCharAvoidQuotesWildcard(buffer, i, maxi, elementBreakdownLocator) :
+                        findNextWhitespaceCharWildcard(buffer, i, maxi, false, elementBreakdownLocator));
             
             if (valueEnd == -1) {
                 // This value ends the attribute
@@ -582,7 +614,7 @@ public final class MarkupParsingUtil {
                 handler.elementAttribute(
                         buffer,                                                               // name 
                         attributeNameOffset, attributeNameLen,                                // name
-                        currentArtifactLine, currentArtifactCol,                              // name
+                        attributeNameLine, attributeNameCol,                                  // name
                         buffer,                                                               // operator
                         operatorOffset, operatorLen,                                          // operator
                         operatorLine, operatorCol,                                            // operator
@@ -609,7 +641,7 @@ public final class MarkupParsingUtil {
             handler.elementAttribute(
                     buffer,                                                               // name 
                     attributeNameOffset, attributeNameLen,                                // name
-                    currentArtifactLine, currentArtifactCol,                              // name
+                    attributeNameLine, attributeNameCol,                                  // name
                     buffer,                                                               // operator
                     operatorOffset, operatorLen,                                          // operator
                     operatorLine, operatorCol,                                            // operator
@@ -625,11 +657,11 @@ public final class MarkupParsingUtil {
         if (isStandalone) {
             handler.standaloneElementEnd(
                     buffer, (outerOffset + outerLen - 2), 2, 
-                    line, col);
+                    elementBreakdownLocator.line, elementBreakdownLocator.col);
         } else {
             handler.openElementEnd(
                     buffer, (outerOffset + outerLen - 1), 1, 
-                    line, col);
+                    elementBreakdownLocator.line, elementBreakdownLocator.col);
         }
         
         return true;
@@ -658,7 +690,7 @@ public final class MarkupParsingUtil {
          */
         
         final int elementNameEnd = 
-            findNext(buffer, innerOffset, maxi, CHAR_WHITESPACE_WILDCARD, true, elementBreakdownLocator);
+            findNextWhitespaceCharWildcard(buffer, innerOffset, maxi, true, elementBreakdownLocator);
         
         if (elementNameEnd == -1) {
             // The buffer only contains the element name
@@ -668,7 +700,7 @@ public final class MarkupParsingUtil {
                     line, col + 2);
             handler.closeElementEnd(
                     buffer, (outerOffset + outerLen - 1), 1, 
-                    elementBreakdownLocator.getLine(), elementBreakdownLocator.getCol());
+                    elementBreakdownLocator.line, elementBreakdownLocator.col);
             
             return true;
             
@@ -683,11 +715,11 @@ public final class MarkupParsingUtil {
         int i = elementNameEnd;
         int current = i;
 
-        int currentArtifactLine = elementBreakdownLocator.getLine();
-        int currentArtifactCol = elementBreakdownLocator.getCol();
+        int currentArtifactLine = elementBreakdownLocator.line;
+        int currentArtifactCol = elementBreakdownLocator.col;
         
         final int wsEnd = 
-                findNext(buffer, i, maxi, CHAR_NONWHITESPACE_WILDCARD, false, elementBreakdownLocator);
+            findNextNonWhitespaceCharWildcard(buffer, i, maxi, elementBreakdownLocator);
         
         if (wsEnd != -1) {
             // This is a close tag, so everything should be whitespace
@@ -702,7 +734,7 @@ public final class MarkupParsingUtil {
         
         handler.closeElementEnd(
                 buffer, (outerOffset + outerLen - 1), 1, 
-                elementBreakdownLocator.getLine(), elementBreakdownLocator.getCol());
+                elementBreakdownLocator.line, elementBreakdownLocator.col);
         
         return true;
         
@@ -767,22 +799,128 @@ public final class MarkupParsingUtil {
         for (int i = offset; i < maxi; i++) {
             
             final char c = text[i];
-            final boolean isWhitespace = Character.isWhitespace(c);
             
             if (avoidQuotes && c == '"') {
                 inQuotes = !inQuotes;
-            } else if (!inQuotes &&
-                       ((target == CHAR_WHITESPACE_WILDCARD && isWhitespace) ||
-                        (target == CHAR_NONWHITESPACE_WILDCARD && !isWhitespace) ||
-                        (target == CHAR_OPERATOR_WILDCARD && (isWhitespace || c == '=')) ||
-                        (target == CHAR_NONOPERATOR_WILDCARD && (!isWhitespace && c != '=')) ||
-                        (c == target))) {
+            } else if (!inQuotes && c == target) {
                 return i;
             }
 
-            if (locator != null) {
-                locator.countChar(c);
+            MarkupParsingLocator.countChar(locator, c);
+            
+        }
+            
+        return -1;
+        
+    }
+
+    
+    static int findNextWhitespaceCharWildcard(
+            final char[] text, final int offset, final int maxi, 
+            final boolean avoidQuotes, final MarkupParsingLocator locator) {
+        
+        boolean inQuotes = false;
+
+        for (int i = offset; i < maxi; i++) {
+            
+            final char c = text[i];
+            final boolean isWhitespace = (!inQuotes && Character.isWhitespace(c));
+            
+            if (avoidQuotes && c == '"') {
+                inQuotes = !inQuotes;
+            } else if (!inQuotes && isWhitespace) {
+                return i;
             }
+
+            MarkupParsingLocator.countChar(locator, c);
+            
+        }
+            
+        return -1;
+        
+    }
+
+    
+    static int findNextNonWhitespaceCharWildcard(
+            final char[] text, final int offset, final int maxi, 
+            final MarkupParsingLocator locator) {
+        
+        for (int i = offset; i < maxi; i++) {
+            
+            final char c = text[i];
+            
+            if (!Character.isWhitespace(c)) {
+                return i;
+            }
+
+            MarkupParsingLocator.countChar(locator, c);
+            
+        }
+            
+        return -1;
+        
+    }
+
+    
+    static int findNextOperatorCharWildcard(
+            final char[] text, final int offset, final int maxi,  
+            final MarkupParsingLocator locator) {
+        
+        for (int i = offset; i < maxi; i++) {
+            
+            final char c = text[i];
+            
+            if (c == '=' || Character.isWhitespace(c)) {
+                return i;
+            }
+
+            MarkupParsingLocator.countChar(locator, c);
+            
+        }
+            
+        return -1;
+        
+    }
+
+    
+    static int findNextNonOperatorCharWildcard(
+            final char[] text, final int offset, final int maxi, 
+            final MarkupParsingLocator locator) {
+        
+        for (int i = offset; i < maxi; i++) {
+            
+            final char c = text[i];
+            
+            if (c != '=' && !Character.isWhitespace(c)) {
+                return i;
+            }
+
+            MarkupParsingLocator.countChar(locator, c);
+            
+        }
+            
+        return -1;
+        
+    }
+
+    
+    static int findNextAnyCharAvoidQuotesWildcard(
+            final char[] text, final int offset, final int maxi,  
+            final MarkupParsingLocator locator) {
+        
+        boolean inQuotes = false;
+
+        for (int i = offset; i < maxi; i++) {
+            
+            final char c = text[i];
+            
+            if (c == '"') {
+                inQuotes = !inQuotes;
+            } else if (!inQuotes) {
+                return i;
+            }
+
+            MarkupParsingLocator.countChar(locator, c);
             
         }
             

@@ -30,13 +30,9 @@ package org.attoparser.markup;
  */
 final class MarkupParsingLocator {
     
-    private int line;
-    private int col;
+    public int line;
+    public int col;
     
-    
-    /*
-     * TODO Maybe removing the getters on line and col could make this faster?
-     */
     
     MarkupParsingLocator() {
         super();
@@ -50,20 +46,12 @@ final class MarkupParsingLocator {
         this.col = col;
     }
 
-    public int getLine() {
-        return this.line;
-    }
-
-    public int getCol() {
-        return this.col;
-    }
-    
-    public void countChar(final char c) {
+    public static void countChar(final MarkupParsingLocator locator, final char c) {
         if (c == '\n') {
-            this.line++;
-            this.col = 1;
+            locator.line++;
+            locator.col = 1;
         } else {
-            this.col++;
+            locator.col++;
         }
     }
     
