@@ -93,14 +93,12 @@ public interface IElementBreakDownHandling {
     
     
     public void elementAttribute(
-            final char[] nameBuffer,
+            final char[] buffer,
             final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol,
-            final char[] operatorBuffer,
             final int operatorOffset, final int operatorLen,
             final int operatorLine, final int operatorCol,
-            final char[] valueBuffer,
-            final int valueInnerOffset, final int valueInnerLen,
+            final int valueContentOffset, final int valueContentLen,
             final int valueOuterOffset, final int valueOuterLen,
             final int valueLine, final int valueCol)
             throws AttoParseException;

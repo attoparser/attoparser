@@ -162,6 +162,9 @@ public class AttoParserTest extends TestCase {
         testDoc( 
             "Hello<!--hi!-->, <br/>",
             "[T(Hello){1,1}C(hi!){1,6}T(, ){1,16}SES(<){1,18}SEN(br){1,19}SEE(/>){1,21}]");
+        testDoc( 
+            "Hello<!--hi\"!-->, <br/>",
+            "[T(Hello){1,1}C(hi\"!){1,6}T(, ){1,17}SES(<){1,19}SEN(br){1,20}SEE(/>){1,22}]");
 
         testDoc( 
             "Hello<!-- 4 > 3 -->, <br/>",
@@ -175,6 +178,9 @@ public class AttoParserTest extends TestCase {
         testDoc( 
             "Hello<![CDATA[ 4 > 3\n > 10 ]]>, <br/>",
             "[T(Hello){1,1}D( 4 > 3\n > 10 ){1,6}T(, ){2,10}SES(<){2,12}SEN(br){2,13}SEE(/>){2,15}]");
+        testDoc( 
+            "Hello<![CDATA[ 4 > 3\n \"> 10 ]]>, <br/>",
+            "[T(Hello){1,1}D( 4 > 3\n \"> 10 ){1,6}T(, ){2,11}SES(<){2,13}SEN(br){2,14}SEE(/>){2,16}]");
         testDoc( 
             "Hello<![CDATA[ 4 > 3 > 10 ]]>, <br/>",
             "[T(Hello){1,1}D( 4 > 3 > 10 ){1,6}T(, ){1,30}SES(<){1,32}SEN(br){1,33}SEE(/>){1,35}]");
@@ -383,76 +389,147 @@ public class AttoParserTest extends TestCase {
             "la &aacute;\n lasd &amp; aiass da & asdll . asi ua&$\" khj askjh 1 kh ak hh\njh" +
             "){22,45}]");
 
-        try {
-            testDoc( 
-                "Hello, <p>lala</p>",
-                "[T(o, ){1,1}OES(<){1,4}OEN(p){1,5}]",
-                4, 5);
-            
-            throw new ComparisonFailure(null, "exception", "no exception");
-            
-        } catch (final AttoParseException e) {
-            assertEquals(Integer.valueOf(1), e.getLine());
-            assertEquals(Integer.valueOf(4), e.getCol());
-        }
+        testDocError( 
+            "Hello, <p>lala</p>",
+            "[T(o, ){1,1}OES(<){1,4}OEN(p){1,5}]",
+            4, 5, 
+            1, 4);
         
-        try {
-            testDoc( 
-                "Hello, <!--lala-->",
-                "[T(o, ){1,1}C(lala){1,4}]",
-                4, 8);
-            
-            throw new ComparisonFailure(null, "exception", "no exception");
-            
-        } catch (final AttoParseException e) {
-            assertEquals(Integer.valueOf(1), e.getLine());
-            assertEquals(Integer.valueOf(4), e.getCol());
-        }
+        testDocError( 
+            "Hello, <!--lala-->",
+            "[T(o, ){1,1}C(lala){1,4}]",
+            4, 8,
+            1, 4);
         
         testDoc( 
             "Hello, <![CDATA[lala]]>",
             "[T(o, <![CD){1,1}]",
             4, 8);
-        try {
-            testDoc( 
-                "Hello, <![CDATA[lala]]>",
-                "[T(o, <![CDATA[){1,1}]",
-                4, 12);
-            
-            throw new ComparisonFailure(null, "exception", "no exception");
-            
-        } catch (final AttoParseException e) {
-            assertEquals(Integer.valueOf(1), e.getLine());
-            assertEquals(Integer.valueOf(4), e.getCol());
-        }
 
-        try {
-            testDoc( 
-                    "Hello, <br th:text = \"a= b/>",
-                    "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}EW( ){1,11}A(th:text){1,12}( = ){1,19}(\"a= b){1,22}SEE(/>){1,27}]");
-            
-            throw new ComparisonFailure(null, "exception", "no exception");
-            
-        } catch (final AttoParseException e) {
-            assertEquals(Integer.valueOf(1), e.getLine());
-            assertEquals(Integer.valueOf(8), e.getCol());
-        }
+        testDocError( 
+            "Hello, <![CDATA[lala]]>",
+            "[T(o, <![CDATA[){1,1}]",
+            4, 12, 
+            1, 4);
+
+        testDocError( 
+            "Hello, <br th:text = \"a= b/>",
+            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}EW( ){1,11}A(th:text){1,12}( = ){1,19}(\"a= b){1,22}SEE(/>){1,27}]",
+            1, 8);
         
         testDoc( 
-                "<div class = \"lala\">",
-                "[OES(<){1,1}OEN(div){1,2}EW( ){1,5}A(class){1,6}( = ){1,11}(\"lala\"){1,14}OEE(>){1,20}]");
+            "<div class = \"lala\">",
+            "[OES(<){1,1}OEN(div){1,2}EW( ){1,5}A(class){1,6}( = ){1,11}(\"lala\"){1,14}OEE(>){1,20}]");
         testDoc( 
-                "<div class \n\n= \nlala li=\nlla>",
-                "[OES(<){1,1}OEN(div){1,2}EW( ){1,5}A(class){1,6}( \n\n= \n){1,11}(lala){4,1}EW( ){4,5}A(li){4,6}(=\n){4,8}(lla){5,1}OEE(>){5,4}]");
+            "<div class \n\n= \nlala li=\nlla>",
+            "[OES(<){1,1}OEN(div){1,2}EW( ){1,5}A(class){1,6}( \n\n= \n){1,11}(lala){4,1}EW( ){4,5}A(li){4,6}(=\n){4,8}(lla){5,1}OEE(>){5,4}]");
         testDoc( 
-                "<div class \n\n= \n\"lala\"li=\nlla>",
-                "[OES(<){1,1}OEN(div){1,2}EW( ){1,5}A(class){1,6}( \n\n= \n){1,11}(\"lala\"){4,1}A(li){4,7}(=\n){4,9}(lla){5,1}OEE(>){5,4}]");
+            "<div class \n\n= \n\"lala\"li=\nlla>",
+            "[OES(<){1,1}OEN(div){1,2}EW( ){1,5}A(class){1,6}( \n\n= \n){1,11}(\"lala\"){4,1}A(li){4,7}(=\n){4,9}(lla){5,1}OEE(>){5,4}]");
+        
+
+        testDoc( 
+            "<!DOCTYPE>",
+            "[DT(DOCTYPE){1,3}(){1,10}(){1,10}(){1,10}(){1,10}]");
+        testDoc( 
+            "<!doctype>",
+            "[DT(doctype){1,3}(){1,10}(){1,10}(){1,10}(){1,10}]");
+        testDoc( 
+            "<!DOCTYPE  >",
+            "[DT(DOCTYPE){1,3}(){1,10}(){1,10}(){1,10}(){1,10}]");
+        testDoc( 
+            "<!DOCTYPE html>",
+            "[DT(DOCTYPE){1,3}(html){1,11}(){1,15}(){1,15}(){1,15}]");
+        testDoc( 
+            "<!DOCTYPE  \nhtml>",
+            "[DT(DOCTYPE){1,3}(html){2,1}(){2,5}(){2,5}(){2,5}]");
+        testDoc( 
+            "<!DOCTYPE html >",
+            "[DT(DOCTYPE){1,3}(html){1,11}(){1,15}(){1,15}(){1,15}]");
+        testDocError( 
+            "<!DOCTYPE html \"lalero\">",
+            "[DT(DOCTYPE){1,3}(html){1,11}(lalero){1,16}(){1,24}(){1,24}]",
+            1,1);
+        testDocError( 
+            "<!DOCTYPE html lalero>",
+            "[DT(DOCTYPE){1,3}(html){1,11}(lalero){1,16}(){1,24}(){1,24}]",
+            1,1);
+        testDocError( 
+            "<!DOCTYPE html lalero>",
+            "[DT(DOCTYPE){1,3}(html){1,11}(lalero){1,16}(){1,24}(){1,24}]",
+            1,1);
+        testDocError( 
+            "<!DOCTYPE html \"lalero\">",
+            "[DT(DOCTYPE){1,3}(html){1,11}(lalero){1,16}(){1,24}(){1,24}]",
+            1,1);
+        testDocError( 
+            "<!DOCTYPE html \"lalero\"  >",
+            "[DT(DOCTYPE){1,3}(html){1,11}(lalero){1,16}(){1,24}(){1,24}]",
+            1,1);
+        testDocError( 
+            "<!DOCTYPE html \"lalero>",
+            "[DT(DOCTYPE){1,3}(html){1,11}(lalero){1,16}(){1,23}(){1,23}]",
+            1, 1);
+        testDocError( 
+            "<!DOCTYPE html PUBLIC \"lalero\">",
+            "[DT(DOCTYPE){1,3}(html){1,11}(PUBLIC){1,16}(lalero){1,23}(){1,23}]",
+            1,1);
+        testDoc( 
+            "<!DOCTYPE html SYSTEM \"lalero\">",
+            "[DT(DOCTYPE){1,3}(html){1,11}(SYSTEM){1,16}(){1,23}(lalero){1,23}]");
+        testDocError( 
+            "<!DOCTYPE html PUBLIC lalero>",
+            "[DT(DOCTYPE){1,3}(html){1,11}(PUBLIC){1,16}(lalero){1,24}(){1,24}]",
+            1,1);
+        testDocError( 
+            "<!DOCTYPE html PUBLIC lalero   as>",
+            "[DT(DOCTYPE){1,3}(html){1,11}(PUBLIC){1,16}(lalero){1,24}(){1,24}]",
+            1,1);
+        testDocError( 
+            "<!DOCTYPE html PUBLIC \"lalero\">",
+            "[DT(DOCTYPE){1,3}(html){1,11}(PUBLIC){1,16}(lalero){1,24}(){1,24}]",
+            1,1);
+        testDoc( 
+            "<!DOCTYPE html system \"lalero\"  >",
+            "[DT(DOCTYPE){1,3}(html){1,11}(system){1,16}(){1,23}(lalero){1,23}]");
+        testDoc( 
+            "<!DOCTYPE html public \"lalero\"   \n\"hey\">",
+            "[DT(DOCTYPE){1,3}(html){1,11}(public){1,16}(lalero){1,23}(hey){2,1}]");
+        testDoc( 
+                "<!DOCTYPE html system \n\"lalero\"\"le\">",
+                "[DT(DOCTYPE){1,3}(html){1,11}(system){1,16}(){2,1}(lalero\"\"le){2,1}]");
+        
+        
         
         
         System.out.println("TOTAL Test executions: " + totalTestExecutions);
         
     }
     
+    
+    
+    static void testDocError(final String input, final String output, final int errorLine, final int errorCol) {
+        try {
+            testDoc(input, output);
+            throw new ComparisonFailure(null, "exception", "no exception");
+            
+        } catch (final AttoParseException e) {
+            assertEquals(Integer.valueOf(errorLine), e.getLine());
+            assertEquals(Integer.valueOf(errorCol), e.getCol());
+        }
+    }
+
+    
+    static void testDocError(final String input, final String output, final int offset, final int len, final int errorLine, final int errorCol) {
+        try {
+            testDoc(input, output, offset, len);
+            throw new ComparisonFailure(null, "exception", "no exception");
+            
+        } catch (final AttoParseException e) {
+            assertEquals(Integer.valueOf(errorLine), e.getLine());
+            assertEquals(Integer.valueOf(errorCol), e.getCol());
+        }
+    }
     
     
     static void testDoc(final String input, final String output) throws AttoParseException {

@@ -33,21 +33,21 @@ public interface IElementHandling {
 
     public void standaloneElement(
             final char[] buffer, 
-            final int innerOffset, final int innerLen,
+            final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
             final int line, final int col)
             throws AttoParseException;
     
     public void openElement(
             final char[] buffer, 
-            final int innerOffset, final int innerLen,
+            final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
             final int line, final int col)
             throws AttoParseException;
     
     public void closeElement(
             final char[] buffer, 
-            final int innerOffset, final int innerLen,
+            final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
             final int line, final int col)
             throws AttoParseException;

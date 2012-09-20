@@ -33,7 +33,7 @@ public interface ICommentHandling {
 
     public void comment(
             final char[] buffer, 
-            final int innerOffset, final int innerLen,
+            final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
             final int line, final int col)
             throws AttoParseException;

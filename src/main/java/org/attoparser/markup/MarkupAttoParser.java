@@ -67,6 +67,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
         boolean inCloseElement = false;
         boolean inComment = false;
         boolean inCdata = false;
+        boolean inDocType = false;
         
         int tagStart = -1;
         int tagEnd = -1;
@@ -77,7 +78,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
             currentCol = locator.col;
             
             inStructure =
-                    (inOpenElement || inCloseElement || inComment || inCdata);
+                    (inOpenElement || inCloseElement || inComment || inCdata || inDocType);
             
             if (!inStructure) {
                 
@@ -94,12 +95,15 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                         inComment = MarkupParsingUtil.isCommentStart(buffer, tagStart, maxi);
                         if (!inComment) {
                             inCdata = MarkupParsingUtil.isCdataStart(buffer, tagStart, maxi);
+                            if (!inCdata) {
+                                inDocType = MarkupParsingUtil.isDocTypeStart(buffer, tagStart, maxi);
+                            }
                         }
                     }
                 }
                 
                 inStructure =
-                        (inOpenElement || inCloseElement || inComment || inCdata);
+                        (inOpenElement || inCloseElement || inComment || inCdata || inDocType);
                 
                 
                 while (!inStructure) {
@@ -120,12 +124,15 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                             inComment = MarkupParsingUtil.isCommentStart(buffer, tagStart, maxi);
                             if (!inComment) {
                                 inCdata = MarkupParsingUtil.isCdataStart(buffer, tagStart, maxi);
+                                if (!inCdata) {
+                                    inDocType = MarkupParsingUtil.isDocTypeStart(buffer, tagStart, maxi);
+                                }
                             }
                         }
                     }
                     
                     inStructure =
-                            (inOpenElement || inCloseElement || inComment || inCdata);
+                            (inOpenElement || inCloseElement || inComment || inCdata || inDocType);
                 
                 }
             
@@ -143,7 +150,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
             } else {
                         
                 final boolean avoidQuotes =
-                        (inOpenElement || inCloseElement);
+                        (inOpenElement || inCloseElement || inDocType);
                 
                 tagEnd = MarkupParsingUtil.findNext(buffer, i, maxi, '>', avoidQuotes, locator);
                 
@@ -200,6 +207,12 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                     
                     handler.structure(buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
                     inCdata = false;
+                    
+                } else if (inDocType) {
+                    // This is a DOCTYPE clause
+                    
+                    handler.structure(buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
+                    inDocType = false;
                     
                 } else {
 

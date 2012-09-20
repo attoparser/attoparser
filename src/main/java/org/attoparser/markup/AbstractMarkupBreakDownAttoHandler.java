@@ -33,48 +33,61 @@ import org.attoparser.AttoParseException;
  * @since 1.0
  *
  */
-public abstract class AbstractBreakDownMarkupAttoHandler 
+public abstract class AbstractMarkupBreakDownAttoHandler 
         extends AbstractMarkupAttoHandler
-        implements IElementBreakDownHandling {
+        implements IElementBreakDownHandling, IDocTypeBreakDownHandling {
 
 
     
-    protected AbstractBreakDownMarkupAttoHandler() {
+    protected AbstractMarkupBreakDownAttoHandler() {
         super();
+    }
+
+
+
+
+    @Override
+    public final void docType(
+            final char[] buffer, 
+            final int contentOffset, final int contentLen,
+            final int outerOffset, final int outerLen, 
+            final int line, final int col)
+            throws AttoParseException {
+        MarkupParsingUtil.parseDocTypeBreakDown(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col, this);
     }
 
     
     @Override
     public final void standaloneElement(
             final char[] buffer, 
-            final int innerOffset, final int innerLen, 
+            final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
             final int line, final int col) 
             throws AttoParseException {
-        MarkupParsingUtil.parseStandaloneElementBreakDown(buffer, innerOffset, innerLen, outerOffset, outerLen, line, col, this);
+        MarkupParsingUtil.parseStandaloneElementBreakDown(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col, this);
     }
 
     
     @Override
     public final void openElement(
             final char[] buffer, 
-            final int innerOffset, final int innerLen, 
+            final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
             final int line, final int col) 
             throws AttoParseException {
-        MarkupParsingUtil.parseOpenElementBreakDown(buffer, innerOffset, innerLen, outerOffset, outerLen, line, col, this);
+        MarkupParsingUtil.parseOpenElementBreakDown(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col, this);
     }
 
     
     @Override
     public final void closeElement(
             final char[] buffer, 
-            final int innerOffset, final int innerLen,
+            final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
             final int line, final int col)
             throws AttoParseException {
 
-        MarkupParsingUtil.parseCloseElementBreakDown(buffer, innerOffset, innerLen, outerOffset, outerLen, line, col, this);
+        MarkupParsingUtil.parseCloseElementBreakDown(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col, this);
 
     }
 
@@ -161,14 +174,12 @@ public abstract class AbstractBreakDownMarkupAttoHandler
 
     
     public void elementAttribute(
-            final char[] nameBuffer,
+            final char[] buffer,
             final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol,
-            final char[] operatorBuffer,
             final int operatorOffset, final int operatorLen,
             final int operatorLine, final int operatorCol,
-            final char[] valueBuffer,
-            final int valueInnerOffset, final int valueInnerLen,
+            final int valueContentOffset, final int valueContentLen,
             final int valueOuterOffset, final int valueOuterLen,
             final int valueLine, final int valueCol)
             throws AttoParseException {
@@ -181,6 +192,26 @@ public abstract class AbstractBreakDownMarkupAttoHandler
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
+    }
+
+
+
+    public void docType(
+            final char[] buffer, 
+            final int keywordOffset, final int keywordLen,
+            final int keywordLine, final int keywordCol,
+            final int elementNameOffset, final int elementNameLen,
+            final int elementNameLine, final int elementNameCol,
+            final int typeOffset, final int typeLen,
+            final int typeLine, final int typeCol,
+            final int publicIdOffset, final int publicIdLen,
+            final int publicIdLine, final int publicIdCol,
+            final int systemIdOffset, final int systemIdLen,
+            final int systemIdLine, final int systemIdCol,
+            final int outerOffset, final int outerLen,
+            final int outerLine, final int outerCol) 
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }

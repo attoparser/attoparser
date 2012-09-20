@@ -35,7 +35,7 @@ import org.attoparser.AttoParseException;
  */
 public abstract class AbstractMarkupAttoHandler 
         extends AbstractAttoHandler
-        implements ICdataHandling, ICommentHandling, IElementHandling {
+        implements IElementHandling, IDocTypeHandling, ICdataHandling, ICommentHandling {
 
 
     
@@ -53,12 +53,23 @@ public abstract class AbstractMarkupAttoHandler
             throws AttoParseException {
         MarkupParsingUtil.parseStructure(buffer, offset, len, line, col, this);
     }
+
+
+
+    public void docType(
+            final char[] buffer, 
+            final int contentOffset, final int contentLen,
+            final int outerOffset, final int outerLen, 
+            final int line, final int col)
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
+    }
     
     
     
     public void standaloneElement(
             final char[] buffer, 
-            final int innerOffset, final int innerLen,
+            final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
             final int line, final int col)
             throws AttoParseException {
@@ -68,7 +79,7 @@ public abstract class AbstractMarkupAttoHandler
 
     public void openElement(
             final char[] buffer, 
-            final int innerOffset, final int innerLen,
+            final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
             final int line, final int col)
             throws AttoParseException {
@@ -78,7 +89,7 @@ public abstract class AbstractMarkupAttoHandler
     
     public void closeElement(
             final char[] buffer, 
-            final int innerOffset, final int innerLen,
+            final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
             final int line, final int col)
             throws AttoParseException {
@@ -88,7 +99,7 @@ public abstract class AbstractMarkupAttoHandler
     
     public void comment(
             final char[] buffer, 
-            final int innerOffset, final int innerLen,
+            final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
             final int line, final int col)
             throws AttoParseException {
@@ -98,25 +109,12 @@ public abstract class AbstractMarkupAttoHandler
     
     public void cdata(
             final char[] buffer, 
-            final int innerOffset, final int innerLen,
+            final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     
