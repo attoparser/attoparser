@@ -88,15 +88,15 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                     return new BufferParseResult(current, currentLine, currentCol, false);
                 }
 
-                inOpenElement = MarkupParsingUtil.isOpenElementStart(buffer, tagStart, maxi);
+                inOpenElement = ElementMarkupParsingUtil.isOpenElementStart(buffer, tagStart, maxi);
                 if (!inOpenElement) {
-                    inCloseElement = MarkupParsingUtil.isCloseElementStart(buffer, tagStart, maxi);
+                    inCloseElement = ElementMarkupParsingUtil.isCloseElementStart(buffer, tagStart, maxi);
                     if (!inCloseElement) {
-                        inComment = MarkupParsingUtil.isCommentStart(buffer, tagStart, maxi);
+                        inComment = CommentMarkupParsingUtil.isCommentStart(buffer, tagStart, maxi);
                         if (!inComment) {
-                            inCdata = MarkupParsingUtil.isCdataStart(buffer, tagStart, maxi);
+                            inCdata = CdataMarkupParsingUtil.isCdataStart(buffer, tagStart, maxi);
                             if (!inCdata) {
-                                inDocType = MarkupParsingUtil.isDocTypeStart(buffer, tagStart, maxi);
+                                inDocType = DocTypeMarkupParsingUtil.isDocTypeStart(buffer, tagStart, maxi);
                             }
                         }
                     }
@@ -117,15 +117,15 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                         return new BufferParseResult(current, currentLine, currentCol, false);
                     }
 
-                    inOpenElement = MarkupParsingUtil.isOpenElementStart(buffer, tagStart, maxi);
+                    inOpenElement = ElementMarkupParsingUtil.isOpenElementStart(buffer, tagStart, maxi);
                     if (!inOpenElement) {
-                        inCloseElement = MarkupParsingUtil.isCloseElementStart(buffer, tagStart, maxi);
+                        inCloseElement = ElementMarkupParsingUtil.isCloseElementStart(buffer, tagStart, maxi);
                         if (!inCloseElement) {
-                            inComment = MarkupParsingUtil.isCommentStart(buffer, tagStart, maxi);
+                            inComment = CommentMarkupParsingUtil.isCommentStart(buffer, tagStart, maxi);
                             if (!inComment) {
-                                inCdata = MarkupParsingUtil.isCdataStart(buffer, tagStart, maxi);
+                                inCdata = CdataMarkupParsingUtil.isCdataStart(buffer, tagStart, maxi);
                                 if (!inCdata) {
-                                    inDocType = MarkupParsingUtil.isDocTypeStart(buffer, tagStart, maxi);
+                                    inDocType = DocTypeMarkupParsingUtil.isDocTypeStart(buffer, tagStart, maxi);
                                 }
                             }
                         }

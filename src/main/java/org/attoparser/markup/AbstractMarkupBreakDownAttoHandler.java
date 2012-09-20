@@ -53,7 +53,10 @@ public abstract class AbstractMarkupBreakDownAttoHandler
             final int outerOffset, final int outerLen, 
             final int line, final int col)
             throws AttoParseException {
-        MarkupParsingUtil.parseDocTypeBreakDown(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col, this);
+        
+        DocTypeMarkupParsingUtil.parseDocTypeBreakDown(
+                buffer, contentOffset, contentLen, outerOffset, outerLen, line, col, this);
+        
     }
 
     
@@ -64,7 +67,9 @@ public abstract class AbstractMarkupBreakDownAttoHandler
             final int outerOffset, final int outerLen, 
             final int line, final int col) 
             throws AttoParseException {
-        MarkupParsingUtil.parseStandaloneElementBreakDown(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col, this);
+        
+        ElementMarkupParsingUtil.parseStandaloneElementBreakDown(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col, this);
+        
     }
 
     
@@ -75,7 +80,9 @@ public abstract class AbstractMarkupBreakDownAttoHandler
             final int outerOffset, final int outerLen, 
             final int line, final int col) 
             throws AttoParseException {
-        MarkupParsingUtil.parseOpenElementBreakDown(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col, this);
+        
+        ElementMarkupParsingUtil.parseOpenElementBreakDown(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col, this);
+        
     }
 
     
@@ -87,7 +94,7 @@ public abstract class AbstractMarkupBreakDownAttoHandler
             final int line, final int col)
             throws AttoParseException {
 
-        MarkupParsingUtil.parseCloseElementBreakDown(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col, this);
+        ElementMarkupParsingUtil.parseCloseElementBreakDown(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col, this);
 
     }
 

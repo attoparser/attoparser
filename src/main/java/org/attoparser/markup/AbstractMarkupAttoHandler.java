@@ -51,7 +51,20 @@ public abstract class AbstractMarkupAttoHandler
             final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
-        MarkupParsingUtil.parseStructure(buffer, offset, len, line, col, this);
+        
+        if (!ElementMarkupParsingUtil.tryParseElement(buffer, offset, len, line, col, this)) {
+            if (!CommentMarkupParsingUtil.tryParseComment(buffer, offset, len, line, col, this)) {
+                 if (!CdataMarkupParsingUtil.tryParseCdata(buffer, offset, len, line, col, this )) {
+                     if (!DocTypeMarkupParsingUtil.tryParseDocType(buffer, offset, len, line, col, this)) {
+                         throw new AttoParseException(
+                                 "Could not parse as markup structure: " +
+                                 "\"" + new String(buffer, offset, len) + "\"", 
+                                 line, col);
+                     }
+                 }
+            }
+        }
+
     }
 
 
