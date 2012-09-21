@@ -32,7 +32,7 @@ import org.attoparser.AttoParseException;
  * @since 1.0
  *
  */
-public final class DuplicatingMarkupAttoHandler extends AbstractMarkupBreakDownAttoHandler {
+public final class DuplicatingMarkupAttoHandler extends AbstractMarkupAttoHandler {
 
     
     private final Writer writer;
@@ -61,79 +61,80 @@ public final class DuplicatingMarkupAttoHandler extends AbstractMarkupBreakDownA
     }
 
 
+    
 
+    
     @Override
-    public void standaloneElementName(final char[] buffer, final int offset, final int len,
+    public void docType(
+            final char[] buffer, 
+            final int contentOffset, final int contentLen,
+            final int outerOffset, final int outerLen, 
             final int line, final int col)
             throws AttoParseException {
         
         try {
-            this.writer.write(buffer, offset, len);
+            this.writer.write(buffer, outerOffset, outerLen);
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
         
     }
-    
-    
-    
+
+
+
+
     @Override
-    public void openElementName(final char[] buffer, final int offset, final int len,
+    public void standaloneElement(
+            final char[] buffer, 
+            final int contentOffset, final int contentLen, 
+            final int outerOffset, final int outerLen, 
             final int line, final int col)
             throws AttoParseException {
         
         try {
-            this.writer.write(buffer, offset, len);
+            this.writer.write(buffer, outerOffset, outerLen);
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
         
     }
+
+
 
 
     @Override
-    public void closeElementName(final char[] buffer, final int offset, final int len,
-            final int line, final int col)
+    public void openElement(
+            final char[] buffer, 
+            int contentOffset, int contentLen,
+            int outerOffset, int outerLen, int line, int col)
             throws AttoParseException {
         
         try {
-            this.writer.write(buffer, offset, len);
+            this.writer.write(buffer, outerOffset, outerLen);
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
         
     }
 
-    
-    
+
+
+
     @Override
-    public void elementAttribute(
-            final char[] buffer,
-            final int nameOffset, final int nameLen,
-            final int nameLine, final int nameCol,
-            final int operatorOffset, final int operatorLen,
-            final int operatorLine, final int operatorCol,
-            final int valueContentOffset, final int valueContentLen,
-            final int valueOuterOffset, final int valueOuterLen,
-            final int valueLine, final int valueCol)
+    public void closeElement(char[] buffer, int contentOffset, int contentLen,
+            int outerOffset, int outerLen, int line, int col)
             throws AttoParseException {
-
         
         try {
-            
-            this.writer.write(buffer, nameOffset, nameLen);
-            if (operatorLen > 0) {
-                this.writer.write(buffer, operatorOffset, operatorLen);
-                if (valueOuterLen > 0) {
-                    this.writer.write(buffer, valueOuterOffset, valueOuterLen);
-                }
-            }
-            
+            this.writer.write(buffer, outerOffset, outerLen);
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
         
     }
+
+
+
 
     
     
@@ -191,34 +192,6 @@ public final class DuplicatingMarkupAttoHandler extends AbstractMarkupBreakDownA
         
     }
 
-
-
-    @Override
-    public void docType(
-            final char[] buffer, 
-            final int keywordOffset, final int keywordLen,
-            final int keywordLine, final int keywordCol,
-            final int elementNameOffset, final int elementNameLen,
-            final int elementNameLine, final int elementNameCol,
-            final int typeOffset, final int typeLen,
-            final int typeLine, final int typeCol,
-            final int publicIdOffset, final int publicIdLen,
-            final int publicIdLine, final int publicIdCol,
-            final int systemIdOffset, final int systemIdLen,
-            final int systemIdLine, final int systemIdCol,
-            final int outerOffset, final int outerLen,
-            final int outerLine, final int outerCol) 
-            throws AttoParseException {
-        
-        try {
-            
-            this.writer.write(buffer, outerOffset, outerLen);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
-    }
 
     
     
