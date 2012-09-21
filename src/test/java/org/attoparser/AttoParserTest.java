@@ -26,6 +26,7 @@ import junit.framework.ComparisonFailure;
 import junit.framework.TestCase;
 
 import org.attoparser.markup.DuplicatingMarkupAttoHandler;
+import org.attoparser.markup.DuplicatingMarkupBreakDownAttoHandler;
 import org.attoparser.markup.MarkupAttoParser;
 import org.attoparser.markup.TracingMarkupAttoHandler;
 
@@ -565,7 +566,8 @@ public class AttoParserTest extends TestCase {
         try {
 
             final IAttoParser parser = new MarkupAttoParser();
-            
+
+            // TEST WITH TRACING HANDLER
             {
                 final StringWriter sw = new StringWriter(); 
                 final IAttoHandler handler = new TracingMarkupAttoHandler(sw);
@@ -579,9 +581,26 @@ public class AttoParserTest extends TestCase {
             }
 
             
+            // TEST WITH DUPLICATING MARKUP HANDLER (few events)
             {
                 final StringWriter sw = new StringWriter(); 
                 final IAttoHandler handler = new DuplicatingMarkupAttoHandler(sw);
+                if (offset == 0 && len == input.length) {
+                    ((AbstractBufferedAttoParser)parser).parseDocument(new CharArrayReader(input), handler, bufferSize);
+                } else { 
+                    ((AbstractBufferedAttoParser)parser).parseDocument(new CharArrayReader(input, offset, len), handler, bufferSize);
+                }
+                final String desired =
+                        (offset == 0 && len == input.length ? new String(input) : new String(input, offset, len));
+                final String result = sw.toString();
+                assertEquals(desired, result);
+            }
+
+            
+            // TEST WITH DUPLICATING MARKUP BREAKDOWN HANDLER (many events)
+            {
+                final StringWriter sw = new StringWriter(); 
+                final IAttoHandler handler = new DuplicatingMarkupBreakDownAttoHandler(sw);
                 if (offset == 0 && len == input.length) {
                     ((AbstractBufferedAttoParser)parser).parseDocument(new CharArrayReader(input), handler, bufferSize);
                 } else { 
