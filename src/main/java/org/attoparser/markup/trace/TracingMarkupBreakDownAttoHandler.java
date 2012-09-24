@@ -17,12 +17,13 @@
  * 
  * =============================================================================
  */
-package org.attoparser.markup;
+package org.attoparser.markup.trace;
 
 import java.io.IOException;
 import java.io.Writer;
 
 import org.attoparser.AttoParseException;
+import org.attoparser.markup.AbstractMarkupBreakDownAttoHandler;
 
 
 
@@ -33,13 +34,13 @@ import org.attoparser.AttoParseException;
  * @since 1.0
  *
  */
-public final class TracingMarkupAttoHandler extends AbstractMarkupBreakDownAttoHandler {
+public final class TracingMarkupBreakDownAttoHandler extends AbstractMarkupBreakDownAttoHandler {
 
     
     private final Writer writer;
     
     
-    public TracingMarkupAttoHandler(final Writer writer) {
+    public TracingMarkupBreakDownAttoHandler(final Writer writer) {
         super();
         this.writer = writer;
     }

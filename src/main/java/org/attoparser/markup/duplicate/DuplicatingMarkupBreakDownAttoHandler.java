@@ -17,11 +17,12 @@
  * 
  * =============================================================================
  */
-package org.attoparser.markup;
+package org.attoparser.markup.duplicate;
 
 import java.io.Writer;
 
 import org.attoparser.AttoParseException;
+import org.attoparser.markup.AbstractMarkupBreakDownAttoHandler;
 
 
 
