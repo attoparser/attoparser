@@ -444,6 +444,8 @@ public final class TracingMarkupBreakDownAttoHandler extends AbstractMarkupBreak
             final int publicIdLine, final int publicIdCol,
             final int systemIdOffset, final int systemIdLen,
             final int systemIdLine, final int systemIdCol,
+            final int internalSubsetOffset, final int internalSubsetLen,
+            final int internalSubsetLine, final int internalSubsetCol,
             final int outerOffset, final int outerLen,
             final int outerLine, final int outerCol) 
             throws AttoParseException {
@@ -472,6 +474,10 @@ public final class TracingMarkupBreakDownAttoHandler extends AbstractMarkupBreak
             this.writer.write(buffer, systemIdOffset, systemIdLen);
             this.writer.write(')');
             writePosition(this.writer, systemIdLine, systemIdCol);
+            this.writer.write('(');
+            this.writer.write(buffer, internalSubsetOffset, internalSubsetLen);
+            this.writer.write(')');
+            writePosition(this.writer, internalSubsetLine, internalSubsetCol);
             
         } catch (final Exception e) {
             throw new AttoParseException(e);

@@ -217,6 +217,8 @@ public abstract class AbstractMarkupBreakDownAttoHandler
             final int publicIdLine, final int publicIdCol,
             final int systemIdOffset, final int systemIdLen,
             final int systemIdLine, final int systemIdCol,
+            final int internalSubsetOffset, final int internalSubsetLen,
+            final int internalSubsetLine, final int internalSubsetCol,
             final int outerOffset, final int outerLen,
             final int outerLine, final int outerCol) 
             throws AttoParseException {

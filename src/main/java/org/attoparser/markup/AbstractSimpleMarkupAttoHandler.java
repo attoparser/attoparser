@@ -255,6 +255,8 @@ public abstract class AbstractSimpleMarkupAttoHandler
             final int publicIdLine, final int publicIdCol, 
             final int systemIdOffset, final int systemIdLen,
             final int systemIdLine, final int systemIdCol, 
+            final int internalSubsetOffset, final int internalSubsetLen,
+            final int internalSubsetLine, final int internalSubsetCol,
             final int outerOffset, final int outerLen,
             final int outerLine, final int outerCol)
             throws AttoParseException {
@@ -263,7 +265,8 @@ public abstract class AbstractSimpleMarkupAttoHandler
                 elementNameOffset, elementNameLen, elementNameLine, elementNameCol,
                 typeOffset, typeLen, typeLine, typeCol, publicIdOffset, publicIdLen,
                 publicIdLine, publicIdCol, systemIdOffset, systemIdLen, systemIdLine,
-                systemIdCol, outerOffset, outerLen, outerLine, outerCol);
+                systemIdCol, internalSubsetOffset, internalSubsetLen, internalSubsetLine, 
+                internalSubsetCol, outerOffset, outerLen, outerLine, outerCol);
         
         docType(
                 new String(buffer, elementNameOffset, elementNameLen),

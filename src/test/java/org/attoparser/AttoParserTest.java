@@ -489,93 +489,91 @@ public class AttoParserTest extends TestCase {
 
         testDoc( 
             "<!DOCTYPE>",
-            "[DT(DOCTYPE){1,3}(){1,10}(){1,10}(){1,10}(){1,10}]",
+            "[DT(DOCTYPE){1,3}(){1,10}(){1,10}(){1,10}(){1,10}(){1,10}]",
             "[DT()()(){1,1}]");
         testDoc( 
             "<!doctype>",
-            "[DT(doctype){1,3}(){1,10}(){1,10}(){1,10}(){1,10}]",
+            "[DT(doctype){1,3}(){1,10}(){1,10}(){1,10}(){1,10}(){1,10}]",
             "[DT()()(){1,1}]");
         testDoc( 
             "<!DOCTYPE  >",
-            "[DT(DOCTYPE){1,3}(){1,10}(){1,10}(){1,10}(){1,10}]",
+            "[DT(DOCTYPE){1,3}(){1,10}(){1,10}(){1,10}(){1,10}(){1,10}]",
             null);
         testDoc( 
             "<!DOCTYPE html>",
-            "[DT(DOCTYPE){1,3}(html){1,11}(){1,15}(){1,15}(){1,15}]",
+            "[DT(DOCTYPE){1,3}(html){1,11}(){1,15}(){1,15}(){1,15}(){1,15}]",
             null);
         testDoc( 
             "<!DOCTYPE  \nhtml>",
-            "[DT(DOCTYPE){1,3}(html){2,1}(){2,5}(){2,5}(){2,5}]",
+            "[DT(DOCTYPE){1,3}(html){2,1}(){2,5}(){2,5}(){2,5}(){2,5}]",
             "[DT(html)()(){1,1}]");
         testDoc( 
             "<!DOCTYPE html >",
-            "[DT(DOCTYPE){1,3}(html){1,11}(){1,15}(){1,15}(){1,15}]",
+            "[DT(DOCTYPE){1,3}(html){1,11}(){1,15}(){1,15}(){1,15}(){1,15}]",
             "[DT(html)()(){1,1}]");
         testDocError( 
             "<!DOCTYPE html \"lalero\">",
-            "[DT(DOCTYPE){1,3}(html){1,11}(lalero){1,16}(){1,24}(){1,24}]",
+            "[DT(DOCTYPE){1,3}(html){1,11}(lalero){1,16}(){1,24}(){1,24}(){1,24}]",
             null,
             1,1);
         testDocError( 
             "<!DOCTYPE html lalero>",
-            "[DT(DOCTYPE){1,3}(html){1,11}(lalero){1,16}(){1,24}(){1,24}]",
+            "[DT(DOCTYPE){1,3}(html){1,11}(lalero){1,16}(){1,24}(){1,24}(){1,24}]",
             null,
             1,1);
         testDocError( 
             "<!DOCTYPE html lalero>",
-            "[DT(DOCTYPE){1,3}(html){1,11}(lalero){1,16}(){1,24}(){1,24}]",
+            "[DT(DOCTYPE){1,3}(html){1,11}(lalero){1,16}(){1,24}(){1,24}(){1,24}]",
             null,
             1,1);
         testDocError( 
             "<!DOCTYPE html \"lalero\">",
-            "[DT(DOCTYPE){1,3}(html){1,11}(lalero){1,16}(){1,24}(){1,24}]",
+            "[DT(DOCTYPE){1,3}(html){1,11}(lalero){1,16}(){1,24}(){1,24}(){1,24}]",
             null,
             1,1);
         testDocError( 
             "<!DOCTYPE html \"lalero\"  >",
-            "[DT(DOCTYPE){1,3}(html){1,11}(lalero){1,16}(){1,24}(){1,24}]",
+            "[DT(DOCTYPE){1,3}(html){1,11}(lalero){1,16}(){1,24}(){1,24}(){1,24}]",
             null,
             1,1);
         testDocError( 
             "<!DOCTYPE html \"lalero>",
-            "[DT(DOCTYPE){1,3}(html){1,11}(lalero){1,16}(){1,23}(){1,23}]",
+            "[DT(DOCTYPE){1,3}(html){1,11}(lalero){1,16}(){1,23}(){1,23}(){1,23}]",
             null,
             1, 1);
-        testDocError( 
+        testDoc( 
             "<!DOCTYPE html PUBLIC \"lalero\">",
-            "[DT(DOCTYPE){1,3}(html){1,11}(PUBLIC){1,16}(lalero){1,23}(){1,23}]",
-            null,
-            1,1);
+            "[DT(DOCTYPE){1,3}(html){1,11}(PUBLIC){1,16}(lalero){1,23}(){1,31}(){1,31}]",
+            null);
         testDoc( 
             "<!DOCTYPE html SYSTEM \"lalero\">",
-            "[DT(DOCTYPE){1,3}(html){1,11}(SYSTEM){1,16}(){1,23}(lalero){1,23}]",
+            "[DT(DOCTYPE){1,3}(html){1,11}(SYSTEM){1,16}(){1,23}(lalero){1,23}(){1,31}]",
             "[DT(html)()(lalero){1,1}]");
         testDocError( 
             "<!DOCTYPE html PUBLIC lalero>",
-            "[DT(DOCTYPE){1,3}(html){1,11}(PUBLIC){1,16}(lalero){1,24}(){1,24}]",
+            "[DT(DOCTYPE){1,3}(html){1,11}(PUBLIC){1,16}(lalero){1,24}(){1,29}(){1,29}]",
             null,
             1,1);
         testDocError( 
             "<!DOCTYPE html PUBLIC lalero   as>",
-            "[DT(DOCTYPE){1,3}(html){1,11}(PUBLIC){1,16}(lalero){1,24}(){1,24}]",
-            null,
-            1,1);
-        testDocError( 
-            "<!DOCTYPE html PUBLIC \"lalero\">",
-            "[DT(DOCTYPE){1,3}(html){1,11}(PUBLIC){1,16}(lalero){1,24}(){1,24}]",
+            "[DT(DOCTYPE){1,3}(html){1,11}(PUBLIC){1,16}(lalero){1,24}(){1,24}(){1,24}]",
             null,
             1,1);
         testDoc( 
+            "<!DOCTYPE html PUBLIC \"lalero\">",
+            "[DT(DOCTYPE){1,3}(html){1,11}(PUBLIC){1,16}(lalero){1,24}(){1,24}(){1,24}]",
+            null);
+        testDoc( 
             "<!DOCTYPE html system \"lalero\"  >",
-            "[DT(DOCTYPE){1,3}(html){1,11}(system){1,16}(){1,23}(lalero){1,23}]",
+            "[DT(DOCTYPE){1,3}(html){1,11}(system){1,16}(){1,23}(lalero){1,23}(){1,23}]",
             "[DT(html)()(lalero){1,1}]");
         testDoc( 
             "<!DOCTYPE html public \"lalero\"   \n\"hey\">",
-            "[DT(DOCTYPE){1,3}(html){1,11}(public){1,16}(lalero){1,23}(hey){2,1}]",
+            "[DT(DOCTYPE){1,3}(html){1,11}(public){1,16}(lalero){1,23}(hey){2,1}(){2,1}]",
             "[DT(html)(lalero)(hey){1,1}]");
         testDoc( 
             "<!DOCTYPE html system \n\"lalero\"\"le\">",
-            "[DT(DOCTYPE){1,3}(html){1,11}(system){1,16}(){2,1}(lalero\"\"le){2,1}]",
+            "[DT(DOCTYPE){1,3}(html){1,11}(system){1,16}(){2,1}(lalero\"\"le){2,1}(){2,1}]",
             null);
         
         

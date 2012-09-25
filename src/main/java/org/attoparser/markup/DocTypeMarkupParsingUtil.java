@@ -144,6 +144,8 @@ public final class DocTypeMarkupParsingUtil {
                     docTypeBreakdownLocator.line, docTypeBreakdownLocator.col,  // publicId
                     0, 0,                                                       // systemId
                     docTypeBreakdownLocator.line, docTypeBreakdownLocator.col,  // systemId
+                    0, 0,                                                       // internalSubset
+                    docTypeBreakdownLocator.line, docTypeBreakdownLocator.col,  // internalSubset
                     outerOffset, outerLen,                                      // outer 
                     line, col);                                                 // outer
             
@@ -186,6 +188,8 @@ public final class DocTypeMarkupParsingUtil {
                     currentDocTypeLine, currentDocTypeCol,                      // publicId
                     0, 0,                                                       // systemId
                     currentDocTypeLine, currentDocTypeCol,                      // systemId
+                    0, 0,                                                       // internalSubset
+                    currentDocTypeLine, currentDocTypeCol,                      // internalSubset
                     outerOffset, outerLen,                                      // outer 
                     line, col);                                                 // outer
             
@@ -223,6 +227,8 @@ public final class DocTypeMarkupParsingUtil {
                     docTypeBreakdownLocator.line, docTypeBreakdownLocator.col,  // publicId
                     0, 0,                                                       // systemId
                     docTypeBreakdownLocator.line, docTypeBreakdownLocator.col,  // systemId
+                    0, 0,                                                       // internalSubset
+                    docTypeBreakdownLocator.line, docTypeBreakdownLocator.col,  // internalSubset
                     outerOffset, outerLen,                                      // outer 
                     line, col);                                                 // outer
             
@@ -265,6 +271,8 @@ public final class DocTypeMarkupParsingUtil {
                     currentDocTypeLine, currentDocTypeCol,                      // publicId
                     0, 0,                                                       // systemId
                     currentDocTypeLine, currentDocTypeCol,                      // systemId
+                    0, 0,                                                       // internalSubset
+                    currentDocTypeLine, currentDocTypeCol,                      // internalSubset
                     outerOffset, outerLen,                                      // outer 
                     line, col);                                                 // outer
             
@@ -354,14 +362,33 @@ public final class DocTypeMarkupParsingUtil {
         if (spec1End == -1) {
             // The spec1 is the last thing to appear in the structure
             
-            if (isTypePublic) {
-                // If type is PUBLIC, we should have two specs instead of one
-                return false;
-            }
-            
             if (!isValidDocTypeSpec(buffer, i, maxi - i)) {
                 // The spec is not well-formed (surrounded by "'s)
                 return false;
+            }
+            
+            if (isTypePublic) {
+                // If type is PUBLIC and we only have one spec, it is the publicId
+                
+                handler.docType(
+                        buffer, 
+                        keywordOffset, keywordLen,                                  // keyword 
+                        keywordLine, keywordCol,                                    // keyword
+                        elementNameOffset, elementNameLen,                          // element name 
+                        elementNameLine, elementNameCol,                            // element name
+                        typeOffset, typeLen,                                        // type
+                        typeLine, typeCol,                                          // type
+                        i + 1, maxi - (i + 2),                                      // publicId
+                        currentDocTypeLine, currentDocTypeCol,                      // publicId
+                        0, 0,                                                       // systemId 
+                        docTypeBreakdownLocator.line, docTypeBreakdownLocator.col,  // systemId
+                        0, 0,                                                       // internalSubset 
+                        docTypeBreakdownLocator.line, docTypeBreakdownLocator.col,  // internalSubset
+                        outerOffset, outerLen,                                      // outer 
+                        line, col);                                                 // outer
+                
+                return true;
+                
             }
             
             handler.docType(
@@ -376,6 +403,8 @@ public final class DocTypeMarkupParsingUtil {
                     currentDocTypeLine, currentDocTypeCol,                      // publicId
                     i + 1, maxi - (i + 2),                                      // systemId
                     currentDocTypeLine, currentDocTypeCol,                      // systemId
+                    0, 0,                                                       // internalSubset 
+                    docTypeBreakdownLocator.line, docTypeBreakdownLocator.col,  // internalSubset
                     outerOffset, outerLen,                                      // outer 
                     line, col);                                                 // outer
             
@@ -410,12 +439,30 @@ public final class DocTypeMarkupParsingUtil {
                 MarkupParsingUtil.findNextNonWhitespaceCharWildcard(buffer, i, maxi, docTypeBreakdownLocator);
 
         if (spec2Start == -1) {
-            // This could be a SYSTEM doctype with additional whitespace
-            // or a PUBLIC one in error
+            // There is no spec2
             
             if (isTypePublic) {
-                // If type is SYSTEM, we should have only one spec!
-                return false;
+                // If type is PUBLIC and we only have one spec, it is the publicId
+                
+                handler.docType(
+                        buffer, 
+                        keywordOffset, keywordLen,                                  // keyword 
+                        keywordLine, keywordCol,                                    // keyword
+                        elementNameOffset, elementNameLen,                          // element name 
+                        elementNameLine, elementNameCol,                            // element name
+                        typeOffset, typeLen,                                        // type
+                        typeLine, typeCol,                                          // type
+                        spec1Offset + 1, spec1Len - 2,                              // publicId 
+                        spec1Line, spec1Col,                                        // publicId
+                        0, 0,                                                       // systemId
+                        currentDocTypeLine, currentDocTypeCol,                      // systemId
+                        0, 0,                                                       // internalSubset 
+                        currentDocTypeLine, currentDocTypeCol,                      // internalSubset
+                        outerOffset, outerLen,                                      // outer 
+                        line, col);                                                 // outer
+                
+                return true;
+                
             }
             
             handler.docType(
@@ -430,6 +477,8 @@ public final class DocTypeMarkupParsingUtil {
                     spec1Line, spec1Col,                                        // publicId
                     spec1Offset + 1, spec1Len - 2,                              // systemId
                     spec1Line, spec1Col,                                        // systemId
+                    0, 0,                                                       // internalSubset 
+                    currentDocTypeLine, currentDocTypeCol,                      // internalSubset
                     outerOffset, outerLen,                                      // outer 
                     line, col);                                                 // outer
             
@@ -456,9 +505,59 @@ public final class DocTypeMarkupParsingUtil {
             // The spec2 is the last thing to appear in the structure (no ending whitespaces)
 
             if (!isValidDocTypeSpec(buffer, i, maxi - i)) {
-                // The spec is not well-formed (surrounded by "'s)
-                return false;
+                // The spec is not well-formed (surrounded by "'s). 
+                // It could be an internal subset
+                
+                if (!isValidInternalSubset(buffer, i, maxi - i)) {
+                    // Not a valid spec and not a valid internal subset: not a valid DOCTYPE
+                    return false;
+                }
+
+                if (isTypePublic) {
+                    
+                    handler.docType(
+                            buffer, 
+                            keywordOffset, keywordLen,                                  // keyword 
+                            keywordLine, keywordCol,                                    // keyword
+                            elementNameOffset, elementNameLen,                          // element name 
+                            elementNameLine, elementNameCol,                            // element name
+                            typeOffset, typeLen,                                        // type
+                            typeLine, typeCol,                                          // type
+                            spec1Offset + 1, spec1Len - 2,                              // publicId 
+                            spec1Line, spec1Col,                                        // publicId
+                            0, 0,                                                       // systemId
+                            currentDocTypeLine, currentDocTypeCol,                      // systemId
+                            i + 1, maxi - (i + 2),                                      // internalSubset
+                            currentDocTypeLine, currentDocTypeCol,                      // internalSubset
+                            outerOffset, outerLen,                                      // outer 
+                            line, col);                                                 // outer
+                    
+                    return true;
+                    
+                }
+                    
+                handler.docType(
+                        buffer, 
+                        keywordOffset, keywordLen,                                  // keyword 
+                        keywordLine, keywordCol,                                    // keyword
+                        elementNameOffset, elementNameLen,                          // element name 
+                        elementNameLine, elementNameCol,                            // element name
+                        typeOffset, typeLen,                                        // type
+                        typeLine, typeCol,                                          // type
+                        0, 0,                                                       // publicId
+                        spec1Line, spec1Col,                                        // publicId
+                        spec1Offset + 1, spec1Len - 2,                              // systemId 
+                        spec1Line, spec1Col,                                        // systemId
+                        i + 1, maxi - (i + 2),                                      // internalSubset
+                        currentDocTypeLine, currentDocTypeCol,                      // internalSubset
+                        outerOffset, outerLen,                                      // outer 
+                        line, col);                                                 // outer
+                
+                return true;
+                
             }
+            
+            // There is no internal subset, and what we have is a valid spec2
             
             handler.docType(
                     buffer, 
@@ -472,6 +571,8 @@ public final class DocTypeMarkupParsingUtil {
                     spec1Line, spec1Col,                                        // publicId
                     i + 1, maxi - (i + 2),                                      // systemId
                     currentDocTypeLine, currentDocTypeCol,                      // systemId
+                    0, 0,                                                       // internalSubset
+                    docTypeBreakdownLocator.line, docTypeBreakdownLocator.col,  // internalSubset
                     outerOffset, outerLen,                                      // outer 
                     line, col);                                                 // outer
             
@@ -479,14 +580,134 @@ public final class DocTypeMarkupParsingUtil {
             
         }
 
-
-        // There is some ending whitespace, which we will ignore
         
+        
+        final int spec2Offset = spec2Start;
+        final int spec2Len = spec2End - spec2Offset;
+        final int spec2Line = currentDocTypeLine;
+        final int spec2Col = currentDocTypeCol;
+        
+        i = spec2End;
 
-        if (!isValidDocTypeSpec(buffer, spec2Start, spec2End - spec2Start)) {
+        
+        if (!isValidDocTypeSpec(buffer, spec2Offset, spec2Len)) {
             // The spec is not well-formed (surrounded by "'s)
             return false;
         }
+        
+        
+        /*
+         * Fast-forward to the internal subset
+         */
+        
+        currentDocTypeLine = docTypeBreakdownLocator.line;
+        currentDocTypeCol = docTypeBreakdownLocator.col;
+        
+        final int internalSubsetStart = 
+                MarkupParsingUtil.findNextNonWhitespaceCharWildcard(buffer, i, maxi, docTypeBreakdownLocator);
+
+        if (internalSubsetStart == -1) {
+            // There is only whitespace from spec2
+                
+            handler.docType(
+                    buffer, 
+                    keywordOffset, keywordLen,                                  // keyword 
+                    keywordLine, keywordCol,                                    // keyword
+                    elementNameOffset, elementNameLen,                          // element name 
+                    elementNameLine, elementNameCol,                            // element name
+                    typeOffset, typeLen,                                        // type
+                    typeLine, typeCol,                                          // type
+                    spec1Offset + 1, spec1Len - 2,                              // publicId 
+                    spec1Line, spec1Col,                                        // publicId
+                    spec2Start + 1, spec2End - (spec2Start + 2),                // systemId
+                    currentDocTypeLine, currentDocTypeCol,                      // systemId
+                    0, 0,                                                       // internalSubset
+                    docTypeBreakdownLocator.line, docTypeBreakdownLocator.col,  // internalSubset
+                    outerOffset, outerLen,                                      // outer 
+                    line, col);                                                 // outer
+            
+            return true;
+            
+        }
+
+        
+        i = internalSubsetStart;
+        
+        
+        
+        /*
+         * Search the internalSubset end
+         */
+        
+        currentDocTypeLine = docTypeBreakdownLocator.line;
+        currentDocTypeCol = docTypeBreakdownLocator.col;
+        
+        final int internalSubsetEnd = 
+                MarkupParsingUtil.findNextWhitespaceCharWildcard(buffer, i, maxi, true, docTypeBreakdownLocator);
+
+        if (internalSubsetEnd == -1) {
+            // The subset is the last thing to appear at the DOCTYPE
+            
+            if (!isValidInternalSubset(buffer, i, maxi - i)) {
+                // Not a valid internal subset: not a valid DOCTYPE
+                return false;
+            }
+            
+            handler.docType(
+                    buffer, 
+                    keywordOffset, keywordLen,                                  // keyword 
+                    keywordLine, keywordCol,                                    // keyword
+                    elementNameOffset, elementNameLen,                          // element name 
+                    elementNameLine, elementNameCol,                            // element name
+                    typeOffset, typeLen,                                        // type
+                    typeLine, typeCol,                                          // type
+                    spec1Offset + 1, spec1Len - 2,                              // publicId 
+                    spec1Line, spec1Col,                                        // publicId
+                    spec2Offset + 1, spec2Len - 2,                              // systemId 
+                    spec2Line, spec2Col,                                        // systemId
+                    i + 1, maxi - (i + 2),                                      // internalSubset
+                    currentDocTypeLine, currentDocTypeCol,                      // internalSubset
+                    outerOffset, outerLen,                                      // outer 
+                    line, col);                                                 // outer
+            
+            return true;
+            
+        }
+
+        
+        
+        final int internalSubsetOffset = internalSubsetStart;
+        final int internalSubsetLen = internalSubsetEnd - internalSubsetOffset;
+        final int internalSubsetLine = currentDocTypeLine;
+        final int internalSubsetCol = currentDocTypeCol;
+        
+        i = internalSubsetEnd;
+
+        
+        if (!isValidInternalSubset(buffer, internalSubsetOffset, internalSubsetLen)) {
+            // The internal subset is not well-formed (between brackets)
+            return false;
+        }
+        
+        
+        /*
+         * Fast-forward to the end of the DOCTYPE clause
+         */
+        
+        currentDocTypeLine = docTypeBreakdownLocator.line;
+        currentDocTypeCol = docTypeBreakdownLocator.col;
+        
+        final int clauseEndStart = 
+                MarkupParsingUtil.findNextNonWhitespaceCharWildcard(buffer, i, maxi, docTypeBreakdownLocator);
+
+        if (clauseEndStart != -1) {
+            // We have found more elements inside the DOCTYPE clause after internal subset.
+            // This is not valid.
+            return false;
+        }
+            
+        
+        // If everything we can find until the end of the clause is whitespace, we are fine
         
         handler.docType(
                 buffer, 
@@ -498,8 +719,10 @@ public final class DocTypeMarkupParsingUtil {
                 typeLine, typeCol,                                          // type
                 spec1Offset + 1, spec1Len - 2,                              // publicId 
                 spec1Line, spec1Col,                                        // publicId
-                spec2Start + 1, spec2End - (spec2Start + 2),                // systemId
-                currentDocTypeLine, currentDocTypeCol,                      // systemId
+                spec2Offset + 1, spec2Len - 2,                              // systemId
+                spec2Line, spec2Col,                                        // systemId
+                internalSubsetOffset + 1, internalSubsetLen - 2,            // systemId
+                internalSubsetLine, internalSubsetCol,                      // systemId
                 outerOffset, outerLen,                                      // outer 
                 line, col);                                                 // outer
         
@@ -564,6 +787,17 @@ public final class DocTypeMarkupParsingUtil {
             return false;
         }
         return (buffer[offset] == '"' && buffer[offset + len - 1] == '"');
+        
+    }
+    
+
+
+    private static boolean isValidInternalSubset(final char[] buffer, final int offset, final int len) {
+        
+        if (len < 2) {
+            return false;
+        }
+        return (buffer[offset] == '[' && buffer[offset + len - 1] == ']');
         
     }
     

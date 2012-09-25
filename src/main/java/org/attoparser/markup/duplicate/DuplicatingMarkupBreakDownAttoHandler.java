@@ -316,13 +316,21 @@ public final class DuplicatingMarkupBreakDownAttoHandler extends AbstractMarkupB
 
 
     @Override
-    public void docType(final char[] buffer, final int keywordOffset, final int keywordLen,
-            final int keywordLine, final int keywordCol, final int elementNameOffset,
-            final int elementNameLen, final int elementNameLine, final int elementNameCol,
-            final int typeOffset, final int typeLen, final int typeLine, final int typeCol,
-            final int publicIdOffset, final int publicIdLen, final int publicIdLine,
-            final int publicIdCol, final int systemIdOffset, final int systemIdLen,
-            final int systemIdLine, final int systemIdCol, final int outerOffset, final int outerLen,
+    public void docType(
+            final char[] buffer, 
+            final int keywordOffset, final int keywordLen,
+            final int keywordLine, final int keywordCol, 
+            final int elementNameOffset, final int elementNameLen, 
+            final int elementNameLine, final int elementNameCol,
+            final int typeOffset, final int typeLen, 
+            final int typeLine, final int typeCol,
+            final int publicIdOffset, final int publicIdLen, 
+            final int publicIdLine, final int publicIdCol, 
+            final int systemIdOffset, final int systemIdLen,
+            final int systemIdLine, final int systemIdCol, 
+            final int internalSubsetOffset, final int internalSubsetLen,
+            final int internalSubsetLine, final int internalSubsetCol,
+            final int outerOffset, final int outerLen,
             final int outerLine, final int outerCol) throws AttoParseException {
         
         try {
