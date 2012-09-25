@@ -403,6 +403,31 @@ public final class TracingMarkupBreakDownAttoHandler extends AbstractMarkupBreak
     
     
     
+    @Override
+    public void xmlDeclaration(
+            final char[] buffer, 
+            final int contentOffset, final int contentLen,
+            final int outerOffset, final int outerLen,
+            final int line,final int col) 
+            throws AttoParseException {
+        
+        try {
+            
+            this.writer.write("X");
+            this.writer.write('(');
+            this.writer.write(buffer, contentOffset, contentLen);
+            this.writer.write(')');
+            writePosition(this.writer, line, col);
+            
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        }
+        
+    }
+
+    
+    
+    
 
 
 

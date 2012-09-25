@@ -193,6 +193,27 @@ public final class DuplicatingMarkupAttoHandler extends AbstractMarkupAttoHandle
         
     }
 
+    
+    
+    
+    @Override
+    public void xmlDeclaration(
+            final char[] buffer, 
+            final int contentOffset, final int contentLen,
+            final int outerOffset, final int outerLen,
+            final int line,final int col) 
+            throws AttoParseException {
+        
+        try {
+            
+            this.writer.write(buffer, outerOffset, outerLen);
+            
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        }
+        
+    }
+
 
     
     

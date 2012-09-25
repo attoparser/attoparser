@@ -53,8 +53,8 @@ public interface ISimpleMarkupHandling {
 
     
     public void docType(
-            final String elementName, final String publicId, final String systemId, 
-            final int line, final int col)
+            final String elementName, final String publicId, final String systemId,
+            final String internalSubset, final int line, final int col)
             throws AttoParseException;
     
     
@@ -65,6 +65,12 @@ public interface ISimpleMarkupHandling {
     
     
     public void cdata(
+            final char[] buffer, final int offset, final int len, 
+            final int line, final int col)
+            throws AttoParseException;
+    
+    
+    public void xmlDeclaration(
             final char[] buffer, final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException;

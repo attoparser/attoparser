@@ -35,7 +35,8 @@ import org.attoparser.AttoParseException;
  */
 public abstract class AbstractMarkupAttoHandler 
         extends AbstractAttoHandler
-        implements IElementHandling, IDocTypeHandling, ICdataHandling, ICommentHandling {
+        implements IElementHandling, IDocTypeHandling, ICdataHandling, ICommentHandling,
+                   IXmlDeclarationHandling {
 
 
     
@@ -56,10 +57,12 @@ public abstract class AbstractMarkupAttoHandler
             if (!CommentMarkupParsingUtil.tryParseComment(buffer, offset, len, line, col, this)) {
                  if (!CdataMarkupParsingUtil.tryParseCdata(buffer, offset, len, line, col, this )) {
                      if (!DocTypeMarkupParsingUtil.tryParseDocType(buffer, offset, len, line, col, this)) {
-                         throw new AttoParseException(
-                                 "Could not parse as markup structure: " +
-                                 "\"" + new String(buffer, offset, len) + "\"", 
-                                 line, col);
+                         if (!XmlDeclarationMarkupParsingUtil.tryParseXmlDeclaration(buffer, offset, len, line, col, this)) {
+                             throw new AttoParseException(
+                                     "Could not parse as markup structure: " +
+                                     "\"" + new String(buffer, offset, len) + "\"", 
+                                     line, col);
+                         }
                      }
                  }
             }
@@ -123,6 +126,16 @@ public abstract class AbstractMarkupAttoHandler
     public void cdata(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
+            final int outerOffset, final int outerLen, 
+            final int line, final int col)
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
+    }
+
+
+    public void xmlDeclaration(
+            final char[] buffer, 
+            final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
             final int line, final int col)
             throws AttoParseException {

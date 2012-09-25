@@ -46,7 +46,7 @@ public class AttoParserTest extends TestCase {
     
 
     public void test() throws Exception {
-
+        
 //        testDoc( 
 //                "Hello, <p>lala</p><?xml version=\"1.0\"?>",
 //                "[T(o, ){1,1}T(<p){1,4}]");
@@ -442,15 +442,13 @@ public class AttoParserTest extends TestCase {
 
         testDocError( 
             "Hello, <p>lala</p>",
-            "[T(o, ){1,1}OES(<){1,4}OEN(p){1,5}]",
-            null,
+            null, null,
             4, 5, 
             1, 4);
         
         testDocError( 
             "Hello, <!--lala-->",
-            "[T(o, ){1,1}C(lala){1,4}]",
-            null,
+            null, null,
             4, 8,
             1, 4);
         
@@ -462,15 +460,13 @@ public class AttoParserTest extends TestCase {
 
         testDocError( 
             "Hello, <![CDATA[lala]]>",
-            "[T(o, <![CDATA[){1,1}]",
-            null,
+            null, null,
             4, 12, 
             1, 4);
 
         testDocError( 
             "Hello, <br th:text = \"a= b/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}EW( ){1,11}A(th:text){1,12}( = ){1,19}(\"a= b){1,22}SEE(/>){1,27}]",
-            null,
+            null, null,
             1, 8);
         
         testDoc( 
@@ -490,11 +486,11 @@ public class AttoParserTest extends TestCase {
         testDoc( 
             "<!DOCTYPE>",
             "[DT(DOCTYPE){1,3}(){1,10}(){1,10}(){1,10}(){1,10}(){1,10}]",
-            "[DT()()(){1,1}]");
+            "[DT()()()(){1,1}]");
         testDoc( 
             "<!doctype>",
             "[DT(doctype){1,3}(){1,10}(){1,10}(){1,10}(){1,10}(){1,10}]",
-            "[DT()()(){1,1}]");
+            "[DT()()()(){1,1}]");
         testDoc( 
             "<!DOCTYPE  >",
             "[DT(DOCTYPE){1,3}(){1,10}(){1,10}(){1,10}(){1,10}(){1,10}]",
@@ -506,40 +502,34 @@ public class AttoParserTest extends TestCase {
         testDoc( 
             "<!DOCTYPE  \nhtml>",
             "[DT(DOCTYPE){1,3}(html){2,1}(){2,5}(){2,5}(){2,5}(){2,5}]",
-            "[DT(html)()(){1,1}]");
+            "[DT(html)()()(){1,1}]");
         testDoc( 
             "<!DOCTYPE html >",
-            "[DT(DOCTYPE){1,3}(html){1,11}(){1,15}(){1,15}(){1,15}(){1,15}]",
-            "[DT(html)()(){1,1}]");
+            "[DT(DOCTYPE){1,3}(html){1,11}(){1,16}(){1,16}(){1,16}(){1,16}]",
+            "[DT(html)()()(){1,1}]");
         testDocError( 
             "<!DOCTYPE html \"lalero\">",
-            "[DT(DOCTYPE){1,3}(html){1,11}(lalero){1,16}(){1,24}(){1,24}(){1,24}]",
-            null,
+            null, null,
             1,1);
         testDocError( 
             "<!DOCTYPE html lalero>",
-            "[DT(DOCTYPE){1,3}(html){1,11}(lalero){1,16}(){1,24}(){1,24}(){1,24}]",
-            null,
+            null, null,
             1,1);
         testDocError( 
             "<!DOCTYPE html lalero>",
-            "[DT(DOCTYPE){1,3}(html){1,11}(lalero){1,16}(){1,24}(){1,24}(){1,24}]",
-            null,
+            null, null,
             1,1);
         testDocError( 
             "<!DOCTYPE html \"lalero\">",
-            "[DT(DOCTYPE){1,3}(html){1,11}(lalero){1,16}(){1,24}(){1,24}(){1,24}]",
-            null,
+            null, null,
             1,1);
         testDocError( 
             "<!DOCTYPE html \"lalero\"  >",
-            "[DT(DOCTYPE){1,3}(html){1,11}(lalero){1,16}(){1,24}(){1,24}(){1,24}]",
-            null,
+            null, null,
             1,1);
         testDocError( 
             "<!DOCTYPE html \"lalero>",
-            "[DT(DOCTYPE){1,3}(html){1,11}(lalero){1,16}(){1,23}(){1,23}(){1,23}]",
-            null,
+            null, null,
             1, 1);
         testDoc( 
             "<!DOCTYPE html PUBLIC \"lalero\">",
@@ -548,35 +538,106 @@ public class AttoParserTest extends TestCase {
         testDoc( 
             "<!DOCTYPE html SYSTEM \"lalero\">",
             "[DT(DOCTYPE){1,3}(html){1,11}(SYSTEM){1,16}(){1,23}(lalero){1,23}(){1,31}]",
-            "[DT(html)()(lalero){1,1}]");
+            "[DT(html)()(lalero)(){1,1}]");
         testDocError( 
             "<!DOCTYPE html PUBLIC lalero>",
-            "[DT(DOCTYPE){1,3}(html){1,11}(PUBLIC){1,16}(lalero){1,24}(){1,29}(){1,29}]",
-            null,
+            null, null,
             1,1);
         testDocError( 
             "<!DOCTYPE html PUBLIC lalero   as>",
-            "[DT(DOCTYPE){1,3}(html){1,11}(PUBLIC){1,16}(lalero){1,24}(){1,24}(){1,24}]",
-            null,
+            null, null,
             1,1);
         testDoc( 
             "<!DOCTYPE html PUBLIC \"lalero\">",
-            "[DT(DOCTYPE){1,3}(html){1,11}(PUBLIC){1,16}(lalero){1,24}(){1,24}(){1,24}]",
+            "[DT(DOCTYPE){1,3}(html){1,11}(PUBLIC){1,16}(lalero){1,23}(){1,31}(){1,31}]",
             null);
         testDoc( 
             "<!DOCTYPE html system \"lalero\"  >",
-            "[DT(DOCTYPE){1,3}(html){1,11}(system){1,16}(){1,23}(lalero){1,23}(){1,23}]",
-            "[DT(html)()(lalero){1,1}]");
+            "[DT(DOCTYPE){1,3}(html){1,11}(system){1,16}(){1,23}(lalero){1,23}(){1,33}]",
+            "[DT(html)()(lalero)(){1,1}]");
         testDoc( 
             "<!DOCTYPE html public \"lalero\"   \n\"hey\">",
-            "[DT(DOCTYPE){1,3}(html){1,11}(public){1,16}(lalero){1,23}(hey){2,1}(){2,1}]",
-            "[DT(html)(lalero)(hey){1,1}]");
+            "[DT(DOCTYPE){1,3}(html){1,11}(public){1,16}(lalero){1,23}(hey){2,1}(){2,6}]",
+            "[DT(html)(lalero)(hey)(){1,1}]");
         testDoc( 
             "<!DOCTYPE html system \n\"lalero\"\"le\">",
-            "[DT(DOCTYPE){1,3}(html){1,11}(system){1,16}(){2,1}(lalero\"\"le){2,1}(){2,1}]",
+            "[DT(DOCTYPE){1,3}(html){1,11}(system){1,16}(){2,1}(lalero\"\"le){2,1}(){2,13}]",
             null);
+        testDocError( 
+            "<!DOCTYPE html system \n\"lalero\" \"le\">",
+            null, null,
+            1,1);
+        testDoc( 
+            "<!DOCTYPE html system \n\"lalero\" [somethinghere]>",
+            "[DT(DOCTYPE){1,3}(html){1,11}(system){1,16}(){2,1}(lalero){2,1}(somethinghere){2,10}]",
+            "[DT(html)()(lalero)(somethinghere){1,1}]");
+        testDoc( 
+            "<!DOCTYPE html public \n\"lalero\" [somethinghere]>",
+            "[DT(DOCTYPE){1,3}(html){1,11}(public){1,16}(lalero){2,1}(){2,10}(somethinghere){2,10}]",
+            "[DT(html)(lalero)()(somethinghere){1,1}]");
+        testDocError( 
+            "<!DOCTYPE html public \n\"lalero\" asas [somethinghere]>",
+            null, null,
+            1,1);
+        testDocError( 
+            "<!DOCTYPE html system \n\"lalero\" asas [somethinghere]>",
+            null, null, 
+            1,1);
+        testDocError( 
+            "<!DOCTYPE html system \n\"lalero\" \"asas\" [somethinghere]>",
+            null, null, 
+            1,1);
+        testDoc( 
+            "<!DOCTYPE html public \n\"lalero\" \"asas\" [somethinghere]>",
+            "[DT(DOCTYPE){1,3}(html){1,11}(public){1,16}(lalero){2,1}(asas){2,10}(somethinghere){2,17}]",
+            null);
+        testDoc( 
+            "<!DOCTYPE html public \n\"lalero\" \"asas\" \n\n[somethinghere]\n  >",
+            "[DT(DOCTYPE){1,3}(html){1,11}(public){1,16}(lalero){2,1}(asas){2,10}(somethinghere){4,1}]",
+            "[DT(html)(lalero)(asas)(somethinghere){1,1}]");
+        testDoc( 
+            "<!DOCTYPE sgml public \"lele\" [\n <!ELEMENT sgml ANY>\n  <!ENTITY % std       \"standard SGML\">\n ]>",
+            "[DT(DOCTYPE){1,3}(sgml){1,11}(public){1,16}(lele){1,23}(){1,30}(\n <!ELEMENT sgml ANY>\n  <!ENTITY % std       \"standard SGML\">\n ){1,30}]",
+            null);
+        testDoc( 
+            "<!DOCTYPE sgml [\n <!ELEMENT sgml ANY>\n  <!ENTITY % std       \"standard SGML\">\n ]>",
+            "[DT(DOCTYPE){1,3}(sgml){1,11}(){1,16}(){1,16}(){1,16}(\n <!ELEMENT sgml ANY>\n  <!ENTITY % std       \"standard SGML\">\n ){1,16}]",
+            "[DT(sgml)()()(\n <!ELEMENT sgml ANY>\n  <!ENTITY % std       \"standard SGML\">\n ){1,1}]");
+        testDocError( 
+            "<!DOCTYPE sgml public [\n <!ELEMENT sgml ANY>\n  <!ENTITY % std       \"standard SGML\">\n ]>",
+            null, null,
+            1,1);
+        testDoc( 
+            "<!DOCTYPE sgml public \"lele\" [\n <!ELEMENT sgml ANY>\n <!-- this is a comment inside --> <!ENTITY % std       \"standard SGML\">\n ]>",
+            "[DT(DOCTYPE){1,3}(sgml){1,11}(public){1,16}(lele){1,23}(){1,30}(\n <!ELEMENT sgml ANY>\n <!-- this is a comment inside --> <!ENTITY % std       \"standard SGML\">\n ){1,30}]",
+            null);
+        testDoc( 
+            "<!DOCTYPE sgml system \"lele\" [\n <!ELEMENT sgml ANY>\n <!-- this is a comment inside --> <!ENTITY % std       \"standard SGML\">\n ]>",
+            "[DT(DOCTYPE){1,3}(sgml){1,11}(system){1,16}(){1,23}(lele){1,23}(\n <!ELEMENT sgml ANY>\n <!-- this is a comment inside --> <!ENTITY % std       \"standard SGML\">\n ){1,30}]",
+            "[DT(sgml)()(lele)(\n <!ELEMENT sgml ANY>\n <!-- this is a comment inside --> <!ENTITY % std       \"standard SGML\">\n ){1,1}]");
+        testDocError( 
+            "<!DOCTYPE sgml public \"lele\" [\n <!ELEMENT sgml [ ANY>\n <!-- this is a comment inside --> <!ENTITY % std       \"standard SGML\">\n ]>",
+            null, null,
+            1,1);
+        testDoc( 
+            "<!DOCTYPE sgml public \"lele\" [\n <!ELEMENT sgml [ ANY>]\n <!-- this is a comment inside --> <!ENTITY % std       \"standard SGML\">\n ]>",
+            "[DT(DOCTYPE){1,3}(sgml){1,11}(public){1,16}(lele){1,23}(){1,30}(\n <!ELEMENT sgml [ ANY>]\n <!-- this is a comment inside --> <!ENTITY % std       \"standard SGML\">\n ){1,30}]",
+            "[DT(sgml)(lele)()(\n <!ELEMENT sgml [ ANY>]\n <!-- this is a comment inside --> <!ENTITY % std       \"standard SGML\">\n ){1,1}]");
         
+        testDoc( 
+            "<?xml version=\"1.0\"?>",
+            "[X(xml version=\"1.0\"){1,1}]",
+            "[X(xml version=\"1.0\"){1,1}]");
         
+        testDoc( 
+            "<?xml version=\"1.0\"?><!DOCTYPE html>",
+            "[X(xml version=\"1.0\"){1,1}DT(DOCTYPE){1,24}(html){1,32}(){1,36}(){1,36}(){1,36}(){1,36}]",
+            "[X(xml version=\"1.0\"){1,1}DT(html)()()(){1,22}]");
+        testDoc( 
+            "<?xml version=\"1.0\"?>\n<!DOCTYPE html>",
+            "[X(xml version=\"1.0\"){1,1}T(\n){1,22}DT(DOCTYPE){2,3}(html){2,11}(){2,15}(){2,15}(){2,15}(){2,15}]",
+            "[X(xml version=\"1.0\"){1,1}T(\n){1,22}DT(html)()()(){2,1}]");
+                
         
         
         System.out.println("TOTAL Test executions: " + totalTestExecutions);
@@ -628,7 +689,7 @@ public class AttoParserTest extends TestCase {
     static void testDoc(final char[] input, final String outputBreakDown, final String outputSimple, final int offset, final int len) throws AttoParseException {
 
         final int maxBufferSize = 16384;
-        for (int bufferSize = 1; bufferSize < maxBufferSize; bufferSize++) {
+        for (int bufferSize = 16384; bufferSize <= maxBufferSize; bufferSize++) {
             testDoc(input, outputBreakDown, outputSimple, offset, len, bufferSize);
         }
         
@@ -655,7 +716,9 @@ public class AttoParserTest extends TestCase {
                     ((AbstractBufferedAttoParser)parser).parseDocument(new CharArrayReader(input, offset, len), handler, bufferSize);
                 }
                 final String result = sw.toString();
-                assertEquals(outputBreakDown, result);
+                if (outputBreakDown != null) {
+                    assertEquals(outputBreakDown, result);
+                }
             }
 
             

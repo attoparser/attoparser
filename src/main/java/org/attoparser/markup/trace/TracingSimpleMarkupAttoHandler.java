@@ -148,6 +148,7 @@ public final class TracingSimpleMarkupAttoHandler extends AbstractSimpleMarkupAt
             final String elementName, 
             final String publicId, 
             final String systemId, 
+            final String internalSubset,
             final int line, final int col) 
             throws AttoParseException {
         
@@ -158,10 +159,13 @@ public final class TracingSimpleMarkupAttoHandler extends AbstractSimpleMarkupAt
             this.writer.write(elementName);
             this.writer.write(')');
             this.writer.write('(');
-            this.writer.write(publicId);
+            this.writer.write((publicId == null? "" : publicId));
             this.writer.write(')');
             this.writer.write('(');
-            this.writer.write(systemId);
+            this.writer.write((systemId == null? "" : systemId));
+            this.writer.write(')');
+            this.writer.write('(');
+            this.writer.write((internalSubset == null? "" : internalSubset));
             this.writer.write(')');
             writePosition(this.writer, line, col);
             
@@ -238,9 +242,33 @@ public final class TracingSimpleMarkupAttoHandler extends AbstractSimpleMarkupAt
         
     }
 
+    
+    
+    
+    @Override
+    public void xmlDeclaration(
+            final char[] buffer, 
+            final int offset, final int len, 
+            final int line,final int col) 
+            throws AttoParseException {
+        
+        try {
+            
+            this.writer.write("X");
+            this.writer.write('(');
+            this.writer.write(buffer, offset, len);
+            this.writer.write(')');
+            writePosition(this.writer, line, col);
+            
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        }
+        
+    }
 
-    
-    
+
+
+
     private static void writeAttributes(final Writer writer, final Map<String,String> attributes) throws IOException {
         if (attributes == null || attributes.size() == 0) {
             return;

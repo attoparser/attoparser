@@ -270,8 +270,9 @@ public abstract class AbstractSimpleMarkupAttoHandler
         
         docType(
                 new String(buffer, elementNameOffset, elementNameLen),
-                (publicIdLen <= 0? "" : new String(buffer, publicIdOffset, publicIdLen)),
-                (systemIdLen <= 0? "" : new String(buffer, systemIdOffset, systemIdLen)),
+                (publicIdLen <= 0? null : new String(buffer, publicIdOffset, publicIdLen)),
+                (systemIdLen <= 0? null : new String(buffer, systemIdOffset, systemIdLen)),
+                (internalSubsetLen <= 0? null : new String(buffer, internalSubsetOffset, internalSubsetLen)),
                 outerLine, outerCol);
         
     }
@@ -307,12 +308,28 @@ public abstract class AbstractSimpleMarkupAttoHandler
         cdata(buffer, contentOffset, contentLen, line, col);
         
     }
+    
+    
+
+    @Override
+    public final void xmlDeclaration(
+            final char[] buffer, 
+            final int contentOffset, final int contentLen, 
+            final int outerOffset, final int outerLen, 
+            final int line, final int col)
+            throws AttoParseException {
+
+        super.xmlDeclaration(
+                buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
+        
+        xmlDeclaration(buffer, contentOffset, contentLen, line, col);
+        
+    }
+
 
     
     
     
-    
-
     public void standaloneElement(
             final String elementName, final Map<String,String> attributes,
             final int line, final int col)
@@ -338,7 +355,7 @@ public abstract class AbstractSimpleMarkupAttoHandler
     
     public void docType(
             final String elementName, final String publicId, final String systemId, 
-            final int line, final int col)
+            final String internalSubset, final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
@@ -355,6 +372,15 @@ public abstract class AbstractSimpleMarkupAttoHandler
     public void cdata(
             final char[] buffer, final int offset, final int len, 
             final int line, final int col)
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
+    }
+
+
+    public void xmlDeclaration(
+            final char[] buffer, 
+            final int offset, final int len, 
+            final int line, final int col) 
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
