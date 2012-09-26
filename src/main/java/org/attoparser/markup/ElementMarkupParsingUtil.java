@@ -51,10 +51,11 @@ public final class ElementMarkupParsingUtil {
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col, 
+            final boolean allowExclMarksAtFirstChar,
             final IElementHandling handler)
             throws AttoParseException {
         
-        if (!tryParseElement(buffer, offset, len, line, col, handler)) {
+        if (!tryParseElement(buffer, offset, len, line, col, allowExclMarksAtFirstChar, handler)) {
             throw new AttoParseException(
                     "Could not parse as markup element: \"" + new String(buffer, offset, len) + "\"", line, col);
         }
@@ -66,19 +67,20 @@ public final class ElementMarkupParsingUtil {
     public static boolean tryParseElement(
             final char[] buffer, 
             final int offset, final int len, 
-            final int line, final int col, 
+            final int line, final int col,
+            final boolean allowExclMarksAtFirstChar,
             final IElementHandling handler)
             throws AttoParseException {
 
         if (len > 3 &&
-                isCloseElementStart(buffer, offset, offset + len) &&
+                isCloseElementStart(buffer, offset, offset + len, allowExclMarksAtFirstChar) &&
                 buffer[offset + len - 1] == '>') {
             
             handler.closeElement(buffer, offset + 2, len - 3, offset, len, line, col);
             return true;
             
         } else if (len > 3 &&
-                isOpenElementStart(buffer, offset, offset + len) &&
+                isOpenElementStart(buffer, offset, offset + len, allowExclMarksAtFirstChar) &&
                 buffer[offset + len - 2] == '/' &&
                 buffer[offset + len - 1] == '>') {
             
@@ -86,7 +88,7 @@ public final class ElementMarkupParsingUtil {
             return true;
             
         } else if (len > 2 && 
-                isOpenElementStart(buffer, offset, offset + len) &&
+                isOpenElementStart(buffer, offset, offset + len, allowExclMarksAtFirstChar) &&
                 buffer[offset + len - 1] == '>'){
             
             handler.openElement(buffer, offset + 1, len - 2, offset, len, line, col);
@@ -607,22 +609,28 @@ public final class ElementMarkupParsingUtil {
     
     
     
-    static boolean isOpenElementStart(final char[] buffer, final int offset, final int maxi) {
-        return ((maxi - offset > 1) && 
+    static boolean isOpenElementStart(final char[] buffer, final int offset, final int maxi,
+            final boolean allowExclMarksAtFirstChar) {
+        final int len = maxi - offset;
+        return (len > 1 && 
                     buffer[offset] == '<' &&
                     buffer[offset + 1] != '/' && 
-                    buffer[offset + 1] != '!' && 
+                    (allowExclMarksAtFirstChar || buffer[offset + 1] != '!') && 
                     buffer[offset + 1] != '?' &&
+                    (len <= 2 || buffer[offset + 2] != '[') &&
                     !Character.isWhitespace(buffer[offset + 1]));
     }
 
     
-    static boolean isCloseElementStart(final char[] buffer, final int offset, final int maxi) {
-        return ((maxi - offset > 2) && 
+    static boolean isCloseElementStart(final char[] buffer, final int offset, final int maxi,
+            final boolean allowExclMarksAtFirstChar) {
+        final int len = maxi - offset;
+        return (len > 2 && 
                     buffer[offset] == '<' &&
                     buffer[offset + 1] == '/' &&
-                    buffer[offset + 2] != '!' && 
+                    (allowExclMarksAtFirstChar || buffer[offset + 2] != '!') && 
                     buffer[offset + 2] != '?' &&
+                    (len <= 3 || buffer[offset + 3] != '[') &&
                     !Character.isWhitespace(buffer[offset + 2]));
     }
 

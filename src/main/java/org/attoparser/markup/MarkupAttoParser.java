@@ -89,9 +89,9 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                     return new BufferParseResult(current, currentLine, currentCol, false);
                 }
 
-                inOpenElement = ElementMarkupParsingUtil.isOpenElementStart(buffer, tagStart, maxi);
+                inOpenElement = ElementMarkupParsingUtil.isOpenElementStart(buffer, tagStart, maxi, false);
                 if (!inOpenElement) {
-                    inCloseElement = ElementMarkupParsingUtil.isCloseElementStart(buffer, tagStart, maxi);
+                    inCloseElement = ElementMarkupParsingUtil.isCloseElementStart(buffer, tagStart, maxi, false);
                     if (!inCloseElement) {
                         inComment = CommentMarkupParsingUtil.isCommentStart(buffer, tagStart, maxi);
                         if (!inComment) {
@@ -100,6 +100,14 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                                 inDocType = DocTypeMarkupParsingUtil.isDocTypeStart(buffer, tagStart, maxi);
                                 if (!inDocType) {
                                     inXmlDeclaration = XmlDeclarationMarkupParsingUtil.isXmlDeclarationStart(buffer, tagStart, maxi);
+                                    if (!inXmlDeclaration) {
+                                        // We test open/close elements again so that we can handle elements starting with "!" and avoid 
+                                        // collisions with DOCTYPE
+                                        inOpenElement = ElementMarkupParsingUtil.isOpenElementStart(buffer, tagStart, maxi, true);
+                                        if (!inOpenElement) {
+                                            inCloseElement = ElementMarkupParsingUtil.isCloseElementStart(buffer, tagStart, maxi, true);
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -121,9 +129,9 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                         return new BufferParseResult(current, currentLine, currentCol, false);
                     }
 
-                    inOpenElement = ElementMarkupParsingUtil.isOpenElementStart(buffer, tagStart, maxi);
+                    inOpenElement = ElementMarkupParsingUtil.isOpenElementStart(buffer, tagStart, maxi, false);
                     if (!inOpenElement) {
-                        inCloseElement = ElementMarkupParsingUtil.isCloseElementStart(buffer, tagStart, maxi);
+                        inCloseElement = ElementMarkupParsingUtil.isCloseElementStart(buffer, tagStart, maxi, false);
                         if (!inCloseElement) {
                             inComment = CommentMarkupParsingUtil.isCommentStart(buffer, tagStart, maxi);
                             if (!inComment) {
@@ -132,6 +140,14 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                                     inDocType = DocTypeMarkupParsingUtil.isDocTypeStart(buffer, tagStart, maxi);
                                     if (!inDocType) {
                                         inXmlDeclaration = XmlDeclarationMarkupParsingUtil.isXmlDeclarationStart(buffer, tagStart, maxi);
+                                        if (!inXmlDeclaration) {
+                                            // We test open/close elements again so that we can handle elements starting with "!" and avoid 
+                                            // collisions with DOCTYPE
+                                            inOpenElement = ElementMarkupParsingUtil.isOpenElementStart(buffer, tagStart, maxi, true);
+                                            if (!inOpenElement) {
+                                                inCloseElement = ElementMarkupParsingUtil.isCloseElementStart(buffer, tagStart, maxi, true);
+                                            }
+                                        }
                                     }
                                 }
                             }
