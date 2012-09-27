@@ -69,6 +69,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
         boolean inCdata = false;
         boolean inDocType = false;
         boolean inXmlDeclaration = false;
+        boolean inProcessingInstruction = false;
         
         int tagStart = -1;
         int tagEnd = -1;
@@ -79,7 +80,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
             currentCol = locator.col;
             
             inStructure =
-                    (inOpenElement || inCloseElement || inComment || inCdata || inDocType || inXmlDeclaration);
+                    (inOpenElement || inCloseElement || inComment || inCdata || inDocType || inXmlDeclaration || inProcessingInstruction);
             
             if (!inStructure) {
                 
@@ -101,11 +102,14 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                                 if (!inDocType) {
                                     inXmlDeclaration = XmlDeclarationMarkupParsingUtil.isXmlDeclarationStart(buffer, tagStart, maxi);
                                     if (!inXmlDeclaration) {
-                                        // We test open/close elements again so that we can handle elements starting with "!" and avoid 
-                                        // collisions with DOCTYPE
-                                        inOpenElement = ElementMarkupParsingUtil.isOpenElementStart(buffer, tagStart, maxi, true);
-                                        if (!inOpenElement) {
-                                            inCloseElement = ElementMarkupParsingUtil.isCloseElementStart(buffer, tagStart, maxi, true);
+                                        inProcessingInstruction = ProcessingInstructionMarkupParsingUtil.isProcessingInstructionStart(buffer, tagStart, maxi);
+                                        if (!inProcessingInstruction) {
+                                            // We test open/close elements again so that we can handle elements starting with "!" and avoid 
+                                            // collisions with DOCTYPE
+                                            inOpenElement = ElementMarkupParsingUtil.isOpenElementStart(buffer, tagStart, maxi, true);
+                                            if (!inOpenElement) {
+                                                inCloseElement = ElementMarkupParsingUtil.isCloseElementStart(buffer, tagStart, maxi, true);
+                                            }
                                         }
                                     }
                                 }
@@ -115,7 +119,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                 }
                 
                 inStructure =
-                        (inOpenElement || inCloseElement || inComment || inCdata || inDocType || inXmlDeclaration);
+                        (inOpenElement || inCloseElement || inComment || inCdata || inDocType || inXmlDeclaration || inProcessingInstruction);
                 
                 
                 while (!inStructure) {
@@ -141,11 +145,14 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                                     if (!inDocType) {
                                         inXmlDeclaration = XmlDeclarationMarkupParsingUtil.isXmlDeclarationStart(buffer, tagStart, maxi);
                                         if (!inXmlDeclaration) {
-                                            // We test open/close elements again so that we can handle elements starting with "!" and avoid 
-                                            // collisions with DOCTYPE
-                                            inOpenElement = ElementMarkupParsingUtil.isOpenElementStart(buffer, tagStart, maxi, true);
-                                            if (!inOpenElement) {
-                                                inCloseElement = ElementMarkupParsingUtil.isCloseElementStart(buffer, tagStart, maxi, true);
+                                            inProcessingInstruction = ProcessingInstructionMarkupParsingUtil.isProcessingInstructionStart(buffer, tagStart, maxi);
+                                            if (!inProcessingInstruction) {
+                                                // We test open/close elements again so that we can handle elements starting with "!" and avoid 
+                                                // collisions with DOCTYPE
+                                                inOpenElement = ElementMarkupParsingUtil.isOpenElementStart(buffer, tagStart, maxi, true);
+                                                if (!inOpenElement) {
+                                                    inCloseElement = ElementMarkupParsingUtil.isCloseElementStart(buffer, tagStart, maxi, true);
+                                                }
                                             }
                                         }
                                     }
@@ -155,7 +162,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                     }
                     
                     inStructure =
-                            (inOpenElement || inCloseElement || inComment || inCdata || inDocType);
+                            (inOpenElement || inCloseElement || inComment || inCdata || inDocType || inXmlDeclaration || inProcessingInstruction);
                 
                 }
             
@@ -171,7 +178,10 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                 i = current;
                 
             } else {
-                        
+
+                // We do not include processing instructions here because their format
+                // is undefined, and everything should be allowed except the "?>" sequence,
+                // which will terminate the instruction.
                 final boolean avoidQuotes =
                         (inOpenElement || inCloseElement || inDocType || inXmlDeclaration);
 
@@ -244,10 +254,29 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                     inDocType = false;
                     
                 } else if (inXmlDeclaration) {
-                    // This is a XML Declaration
-                    
+                    // This is an XML Declaration
+
                     handler.structure(buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
                     inXmlDeclaration = false;
+                    
+                } else if (inProcessingInstruction) {
+                    // This is a processing instruction
+
+                    while (tagEnd - current < 5 || buffer[tagEnd - 1] != '?') {
+                        // the '>' we chose is not the PI-closing one. Let's find again
+
+                        MarkupParsingLocator.countChar(locator, buffer[tagEnd]);
+                        tagEnd = MarkupParsingUtil.findNextStructureEndDontAvoidQuotes(buffer, tagEnd + 1, maxi, locator);
+                        
+                        if (tagEnd == -1) {
+                            return new BufferParseResult(current, currentLine, currentCol, true);
+                        }
+                        
+                    }
+                    
+
+                    handler.structure(buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
+                    inProcessingInstruction = false;
                     
                 } else {
 

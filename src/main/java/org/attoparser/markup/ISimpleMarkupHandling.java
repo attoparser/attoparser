@@ -34,6 +34,13 @@ import org.attoparser.AttoParseException;
 public interface ISimpleMarkupHandling {
 
     
+    public void startDocument()
+            throws AttoParseException;
+
+    
+    public void endDocument()
+            throws AttoParseException;
+    
     
     public void standaloneElement(
             final String elementName, final Map<String,String> attributes,
@@ -50,11 +57,29 @@ public interface ISimpleMarkupHandling {
     public void closeElement(
             final String elementName, final int line, final int col)
             throws AttoParseException;
+    
+    
+    public void xmlDeclaration(
+            final String content, 
+            final int line, final int col)
+            throws AttoParseException;
 
     
     public void docType(
             final String elementName, final String publicId, final String systemId,
             final String internalSubset, final int line, final int col)
+            throws AttoParseException;
+    
+
+    public void processingInstruction(
+            final String target, final String content, 
+            int line, int col) 
+            throws AttoParseException;
+
+    
+    public void text(
+            final char[] buffer, final int offset, final int len, 
+            final int line, final int col)
             throws AttoParseException;
     
     
@@ -68,12 +93,5 @@ public interface ISimpleMarkupHandling {
             final char[] buffer, final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException;
-    
-    
-    public void xmlDeclaration(
-            final char[] buffer, final int offset, final int len, 
-            final int line, final int col)
-            throws AttoParseException;
-
     
 }

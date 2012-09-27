@@ -29,7 +29,7 @@ import org.attoparser.AttoParseException;
  * @since 1.0
  *
  */
-public interface IElementBreakDownHandling {
+public interface IElementBreakDownHandling extends IAttributeSequenceHandling {
 
     
     public void standaloneElementStart(
@@ -90,25 +90,6 @@ public interface IElementBreakDownHandling {
             final int line, final int col)
             throws AttoParseException;
 
-    
-    
-    public void elementAttribute(
-            final char[] buffer,
-            final int nameOffset, final int nameLen,
-            final int nameLine, final int nameCol,
-            final int operatorOffset, final int operatorLen,
-            final int operatorLine, final int operatorCol,
-            final int valueContentOffset, final int valueContentLen,
-            final int valueOuterOffset, final int valueOuterLen,
-            final int valueLine, final int valueCol)
-            throws AttoParseException;
 
-    
-    
-    public void elementWhitespace(
-            final char[] buffer, 
-            final int offset, final int len,
-            final int line, final int col)
-            throws AttoParseException;
     
 }

@@ -180,7 +180,7 @@ public abstract class AbstractMarkupBreakDownAttoHandler
 
 
     
-    public void elementAttribute(
+    public void attribute(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol,
@@ -195,7 +195,7 @@ public abstract class AbstractMarkupBreakDownAttoHandler
 
 
     
-    public void elementWhitespace(
+    public void attributeSeparator(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)

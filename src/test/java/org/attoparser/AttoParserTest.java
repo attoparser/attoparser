@@ -77,9 +77,6 @@ public class AttoParserTest extends TestCase {
         assertEquals("[DT(html public \"aaa\" [<!ELEMENT>]){1,1}]", sw4.toString());
         
         
-//        testDoc( 
-//                "Hello, <p>lala</p><?xml version=\"1.0\"?>",
-//                "[T(o, ){1,1}T(<p){1,4}]");
         testDoc( 
             "<h1>Hello</ h1>",
             "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}T(Hello</ h1>){1,5}]",
@@ -102,11 +99,11 @@ public class AttoParserTest extends TestCase {
             "[OE(h1){1,1}T(Hello){1,5}CE(h1){1,10}]");
         testDoc( 
             "<h1>Hello</h1 >",
-            "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}T(Hello){1,5}CES(</){1,10}CEN(h1){1,12}EW( ){1,14}CEE(>){1,15}]",
+            "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}T(Hello){1,5}CES(</){1,10}CEN(h1){1,12}AS( ){1,14}CEE(>){1,15}]",
             "[OE(h1){1,1}T(Hello){1,5}CE(h1){1,10}]");
         testDoc( 
             "<h1>Hello</h1 \n\n>",
-            "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}T(Hello){1,5}CES(</){1,10}CEN(h1){1,12}EW( \n\n){1,14}CEE(>){3,1}]",
+            "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}T(Hello){1,5}CES(</){1,10}CEN(h1){1,12}AS( \n\n){1,14}CEE(>){3,1}]",
             "[OE(h1){1,1}T(Hello){1,5}CE(h1){1,10}]");
         testDoc( 
             "<\np  >Hello</p>",
@@ -149,80 +146,80 @@ public class AttoParserTest extends TestCase {
             "[T(Hello, ){1,1}SE(br){1,8}]");
         testDoc( 
             "Hello, <br th:text=\"ll\"/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}EW( ){1,11}A(th:text){1,12}(=){1,19}(\"ll\"){1,20}SEE(/>){1,24}]",
+            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}(=){1,19}(\"ll\"){1,20}SEE(/>){1,24}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]");
         testDoc( 
             "Hello, <br th:text =\"ll\"/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}EW( ){1,11}A(th:text){1,12}( =){1,19}(\"ll\"){1,21}SEE(/>){1,25}]",
+            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( =){1,19}(\"ll\"){1,21}SEE(/>){1,25}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]");
         testDoc( 
             "Hello, <br th:text =   \"ll\"/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}EW( ){1,11}A(th:text){1,12}( =   ){1,19}(\"ll\"){1,24}SEE(/>){1,28}]",
+            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( =   ){1,19}(\"ll\"){1,24}SEE(/>){1,28}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]");
         testDoc( 
             "Hello, <br th:text =   ll/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}EW( ){1,11}A(th:text){1,12}( =   ){1,19}(ll){1,24}SEE(/>){1,26}]",
+            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( =   ){1,19}(ll){1,24}SEE(/>){1,26}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]");
         testDoc( 
             "Hello, <br th:text =   \"ll\"a=2/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}EW( ){1,11}A(th:text){1,12}( =   ){1,19}(\"ll\"){1,24}A(a){1,28}(=){1,29}(2){1,30}SEE(/>){1,31}]",
+            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( =   ){1,19}(\"ll\"){1,24}A(a){1,28}(=){1,29}(2){1,30}SEE(/>){1,31}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll',a='2']){1,8}]");
         testDoc( 
             "Hello, <br th:text =   \"ll\"a= \n 2/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}EW( ){1,11}A(th:text){1,12}( =   ){1,19}(\"ll\"){1,24}A(a){1,28}(= \n ){1,29}(2){2,2}SEE(/>){2,3}]",
+            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( =   ){1,19}(\"ll\"){1,24}A(a){1,28}(= \n ){1,29}(2){2,2}SEE(/>){2,3}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll',a='2']){1,8}]");
         testDoc( 
             "Hello, <br th:text =   ll a= \n 2/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}EW( ){1,11}A(th:text){1,12}( =   ){1,19}(ll){1,24}EW( ){1,26}A(a){1,27}(= \n ){1,28}(2){2,2}SEE(/>){2,3}]",
+            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( =   ){1,19}(ll){1,24}AS( ){1,26}A(a){1,27}(= \n ){1,28}(2){2,2}SEE(/>){2,3}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll',a='2']){1,8}]");
         testDoc( 
             "Hello, <br th:text =   ll a/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}EW( ){1,11}A(th:text){1,12}( =   ){1,19}(ll){1,24}EW( ){1,26}A(a){1,27}(){1,28}(){1,28}SEE(/>){1,28}]",
+            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( =   ){1,19}(ll){1,24}AS( ){1,26}A(a){1,27}(){1,28}(){1,28}SEE(/>){1,28}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll',a='']){1,8}]");
         testDoc( 
             "Hello, <br th:text =   ll a=/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}EW( ){1,11}A(th:text){1,12}( =   ){1,19}(ll){1,24}EW( ){1,26}A(a){1,27}(=){1,28}(){1,29}SEE(/>){1,29}]",
+            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( =   ){1,19}(ll){1,24}AS( ){1,26}A(a){1,27}(=){1,28}(){1,29}SEE(/>){1,29}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll',a='']){1,8}]");
         testDoc( 
             "Hello, <br th:text = a=/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}EW( ){1,11}A(th:text){1,12}( = ){1,19}(a=){1,22}SEE(/>){1,24}]",
+            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( = ){1,19}(a=){1,22}SEE(/>){1,24}]",
             "[T(Hello, ){1,1}SE(br[th:text='a=']){1,8}]");
         testDoc( 
             "Hello, <br th:text = a= b/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}EW( ){1,11}A(th:text){1,12}( = ){1,19}(a=){1,22}EW( ){1,24}A(b){1,25}(){1,26}(){1,26}SEE(/>){1,26}]",
+            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( = ){1,19}(a=){1,22}AS( ){1,24}A(b){1,25}(){1,26}(){1,26}SEE(/>){1,26}]",
             "[T(Hello, ){1,1}SE(br[th:text='a=',b='']){1,8}]");
         testDoc( 
             "Hello, <br th:text = a=b/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}EW( ){1,11}A(th:text){1,12}( = ){1,19}(a=b){1,22}SEE(/>){1,25}]",
+            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( = ){1,19}(a=b){1,22}SEE(/>){1,25}]",
             "[T(Hello, ){1,1}SE(br[th:text='a=b']){1,8}]");
         testDoc( 
             "Hello, <br th:text = \"a=b\"/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}EW( ){1,11}A(th:text){1,12}( = ){1,19}(\"a=b\"){1,22}SEE(/>){1,27}]",
+            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( = ){1,19}(\"a=b\"){1,22}SEE(/>){1,27}]",
             "[T(Hello, ){1,1}SE(br[th:text='a=b']){1,8}]");
         testDoc( 
             "Hello, <br th:text = \"a= b\"/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}EW( ){1,11}A(th:text){1,12}( = ){1,19}(\"a= b\"){1,22}SEE(/>){1,28}]",
+            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( = ){1,19}(\"a= b\"){1,22}SEE(/>){1,28}]",
             "[T(Hello, ){1,1}SE(br[th:text='a= b']){1,8}]");
         testDoc( 
             "Hello, <br th:text = \"a= b\"\n/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}EW( ){1,11}A(th:text){1,12}( = ){1,19}(\"a= b\"){1,22}EW(\n){1,28}SEE(/>){2,1}]",
+            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( = ){1,19}(\"a= b\"){1,22}AS(\n){1,28}SEE(/>){2,1}]",
             "[T(Hello, ){1,1}SE(br[th:text='a= b']){1,8}]");
         testDoc( 
             "Hello, <br  th:text=\"ll\"/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}EW(  ){1,11}A(th:text){1,13}(=){1,20}(\"ll\"){1,21}SEE(/>){1,25}]",
+            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS(  ){1,11}A(th:text){1,13}(=){1,20}(\"ll\"){1,21}SEE(/>){1,25}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]");
         testDoc( 
             "Hello, <br \nth:text=\"ll\"/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}EW( \n){1,11}A(th:text){2,1}(=){2,8}(\"ll\"){2,9}SEE(/>){2,13}]",
+            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( \n){1,11}A(th:text){2,1}(=){2,8}(\"ll\"){2,9}SEE(/>){2,13}]",
             null);
         testDoc( 
             "Hello, World! <br/>\n<div\n l\n     a=\"12 3\" zas    o=\"\"  b=\"lelo\n  = s\">lala</div> <p th=\"lala\" >liool</p>",
             "[T(Hello, World! ){1,1}SES(<){1,15}SEN(br){1,16}SEE(/>){1,18}T(\n){1,20}" +
-              "OES(<){2,1}OEN(div){2,2}EW(\n ){2,5}A(l){3,2}(){3,3}(){3,3}EW(\n     ){3,3}" +
-              "A(a){4,6}(=){4,7}(\"12 3\"){4,8}EW( ){4,14}A(zas){4,15}(){4,18}(){4,18}EW(    ){4,18}" +
-              "A(o){4,22}(=){4,23}(\"\"){4,24}EW(  ){4,26}A(b){4,28}(=){4,29}(\"lelo\n  = s\"){4,30}" +
+              "OES(<){2,1}OEN(div){2,2}AS(\n ){2,5}A(l){3,2}(){3,3}(){3,3}AS(\n     ){3,3}" +
+              "A(a){4,6}(=){4,7}(\"12 3\"){4,8}AS( ){4,14}A(zas){4,15}(){4,18}(){4,18}AS(    ){4,18}" +
+              "A(o){4,22}(=){4,23}(\"\"){4,24}AS(  ){4,26}A(b){4,28}(=){4,29}(\"lelo\n  = s\"){4,30}" +
               "OEE(>){5,7}T(lala){5,8}CES(</){5,12}CEN(div){5,14}CEE(>){5,17}T( ){5,18}" +
-              "OES(<){5,19}OEN(p){5,20}EW( ){5,21}A(th){5,22}(=){5,24}(\"lala\"){5,25}EW( ){5,31}OEE(>){5,32}" +
+              "OES(<){5,19}OEN(p){5,20}AS( ){5,21}A(th){5,22}(=){5,24}(\"lala\"){5,25}AS( ){5,31}OEE(>){5,32}" +
               "T(liool){5,33}CES(</){5,38}CEN(p){5,40}CEE(>){5,41}]",
               null);
 
@@ -501,15 +498,15 @@ public class AttoParserTest extends TestCase {
         
         testDoc( 
             "<div class = \"lala\">",
-            "[OES(<){1,1}OEN(div){1,2}EW( ){1,5}A(class){1,6}( = ){1,11}(\"lala\"){1,14}OEE(>){1,20}]",
+            "[OES(<){1,1}OEN(div){1,2}AS( ){1,5}A(class){1,6}( = ){1,11}(\"lala\"){1,14}OEE(>){1,20}]",
             null);
         testDoc( 
             "<div class \n\n= \nlala li=\nlla>",
-            "[OES(<){1,1}OEN(div){1,2}EW( ){1,5}A(class){1,6}( \n\n= \n){1,11}(lala){4,1}EW( ){4,5}A(li){4,6}(=\n){4,8}(lla){5,1}OEE(>){5,4}]",
+            "[OES(<){1,1}OEN(div){1,2}AS( ){1,5}A(class){1,6}( \n\n= \n){1,11}(lala){4,1}AS( ){4,5}A(li){4,6}(=\n){4,8}(lla){5,1}OEE(>){5,4}]",
             null);
         testDoc( 
             "<div class \n\n= \n\"lala\"li=\nlla>",
-            "[OES(<){1,1}OEN(div){1,2}EW( ){1,5}A(class){1,6}( \n\n= \n){1,11}(\"lala\"){4,1}A(li){4,7}(=\n){4,9}(lla){5,1}OEE(>){5,4}]",
+            "[OES(<){1,1}OEN(div){1,2}AS( ){1,5}A(class){1,6}( \n\n= \n){1,11}(\"lala\"){4,1}A(li){4,7}(=\n){4,9}(lla){5,1}OEE(>){5,4}]",
             null);
         
 
@@ -674,14 +671,40 @@ public class AttoParserTest extends TestCase {
                 
         testDoc( 
             "\n <!ELEMENT sgml ANY>",
-            "[T(\n ){1,1}OES(<){2,2}OEN(!ELEMENT){2,3}EW( ){2,11}A(sgml){2,12}(){2,16}(){2,16}EW( ){2,16}A(ANY){2,17}(){2,20}(){2,20}OEE(>){2,20}]",
+            "[T(\n ){1,1}OES(<){2,2}OEN(!ELEMENT){2,3}AS( ){2,11}A(sgml){2,12}(){2,16}(){2,16}AS( ){2,16}A(ANY){2,17}(){2,20}(){2,20}OEE(>){2,20}]",
             "[T(\n ){1,1}OE(!ELEMENT[sgml='',ANY='']){2,2}]");
         testDoc( 
             "\n <!ELEMENT sgml ANY>\n <!-- this is a comment inside --> <!ENTITY % std       \"standard SGML\">\n",
-            "[T(\n ){1,1}OES(<){2,2}OEN(!ELEMENT){2,3}EW( ){2,11}A(sgml){2,12}(){2,16}(){2,16}EW( ){2,16}A(ANY){2,17}(){2,20}(){2,20}OEE(>){2,20}T(\n ){2,21}C( this is a comment inside ){3,2}T( ){3,35}OES(<){3,36}OEN(!ENTITY){3,37}EW( ){3,44}A(%){3,45}(){3,46}(){3,46}EW( ){3,46}A(std){3,47}(){3,50}(){3,50}EW(       ){3,50}A(\"standard){3,57}(){3,66}(){3,66}EW( ){3,66}A(SGML\"){3,67}(){3,72}(){3,72}OEE(>){3,72}T(\n){3,73}]",
+            "[T(\n ){1,1}OES(<){2,2}OEN(!ELEMENT){2,3}AS( ){2,11}A(sgml){2,12}(){2,16}(){2,16}AS( ){2,16}A(ANY){2,17}(){2,20}(){2,20}OEE(>){2,20}T(\n ){2,21}C( this is a comment inside ){3,2}T( ){3,35}OES(<){3,36}OEN(!ENTITY){3,37}AS( ){3,44}A(%){3,45}(){3,46}(){3,46}AS( ){3,46}A(std){3,47}(){3,50}(){3,50}AS(       ){3,50}A(\"standard){3,57}(){3,66}(){3,66}AS( ){3,66}A(SGML\"){3,67}(){3,72}(){3,72}OEE(>){3,72}T(\n){3,73}]",
             "[T(\n ){1,1}OE(!ELEMENT[sgml='',ANY='']){2,2}T(\n ){2,21}C( this is a comment inside ){3,2}T( ){3,35}OE(!ENTITY[%='',std='',\"standard='',SGML\"='']){3,36}T(\n){3,73}]");
+
+        
+        testDoc( 
+            "<?xsl-stylesheet a=\"1\"?>",
+            "[P(xsl-stylesheet)(a=\"1\"){1,1}]",
+            null);
+        testDoc( 
+            "<?xsl-stylesheet ?>",
+            "[P(xsl-stylesheet)(){1,1}]",
+            null);
+        testDoc( 
+            "<?xsl-stylesheet?>",
+            "[P(xsl-stylesheet)(){1,1}]",
+            null);
+        testDoc( 
+            "<?xsl-stylesheet a=\"1\" a b > uas23 ?>",
+            "[P(xsl-stylesheet)(a=\"1\" a b > uas23 ){1,1}]",
+            null);
+        testDoc( 
+            "<p><?xsl-stylesheet a=\"1\" a b > uas23 ?>",
+            "[OES(<){1,1}OEN(p){1,2}OEE(>){1,3}P(xsl-stylesheet)(a=\"1\" a b > uas23 ){1,4}]",
+            "[OE(p){1,1}P(xsl-stylesheet)(a=\"1\" a b > uas23 ){1,4}]");
+        
+        
+        
         
         System.out.println("TOTAL Test executions: " + totalTestExecutions);
+        
         
     }
     

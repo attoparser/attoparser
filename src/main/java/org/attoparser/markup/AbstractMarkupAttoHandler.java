@@ -36,7 +36,7 @@ import org.attoparser.AttoParseException;
 public abstract class AbstractMarkupAttoHandler 
         extends AbstractAttoHandler
         implements IElementHandling, IDocTypeHandling, ICdataHandling, ICommentHandling,
-                   IXmlDeclarationHandling {
+                   IXmlDeclarationHandling, IProcessingInstructionHandling {
 
 
     
@@ -58,11 +58,13 @@ public abstract class AbstractMarkupAttoHandler
                  if (!CdataMarkupParsingUtil.tryParseCdata(buffer, offset, len, line, col, this )) {
                      if (!DocTypeMarkupParsingUtil.tryParseDocType(buffer, offset, len, line, col, this)) {
                          if (!XmlDeclarationMarkupParsingUtil.tryParseXmlDeclaration(buffer, offset, len, line, col, this)) {
-                             if (!ElementMarkupParsingUtil.tryParseElement(buffer, offset, len, line, col, true, this)) {
-                                 throw new AttoParseException(
-                                         "Could not parse as markup structure: " +
-                                         "\"" + new String(buffer, offset, len) + "\"", 
-                                         line, col);
+                             if (!ProcessingInstructionMarkupParsingUtil.tryParseProcessingInstruction(buffer, offset, len, line, col, this)) {
+                                 if (!ElementMarkupParsingUtil.tryParseElement(buffer, offset, len, line, col, true, this)) {
+                                     throw new AttoParseException(
+                                             "Could not parse as markup structure: " +
+                                             "\"" + new String(buffer, offset, len) + "\"", 
+                                             line, col);
+                                 }
                              }
                          }
                      }
@@ -137,6 +139,17 @@ public abstract class AbstractMarkupAttoHandler
 
     public void xmlDeclaration(
             final char[] buffer, 
+            final int contentOffset, final int contentLen, 
+            final int outerOffset, final int outerLen, 
+            final int line, final int col)
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
+    }
+
+
+    public void processingInstruction(
+            final char[] buffer, 
+            final int targetOffset, final int targetLen, 
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
             final int line, final int col)

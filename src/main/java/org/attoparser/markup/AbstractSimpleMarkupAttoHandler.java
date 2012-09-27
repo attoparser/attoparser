@@ -199,7 +199,7 @@ public abstract class AbstractSimpleMarkupAttoHandler
     
     
     @Override
-    public final void elementAttribute(
+    public final void attribute(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol, 
@@ -210,7 +210,7 @@ public abstract class AbstractSimpleMarkupAttoHandler
             final int valueLine, final int valueCol)
             throws AttoParseException {
 
-        super.elementAttribute(buffer, nameOffset, nameLen, nameLine, nameCol,
+        super.attribute(buffer, nameOffset, nameLen, nameLine, nameCol,
                 operatorOffset, operatorLen, operatorLine, operatorCol,
                 valueContentOffset, valueContentLen, valueOuterOffset, valueOuterLen,
                 valueLine, valueCol);
@@ -230,13 +230,13 @@ public abstract class AbstractSimpleMarkupAttoHandler
     
     
     @Override
-    public final void elementWhitespace(
+    public final void attributeSeparator(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col) 
             throws AttoParseException {
 
-        super.elementWhitespace(buffer, offset, len, line, col);
+        super.attributeSeparator(buffer, offset, len, line, col);
         
     }
 
@@ -322,7 +322,29 @@ public abstract class AbstractSimpleMarkupAttoHandler
         super.xmlDeclaration(
                 buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
         
-        xmlDeclaration(buffer, contentOffset, contentLen, line, col);
+        xmlDeclaration(new String(buffer, contentOffset, contentLen), line, col);
+        
+    }
+
+
+    
+    @Override
+    public final void processingInstruction(
+            final char[] buffer, 
+            final int targetOffset, final int targetLen, 
+            final int contentOffset, final int contentLen, 
+            final int outerOffset, final int outerLen, 
+            final int line, final int col)
+            throws AttoParseException {
+
+        super.processingInstruction(
+                buffer, targetOffset, targetLen, contentOffset,
+                contentLen, outerOffset, outerLen, line, col);
+        
+        processingInstruction(
+                new String(buffer, targetOffset, targetLen), 
+                new String(buffer, contentOffset, contentLen), 
+                line, col);
         
     }
 
@@ -378,8 +400,15 @@ public abstract class AbstractSimpleMarkupAttoHandler
 
 
     public void xmlDeclaration(
-            final char[] buffer, 
-            final int offset, final int len, 
+            final String content, 
+            final int line, final int col) 
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
+    }
+
+
+    public void processingInstruction(
+            final String target, final String content, 
             final int line, final int col) 
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required

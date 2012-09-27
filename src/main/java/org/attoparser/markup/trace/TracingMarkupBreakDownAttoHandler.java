@@ -298,7 +298,7 @@ public final class TracingMarkupBreakDownAttoHandler extends AbstractMarkupBreak
     
     
     @Override
-    public void elementAttribute(
+    public void attribute(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol,
@@ -433,7 +433,7 @@ public final class TracingMarkupBreakDownAttoHandler extends AbstractMarkupBreak
 
 
     @Override
-    public void elementWhitespace(
+    public void attributeSeparator(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col)
@@ -441,8 +441,8 @@ public final class TracingMarkupBreakDownAttoHandler extends AbstractMarkupBreak
         
         try {
             
-            this.writer.write('E');
-            this.writer.write('W');
+            this.writer.write('A');
+            this.writer.write('S');
             this.writer.write('(');
             this.writer.write(buffer, offset, len);
             this.writer.write(')');
@@ -509,6 +509,37 @@ public final class TracingMarkupBreakDownAttoHandler extends AbstractMarkupBreak
         }
         
     }
+
+
+
+
+
+    @Override
+    public void processingInstruction(
+            final char[] buffer, 
+            final int targetOffset, final int targetLen, 
+            final int contentOffset, final int contentLen, 
+            final int outerOffset, final int outerLen, 
+            final int line, final int col)
+            throws AttoParseException {
+        
+        try {
+            
+            this.writer.write("P");
+            this.writer.write('(');
+            this.writer.write(buffer, targetOffset, targetLen);
+            this.writer.write(')');
+            this.writer.write('(');
+            this.writer.write(buffer, contentOffset, contentLen);
+            this.writer.write(')');
+            writePosition(this.writer, line, col);
+            
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        }
+        
+    }
+
 
 
 

@@ -71,12 +71,14 @@ public final class ProcessingInstructionMarkupParsingUtil {
             final IProcessingInstructionHandling handler)
             throws AttoParseException {
 
-        if (len >= 8 && 
+        if (len >= 5 && 
                 isProcessingInstructionStart(buffer, offset, (offset + len)) &&
                 buffer[offset + len - 2] == '?' &&
                 buffer[offset + len - 1] == '>') {
-            handler.processingInstruction(buffer, 0, 0, offset + 2, len - 4, offset, len, line, col);
-            return true;
+
+            return tryParseProcessingInstructionContent(
+                    buffer, offset + 2, len - 4, offset, len, line, col, handler);
+            
         }
         
         return false;
@@ -85,15 +87,111 @@ public final class ProcessingInstructionMarkupParsingUtil {
 
 
     
+    private static boolean tryParseProcessingInstructionContent(
+            final char[] buffer, 
+            final int internalOffset, final int internalLen, 
+            final int outerOffset, final int outerLen,
+            final int line, final int col, 
+            final IProcessingInstructionHandling handler)
+            throws AttoParseException {
+
+        final int maxi = internalOffset + internalLen;
+        
+        final MarkupParsingLocator locator = new MarkupParsingLocator(line, col + 2);
+        
+        int i = internalOffset;
+        
+        /*
+         * Extract the target 
+         */
+        
+        final int targetEnd = 
+            MarkupParsingUtil.findNextWhitespaceCharWildcard(buffer, i, maxi, false, locator);
+        
+        if (targetEnd == -1) {
+            // There is no content, only target
+            
+            handler.processingInstruction(
+                    buffer, 
+                    i, maxi - i,                                      // target
+                    0, 0,                                             // content 
+                    outerOffset, outerLen,                            // outer 
+                    line, col);                                       // outer
+            
+            return true;
+            
+        }
+        
+        
+        
+        final int targetOffset = i;
+        final int targetLen = targetEnd - targetOffset;
+        
+        i = targetEnd;
+
+        
+        /*
+         * Fast-forward to the content
+         */
+        
+        final int contentStart = 
+                MarkupParsingUtil.findNextNonWhitespaceCharWildcard(buffer, i, maxi, locator);
+
+        if (contentStart == -1) {
+            // There is no content. Only whitespace until the end of the structure
+            
+            handler.processingInstruction(
+                    buffer, 
+                    targetOffset, targetLen,                          // target
+                    0, 0,                                             // content 
+                    outerOffset, outerLen,                            // outer 
+                    line, col);                                       // outer
+            
+            return true;
+            
+        }
+
+        
+        handler.processingInstruction(
+                buffer, 
+                targetOffset, targetLen,                          // target
+                contentStart, maxi - contentStart,                // content 
+                outerOffset, outerLen,                            // outer 
+                line, col);                                       // outer
+        
+        return true;
+        
+        
+    }
+    
+    
+    
     static boolean isProcessingInstructionStart(final char[] buffer, final int offset, final int maxi) {
-        return ((maxi - offset > 5) && 
-                    buffer[offset] == '<' &&
+        
+        final int len = maxi - offset;
+        
+        if (len > 5) {
+            // Make sure we do not match an XML declaration by error.
+            
+            return (buffer[offset] == '<' &&
                     buffer[offset + 1] == '?' &&
-                    (buffer[offset + 2] == 'X' || buffer[offset + 2] == 'x') && 
-                    (buffer[offset + 3] == 'M' || buffer[offset + 3] == 'm') && 
-                    (buffer[offset + 4] == 'L' || buffer[offset + 4] == 'l') && 
-                    Character.isWhitespace(buffer[offset + 5]));
+                    (buffer[offset + 2] != ' ' && !Character.isWhitespace(buffer[offset + 2])) &&
+                    !(
+                      (buffer[offset + 2] == 'X' || buffer[offset + 2] == 'x') && 
+                      (buffer[offset + 3] == 'M' || buffer[offset + 3] == 'm') && 
+                      (buffer[offset + 4] == 'L' || buffer[offset + 4] == 'l') && 
+                      (buffer[offset + 5] == ' ' || Character.isWhitespace(buffer[offset + 5]))
+                    ));
+            
+        }
+        
+        return (len > 2 && 
+                buffer[offset] == '<' &&
+                buffer[offset + 1] == '?' &&
+                (buffer[offset + 2] != ' ' && !Character.isWhitespace(buffer[offset + 2])));
+        
     }
 
+    
     
 }

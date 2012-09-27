@@ -277,7 +277,7 @@ public final class DuplicatingMarkupBreakDownAttoHandler extends AbstractMarkupB
 
 
     @Override
-    public void elementAttribute(final char[] buffer, final int nameOffset, final int nameLen,
+    public void attribute(final char[] buffer, final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol, final int operatorOffset, final int operatorLen,
             final int operatorLine, final int operatorCol, final int valueContentOffset,
             final int valueContentLen, final int valueOuterOffset, final int valueOuterLen,
@@ -299,8 +299,11 @@ public final class DuplicatingMarkupBreakDownAttoHandler extends AbstractMarkupB
 
 
     @Override
-    public void elementWhitespace(final char[] buffer, final int offset, final int len, final int line,
-            final int col) throws AttoParseException {
+    public void attributeSeparator(
+            final char[] buffer, 
+            final int offset, final int len, 
+            final int line, final int col)
+            throws AttoParseException {
         
         try {
             
@@ -364,6 +367,29 @@ public final class DuplicatingMarkupBreakDownAttoHandler extends AbstractMarkupB
         
     }
 
+
+
+
+
+
+    @Override
+    public void processingInstruction(
+            final char[] buffer, 
+            final int targetOffset, final int targetLen, 
+            final int contentOffset, final int contentLen, 
+            final int outerOffset, final int outerLen, 
+            final int line, final int col)
+            throws AttoParseException {
+        
+        try {
+            
+            this.writer.write(buffer, outerOffset, outerLen);
+            
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        }
+        
+    }
 
 
     
