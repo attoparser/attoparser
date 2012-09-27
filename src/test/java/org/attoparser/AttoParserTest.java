@@ -28,6 +28,7 @@ import junit.framework.TestCase;
 import org.attoparser.markup.MarkupAttoParser;
 import org.attoparser.markup.duplicate.DuplicatingMarkupAttoHandler;
 import org.attoparser.markup.duplicate.DuplicatingMarkupBreakDownAttoHandler;
+import org.attoparser.markup.trace.TracingMarkupAttoHandler;
 import org.attoparser.markup.trace.TracingMarkupBreakDownAttoHandler;
 import org.attoparser.markup.trace.TracingSimpleMarkupAttoHandler;
 
@@ -46,6 +47,35 @@ public class AttoParserTest extends TestCase {
     
 
     public void test() throws Exception {
+        
+        
+        final String dt1 = "<!DOCTYPE>"; 
+        final String dt2 = "<!DOCTYPE html>"; 
+        final String dt3 = "<!DOCTYPE html public \"lala\">"; 
+        final String dt4 = "<!DOCTYPE html public \"aaa\" [<!ELEMENT>]>"; 
+        
+        final IAttoParser p = new MarkupAttoParser();
+        
+        StringWriter sw1 = new StringWriter();
+        IAttoHandler h = new TracingMarkupAttoHandler(sw1);        
+        p.parse(dt1, h);
+        assertEquals("[DT(){1,1}]", sw1.toString());
+        
+        StringWriter sw2 = new StringWriter();
+        h = new TracingMarkupAttoHandler(sw2);        
+        p.parse(dt2, h);
+        assertEquals("[DT(html){1,1}]", sw2.toString());
+        
+        StringWriter sw3 = new StringWriter();
+        h = new TracingMarkupAttoHandler(sw3);        
+        p.parse(dt3, h);
+        assertEquals("[DT(html public \"lala\"){1,1}]", sw3.toString());
+        
+        StringWriter sw4 = new StringWriter();
+        h = new TracingMarkupAttoHandler(sw4);        
+        p.parse(dt4, h);
+        assertEquals("[DT(html public \"aaa\" [<!ELEMENT>]){1,1}]", sw4.toString());
+        
         
 //        testDoc( 
 //                "Hello, <p>lala</p><?xml version=\"1.0\"?>",
@@ -440,15 +470,11 @@ public class AttoParserTest extends TestCase {
             "){22,45}]",
             null);
 
-//        testDocError( 
-//            "Hello, <p>lala</p>",
-//            null, null,
-//            4, 5, 
-//            1, 4);
-        testDoc( 
-                "Hello, <p>lala</p>",
-                "[aa]", null,
-                4, 5);
+        testDocError( 
+            "Hello, <p>lala</p>",
+            null, null,
+            4, 5,
+            1, 4);
         
         testDocError( 
             "Hello, <!--lala-->",
@@ -563,6 +589,10 @@ public class AttoParserTest extends TestCase {
             "<!DOCTYPE html public \"lalero\"   \n\"hey\">",
             "[DT(DOCTYPE){1,3}(html){1,11}(public){1,16}(lalero){1,23}(hey){2,1}(){2,6}]",
             "[DT(html)(lalero)(hey)(){1,1}]");
+        testDoc( 
+            "<!DOCTYPE html public \"lalero\n\"   \n\"hey\">",
+            "[DT(DOCTYPE){1,3}(html){1,11}(public){1,16}(lalero\n){1,23}(hey){3,1}(){3,6}]",
+            "[DT(html)(lalero\n)(hey)(){1,1}]");
         testDoc( 
             "<!DOCTYPE html system \n\"lalero\"\"le\">",
             "[DT(DOCTYPE){1,3}(html){1,11}(system){1,16}(){2,1}(lalero\"\"le){2,1}(){2,13}]",
@@ -697,10 +727,13 @@ public class AttoParserTest extends TestCase {
         testDoc(input.toCharArray(), outputBreakDown, outputSimple, offset, len, bufferSize);
     }
     
+    
+    
+    
     static void testDoc(final char[] input, final String outputBreakDown, final String outputSimple, final int offset, final int len) throws AttoParseException {
 
-        final int maxBufferSize = 1;
-        for (int bufferSize = 16384; bufferSize <= maxBufferSize; bufferSize++) {
+        final int maxBufferSize = 16384;
+        for (int bufferSize = 1; bufferSize <= maxBufferSize; bufferSize++) {
             testDoc(input, outputBreakDown, outputSimple, offset, len, bufferSize);
         }
         

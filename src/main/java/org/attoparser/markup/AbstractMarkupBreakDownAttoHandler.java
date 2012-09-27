@@ -55,7 +55,7 @@ public abstract class AbstractMarkupBreakDownAttoHandler
             throws AttoParseException {
         
         DocTypeMarkupParsingUtil.parseDocTypeBreakDown(
-                buffer, contentOffset, contentLen, outerOffset, outerLen, line, col, this);
+                buffer, outerOffset, outerLen, line, col, this);
         
     }
 
