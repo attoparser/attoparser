@@ -50,9 +50,9 @@ public final class MarkupParsingUtil {
     
     
     
-    static int findNext(
-            final char[] text, final int offset, final int maxi, final char target, 
-            final boolean avoidQuotes, final MarkupParsingLocator locator) {
+    static int findNextStructureEndAvoidQuotes(
+            final char[] text, final int offset, final int maxi, 
+            final MarkupParsingLocator locator) {
         
         boolean inQuotes = false;
 
@@ -60,9 +60,49 @@ public final class MarkupParsingUtil {
             
             final char c = text[i];
             
-            if (avoidQuotes && c == '"') {
+            if (c == '"') {
                 inQuotes = !inQuotes;
-            } else if (!inQuotes && c == target) {
+            } else if (!inQuotes && c == '>') {
+                return i;
+            }
+
+            MarkupParsingLocator.countChar(locator, c);
+            
+        }
+            
+        return -1;
+        
+    }
+    
+    static int findNextStructureEndDontAvoidQuotes(
+            final char[] text, final int offset, final int maxi, 
+            final MarkupParsingLocator locator) {
+        
+        for (int i = offset; i < maxi; i++) {
+            
+            final char c = text[i];
+            
+            if (c == '>') {
+                return i;
+            }
+
+            MarkupParsingLocator.countChar(locator, c);
+            
+        }
+            
+        return -1;
+        
+    }
+    
+    static int findNextStructureStart(
+            final char[] text, final int offset, final int maxi, 
+            final MarkupParsingLocator locator) {
+        
+        for (int i = offset; i < maxi; i++) {
+            
+            final char c = text[i];
+            
+            if (c == '<') {
                 return i;
             }
 
@@ -84,11 +124,10 @@ public final class MarkupParsingUtil {
         for (int i = offset; i < maxi; i++) {
             
             final char c = text[i];
-            final boolean isWhitespace = (!inQuotes && Character.isWhitespace(c));
             
             if (avoidQuotes && c == '"') {
                 inQuotes = !inQuotes;
-            } else if (!inQuotes && isWhitespace) {
+            } else if (!inQuotes && (c == ' ' || c == '\n' || Character.isWhitespace(c))) {
                 return i;
             }
 
@@ -108,8 +147,9 @@ public final class MarkupParsingUtil {
         for (int i = offset; i < maxi; i++) {
             
             final char c = text[i];
+            final boolean isWhitespace = (c == ' ' || c == '\n' || Character.isWhitespace(c));
             
-            if (!Character.isWhitespace(c)) {
+            if (!isWhitespace) {
                 return i;
             }
 
@@ -130,7 +170,7 @@ public final class MarkupParsingUtil {
             
             final char c = text[i];
             
-            if (c == '=' || Character.isWhitespace(c)) {
+            if (c == '=' || (c == ' ' || c == '\n' || Character.isWhitespace(c))) {
                 return i;
             }
 
@@ -151,7 +191,7 @@ public final class MarkupParsingUtil {
             
             final char c = text[i];
             
-            if (c != '=' && !Character.isWhitespace(c)) {
+            if (c != '=' && !(c == ' ' || c == '\n' || Character.isWhitespace(c))) {
                 return i;
             }
 

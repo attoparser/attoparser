@@ -611,27 +611,49 @@ public final class ElementMarkupParsingUtil {
     
     static boolean isOpenElementStart(final char[] buffer, final int offset, final int maxi,
             final boolean allowExclMarksAtFirstChar) {
+        
         final int len = maxi - offset;
-        return (len > 1 && 
-                    buffer[offset] == '<' &&
-                    buffer[offset + 1] != '/' && 
-                    (allowExclMarksAtFirstChar || buffer[offset + 1] != '!') && 
-                    buffer[offset + 1] != '?' &&
-                    (len <= 2 || buffer[offset + 2] != '[') &&
-                    !Character.isWhitespace(buffer[offset + 1]));
+        
+        if (!allowExclMarksAtFirstChar) {
+            return (len > 1 && 
+                        buffer[offset] == '<' &&
+                        buffer[offset + 1] != '/' && 
+                        buffer[offset + 1] != '!' && 
+                        buffer[offset + 1] != '?' &&
+                        !Character.isWhitespace(buffer[offset + 1]));
+        }
+        
+        return (len > 2 && 
+                buffer[offset] == '<' &&
+                buffer[offset + 1] != '/' && 
+                (buffer[offset + 1] != '!' || (buffer[offset + 2] != '[' && buffer[offset + 2] != '/' && buffer[offset + 2] != '?')) && 
+                buffer[offset + 1] != '?' &&
+                !Character.isWhitespace(buffer[offset + 1]));
+        
     }
 
     
     static boolean isCloseElementStart(final char[] buffer, final int offset, final int maxi,
             final boolean allowExclMarksAtFirstChar) {
+        
         final int len = maxi - offset;
-        return (len > 2 && 
-                    buffer[offset] == '<' &&
-                    buffer[offset + 1] == '/' &&
-                    (allowExclMarksAtFirstChar || buffer[offset + 2] != '!') && 
-                    buffer[offset + 2] != '?' &&
-                    (len <= 3 || buffer[offset + 3] != '[') &&
-                    !Character.isWhitespace(buffer[offset + 2]));
+        
+        if (!allowExclMarksAtFirstChar) {
+            return (len > 2 && 
+                        buffer[offset] == '<' &&
+                        buffer[offset + 1] == '/' &&
+                        buffer[offset + 2] != '!' && 
+                        buffer[offset + 2] != '?' &&
+                        !Character.isWhitespace(buffer[offset + 2]));
+        }
+        
+        return (len > 3 && 
+                buffer[offset] == '<' &&
+                buffer[offset + 1] == '/' &&
+                (buffer[offset + 2] != '!' || (buffer[offset + 3] != '[' && buffer[offset + 3] != '/' && buffer[offset + 3] != '?')) && 
+                buffer[offset + 2] != '?' &&
+                !Character.isWhitespace(buffer[offset + 2]));
+        
     }
 
     

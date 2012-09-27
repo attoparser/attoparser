@@ -52,7 +52,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
             throws AttoParseException {
 
 
-        MarkupParsingLocator locator = new MarkupParsingLocator(line, col);
+        final MarkupParsingLocator locator = new MarkupParsingLocator(line, col);
         
         int currentLine = locator.line;
         int currentCol = locator.col;
@@ -83,7 +83,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
             
             if (!inStructure) {
                 
-                tagStart = MarkupParsingUtil.findNext(buffer, i, maxi, '<', false, locator);
+                tagStart = MarkupParsingUtil.findNextStructureStart(buffer, i, maxi, locator);
                 
                 if (tagStart == -1) {
                     return new BufferParseResult(current, currentLine, currentCol, false);
@@ -123,7 +123,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                     // the beginning of any known structure
                     
                     MarkupParsingLocator.countChar(locator, buffer[tagStart]);
-                    tagStart = MarkupParsingUtil.findNext(buffer, tagStart + 1, maxi, '<', false, locator);
+                    tagStart = MarkupParsingUtil.findNextStructureStart(buffer, tagStart + 1, maxi, locator);
                     
                     if (tagStart == -1) {
                         return new BufferParseResult(current, currentLine, currentCol, false);
@@ -179,7 +179,9 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                 tagEnd =
                         (inDocType?
                                 DocTypeMarkupParsingUtil.findNextDocTypeStructureEnd(buffer, i, maxi, locator) :
-                                MarkupParsingUtil.findNext(buffer, i, maxi, '>', avoidQuotes, locator));
+                                (avoidQuotes?
+                                        MarkupParsingUtil.findNextStructureEndAvoidQuotes(buffer, i, maxi, locator) :
+                                        MarkupParsingUtil.findNextStructureEndDontAvoidQuotes(buffer, i, maxi, locator)));
                 
                 if (tagEnd < 0) {
                     // This is an unfinished structure
@@ -206,7 +208,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                         // the '>' we chose is not the comment-closing one. Let's find again
                         
                         MarkupParsingLocator.countChar(locator, buffer[tagEnd]);
-                        tagEnd = MarkupParsingUtil.findNext(buffer, tagEnd + 1, maxi, '>', false, locator);
+                        tagEnd = MarkupParsingUtil.findNextStructureEndDontAvoidQuotes(buffer, tagEnd + 1, maxi, locator);
                         
                         if (tagEnd == -1) {
                             return new BufferParseResult(current, currentLine, currentCol, true);
@@ -224,7 +226,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                         // the '>' we chose is not the comment-closing one. Let's find again
                         
                         MarkupParsingLocator.countChar(locator, buffer[tagEnd]);
-                        tagEnd = MarkupParsingUtil.findNext(buffer, tagEnd + 1, maxi, '>', false, locator);
+                        tagEnd = MarkupParsingUtil.findNextStructureEndDontAvoidQuotes(buffer, tagEnd + 1, maxi, locator);
                         
                         if (tagEnd == -1) {
                             return new BufferParseResult(current, currentLine, currentCol, true);

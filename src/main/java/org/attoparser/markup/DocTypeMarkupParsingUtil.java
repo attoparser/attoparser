@@ -77,8 +77,15 @@ public final class DocTypeMarkupParsingUtil {
         if (len >= 10 && 
                 isDocTypeStart(buffer, offset, (offset + len)) &&
                 buffer[offset + len - 1] == '>') {
-            handler.docType(buffer, offset + 2, len - 3, offset, len, line, col);
+            
+            final char c9 = buffer[offset + 9];
+            final int contentOffset =
+                ((c9 == ' ' || Character.isWhitespace(c9))? 10 : 9);
+            
+            handler.docType(buffer, offset + contentOffset, (len - contentOffset) - 1, offset, len, line, col);
+            
             return true;
+            
         }
         
         return false;
@@ -91,13 +98,12 @@ public final class DocTypeMarkupParsingUtil {
     
     public static void parseDocTypeBreakDown(
             final char[] buffer, 
-            final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
             final int line, final int col, 
             final IDocTypeBreakDownHandling handler)
             throws AttoParseException {
         
-        if (!tryParseDocTypeBreakDown(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col, handler)) {
+        if (!tryParseDocTypeBreakDown(buffer, outerOffset, outerLen, line, col, handler)) {
             throw new AttoParseException(
                     "Could not parse as a broken down DOCTYPE clause: \"" + new String(buffer, outerOffset, outerLen) + "\"", line, col);
         }
@@ -113,27 +119,28 @@ public final class DocTypeMarkupParsingUtil {
     
     public static boolean tryParseDocTypeBreakDown(
             final char[] buffer,
-            final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
             final int line, final int col, 
             final IDocTypeBreakDownHandling handler)
             throws AttoParseException {
         
+        final int internalOffset = outerOffset + 2;
+        final int internalLen = outerLen - 3;
         
         final int internalSubsetLastChar =
-                findInternalSubsetEndChar(buffer, contentOffset, contentLen);
+                findInternalSubsetEndChar(buffer, internalOffset, internalLen);
         
         if (internalSubsetLastChar == -1) {
             return tryParseDocTypeBreakDownWithInternalSubset(
-                    buffer, contentOffset, contentLen, outerOffset, outerLen, line, col, 
+                    buffer, internalOffset, internalLen, outerOffset, outerLen, line, col, 
                     0, 0, 0, 0, handler);
         }
-        
-        final int maxi = contentOffset + contentLen;
+
+        final int maxi = internalOffset + internalLen;
         
         final MarkupParsingLocator docTypeBreakdownLocator = new MarkupParsingLocator(line, col + 2);
         
-        int i = contentOffset;
+        int i = internalOffset;
         
         /*
          * Extract the keyword 
@@ -148,7 +155,7 @@ public final class DocTypeMarkupParsingUtil {
         }
         
         return tryParseDocTypeBreakDownWithInternalSubset(
-                buffer, contentOffset, (internalSubsetStart - contentOffset), outerOffset, outerLen, line, col, 
+                buffer, internalOffset, (internalSubsetStart - internalOffset), outerOffset, outerLen, line, col, 
                 internalSubsetStart + 1, (internalSubsetLastChar - internalSubsetStart) - 1, 
                 docTypeBreakdownLocator.line, docTypeBreakdownLocator.col, 
                 handler);
@@ -170,7 +177,7 @@ public final class DocTypeMarkupParsingUtil {
             final int internalSubsetLine, final int internalSubsetCol,
             final IDocTypeBreakDownHandling handler)
             throws AttoParseException {
-        
+
         final int maxi = contentOffset + contentLen;
         
         final MarkupParsingLocator docTypeBreakdownLocator = new MarkupParsingLocator(line, col + 2);
