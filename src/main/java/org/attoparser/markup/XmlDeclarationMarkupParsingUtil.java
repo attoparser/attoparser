@@ -32,6 +32,8 @@ import org.attoparser.AttoParseException;
  */
 public final class XmlDeclarationMarkupParsingUtil {
 
+
+    
     
 
     
@@ -71,12 +73,17 @@ public final class XmlDeclarationMarkupParsingUtil {
             final IXmlDeclarationHandling handler)
             throws AttoParseException {
 
-        if (len >= 8 && 
+        if (len >= 7 && 
                 isXmlDeclarationStart(buffer, offset, (offset + len)) &&
                 buffer[offset + len - 2] == '?' &&
                 buffer[offset + len - 1] == '>') {
-            handler.xmlDeclaration(buffer, offset + 2, len - 4, offset, len, line, col);
+            
+
+            doParseXmlDeclarationContent(
+                    buffer, offset + 2, len - 4, offset, len, line, col, handler);
+
             return true;
+            
         }
         
         return false;
@@ -85,15 +92,295 @@ public final class XmlDeclarationMarkupParsingUtil {
 
 
     
+    private static void doParseXmlDeclarationContent(
+            final char[] buffer, 
+            final int internalOffset, final int internalLen, 
+            final int outerOffset, final int outerLen,
+            final int line, final int col, 
+            final IXmlDeclarationHandling handler)
+            throws AttoParseException {
+
+        final int maxi = internalOffset + internalLen;
+        
+        final MarkupParsingLocator locator = new MarkupParsingLocator(line, col + 2);
+        
+        final int keywordLine = locator.line;
+        final int keywordCol = locator.col;
+        
+        int i = internalOffset;
+        
+        /*
+         * Extract the target 
+         */
+        
+        final int keywordEnd = 
+            MarkupParsingUtil.findNextWhitespaceCharWildcard(buffer, i, maxi, false, locator);
+        
+        if (keywordEnd == -1) {
+            // There is no content, only keyword. But an XML declaration should
+            // contain at least the XML version, so this XML declaration doesn't
+            // have a correct format.
+            
+            throw new AttoParseException(
+                    "XML Declaration must at least contain a \"version\" attribute: " +
+                    "\"" + new String(buffer, outerOffset, outerLen) + "\"", line, col);
+            
+        }
+        
+        
+        final int keywordOffset = i;
+        final int keywordLen = keywordEnd - keywordOffset;
+        
+        i = keywordEnd;
+
+        
+        /*
+         * Fast-forward to the content
+         */
+        
+        final int contentOffset = 
+                MarkupParsingUtil.findNextNonWhitespaceCharWildcard(buffer, i, maxi, locator);
+
+        if (contentOffset == -1) {
+            // There is no content. Only whitespace until the end of the structure.
+            // But an XML declaration should contain at least the XML version, so 
+            // this XML declaration doesn't have a correct format.
+            
+            throw new AttoParseException(
+                    "XML Declaration must at least contain a \"version\" attribute: " +
+                    "\"" + new String(buffer, outerOffset, outerLen) + "\"", line, col);
+            
+        }
+        
+        final int contentLen = maxi - contentOffset;
+        
+        final XmlDeclarationAttributeHandling attHandling = new XmlDeclarationAttributeHandling(line, col);
+    
+        if (!AttributeSequenceMarkupParsingUtil.
+                tryParseAttributeSequence(buffer, contentOffset, contentLen, locator, attHandling)) {
+            
+            throw new AttoParseException(
+                    "Could not parse attribute sequence in XML declaration: " +
+                    "\"" + new String(buffer, outerOffset, outerLen) + "\"", line, col);
+            
+        }
+        
+        attHandling.finalChecks(locator, buffer);
+
+        
+        handler.xmlDeclaration(
+                buffer, 
+                keywordOffset, keywordLen,                                // keyword
+                keywordLine, keywordCol,                                  // keyword
+                attHandling.versionOffset, attHandling.versionLen,        // version
+                attHandling.versionLine, attHandling.versionCol,          // version
+                attHandling.encodingOffset, attHandling.encodingLen,      // encoding
+                attHandling.encodingLine, attHandling.encodingCol,        // encoding
+                attHandling.standaloneOffset, attHandling.standaloneLen,  // standalone
+                attHandling.standaloneLine, attHandling.standaloneCol,    // standalone
+                outerOffset, outerLen,                                    // outer 
+                line, col);                                               // outer
+        
+        
+    }
+    
+    
+    
+
+
+    
     static boolean isXmlDeclarationStart(final char[] buffer, final int offset, final int maxi) {
+        // No upper case allowed in XML Declaration. XML is case-sensitive!!
         return ((maxi - offset > 5) && 
                     buffer[offset] == '<' &&
                     buffer[offset + 1] == '?' &&
-                    (buffer[offset + 2] == 'X' || buffer[offset + 2] == 'x') && 
-                    (buffer[offset + 3] == 'M' || buffer[offset + 3] == 'm') && 
-                    (buffer[offset + 4] == 'L' || buffer[offset + 4] == 'l') && 
-                    Character.isWhitespace(buffer[offset + 5]));
+                    buffer[offset + 2] == 'x' && 
+                    buffer[offset + 3] == 'm' && 
+                    buffer[offset + 4] == 'l' && 
+                    (Character.isWhitespace(buffer[offset + 5]) || 
+                            ((maxi - offset > 6) && buffer[offset + 5] == '?' && buffer[offset + 6] == '>')));
     }
 
+    
+    
+    
+
+    
+    
+    private static class XmlDeclarationAttributeHandling implements IAttributeSequenceHandling {
+
+        private final int outerLine;
+        private final int outerCol;
+        
+        // attribute names will only be in lowercase, as XML is case sensitive and upper
+        // case would be wrong.
+        
+        final static char[] VERSION = "version".toCharArray();
+        boolean versionPresent = false;
+        int versionOffset = 0;
+        int versionLen = 0;
+        int versionLine = -1;
+        int versionCol = -1;
+        
+        final static char[] ENCODING = "encoding".toCharArray();
+        boolean encodingPresent = false;
+        int encodingOffset = 0;
+        int encodingLen = 0;
+        int encodingLine = -1;
+        int encodingCol = -1;
+
+        final static char[] STANDALONE = "standalone".toCharArray();
+        boolean standalonePresent = false;
+        int standaloneOffset = 0;
+        int standaloneLen = 0;
+        int standaloneLine = -1;
+        int standaloneCol = -1;
+
+        
+        
+        XmlDeclarationAttributeHandling(final int outerLine, final int outerCol) {
+            super();
+            this.outerLine = outerLine;
+            this.outerCol = outerCol;
+        }
+        
+        
+        
+        public void attribute(
+                final char[] buffer, 
+                final int nameOffset, final int nameLen,
+                final int nameLine, final int nameCol, 
+                final int operatorOffset, final int operatorLen,
+                final int operatorLine, final int operatorCol, 
+                final int valueContentOffset, final int valueContentLen, 
+                final int valueOuterOffset, final int valueOuterLen,
+                final int valueLine, final int valueCol)
+                throws AttoParseException {
+
+            if (charArrayEquals(buffer, nameOffset, nameLen, VERSION, 0, VERSION.length)) {
+                if (this.versionPresent) {
+                    throw new AttoParseException(
+                            "XML Declaration can declare only one \"version\" attribute: " +
+                            "\"" + new String(buffer, this.outerLine, this.outerCol) + "\"", 
+                            this.outerLine, this.outerCol);
+                }
+                if (this.encodingPresent || this.standalonePresent) {
+                    throw new AttoParseException(
+                            "XML Declaration must declare \"version\" as its first attribute: " +
+                            "\"" + new String(buffer, this.outerLine, this.outerCol) + "\"", 
+                            this.outerLine, this.outerCol);
+                }
+                this.versionOffset = valueContentOffset;
+                this.versionLen = valueContentLen;
+                this.versionLine = valueLine;
+                this.versionCol = valueCol;
+                this.versionPresent = true;
+                return;
+            }
+            
+            if (charArrayEquals(buffer, nameOffset, nameLen, ENCODING, 0, ENCODING.length)) {
+                if (this.encodingPresent) {
+                    throw new AttoParseException(
+                            "XML Declaration can declare only one \"encoding\" attribute: " +
+                            "\"" + new String(buffer, this.outerLine, this.outerCol) + "\"", 
+                            this.outerLine, this.outerCol);
+                }
+                if (!this.versionPresent) {
+                    throw new AttoParseException(
+                            "XML Declaration must declare \"encoding\" after \"version\": " +
+                            "\"" + new String(buffer, this.outerLine, this.outerCol) + "\"", 
+                            this.outerLine, this.outerCol);
+                }
+                if (this.standalonePresent) {
+                    throw new AttoParseException(
+                            "XML Declaration must declare \"encoding\" before \"standalone\": " +
+                            "\"" + new String(buffer, this.outerLine, this.outerCol) + "\"", 
+                            this.outerLine, this.outerCol);
+                }
+                this.encodingOffset = valueContentOffset;
+                this.encodingLen = valueContentLen;
+                this.encodingLine = valueLine;
+                this.encodingCol = valueCol;
+                this.encodingPresent = true;
+                return;
+            }
+            
+            if (charArrayEquals(buffer, nameOffset, nameLen, STANDALONE, 0, STANDALONE.length)) {
+                if (this.standalonePresent) {
+                    throw new AttoParseException(
+                            "XML Declaration can declare only one \"standalone\" attribute: " +
+                            "\"" + new String(buffer, this.outerLine, this.outerCol) + "\"", 
+                            this.outerLine, this.outerCol);
+                }
+                this.standaloneOffset = valueContentOffset;
+                this.standaloneLen = valueContentLen;
+                this.standaloneLine = valueLine;
+                this.standaloneCol = valueCol;
+                this.standalonePresent = true;
+                return;
+            }
+            
+            throw new AttoParseException(
+                    "XML Declaration does not allow attribute with name \"" + (new String(buffer, nameOffset, nameLen)) + "\". " +
+            		"Only \"version\", \"encoding\" and \"standalone\" are allowed (in that order): " +
+                    "\"" + new String(buffer, this.outerLine, this.outerCol) + "\"", 
+                    this.outerLine, this.outerCol);
+            
+        }
+        
+
+        public void attributeSeparator(
+                final char[] buffer, 
+                final int offset, final int len,
+                final int line, final int col)
+                throws AttoParseException {
+            // We will ignore separators
+        }
+
+        
+        
+        public void finalChecks(final MarkupParsingLocator locator, final char[] buffer) throws AttoParseException {
+            if (!this.versionPresent) {
+                throw new AttoParseException(
+                        "Attribute \"version\" is required in XML Declaration: " +
+                        "\"" + new String(buffer, this.outerLine, this.outerCol) + "\"", 
+                        this.outerLine, this.outerLine);
+            }
+            if (!this.standalonePresent) {
+                this.standaloneLine = locator.line;
+                this.standaloneCol = locator.col;
+            }
+            if (!this.encodingPresent) {
+                if (!this.standalonePresent) {
+                    this.encodingLine = locator.line;
+                    this.encodingCol = locator.col;
+                } else {
+                    this.encodingLine = this.standaloneLine;
+                    this.encodingCol = this.standaloneCol;
+                }
+            }
+        }
+        
+        
+        
+        
+        private static boolean charArrayEquals(
+                final char[] arr1, final int arr1Offset, final int arr1Len,
+                final char[] arr2, final int arr2Offset, final int arr2Len) {
+            if (arr1Len != arr2Len) {
+                return false;
+            }
+            for (int i = 0; i < arr1Len; i++) {
+                if (arr1[arr1Offset + i] != arr2[arr2Offset + i]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        
+    }
+    
+    
     
 }

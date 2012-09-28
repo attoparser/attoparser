@@ -60,7 +60,9 @@ public interface ISimpleMarkupHandling {
     
     
     public void xmlDeclaration(
-            final String content, 
+            final String version,
+            final String encoding,
+            final String standalone,
             final int line, final int col)
             throws AttoParseException;
 

@@ -314,15 +314,31 @@ public abstract class AbstractSimpleMarkupAttoHandler
     @Override
     public final void xmlDeclaration(
             final char[] buffer, 
-            final int contentOffset, final int contentLen, 
+            final int keywordOffset, final int keywordLen,
+            final int keywordLine, final int keywordCol,
+            final int versionOffset, final int versionLen,
+            final int versionLine, final int versionCol,
+            final int encodingOffset, final int encodingLen,
+            final int encodingLine, final int encodingCol,
+            final int standaloneOffset, final int standaloneLen,
+            final int standaloneLine, final int standaloneCol,
             final int outerOffset, final int outerLen, 
             final int line, final int col)
             throws AttoParseException {
 
         super.xmlDeclaration(
-                buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
+                buffer, 
+                keywordOffset, keywordLen, keywordLine, keywordCol,
+                versionOffset, versionLen, versionLine, versionCol, 
+                encodingOffset, encodingLen, encodingLine, encodingCol, 
+                standaloneOffset, standaloneLen, standaloneLine, standaloneCol, 
+                outerOffset, outerLen, line, col);
         
-        xmlDeclaration(new String(buffer, contentOffset, contentLen), line, col);
+        final String version = new String(buffer, versionOffset, versionLen);
+        final String encoding = new String(buffer, encodingOffset, encodingLen);
+        final String standalone = new String(buffer, standaloneOffset, standaloneLen);
+        
+        xmlDeclaration(version, encoding, standalone, line, col);
         
     }
 
@@ -400,7 +416,9 @@ public abstract class AbstractSimpleMarkupAttoHandler
 
 
     public void xmlDeclaration(
-            final String content, 
+            final String version, 
+            final String encoding, 
+            final String standalone, 
             final int line, final int col) 
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required

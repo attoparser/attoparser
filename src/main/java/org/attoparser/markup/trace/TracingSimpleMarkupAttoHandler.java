@@ -247,7 +247,9 @@ public final class TracingSimpleMarkupAttoHandler extends AbstractSimpleMarkupAt
     
     @Override
     public void xmlDeclaration(
-            final String content, 
+            final String version, 
+            final String encoding,
+            final String standalone,
             final int line,final int col) 
             throws AttoParseException {
         
@@ -255,7 +257,13 @@ public final class TracingSimpleMarkupAttoHandler extends AbstractSimpleMarkupAt
             
             this.writer.write("X");
             this.writer.write('(');
-            this.writer.write(content);
+            this.writer.write(version);
+            this.writer.write(')');
+            this.writer.write('(');
+            this.writer.write(encoding);
+            this.writer.write(')');
+            this.writer.write('(');
+            this.writer.write(standalone);
             this.writer.write(')');
             writePosition(this.writer, line, col);
             

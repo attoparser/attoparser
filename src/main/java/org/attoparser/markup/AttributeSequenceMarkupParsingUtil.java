@@ -103,6 +103,9 @@ public final class AttributeSequenceMarkupParsingUtil {
             final IAttributeSequenceHandling handler)
             throws AttoParseException {
 
+        // Any string will be recognized as an "attribute sequence", so this will always either return "true"
+        // or raise an exception.
+        
         
         final int maxi = offset + len;
         
@@ -178,7 +181,9 @@ public final class AttributeSequenceMarkupParsingUtil {
             
             if (attributeNameEnd <= current) {
                 // This attribute name starts by an equals sign, which is forbidden
-                return false;  
+                throw new AttoParseException(
+                        "Bad attribute name in sequence \"" + new String(buffer, offset, len) + "\": attribute names " +
+                		"cannot start with an equals sign", currentArtifactLine, currentArtifactCol);  
             }
 
             

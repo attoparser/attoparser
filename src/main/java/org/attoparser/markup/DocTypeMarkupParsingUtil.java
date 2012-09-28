@@ -114,26 +114,50 @@ public final class DocTypeMarkupParsingUtil {
     
     
 
-    
+
     
     
     public static boolean tryParseDocTypeBreakDown(
+            final char[] buffer, 
+            final int offset, final int len, 
+            final int line, final int col, 
+            final IDocTypeBreakDownHandling handler)
+            throws AttoParseException {
+
+        if (len >= 10 && 
+                isDocTypeStart(buffer, offset, (offset + len)) &&
+                buffer[offset + len - 1] == '>') {
+            
+            doParseDocTypeBreakDown(buffer, offset, len, line, col, handler);
+            
+            return true;
+            
+        }
+        
+        return false;
+        
+    }
+    
+    
+    
+    private static void doParseDocTypeBreakDown(
             final char[] buffer,
-            final int outerOffset, final int outerLen, 
+            final int offset, final int len, 
             final int line, final int col, 
             final IDocTypeBreakDownHandling handler)
             throws AttoParseException {
         
-        final int internalOffset = outerOffset + 2;
-        final int internalLen = outerLen - 3;
+        final int internalOffset = offset + 2;
+        final int internalLen = len - 3;
         
         final int internalSubsetLastChar =
                 findInternalSubsetEndChar(buffer, internalOffset, internalLen);
         
         if (internalSubsetLastChar == -1) {
-            return tryParseDocTypeBreakDownWithInternalSubset(
-                    buffer, internalOffset, internalLen, outerOffset, outerLen, line, col, 
+            doParseDocTypeBreakDownWithInternalSubset(
+                    buffer, internalOffset, internalLen, offset, len, line, col, 
                     0, 0, 0, 0, handler);
+            return;
         }
 
         final int maxi = internalOffset + internalLen;
@@ -151,11 +175,12 @@ public final class DocTypeMarkupParsingUtil {
         
         if (internalSubsetStart == -1) {
             // We identified this as having an internal subset, but it doesn't. Not valid.
-            return false;
+            throw new AttoParseException(
+                    "Could not parse as a well-formed DOCTYPE clause: \"" + new String(buffer, offset, len) + "\"", line, col);
         }
         
-        return tryParseDocTypeBreakDownWithInternalSubset(
-                buffer, internalOffset, (internalSubsetStart - internalOffset), outerOffset, outerLen, line, col, 
+        doParseDocTypeBreakDownWithInternalSubset(
+                buffer, internalOffset, (internalSubsetStart - internalOffset), offset, len, line, col, 
                 internalSubsetStart + 1, (internalSubsetLastChar - internalSubsetStart) - 1, 
                 docTypeBreakdownLocator.line, docTypeBreakdownLocator.col, 
                 handler);
@@ -168,7 +193,7 @@ public final class DocTypeMarkupParsingUtil {
     
 
     
-    private static boolean tryParseDocTypeBreakDownWithInternalSubset(
+    private static void doParseDocTypeBreakDownWithInternalSubset(
             final char[] buffer,
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
@@ -212,7 +237,7 @@ public final class DocTypeMarkupParsingUtil {
                     outerOffset, outerLen,                                      // outer 
                     line, col);                                                 // outer
             
-            return true;
+            return;
             
         }
         
@@ -257,7 +282,7 @@ public final class DocTypeMarkupParsingUtil {
                     outerOffset, outerLen,                                      // outer 
                     line, col);                                                 // outer
             
-            return true;
+            return;
             
         }
 
@@ -297,7 +322,7 @@ public final class DocTypeMarkupParsingUtil {
                     outerOffset, outerLen,                                      // outer 
                     line, col);                                                 // outer
             
-            return true;
+            return;
             
         }
         
@@ -342,7 +367,7 @@ public final class DocTypeMarkupParsingUtil {
                     outerOffset, outerLen,                                      // outer 
                     line, col);                                                 // outer
             
-            return true;
+            return;
             
         }
 
@@ -367,7 +392,11 @@ public final class DocTypeMarkupParsingUtil {
             // When there is a type, there must be a at least a spec1,
             // so this is an error
             
-            return false;
+            throw new AttoParseException(
+                    "Could not parse as a well-formed DOCTYPE clause " +
+                    "\"" + new String(buffer, outerOffset, outerLen) + "\"" +
+            		": If a type is specified (PUBLIC or SYSTEM), at least a public or a system ID " +
+                    "has to be specified", line, col);
             
         }
         
@@ -387,7 +416,13 @@ public final class DocTypeMarkupParsingUtil {
          */
         
         if (!isValidDocTypeType(buffer, typeOffset, typeLen)) {
-            return false;
+
+            throw new AttoParseException(
+                    "Could not parse as a well-formed DOCTYPE clause " +
+                    "\"" + new String(buffer, outerOffset, outerLen) + "\"" +
+                    ": DOCTYPE type must be either \"PUBLIC\" or \"SYSTEM\"",
+                    line, col);
+            
         }
 
         final boolean isTypePublic = 
@@ -407,7 +442,13 @@ public final class DocTypeMarkupParsingUtil {
         if (spec1Start == -1) {
             // When there is a type, there must be a at least a spec1,
             // so this is an error
-            return false;
+            
+            throw new AttoParseException(
+                    "Could not parse as a well-formed DOCTYPE clause " +
+                    "\"" + new String(buffer, outerOffset, outerLen) + "\"" +
+                    ": If a type is specified (PUBLIC or SYSTEM), at least a public or a system ID " +
+                    "has to be specified", line, col);
+            
         }
 
         
@@ -430,7 +471,13 @@ public final class DocTypeMarkupParsingUtil {
             
             if (!isValidDocTypeSpec(buffer, i, maxi - i)) {
                 // The spec is not well-formed (surrounded by "'s)
-                return false;
+                
+                throw new AttoParseException(
+                        "Could not parse as a well-formed DOCTYPE clause " +
+                        "\"" + new String(buffer, outerOffset, outerLen) + "\"" +
+                        ": Public and Systen IDs must be surrounded by quotes (\")", 
+                        line, col);
+
             }
             
             if (isTypePublic) {
@@ -454,7 +501,7 @@ public final class DocTypeMarkupParsingUtil {
                         outerOffset, outerLen,                                      // outer 
                         line, col);                                                 // outer
                 
-                return true;
+                return;
                 
             }
             
@@ -476,7 +523,7 @@ public final class DocTypeMarkupParsingUtil {
                     outerOffset, outerLen,                                      // outer 
                     line, col);                                                 // outer
             
-            return true;
+            return;
             
         }
 
@@ -492,7 +539,13 @@ public final class DocTypeMarkupParsingUtil {
         
         if (!isValidDocTypeSpec(buffer, spec1Offset, spec1Len)) {
             // The spec is not well-formed (surrounded by "'s)
-            return false;
+            
+            throw new AttoParseException(
+                    "Could not parse as a well-formed DOCTYPE clause " +
+                    "\"" + new String(buffer, outerOffset, outerLen) + "\"" +
+                    ": Public and Systen IDs must be surrounded by quotes (\")", 
+                    line, col);
+            
         }
         
         
@@ -530,7 +583,7 @@ public final class DocTypeMarkupParsingUtil {
                         outerOffset, outerLen,                                      // outer 
                         line, col);                                                 // outer
                 
-                return true;
+                return;
                 
             }
             
@@ -552,7 +605,7 @@ public final class DocTypeMarkupParsingUtil {
                     outerOffset, outerLen,                                      // outer 
                     line, col);                                                 // outer
             
-            return true;
+            return;
             
         }
 
@@ -576,14 +629,26 @@ public final class DocTypeMarkupParsingUtil {
 
             if (!isValidDocTypeSpec(buffer, i, maxi - i)) {
                 // The spec is not well-formed (surrounded by "'s). 
-                return false;
+                
+                throw new AttoParseException(
+                        "Could not parse as a well-formed DOCTYPE clause " +
+                        "\"" + new String(buffer, outerOffset, outerLen) + "\"" +
+                        ": Public and Systen IDs must be surrounded by quotes (\")", 
+                        line, col);
+                
             }
             
             // There is no internal subset, and what we have is a valid spec2
 
             if (!isTypePublic) {
                 // Type SYSTEM cannot have two specs!
-                return false;
+                
+                throw new AttoParseException(
+                        "Could not parse as a well-formed DOCTYPE clause " +
+                        "\"" + new String(buffer, outerOffset, outerLen) + "\"" +
+                        ": type SYSTEM only allows specifying one element (a system ID)", 
+                        line, col);
+
             }
             
             handler.docType(
@@ -604,7 +669,7 @@ public final class DocTypeMarkupParsingUtil {
                     outerOffset, outerLen,                                      // outer 
                     line, col);                                                 // outer
             
-            return true;
+            return;
             
         }
 
@@ -620,13 +685,25 @@ public final class DocTypeMarkupParsingUtil {
         
         if (!isValidDocTypeSpec(buffer, spec2Offset, spec2Len)) {
             // The spec is not well-formed (surrounded by "'s)
-            return false;
+            
+            throw new AttoParseException(
+                    "Could not parse as a well-formed DOCTYPE clause " +
+                    "\"" + new String(buffer, outerOffset, outerLen) + "\"" +
+                    ": Public and Systen IDs must be surrounded by quotes (\")", 
+                    line, col);
+
         }
         
 
         if (!isTypePublic) {
             // Type SYSTEM cannot have two specs!
-            return false;
+            
+            throw new AttoParseException(
+                    "Could not parse as a well-formed DOCTYPE clause " +
+                    "\"" + new String(buffer, outerOffset, outerLen) + "\"" +
+                    ": type SYSTEM only allows specifying one element (a system ID)", 
+                    line, col);
+
         }
         
         
@@ -643,7 +720,13 @@ public final class DocTypeMarkupParsingUtil {
         if (clauseEndStart != -1) {
             // We have found more elements inside the DOCTYPE clause after all valid ones.
             // This is not valid.
-            return false;
+            
+            throw new AttoParseException(
+                    "Could not parse as a well-formed DOCTYPE clause " +
+                    "\"" + new String(buffer, outerOffset, outerLen) + "\"" +
+                    ": More elements found than allowed", 
+                    line, col);
+
         }
             
         
@@ -666,8 +749,6 @@ public final class DocTypeMarkupParsingUtil {
                 Math.max(docTypeBreakdownLocator.col, internalSubsetCol),   // internalSubset
                 outerOffset, outerLen,                                      // outer 
                 line, col);                                                 // outer
-        
-        return true;
         
         
     }

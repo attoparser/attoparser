@@ -224,7 +224,14 @@ public final class TracingMarkupAttoHandler extends AbstractMarkupAttoHandler {
     @Override
     public void xmlDeclaration(
             final char[] buffer, 
-            final int contentOffset, final int contentLen,
+            final int keywordOffset, final int keywordLen,
+            final int keywordLine, final int keywordCol,
+            final int versionOffset, final int versionLen,
+            final int versionLine, final int versionCol,
+            final int encodingOffset, final int encodingLen,
+            final int encodingLine, final int encodingCol,
+            final int standaloneOffset, final int standaloneLen,
+            final int standaloneLine, final int standaloneCol,
             final int outerOffset, final int outerLen,
             final int line,final int col) 
             throws AttoParseException {
@@ -233,7 +240,13 @@ public final class TracingMarkupAttoHandler extends AbstractMarkupAttoHandler {
             
             this.writer.write("X");
             this.writer.write('(');
-            this.writer.write(buffer, contentOffset, contentLen);
+            this.writer.write(buffer, versionOffset, versionLen);
+            this.writer.write(')');
+            this.writer.write('(');
+            this.writer.write(buffer, encodingOffset, encodingLen);
+            this.writer.write(')');
+            this.writer.write('(');
+            this.writer.write(buffer, standaloneOffset, standaloneLen);
             this.writer.write(')');
             writePosition(this.writer, line, col);
             

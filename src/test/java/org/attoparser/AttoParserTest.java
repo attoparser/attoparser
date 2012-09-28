@@ -657,17 +657,69 @@ public class AttoParserTest extends TestCase {
         
         testDoc( 
             "<?xml version=\"1.0\"?>",
-            "[X(xml version=\"1.0\"){1,1}]",
-            "[X(xml version=\"1.0\"){1,1}]");
+            "[X(1.0){1,15}(){1,20}(){1,20}]",
+            "[X(1.0)()(){1,1}]");
         
         testDoc( 
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "[X(1.0){1,15}(UTF-8){1,30}(){1,37}]",
+            "[X(1.0)(UTF-8)(){1,1}]");
+        
+        testDoc( 
+            "<?xml version=\"1.0\"   \nencoding=\"UTF-8\"   ?>",
+            "[X(1.0){1,15}(UTF-8){2,10}(){2,20}]",
+            "[X(1.0)(UTF-8)(){1,1}]");
+        
+        testDoc( 
+            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>",
+            "[X(1.0){1,15}(UTF-8){1,30}(yes){1,49}]",
+            "[X(1.0)(UTF-8)(yes){1,1}]");
+        
+        testDoc( 
+            "<?xml version=\"1.0\" standalone=\"yes\" encoding=\"UTF-8\"?>",
+            "", null, 1, 1);
+        
+        testDoc( 
+            "<?xml standalone=\"yes\" version=\"1.0\" encoding=\"UTF-8\"?>",
+            "", null, 1, 1);
+        
+        testDoc( 
+            "<?xml versio=\"1.0\"?>",
+            "", null, 1, 1);
+        
+        testDoc( 
+            "<?xml?>",
+            "[X(xml){1,3}(version=\"1.0\"){1,7}]",
+            "[X(version=\"1.0\"){1,1}]");
+        
+        testDoc( 
+            "<?xml  ?>",
+            "[X(xml){1,3}(version=\"1.0\"){1,7}]",
+            "[X(version=\"1.0\"){1,1}]");
+        
+        testDoc( 
+            "<?XML version=\"1.0\"?>",
+            "[X(xml){1,3}(version=\"1.0\"  ){1,7}]",
+            "[X(version=\"1.0\"  ){1,1}]");
+        
+        testDoc( 
+            "<?xml Version=\"1.0\"?>",
+            "[X(xml){1,3}(version=\"1.0\"  ){1,7}]",
+            "[X(version=\"1.0\"  ){1,1}]");
+        
+        testDoc( 
+            "<?xml version=\"1.0\"  ?>",
+            "[X(xml){1,3}(version=\"1.0\"  ){1,7}]",
+            "[X(version=\"1.0\"  ){1,1}]");
+            
+        testDoc( 
             "<?xml version=\"1.0\"?><!DOCTYPE html>",
-            "[X(xml version=\"1.0\"){1,1}DT(DOCTYPE){1,24}(html){1,32}(){1,36}(){1,36}(){1,36}(){1,36}]",
-            "[X(xml version=\"1.0\"){1,1}DT(html)()()(){1,22}]");
+            "[X(xml){1,3}(version=\"1.0\"){1,7}DT(DOCTYPE){1,24}(html){1,32}(){1,36}(){1,36}(){1,36}(){1,36}]",
+            "[X(version=\"1.0\"){1,1}DT(html)()()(){1,22}]");
         testDoc( 
             "<?xml version=\"1.0\"?>\n<!DOCTYPE html>",
-            "[X(xml version=\"1.0\"){1,1}T(\n){1,22}DT(DOCTYPE){2,3}(html){2,11}(){2,15}(){2,15}(){2,15}(){2,15}]",
-            "[X(xml version=\"1.0\"){1,1}T(\n){1,22}DT(html)()()(){2,1}]");
+            "[X(xml){1,3}(version=\"1.0\"){1,7}T(\n){1,22}DT(DOCTYPE){2,3}(html){2,11}(){2,15}(){2,15}(){2,15}(){2,15}]",
+            "[X(version=\"1.0\"){1,1}T(\n){1,22}DT(html)()()(){2,1}]");
                 
         testDoc( 
             "\n <!ELEMENT sgml ANY>",
@@ -756,7 +808,7 @@ public class AttoParserTest extends TestCase {
     static void testDoc(final char[] input, final String outputBreakDown, final String outputSimple, final int offset, final int len) throws AttoParseException {
 
         final int maxBufferSize = 16384;
-        for (int bufferSize = 1; bufferSize <= maxBufferSize; bufferSize++) {
+        for (int bufferSize = 16384; bufferSize <= maxBufferSize; bufferSize++) {
             testDoc(input, outputBreakDown, outputSimple, offset, len, bufferSize);
         }
         
