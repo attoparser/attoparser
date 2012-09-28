@@ -177,10 +177,10 @@ public final class ProcessingInstructionMarkupParsingUtil {
                     buffer[offset + 1] == '?' &&
                     (buffer[offset + 2] != ' ' && !Character.isWhitespace(buffer[offset + 2])) &&
                     !(
-                      (buffer[offset + 2] == 'X' || buffer[offset + 2] == 'x') && 
-                      (buffer[offset + 3] == 'M' || buffer[offset + 3] == 'm') && 
-                      (buffer[offset + 4] == 'L' || buffer[offset + 4] == 'l') && 
-                      (buffer[offset + 5] == ' ' || Character.isWhitespace(buffer[offset + 5]))
+                      buffer[offset + 2] == 'x' && 
+                      buffer[offset + 3] == 'm' && 
+                      buffer[offset + 4] == 'l' && 
+                      Character.isWhitespace(buffer[offset + 5])
                     ));
             
         }

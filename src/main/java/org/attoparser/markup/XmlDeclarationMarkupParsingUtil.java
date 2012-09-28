@@ -154,7 +154,8 @@ public final class XmlDeclarationMarkupParsingUtil {
         
         final int contentLen = maxi - contentOffset;
         
-        final XmlDeclarationAttributeHandling attHandling = new XmlDeclarationAttributeHandling(line, col);
+        final XmlDeclarationAttributeHandling attHandling = 
+                new XmlDeclarationAttributeHandling(outerOffset, outerLen, line, col);
     
         if (!AttributeSequenceMarkupParsingUtil.
                 tryParseAttributeSequence(buffer, contentOffset, contentLen, locator, attHandling)) {
@@ -209,6 +210,8 @@ public final class XmlDeclarationMarkupParsingUtil {
     
     private static class XmlDeclarationAttributeHandling implements IAttributeSequenceHandling {
 
+        private final int outerOffset;
+        private final int outerLen;
         private final int outerLine;
         private final int outerCol;
         
@@ -238,8 +241,11 @@ public final class XmlDeclarationMarkupParsingUtil {
 
         
         
-        XmlDeclarationAttributeHandling(final int outerLine, final int outerCol) {
+        XmlDeclarationAttributeHandling(final int outerOffset, final int outerLen, 
+                final int outerLine, final int outerCol) {
             super();
+            this.outerOffset = outerOffset;
+            this.outerLen = outerLen;
             this.outerLine = outerLine;
             this.outerCol = outerCol;
         }
@@ -261,13 +267,13 @@ public final class XmlDeclarationMarkupParsingUtil {
                 if (this.versionPresent) {
                     throw new AttoParseException(
                             "XML Declaration can declare only one \"version\" attribute: " +
-                            "\"" + new String(buffer, this.outerLine, this.outerCol) + "\"", 
+                            "\"" + new String(buffer, this.outerOffset, this.outerLen) + "\"", 
                             this.outerLine, this.outerCol);
                 }
                 if (this.encodingPresent || this.standalonePresent) {
                     throw new AttoParseException(
                             "XML Declaration must declare \"version\" as its first attribute: " +
-                            "\"" + new String(buffer, this.outerLine, this.outerCol) + "\"", 
+                            "\"" + new String(buffer, this.outerOffset, this.outerLen) + "\"", 
                             this.outerLine, this.outerCol);
                 }
                 this.versionOffset = valueContentOffset;
@@ -282,19 +288,19 @@ public final class XmlDeclarationMarkupParsingUtil {
                 if (this.encodingPresent) {
                     throw new AttoParseException(
                             "XML Declaration can declare only one \"encoding\" attribute: " +
-                            "\"" + new String(buffer, this.outerLine, this.outerCol) + "\"", 
+                            "\"" + new String(buffer, this.outerOffset, this.outerLen) + "\"", 
                             this.outerLine, this.outerCol);
                 }
                 if (!this.versionPresent) {
                     throw new AttoParseException(
                             "XML Declaration must declare \"encoding\" after \"version\": " +
-                            "\"" + new String(buffer, this.outerLine, this.outerCol) + "\"", 
+                            "\"" + new String(buffer, this.outerOffset, this.outerLen) + "\"", 
                             this.outerLine, this.outerCol);
                 }
                 if (this.standalonePresent) {
                     throw new AttoParseException(
                             "XML Declaration must declare \"encoding\" before \"standalone\": " +
-                            "\"" + new String(buffer, this.outerLine, this.outerCol) + "\"", 
+                            "\"" + new String(buffer, this.outerOffset, this.outerLen) + "\"", 
                             this.outerLine, this.outerCol);
                 }
                 this.encodingOffset = valueContentOffset;
@@ -309,7 +315,7 @@ public final class XmlDeclarationMarkupParsingUtil {
                 if (this.standalonePresent) {
                     throw new AttoParseException(
                             "XML Declaration can declare only one \"standalone\" attribute: " +
-                            "\"" + new String(buffer, this.outerLine, this.outerCol) + "\"", 
+                            "\"" + new String(buffer, this.outerOffset, this.outerLen) + "\"", 
                             this.outerLine, this.outerCol);
                 }
                 this.standaloneOffset = valueContentOffset;
@@ -323,7 +329,7 @@ public final class XmlDeclarationMarkupParsingUtil {
             throw new AttoParseException(
                     "XML Declaration does not allow attribute with name \"" + (new String(buffer, nameOffset, nameLen)) + "\". " +
             		"Only \"version\", \"encoding\" and \"standalone\" are allowed (in that order): " +
-                    "\"" + new String(buffer, this.outerLine, this.outerCol) + "\"", 
+                    "\"" + new String(buffer, this.outerOffset, this.outerLen) + "\"", 
                     this.outerLine, this.outerCol);
             
         }
@@ -343,7 +349,7 @@ public final class XmlDeclarationMarkupParsingUtil {
             if (!this.versionPresent) {
                 throw new AttoParseException(
                         "Attribute \"version\" is required in XML Declaration: " +
-                        "\"" + new String(buffer, this.outerLine, this.outerCol) + "\"", 
+                        "\"" + new String(buffer, this.outerOffset, this.outerLen) + "\"", 
                         this.outerLine, this.outerLine);
             }
             if (!this.standalonePresent) {
