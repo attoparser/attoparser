@@ -76,8 +76,9 @@ public final class ProcessingInstructionMarkupParsingUtil {
                 buffer[offset + len - 2] == '?' &&
                 buffer[offset + len - 1] == '>') {
 
-            return tryParseProcessingInstructionContent(
+            doParseProcessingInstruction(
                     buffer, offset + 2, len - 4, offset, len, line, col, handler);
+            return true;
             
         }
         
@@ -87,7 +88,7 @@ public final class ProcessingInstructionMarkupParsingUtil {
 
 
     
-    private static boolean tryParseProcessingInstructionContent(
+    private static void doParseProcessingInstruction(
             final char[] buffer, 
             final int internalOffset, final int internalLen, 
             final int outerOffset, final int outerLen,
@@ -114,11 +115,13 @@ public final class ProcessingInstructionMarkupParsingUtil {
             handler.processingInstruction(
                     buffer, 
                     i, maxi - i,                                      // target
-                    0, 0,                                             // content 
+                    line, col + 2,                                    // target
+                    0, 0,                                             // content
+                    locator.line, locator.col,                        // content
                     outerOffset, outerLen,                            // outer 
                     line, col);                                       // outer
             
-            return true;
+            return;
             
         }
         
@@ -143,11 +146,13 @@ public final class ProcessingInstructionMarkupParsingUtil {
             handler.processingInstruction(
                     buffer, 
                     targetOffset, targetLen,                          // target
-                    0, 0,                                             // content 
+                    line, col + 2,                                    // target
+                    0, 0,                                             // content
+                    locator.line, locator.col,                        // content
                     outerOffset, outerLen,                            // outer 
                     line, col);                                       // outer
             
-            return true;
+            return;
             
         }
 
@@ -155,12 +160,11 @@ public final class ProcessingInstructionMarkupParsingUtil {
         handler.processingInstruction(
                 buffer, 
                 targetOffset, targetLen,                          // target
-                contentStart, maxi - contentStart,                // content 
+                line, col + 2,                                    // target
+                contentStart, maxi - contentStart,                // content
+                locator.line, locator.col,                        // content
                 outerOffset, outerLen,                            // outer 
                 line, col);                                       // outer
-        
-        return true;
-        
         
     }
     

@@ -697,8 +697,8 @@ public class AttoParserTest extends TestCase {
         
         testDoc( 
             "<?XML version=\"1.0\"?>",
-            "[P(XML)(version=\"1.0\"){1,1}]",
-            null);
+            "[P(XML){1,3}(version=\"1.0\"){1,7}]",
+            "[P(XML)(version=\"1.0\"){1,1}]");
         
         testDocError( 
             "<?xml Version=\"1.0\"?>",
@@ -730,23 +730,23 @@ public class AttoParserTest extends TestCase {
         
         testDoc( 
             "<?xsl-stylesheet a=\"1\"?>",
-            "[P(xsl-stylesheet)(a=\"1\"){1,1}]",
-            null);
+            "[P(xsl-stylesheet){1,3}(a=\"1\"){1,18}]",
+            "[P(xsl-stylesheet)(a=\"1\"){1,1}]");
         testDoc( 
             "<?xsl-stylesheet ?>",
-            "[P(xsl-stylesheet)(){1,1}]",
-            null);
+            "[P(xsl-stylesheet){1,3}(){1,18}]",
+            "[P(xsl-stylesheet)(){1,1}]");
         testDoc( 
             "<?xsl-stylesheet?>",
-            "[P(xsl-stylesheet)(){1,1}]",
-            null);
+            "[P(xsl-stylesheet){1,3}(){1,17}]",
+            "[P(xsl-stylesheet)(){1,1}]");
         testDoc( 
             "<?xsl-stylesheet a=\"1\" a b > uas23 ?>",
-            "[P(xsl-stylesheet)(a=\"1\" a b > uas23 ){1,1}]",
-            null);
+            "[P(xsl-stylesheet){1,3}(a=\"1\" a b > uas23 ){1,18}]",
+            "[P(xsl-stylesheet)(a=\"1\" a b > uas23 ){1,1}]");
         testDoc( 
             "<p><?xsl-stylesheet a=\"1\" a b > uas23 ?>",
-            "[OES(<){1,1}OEN(p){1,2}OEE(>){1,3}P(xsl-stylesheet)(a=\"1\" a b > uas23 ){1,4}]",
+            "[OES(<){1,1}OEN(p){1,2}OEE(>){1,3}P(xsl-stylesheet){1,6}(a=\"1\" a b > uas23 ){1,21}]",
             "[OE(p){1,1}P(xsl-stylesheet)(a=\"1\" a b > uas23 ){1,4}]");
         
         

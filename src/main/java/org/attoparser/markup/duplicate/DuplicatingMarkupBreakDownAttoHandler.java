@@ -434,7 +434,9 @@ public final class DuplicatingMarkupBreakDownAttoHandler extends AbstractMarkupB
     public void processingInstruction(
             final char[] buffer, 
             final int targetOffset, final int targetLen, 
-            final int contentOffset, final int contentLen, 
+            final int targetLine, final int targetCol,
+            final int contentOffset, final int contentLen,
+            final int contentLine, final int contentCol,
             final int outerOffset, final int outerLen, 
             final int line, final int col)
             throws AttoParseException {
