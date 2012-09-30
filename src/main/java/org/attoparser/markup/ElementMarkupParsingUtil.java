@@ -51,11 +51,10 @@ public final class ElementMarkupParsingUtil {
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col, 
-            final boolean allowExclMarksAtFirstChar,
             final IElementHandling handler)
             throws AttoParseException {
         
-        if (!tryParseElement(buffer, offset, len, line, col, allowExclMarksAtFirstChar, handler)) {
+        if (!tryParseElement(buffer, offset, len, line, col, handler)) {
             throw new AttoParseException(
                     "Could not parse as markup element: \"" + new String(buffer, offset, len) + "\"", line, col);
         }
@@ -68,19 +67,18 @@ public final class ElementMarkupParsingUtil {
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col,
-            final boolean allowExclMarksAtFirstChar,
             final IElementHandling handler)
             throws AttoParseException {
 
         if (len > 3 &&
-                isCloseElementStart(buffer, offset, offset + len, allowExclMarksAtFirstChar) &&
+                isCloseElementStart(buffer, offset, offset + len) &&
                 buffer[offset + len - 1] == '>') {
             
             handler.closeElement(buffer, offset + 2, len - 3, offset, len, line, col);
             return true;
             
         } else if (len > 3 &&
-                isOpenElementStart(buffer, offset, offset + len, allowExclMarksAtFirstChar) &&
+                isOpenElementStart(buffer, offset, offset + len) &&
                 buffer[offset + len - 2] == '/' &&
                 buffer[offset + len - 1] == '>') {
             
@@ -88,7 +86,7 @@ public final class ElementMarkupParsingUtil {
             return true;
             
         } else if (len > 2 && 
-                isOpenElementStart(buffer, offset, offset + len, allowExclMarksAtFirstChar) &&
+                isOpenElementStart(buffer, offset, offset + len) &&
                 buffer[offset + len - 1] == '>'){
             
             handler.openElement(buffer, offset + 1, len - 2, offset, len, line, col);
@@ -109,15 +107,14 @@ public final class ElementMarkupParsingUtil {
     
     public static void parseStandaloneElementBreakDown(
             final char[] buffer, 
-            final int contentOffset, final int contentLen, 
-            final int outerOffset, final int outerLen, 
+            final int offset, final int len, 
             final int line, final int col, 
             final IElementBreakDownHandling handler)
             throws AttoParseException {
         
-        if (!tryParseStandaloneElementBreakDown(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col, handler)) {
+        if (!tryParseStandaloneElementBreakDown(buffer, offset, len, line, col, handler)) {
             throw new AttoParseException(
-                    "Could not parse as a broken down standalone tag: \"" + new String(buffer, outerOffset, outerLen) + "\"", line, col);
+                    "Could not parse as a broken down standalone tag: \"" + new String(buffer, offset, len) + "\"", line, col);
         }
 
     }
@@ -125,15 +122,14 @@ public final class ElementMarkupParsingUtil {
     
     public static void parseOpenElementBreakDown(
             final char[] buffer, 
-            final int contentOffset, final int contentLen, 
-            final int outerOffset, final int outerLen, 
+            final int offset, final int len, 
             final int line, final int col, 
             final IElementBreakDownHandling handler)
             throws AttoParseException {
         
-        if (!tryParseOpenElementBreakDown(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col, handler)) {
+        if (!tryParseOpenElementBreakDown(buffer, offset, len, line, col, handler)) {
             throw new AttoParseException(
-                    "Could not parse as a broken down opening tag: \"" + new String(buffer, outerOffset, outerLen) + "\"", line, col);
+                    "Could not parse as a broken down opening tag: \"" + new String(buffer, offset, len) + "\"", line, col);
         }
 
     }
@@ -141,15 +137,14 @@ public final class ElementMarkupParsingUtil {
     
     public static void parseCloseElementBreakDown(
             final char[] buffer, 
-            final int contentOffset, final int contentLen, 
-            final int outerOffset, final int outerLen, 
+            final int offset, final int len, 
             final int line, final int col, 
             final IElementBreakDownHandling handler)
             throws AttoParseException {
         
-        if (!tryParseCloseElementBreakDown(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col, handler)) {
+        if (!tryParseCloseElementBreakDown(buffer, offset, len, line, col, handler)) {
             throw new AttoParseException(
-                    "Could not parse as a broken down closing tag: \"" + new String(buffer, outerOffset, outerLen) + "\"", line, col);
+                    "Could not parse as a broken down closing tag: \"" + new String(buffer, offset, len) + "\"", line, col);
         }
         
     }
@@ -158,37 +153,58 @@ public final class ElementMarkupParsingUtil {
 
     public static boolean tryParseStandaloneElementBreakDown(
             final char[] buffer, 
-            final int contentOffset, final int contentLen, 
-            final int outerOffset, final int outerLen, 
+            final int offset, final int len, 
             final int line, final int col, 
             final IElementBreakDownHandling handler)
             throws AttoParseException {
-        return doTryParseOpenOrStandaloneElementBreakDown(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col, handler, true);
+        
+        if (len > 3 &&
+                isOpenElementStart(buffer, offset, offset + len) &&
+                buffer[offset + len - 2] == '/' &&
+                buffer[offset + len - 1] == '>') {
+            doTryParseOpenOrStandaloneElementBreakDown(
+                    buffer, offset + 1, len - 3, offset, len, line, col, handler, true);
+            return true;
+        }
+        return false;
+
     }
     
     
     public static boolean tryParseOpenElementBreakDown(
             final char[] buffer,
-            final int contentOffset, final int contentLen, 
-            final int outerOffset, final int outerLen, 
+            final int offset, final int len, 
             final int line, final int col, 
             final IElementBreakDownHandling handler)
             throws AttoParseException {
-        return doTryParseOpenOrStandaloneElementBreakDown(
-                buffer, contentOffset, contentLen, outerOffset, outerLen, line, col, handler, false);
+        
+        if (len > 2 && 
+                isOpenElementStart(buffer, offset, offset + len) &&
+                buffer[offset + len - 1] == '>'){
+            doTryParseOpenOrStandaloneElementBreakDown(
+                    buffer, offset + 1, len - 2, offset, len, line, col, handler, false);
+            return true;
+        }
+        return false;
+        
     }
     
     
     public static boolean tryParseCloseElementBreakDown(
             final char[] buffer,
-            final int contentOffset, final int contentLen, 
-            final int outerOffset, final int outerLen, 
+            final int offset, final int len, 
             final int line, final int col, 
             final IElementBreakDownHandling handler)
             throws AttoParseException {
 
-        return doTryParseCloseElementBreakDown(
-                buffer, contentOffset, contentLen, outerOffset, outerLen, line, col, handler);
+        if (len > 3 &&
+                isCloseElementStart(buffer, offset, offset + len) &&
+                buffer[offset + len - 1] == '>') {
+            doTryParseCloseElementBreakDown(
+                    buffer, offset + 2, len - 3, offset, len, line, col, handler);
+            return true;
+        }
+        return false;
         
     }
     
@@ -197,7 +213,7 @@ public final class ElementMarkupParsingUtil {
 
     
     
-    private static boolean doTryParseOpenOrStandaloneElementBreakDown(
+    private static void doTryParseOpenOrStandaloneElementBreakDown(
             final char[] buffer, 
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
@@ -242,7 +258,7 @@ public final class ElementMarkupParsingUtil {
                         elementBreakdownLocator.line, elementBreakdownLocator.col);
             }
             
-            return true;
+            return;
             
         }
 
@@ -273,14 +289,14 @@ public final class ElementMarkupParsingUtil {
                     elementBreakdownLocator.line, elementBreakdownLocator.col);
         }
         
-        return true;
+        return;
         
     }
 
 
     
     
-    private static boolean doTryParseCloseElementBreakDown(
+    private static void doTryParseCloseElementBreakDown(
             final char[] buffer, 
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
@@ -311,7 +327,7 @@ public final class ElementMarkupParsingUtil {
                     buffer, (outerOffset + outerLen - 1), 1, 
                     elementBreakdownLocator.line, elementBreakdownLocator.col);
             
-            return true;
+            return;
             
         }
 
@@ -333,7 +349,10 @@ public final class ElementMarkupParsingUtil {
         if (wsEnd != -1) {
             // This is a close tag, so everything should be whitespace
             // until the end of the close tag
-            return false;
+            throw new AttoParseException(
+                    "Could not parse as a well-formed closing element " +
+                    "\"" + new String(buffer, outerOffset, outerLen) + "\"" +
+                    ": No attributes are allowed here", line, col);
         }
         
         final int wsOffset = current;
@@ -345,8 +364,6 @@ public final class ElementMarkupParsingUtil {
                 buffer, (outerOffset + outerLen - 1), 1, 
                 elementBreakdownLocator.line, elementBreakdownLocator.col);
         
-        return true;
-        
     }
     
     
@@ -354,54 +371,59 @@ public final class ElementMarkupParsingUtil {
     
     
     
-    static boolean isOpenElementStart(final char[] buffer, final int offset, final int maxi,
-            final boolean allowExclMarksAtFirstChar) {
+    static boolean isOpenElementStart(final char[] buffer, final int offset, final int maxi) {
         
         final int len = maxi - offset;
         
-        if (!allowExclMarksAtFirstChar) {
-            return (len > 1 && 
-                        buffer[offset] == '<' &&
-                        buffer[offset + 1] != '/' && 
-                        buffer[offset + 1] != '!' && 
-                        buffer[offset + 1] != '?' &&
-                        !Character.isWhitespace(buffer[offset + 1]));
-        }
+        return (len > 1 && 
+                    buffer[offset] == '<' &&
+                    isElementName(buffer, offset + 1, maxi));
+        
+    }
+
+    
+    static boolean isCloseElementStart(final char[] buffer, final int offset, final int maxi) {
+        
+        final int len = maxi - offset;
         
         return (len > 2 && 
-                buffer[offset] == '<' &&
-                buffer[offset + 1] != '/' && 
-                (buffer[offset + 1] != '!' || (buffer[offset + 2] != '[' && buffer[offset + 2] != '/' && buffer[offset + 2] != '?')) && 
-                buffer[offset + 1] != '?' &&
-                !Character.isWhitespace(buffer[offset + 1]));
+                    buffer[offset] == '<' &&
+                    buffer[offset + 1] == '/' &&
+                    isElementName(buffer, offset + 2, maxi));
         
     }
 
+
     
-    static boolean isCloseElementStart(final char[] buffer, final int offset, final int maxi,
-            final boolean allowExclMarksAtFirstChar) {
+    
+    private static boolean isElementName(final char[] buffer, final int offset, final int maxi) {
         
         final int len = maxi - offset;
         
-        if (!allowExclMarksAtFirstChar) {
-            return (len > 2 && 
-                        buffer[offset] == '<' &&
-                        buffer[offset + 1] == '/' &&
-                        buffer[offset + 2] != '!' && 
-                        buffer[offset + 2] != '?' &&
-                        !Character.isWhitespace(buffer[offset + 2]));
+        if (len > 1 && buffer[offset] == '!') {
+            if (len > 8) {
+                return (buffer[offset + 1] != '-' && buffer[offset + 1] != '!' && 
+                        buffer[offset + 1] != '/' && buffer[offset + 1] != '?' && 
+                        buffer[offset + 1] != '[' &&
+                        !((buffer[offset + 1] == 'D' || buffer[offset + 1] == 'd') && 
+                          (buffer[offset + 2] == 'O' || buffer[offset + 2] == 'o') && 
+                          (buffer[offset + 3] == 'C' || buffer[offset + 3] == 'c') && 
+                          (buffer[offset + 4] == 'T' || buffer[offset + 4] == 't') && 
+                          (buffer[offset + 5] == 'Y' || buffer[offset + 5] == 'y') && 
+                          (buffer[offset + 6] == 'P' || buffer[offset + 6] == 'p') && 
+                          (buffer[offset + 7] == 'E' || buffer[offset + 7] == 'e') &&
+                          (Character.isWhitespace(buffer[offset + 8]) || buffer[offset + 8] == '>'))); 
+            }
+            return (buffer[offset + 1] != '-' && buffer[offset + 1] != '!' && 
+                    buffer[offset + 1] != '/' && buffer[offset + 1] != '?' && 
+                    buffer[offset + 1] != '[' && !Character.isWhitespace(buffer[offset + 1])); 
         }
-        
-        return (len > 3 && 
-                buffer[offset] == '<' &&
-                buffer[offset + 1] == '/' &&
-                (buffer[offset + 2] != '!' || (buffer[offset + 3] != '[' && buffer[offset + 3] != '/' && buffer[offset + 3] != '?')) && 
-                buffer[offset + 2] != '?' &&
-                !Character.isWhitespace(buffer[offset + 2]));
+        return (len > 0 &&
+                buffer[offset] != '-' && buffer[offset] != '!' && 
+                buffer[offset] != '/' && buffer[offset] != '?' && 
+                buffer[offset] != '[' && !Character.isWhitespace(buffer[offset]));
         
     }
-
-    
     
     
     

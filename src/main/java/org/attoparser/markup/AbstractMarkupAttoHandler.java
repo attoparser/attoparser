@@ -53,18 +53,16 @@ public abstract class AbstractMarkupAttoHandler
             final int line, final int col)
             throws AttoParseException {
         
-        if (!ElementMarkupParsingUtil.tryParseElement(buffer, offset, len, line, col, false, this)) {
+        if (!ElementMarkupParsingUtil.tryParseElement(buffer, offset, len, line, col, this)) {
             if (!CommentMarkupParsingUtil.tryParseComment(buffer, offset, len, line, col, this)) {
                  if (!CdataMarkupParsingUtil.tryParseCdata(buffer, offset, len, line, col, this )) {
                      if (!DocTypeMarkupParsingUtil.tryParseDocType(buffer, offset, len, line, col, this)) {
                          if (!XmlDeclarationMarkupParsingUtil.tryParseXmlDeclaration(buffer, offset, len, line, col, this)) {
                              if (!ProcessingInstructionMarkupParsingUtil.tryParseProcessingInstruction(buffer, offset, len, line, col, this)) {
-                                 if (!ElementMarkupParsingUtil.tryParseElement(buffer, offset, len, line, col, true, this)) {
-                                     throw new AttoParseException(
-                                             "Could not parse as markup structure: " +
-                                             "\"" + new String(buffer, offset, len) + "\"", 
-                                             line, col);
-                                 }
+                                 throw new AttoParseException(
+                                         "Could not parse as markup structure: " +
+                                         "\"" + new String(buffer, offset, len) + "\"", 
+                                         line, col);
                              }
                          }
                      }

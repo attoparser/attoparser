@@ -98,14 +98,14 @@ public final class DocTypeMarkupParsingUtil {
     
     public static void parseDocTypeBreakDown(
             final char[] buffer, 
-            final int outerOffset, final int outerLen, 
+            final int offset, final int len, 
             final int line, final int col, 
             final IDocTypeBreakDownHandling handler)
             throws AttoParseException {
         
-        if (!tryParseDocTypeBreakDown(buffer, outerOffset, outerLen, line, col, handler)) {
+        if (!tryParseDocTypeBreakDown(buffer, offset, len, line, col, handler)) {
             throw new AttoParseException(
-                    "Could not parse as a broken down DOCTYPE clause: \"" + new String(buffer, outerOffset, outerLen) + "\"", line, col);
+                    "Could not parse as a broken down DOCTYPE clause: \"" + new String(buffer, offset, len) + "\"", line, col);
         }
         
     }

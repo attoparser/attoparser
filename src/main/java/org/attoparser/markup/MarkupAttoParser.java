@@ -90,9 +90,9 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                     return new BufferParseResult(current, currentLine, currentCol, false);
                 }
 
-                inOpenElement = ElementMarkupParsingUtil.isOpenElementStart(buffer, tagStart, maxi, false);
+                inOpenElement = ElementMarkupParsingUtil.isOpenElementStart(buffer, tagStart, maxi);
                 if (!inOpenElement) {
-                    inCloseElement = ElementMarkupParsingUtil.isCloseElementStart(buffer, tagStart, maxi, false);
+                    inCloseElement = ElementMarkupParsingUtil.isCloseElementStart(buffer, tagStart, maxi);
                     if (!inCloseElement) {
                         inComment = CommentMarkupParsingUtil.isCommentStart(buffer, tagStart, maxi);
                         if (!inComment) {
@@ -103,14 +103,6 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                                     inXmlDeclaration = XmlDeclarationMarkupParsingUtil.isXmlDeclarationStart(buffer, tagStart, maxi);
                                     if (!inXmlDeclaration) {
                                         inProcessingInstruction = ProcessingInstructionMarkupParsingUtil.isProcessingInstructionStart(buffer, tagStart, maxi);
-                                        if (!inProcessingInstruction) {
-                                            // We test open/close elements again so that we can handle elements starting with "!" and avoid 
-                                            // collisions with DOCTYPE
-                                            inOpenElement = ElementMarkupParsingUtil.isOpenElementStart(buffer, tagStart, maxi, true);
-                                            if (!inOpenElement) {
-                                                inCloseElement = ElementMarkupParsingUtil.isCloseElementStart(buffer, tagStart, maxi, true);
-                                            }
-                                        }
                                     }
                                 }
                             }
@@ -133,9 +125,9 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                         return new BufferParseResult(current, currentLine, currentCol, false);
                     }
 
-                    inOpenElement = ElementMarkupParsingUtil.isOpenElementStart(buffer, tagStart, maxi, false);
+                    inOpenElement = ElementMarkupParsingUtil.isOpenElementStart(buffer, tagStart, maxi);
                     if (!inOpenElement) {
-                        inCloseElement = ElementMarkupParsingUtil.isCloseElementStart(buffer, tagStart, maxi, false);
+                        inCloseElement = ElementMarkupParsingUtil.isCloseElementStart(buffer, tagStart, maxi);
                         if (!inCloseElement) {
                             inComment = CommentMarkupParsingUtil.isCommentStart(buffer, tagStart, maxi);
                             if (!inComment) {
@@ -146,14 +138,6 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                                         inXmlDeclaration = XmlDeclarationMarkupParsingUtil.isXmlDeclarationStart(buffer, tagStart, maxi);
                                         if (!inXmlDeclaration) {
                                             inProcessingInstruction = ProcessingInstructionMarkupParsingUtil.isProcessingInstructionStart(buffer, tagStart, maxi);
-                                            if (!inProcessingInstruction) {
-                                                // We test open/close elements again so that we can handle elements starting with "!" and avoid 
-                                                // collisions with DOCTYPE
-                                                inOpenElement = ElementMarkupParsingUtil.isOpenElementStart(buffer, tagStart, maxi, true);
-                                                if (!inOpenElement) {
-                                                    inCloseElement = ElementMarkupParsingUtil.isCloseElementStart(buffer, tagStart, maxi, true);
-                                                }
-                                            }
                                         }
                                     }
                                 }
