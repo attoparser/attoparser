@@ -136,6 +136,14 @@ public class AttoParserTest extends TestCase {
             "[T(Hello, ){1,1}OES(<){1,8}OEN(p){1,9}OEE(>){1,10}T(lala){1,11}CES(</){1,15}CEN(p){1,17}CEE(>){1,18}]",
             "[T(Hello, ){1,1}OE(p){1,8}T(lala){1,11}CE(p){1,15}]");
         testDoc( 
+            "Hello, <p>lal'a</p>",
+            "[T(Hello, ){1,1}OES(<){1,8}OEN(p){1,9}OEE(>){1,10}T(lal'a){1,11}CES(</){1,16}CEN(p){1,18}CEE(>){1,19}]",
+            "[T(Hello, ){1,1}OE(p){1,8}T(lal'a){1,11}CE(p){1,16}]");
+        testDoc( 
+            "Hello, <p>l'al'a</p>",
+            "[T(Hello, ){1,1}OES(<){1,8}OEN(p){1,9}OEE(>){1,10}T(l'al'a){1,11}CES(</){1,17}CEN(p){1,19}CEE(>){1,20}]",
+            "[T(Hello, ){1,1}OE(p){1,8}T(l'al'a){1,11}CE(p){1,17}]");
+        testDoc( 
             "Hello, <p>lala</p>",
             "[T(o, ){1,1}OES(<){1,4}OEN(p){1,5}OEE(>){1,6}T(l){1,7}]",
             "[T(o, ){1,1}OE(p){1,4}T(l){1,7}]",
@@ -147,6 +155,10 @@ public class AttoParserTest extends TestCase {
         testDoc( 
             "Hello, <br th:text=\"ll\"/>",
             "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}(=){1,19}(\"ll\"){1,20}SEE(/>){1,24}]",
+            "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]");
+        testDoc( 
+            "Hello, <br th:text='ll'/>",
+            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}(=){1,19}('ll'){1,20}SEE(/>){1,24}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]");
         testDoc( 
             "Hello, <br th:text =\"ll\"/>",
@@ -163,6 +175,10 @@ public class AttoParserTest extends TestCase {
         testDoc( 
             "Hello, <br th:text =   \"ll\"a=2/>",
             "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( =   ){1,19}(\"ll\"){1,24}A(a){1,28}(=){1,29}(2){1,30}SEE(/>){1,31}]",
+            "[T(Hello, ){1,1}SE(br[th:text='ll',a='2']){1,8}]");
+        testDoc( 
+            "Hello, <br th:text =   'll'a=2/>",
+            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( =   ){1,19}('ll'){1,24}A(a){1,28}(=){1,29}(2){1,30}SEE(/>){1,31}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll',a='2']){1,8}]");
         testDoc( 
             "Hello, <br th:text =   \"ll\"a= \n 2/>",
@@ -199,6 +215,10 @@ public class AttoParserTest extends TestCase {
         testDoc( 
             "Hello, <br th:text = \"a= b\"/>",
             "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( = ){1,19}(\"a= b\"){1,22}SEE(/>){1,28}]",
+            "[T(Hello, ){1,1}SE(br[th:text='a= b']){1,8}]");
+        testDoc( 
+            "Hello, <br th:text = 'a= b'/>",
+            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( = ){1,19}('a= b'){1,22}SEE(/>){1,28}]",
             "[T(Hello, ){1,1}SE(br[th:text='a= b']){1,8}]");
         testDoc( 
             "Hello, <br th:text = \"a= b\"\n/>",
@@ -252,6 +272,10 @@ public class AttoParserTest extends TestCase {
             "Hello<![CDATA[ 4 > 3\n \"> 10 ]]>, <br/>",
             "[T(Hello){1,1}D( 4 > 3\n \"> 10 ){1,6}T(, ){2,11}SES(<){2,13}SEN(br){2,14}SEE(/>){2,16}]",
             "[T(Hello){1,1}D( 4 > 3\n \"> 10 ){1,6}T(, ){2,11}SE(br){2,13}]");
+        testDoc( 
+            "Hello<![CDATA[ 4 > 3\n '> 10 ]]>, <br/>",
+            "[T(Hello){1,1}D( 4 > 3\n '> 10 ){1,6}T(, ){2,11}SES(<){2,13}SEN(br){2,14}SEE(/>){2,16}]",
+            "[T(Hello){1,1}D( 4 > 3\n '> 10 ){1,6}T(, ){2,11}SE(br){2,13}]");
         testDoc( 
             "Hello<![CDATA[ 4 > 3 > 10 ]]>, <br/>",
             "[T(Hello){1,1}D( 4 > 3 > 10 ){1,6}T(, ){1,30}SES(<){1,32}SEN(br){1,33}SEE(/>){1,35}]",
@@ -508,6 +532,10 @@ public class AttoParserTest extends TestCase {
             "<div class \n\n= \n\"lala\"li=\nlla>",
             "[OES(<){1,1}OEN(div){1,2}AS( ){1,5}A(class){1,6}( \n\n= \n){1,11}(\"lala\"){4,1}A(li){4,7}(=\n){4,9}(lla){5,1}OEE(>){5,4}]",
             null);
+        testDoc( 
+            "<div class \n\n= \n'lala'li=\nlla>",
+            "[OES(<){1,1}OEN(div){1,2}AS( ){1,5}A(class){1,6}( \n\n= \n){1,11}('lala'){4,1}A(li){4,7}(=\n){4,9}(lla){5,1}OEE(>){5,4}]",
+            null);
         
 
         testDoc( 
@@ -563,6 +591,10 @@ public class AttoParserTest extends TestCase {
             "[DT(DOCTYPE){1,3}(html){1,11}(PUBLIC){1,16}(lalero){1,23}(){1,31}(){1,31}]",
             null);
         testDoc( 
+            "<!DOCTYPE html PUBLIC 'lalero'>",
+            "[DT(DOCTYPE){1,3}(html){1,11}(PUBLIC){1,16}(lalero){1,23}(){1,31}(){1,31}]",
+            null);
+        testDoc( 
             "<!DOCTYPE html SYSTEM \"lalero\">",
             "[DT(DOCTYPE){1,3}(html){1,11}(SYSTEM){1,16}(){1,23}(lalero){1,23}(){1,31}]",
             "[DT(html)()(lalero)(){1,1}]");
@@ -584,6 +616,10 @@ public class AttoParserTest extends TestCase {
             "[DT(html)()(lalero)(){1,1}]");
         testDoc( 
             "<!DOCTYPE html public \"lalero\"   \n\"hey\">",
+            "[DT(DOCTYPE){1,3}(html){1,11}(public){1,16}(lalero){1,23}(hey){2,1}(){2,6}]",
+            "[DT(html)(lalero)(hey)(){1,1}]");
+        testDoc( 
+            "<!DOCTYPE html public 'lalero'   \n'hey'>",
             "[DT(DOCTYPE){1,3}(html){1,11}(public){1,16}(lalero){1,23}(hey){2,1}(){2,6}]",
             "[DT(html)(lalero)(hey)(){1,1}]");
         testDoc( 

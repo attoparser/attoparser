@@ -816,7 +816,8 @@ public final class DocTypeMarkupParsingUtil {
         if (len < 2) {
             return false;
         }
-        return (buffer[offset] == '"' && buffer[offset + len - 1] == '"');
+        return (buffer[offset] == '"' && buffer[offset + len - 1] == '"') ||
+               (buffer[offset] == '\'' && buffer[offset + len - 1] == '\'');
         
     }
     
@@ -848,14 +849,17 @@ public final class DocTypeMarkupParsingUtil {
             final char[] text, final int offset, final int maxi, final MarkupParsingLocator locator) {
         
         boolean inQuotes = false;
+        boolean inApos = false;
 
         for (int i = offset; i < maxi; i++) {
             
             final char c = text[i];
             
-            if (c == '"') {
+            if (!inApos && c == '"') {
                 inQuotes = !inQuotes;
-            } else if (!inQuotes && c == '[') {
+            } else if (!inQuotes && c == '\'') {
+                inApos = !inApos;
+            } else if (!inQuotes && !inApos && c == '[') {
                 return i;
             }
 
@@ -874,19 +878,22 @@ public final class DocTypeMarkupParsingUtil {
             final char[] text, final int offset, final int maxi, final MarkupParsingLocator locator) {
         
         boolean inQuotes = false;
+        boolean inApos = false;
         int bracketLevel = 0;
 
         for (int i = offset; i < maxi; i++) {
             
             final char c = text[i];
             
-            if (c == '"') {
+            if (!inApos && c == '"') {
                 inQuotes = !inQuotes;
-            } else if (!inQuotes && c == '[') {
+            } else if (!inQuotes && c == '\'') {
+                inApos = !inApos;
+            } else if (!inQuotes && !inApos && c == '[') {
                 bracketLevel++;
-            } else  if (!inQuotes && c == ']') {
+            } else  if (!inQuotes && !inApos && c == ']') {
                 bracketLevel--;
-            } else if (!inQuotes && bracketLevel == 0 && c == '>') {
+            } else if (!inQuotes && !inApos && bracketLevel == 0 && c == '>') {
                 return i;
             }
 

@@ -55,14 +55,17 @@ public final class MarkupParsingUtil {
             final MarkupParsingLocator locator) {
         
         boolean inQuotes = false;
+        boolean inApos = false;
 
         for (int i = offset; i < maxi; i++) {
             
             final char c = text[i];
             
-            if (c == '"') {
+            if (!inApos && c == '"') {
                 inQuotes = !inQuotes;
-            } else if (!inQuotes && c == '>') {
+            } else if (!inQuotes && c == '\'') {
+                inApos = !inApos;
+            } else if (!inQuotes && !inApos && c == '>') {
                 return i;
             }
 
@@ -120,14 +123,17 @@ public final class MarkupParsingUtil {
             final boolean avoidQuotes, final MarkupParsingLocator locator) {
         
         boolean inQuotes = false;
+        boolean inApos = false;
 
         for (int i = offset; i < maxi; i++) {
             
             final char c = text[i];
             
-            if (avoidQuotes && c == '"') {
+            if (avoidQuotes && !inApos && c == '"') {
                 inQuotes = !inQuotes;
-            } else if (!inQuotes && (c == ' ' || c == '\n' || Character.isWhitespace(c))) {
+            } else if (avoidQuotes && !inQuotes && c == '\'') {
+                inApos = !inApos;
+            } else if (!inQuotes && !inApos && (c == ' ' || c == '\n' || Character.isWhitespace(c))) {
                 return i;
             }
 
@@ -209,14 +215,17 @@ public final class MarkupParsingUtil {
             final MarkupParsingLocator locator) {
         
         boolean inQuotes = false;
+        boolean inApos = false;
 
         for (int i = offset; i < maxi; i++) {
             
             final char c = text[i];
             
-            if (c == '"') {
+            if (!inApos && c == '"') {
                 inQuotes = !inQuotes;
-            } else if (!inQuotes) {
+            } else if (!inQuotes && c == '\'') {
+                inApos = !inApos;
+            } else if (!inQuotes && !inApos) {
                 return i;
             }
 

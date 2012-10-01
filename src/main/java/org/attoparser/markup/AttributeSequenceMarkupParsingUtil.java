@@ -313,7 +313,7 @@ public final class AttributeSequenceMarkupParsingUtil {
             currentArtifactLine = locator.line;
             currentArtifactCol = locator.col;
 
-            final boolean attributeEndsWithQuotes = (i < maxi && buffer[current] == '"');
+            final boolean attributeEndsWithQuotes = (i < maxi && (buffer[current] == '"' || buffer[current] == '\''));
             final int valueEnd =
                 (attributeEndsWithQuotes?
                         MarkupParsingUtil.findNextAnyCharAvoidQuotesWildcard(buffer, i, maxi, locator) :
@@ -327,8 +327,7 @@ public final class AttributeSequenceMarkupParsingUtil {
                 int valueContentOffset = valueOuterOffset;
                 int valueContentLen = valueOuterLen;
                 
-                if (valueOuterLen >= 2 && 
-                        buffer[valueOuterOffset] == '"' && buffer[valueOuterOffset + valueOuterLen -1] == '"') {
+                if (isValueSurroundedByCommas(buffer, valueOuterOffset, valueOuterLen)) {
                     valueContentOffset = valueOuterOffset + 1;
                     valueContentLen = valueOuterLen - 2;
                 }
@@ -352,8 +351,7 @@ public final class AttributeSequenceMarkupParsingUtil {
             int valueContentOffset = valueOuterOffset;
             int valueContentLen = valueOuterLen;
             
-            if (valueOuterLen >= 2 && 
-                    buffer[valueOuterOffset] == '"' && buffer[valueOuterOffset + valueOuterLen -1] == '"') {
+            if (isValueSurroundedByCommas(buffer, valueOuterOffset, valueOuterLen)) {
                 valueContentOffset = valueOuterOffset + 1;
                 valueContentLen = valueOuterLen - 2;
             }
@@ -377,6 +375,17 @@ public final class AttributeSequenceMarkupParsingUtil {
     }
 
     
+    
+
+    private static boolean isValueSurroundedByCommas(final char[] buffer, final int offset, final int len) {
+        
+        if (len < 2) {
+            return false;
+        }
+        return (buffer[offset] == '"' && buffer[offset + len - 1] == '"') ||
+               (buffer[offset] == '\'' && buffer[offset + len - 1] == '\'');
+        
+    }
     
     
     
