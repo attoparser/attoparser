@@ -17,13 +17,12 @@
  * 
  * =============================================================================
  */
-package org.attoparser.markup.trace;
+package org.attoparser.markup.duplicate;
 
-import java.io.IOException;
 import java.io.Writer;
 
 import org.attoparser.AttoParseException;
-import org.attoparser.markup.AbstractMarkupAttoHandler;
+import org.attoparser.markup.AbstractBasicMarkupAttoHandler;
 
 
 
@@ -34,13 +33,13 @@ import org.attoparser.markup.AbstractMarkupAttoHandler;
  * @since 1.0
  *
  */
-public final class TracingMarkupAttoHandler extends AbstractMarkupAttoHandler {
+public final class DuplicatingBasicMarkupAttoHandler extends AbstractBasicMarkupAttoHandler {
 
     
     private final Writer writer;
     
     
-    public TracingMarkupAttoHandler(final Writer writer) {
+    public DuplicatingBasicMarkupAttoHandler(final Writer writer) {
         super();
         this.writer = writer;
     }
@@ -51,11 +50,7 @@ public final class TracingMarkupAttoHandler extends AbstractMarkupAttoHandler {
     @Override
     public void startDocument()
             throws AttoParseException {
-        try {
-            this.writer.write('[');
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
+        // Nothing to be done here
     }
 
     
@@ -63,12 +58,29 @@ public final class TracingMarkupAttoHandler extends AbstractMarkupAttoHandler {
     @Override
     public void endDocument()
             throws AttoParseException {
+        // Nothing to be done here
+    }
+
+
+    
+
+    
+    @Override
+    public void docType(
+            final char[] buffer, 
+            final int contentOffset, final int contentLen,
+            final int outerOffset, final int outerLen, 
+            final int line, final int col)
+            throws AttoParseException {
+        
         try {
-            this.writer.write(']');
+            this.writer.write(buffer, outerOffset, outerLen);
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
+        
     }
+
 
 
 
@@ -81,74 +93,49 @@ public final class TracingMarkupAttoHandler extends AbstractMarkupAttoHandler {
             throws AttoParseException {
         
         try {
-            
-            this.writer.write('S');
-            this.writer.write('E');
-            this.writer.write('S');
-            this.writer.write('(');
-            this.writer.write(buffer, contentOffset, contentLen);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
-            
+            this.writer.write(buffer, outerOffset, outerLen);
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
         
     }
-    
-    
 
-    
+
+
+
     @Override
     public void openElement(
             final char[] buffer, 
-            final int contentOffset, final int contentLen,
-            final int outerOffset, final int outerLen, 
-            final int line, final int col)
+            int contentOffset, int contentLen,
+            int outerOffset, int outerLen, int line, int col)
             throws AttoParseException {
         
         try {
-            
-            this.writer.write('O');
-            this.writer.write('E');
-            this.writer.write('S');
-            this.writer.write('(');
-            this.writer.write(buffer, contentOffset, contentLen);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
-            
+            this.writer.write(buffer, outerOffset, outerLen);
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
         
     }
-    
-    
 
-    
+
+
+
     @Override
-    public void closeElement(
-            final char[] buffer, 
-            final int contentOffset, final int contentLen,
-            final int outerOffset, final int outerLen, 
-            final int line, final int col)
+    public void closeElement(char[] buffer, int contentOffset, int contentLen,
+            int outerOffset, int outerLen, int line, int col)
             throws AttoParseException {
         
         try {
-            
-            this.writer.write('C');
-            this.writer.write('E');
-            this.writer.write('S');
-            this.writer.write('(');
-            this.writer.write(buffer, contentOffset, contentLen);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
-            
+            this.writer.write(buffer, outerOffset, outerLen);
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
         
     }
+
+
+
 
     
     
@@ -159,11 +146,7 @@ public final class TracingMarkupAttoHandler extends AbstractMarkupAttoHandler {
         
         try {
             
-            this.writer.write('T');
-            this.writer.write('(');
             this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -183,11 +166,7 @@ public final class TracingMarkupAttoHandler extends AbstractMarkupAttoHandler {
         
         try {
             
-            this.writer.write('C');
-            this.writer.write('(');
-            this.writer.write(buffer, contentOffset, contentLen);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
+            this.writer.write(buffer, outerOffset, outerLen);
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -206,11 +185,7 @@ public final class TracingMarkupAttoHandler extends AbstractMarkupAttoHandler {
         
         try {
             
-            this.writer.write('D');
-            this.writer.write('(');
-            this.writer.write(buffer, contentOffset, contentLen);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
+            this.writer.write(buffer, outerOffset, outerLen);
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -238,17 +213,7 @@ public final class TracingMarkupAttoHandler extends AbstractMarkupAttoHandler {
         
         try {
             
-            this.writer.write("X");
-            this.writer.write('(');
-            this.writer.write(buffer, versionOffset, versionLen);
-            this.writer.write(')');
-            this.writer.write('(');
-            this.writer.write(buffer, encodingOffset, encodingLen);
-            this.writer.write(')');
-            this.writer.write('(');
-            this.writer.write(buffer, standaloneOffset, standaloneLen);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
+            this.writer.write(buffer, outerOffset, outerLen);
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -273,63 +238,13 @@ public final class TracingMarkupAttoHandler extends AbstractMarkupAttoHandler {
         
         try {
             
-            this.writer.write("P");
-            this.writer.write('(');
-            this.writer.write(buffer, targetOffset, targetLen);
-            this.writer.write(')');
-            this.writer.write('(');
-            this.writer.write(buffer, contentOffset, contentLen);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
+            this.writer.write(buffer, outerOffset, outerLen);
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
         
     }
-
-    
-    
-    
-
-
-
-
-    @Override
-    public void docType(
-            final char[] buffer, 
-            final int contentOffset, final int contentLen,
-            final int outerOffset, final int outerLen, 
-            final int line, final int col)
-            throws AttoParseException {
-        
-        try {
-            
-            this.writer.write('D');
-            this.writer.write('T');
-            this.writer.write('(');
-            this.writer.write(buffer, contentOffset, contentLen);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
-    }
-
-
-
-
-    private static void writePosition(final Writer writer, final int line, final int col) throws IOException {
-        writer.write('{');
-        writer.write(String.valueOf(line));
-        writer.write(',');
-        writer.write(String.valueOf(col));
-        writer.write('}');
-    }
-
-
 
 
     

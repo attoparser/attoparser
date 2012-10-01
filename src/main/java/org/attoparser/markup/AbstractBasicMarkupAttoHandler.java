@@ -33,14 +33,14 @@ import org.attoparser.AttoParseException;
  * @since 1.0
  *
  */
-public abstract class AbstractMarkupAttoHandler 
+public abstract class AbstractBasicMarkupAttoHandler 
         extends AbstractAttoHandler
-        implements IElementHandling, IDocTypeHandling, ICdataHandling, ICommentHandling,
+        implements IBasicElementHandling, IBasicDocTypeHandling, ICdataHandling, ICommentHandling,
                    IXmlDeclarationHandling, IProcessingInstructionHandling {
 
 
     
-    protected AbstractMarkupAttoHandler() {
+    protected AbstractBasicMarkupAttoHandler() {
         super();
     }
 

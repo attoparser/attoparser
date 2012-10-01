@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.io.Writer;
 
 import org.attoparser.AttoParseException;
-import org.attoparser.markup.AbstractMarkupBreakDownAttoHandler;
+import org.attoparser.markup.AbstractDetailedMarkupAttoHandler;
 
 
 
@@ -34,13 +34,13 @@ import org.attoparser.markup.AbstractMarkupBreakDownAttoHandler;
  * @since 1.0
  *
  */
-public final class TracingMarkupBreakDownAttoHandler extends AbstractMarkupBreakDownAttoHandler {
+public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMarkupAttoHandler {
 
     
     private final Writer writer;
     
     
-    public TracingMarkupBreakDownAttoHandler(final Writer writer) {
+    public TracingDetailedMarkupAttoHandler(final Writer writer) {
         super();
         this.writer = writer;
     }

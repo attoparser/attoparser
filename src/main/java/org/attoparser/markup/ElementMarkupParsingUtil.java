@@ -51,7 +51,7 @@ public final class ElementMarkupParsingUtil {
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col, 
-            final IElementHandling handler)
+            final IBasicElementHandling handler)
             throws AttoParseException {
         
         if (!tryParseElement(buffer, offset, len, line, col, handler)) {
@@ -67,7 +67,7 @@ public final class ElementMarkupParsingUtil {
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col,
-            final IElementHandling handler)
+            final IBasicElementHandling handler)
             throws AttoParseException {
 
         if (len > 3 &&
@@ -105,14 +105,14 @@ public final class ElementMarkupParsingUtil {
     
     
     
-    public static void parseStandaloneElementBreakDown(
+    public static void parseDetailedStandaloneElement(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col, 
-            final IElementBreakDownHandling handler)
+            final IDetailedElementHandling handler)
             throws AttoParseException {
         
-        if (!tryParseStandaloneElementBreakDown(buffer, offset, len, line, col, handler)) {
+        if (!tryParseDetailedStandaloneElement(buffer, offset, len, line, col, handler)) {
             throw new AttoParseException(
                     "Could not parse as a broken down standalone tag: \"" + new String(buffer, offset, len) + "\"", line, col);
         }
@@ -120,14 +120,14 @@ public final class ElementMarkupParsingUtil {
     }
     
     
-    public static void parseOpenElementBreakDown(
+    public static void parseDetailedOpenElement(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col, 
-            final IElementBreakDownHandling handler)
+            final IDetailedElementHandling handler)
             throws AttoParseException {
         
-        if (!tryParseOpenElementBreakDown(buffer, offset, len, line, col, handler)) {
+        if (!tryParseDetailedOpenElement(buffer, offset, len, line, col, handler)) {
             throw new AttoParseException(
                     "Could not parse as a broken down opening tag: \"" + new String(buffer, offset, len) + "\"", line, col);
         }
@@ -135,14 +135,14 @@ public final class ElementMarkupParsingUtil {
     }
     
     
-    public static void parseCloseElementBreakDown(
+    public static void parseDetailedCloseElement(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col, 
-            final IElementBreakDownHandling handler)
+            final IDetailedElementHandling handler)
             throws AttoParseException {
         
-        if (!tryParseCloseElementBreakDown(buffer, offset, len, line, col, handler)) {
+        if (!tryParseDetailedCloseElement(buffer, offset, len, line, col, handler)) {
             throw new AttoParseException(
                     "Could not parse as a broken down closing tag: \"" + new String(buffer, offset, len) + "\"", line, col);
         }
@@ -151,18 +151,18 @@ public final class ElementMarkupParsingUtil {
     
     
 
-    public static boolean tryParseStandaloneElementBreakDown(
+    public static boolean tryParseDetailedStandaloneElement(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col, 
-            final IElementBreakDownHandling handler)
+            final IDetailedElementHandling handler)
             throws AttoParseException {
         
         if (len > 3 &&
                 isOpenElementStart(buffer, offset, offset + len) &&
                 buffer[offset + len - 2] == '/' &&
                 buffer[offset + len - 1] == '>') {
-            doTryParseOpenOrStandaloneElementBreakDown(
+            doTryParseDetailedOpenOrStandaloneElement(
                     buffer, offset + 1, len - 3, offset, len, line, col, handler, true);
             return true;
         }
@@ -171,17 +171,17 @@ public final class ElementMarkupParsingUtil {
     }
     
     
-    public static boolean tryParseOpenElementBreakDown(
+    public static boolean tryParseDetailedOpenElement(
             final char[] buffer,
             final int offset, final int len, 
             final int line, final int col, 
-            final IElementBreakDownHandling handler)
+            final IDetailedElementHandling handler)
             throws AttoParseException {
         
         if (len > 2 && 
                 isOpenElementStart(buffer, offset, offset + len) &&
                 buffer[offset + len - 1] == '>'){
-            doTryParseOpenOrStandaloneElementBreakDown(
+            doTryParseDetailedOpenOrStandaloneElement(
                     buffer, offset + 1, len - 2, offset, len, line, col, handler, false);
             return true;
         }
@@ -190,17 +190,17 @@ public final class ElementMarkupParsingUtil {
     }
     
     
-    public static boolean tryParseCloseElementBreakDown(
+    public static boolean tryParseDetailedCloseElement(
             final char[] buffer,
             final int offset, final int len, 
             final int line, final int col, 
-            final IElementBreakDownHandling handler)
+            final IDetailedElementHandling handler)
             throws AttoParseException {
 
         if (len > 3 &&
                 isCloseElementStart(buffer, offset, offset + len) &&
                 buffer[offset + len - 1] == '>') {
-            doTryParseCloseElementBreakDown(
+            doTryParseDetailedCloseElement(
                     buffer, offset + 2, len - 3, offset, len, line, col, handler);
             return true;
         }
@@ -213,12 +213,12 @@ public final class ElementMarkupParsingUtil {
 
     
     
-    private static void doTryParseOpenOrStandaloneElementBreakDown(
+    private static void doTryParseDetailedOpenOrStandaloneElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
             final int line, final int col, 
-            final IElementBreakDownHandling handler, 
+            final IDetailedElementHandling handler, 
             final boolean isStandalone)
             throws AttoParseException {
 
@@ -230,14 +230,14 @@ public final class ElementMarkupParsingUtil {
         
         final int maxi = contentOffset + contentLen;
         
-        final MarkupParsingLocator elementBreakdownLocator = new MarkupParsingLocator(line, col + 1);
+        final MarkupParsingLocator locator = new MarkupParsingLocator(line, col + 1);
         
         /*
          * Extract the element name first 
          */
         
         final int elementNameEnd = 
-            MarkupParsingUtil.findNextWhitespaceCharWildcard(buffer, contentOffset, maxi, true, elementBreakdownLocator);
+            MarkupParsingUtil.findNextWhitespaceCharWildcard(buffer, contentOffset, maxi, true, locator);
         
         if (elementNameEnd == -1) {
             // The buffer only contains the element name
@@ -248,14 +248,14 @@ public final class ElementMarkupParsingUtil {
                         line, col + 1);
                 handler.standaloneElementEnd(
                         buffer, (outerOffset + outerLen - 2), 2, 
-                        elementBreakdownLocator.line, elementBreakdownLocator.col);
+                        locator.line, locator.col);
             } else {
                 handler.openElementName(
                         buffer, contentOffset, contentLen, 
                         line, col + 1);
                 handler.openElementEnd(
                         buffer, (outerOffset + outerLen - 1), 1, 
-                        elementBreakdownLocator.line, elementBreakdownLocator.col);
+                        locator.line, locator.col);
             }
             
             return;
@@ -275,18 +275,18 @@ public final class ElementMarkupParsingUtil {
         
         
         AttributeSequenceMarkupParsingUtil.parseAttributeSequence(
-                buffer, elementNameEnd, maxi - elementNameEnd, elementBreakdownLocator, handler);
+                buffer, elementNameEnd, maxi - elementNameEnd, locator, handler);
 
         
         
         if (isStandalone) {
             handler.standaloneElementEnd(
                     buffer, (outerOffset + outerLen - 2), 2, 
-                    elementBreakdownLocator.line, elementBreakdownLocator.col);
+                    locator.line, locator.col);
         } else {
             handler.openElementEnd(
                     buffer, (outerOffset + outerLen - 1), 1, 
-                    elementBreakdownLocator.line, elementBreakdownLocator.col);
+                    locator.line, locator.col);
         }
         
         return;
@@ -296,26 +296,26 @@ public final class ElementMarkupParsingUtil {
 
     
     
-    private static void doTryParseCloseElementBreakDown(
+    private static void doTryParseDetailedCloseElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
             final int line, final int col, 
-            final IElementBreakDownHandling handler)
+            final IDetailedElementHandling handler)
             throws AttoParseException {
 
         handler.closeElementStart(buffer, outerOffset, 2, line, col);
         
         final int maxi = contentOffset + contentLen;
         
-        final MarkupParsingLocator elementBreakdownLocator = new MarkupParsingLocator(line, col + 2);
+        final MarkupParsingLocator locator = new MarkupParsingLocator(line, col + 2);
         
         /*
          * Extract the element name first 
          */
         
         final int elementNameEnd = 
-            MarkupParsingUtil.findNextWhitespaceCharWildcard(buffer, contentOffset, maxi, true, elementBreakdownLocator);
+            MarkupParsingUtil.findNextWhitespaceCharWildcard(buffer, contentOffset, maxi, true, locator);
         
         if (elementNameEnd == -1) {
             // The buffer only contains the element name
@@ -325,7 +325,7 @@ public final class ElementMarkupParsingUtil {
                     line, col + 2);
             handler.closeElementEnd(
                     buffer, (outerOffset + outerLen - 1), 1, 
-                    elementBreakdownLocator.line, elementBreakdownLocator.col);
+                    locator.line, locator.col);
             
             return;
             
@@ -340,11 +340,11 @@ public final class ElementMarkupParsingUtil {
         int i = elementNameEnd;
         int current = i;
 
-        int currentArtifactLine = elementBreakdownLocator.line;
-        int currentArtifactCol = elementBreakdownLocator.col;
+        int currentArtifactLine = locator.line;
+        int currentArtifactCol = locator.col;
         
         final int wsEnd = 
-            MarkupParsingUtil.findNextNonWhitespaceCharWildcard(buffer, i, maxi, elementBreakdownLocator);
+            MarkupParsingUtil.findNextNonWhitespaceCharWildcard(buffer, i, maxi, locator);
         
         if (wsEnd != -1) {
             // This is a close tag, so everything should be whitespace
@@ -362,7 +362,7 @@ public final class ElementMarkupParsingUtil {
         
         handler.closeElementEnd(
                 buffer, (outerOffset + outerLen - 1), 1, 
-                elementBreakdownLocator.line, elementBreakdownLocator.col);
+                locator.line, locator.col);
         
     }
     

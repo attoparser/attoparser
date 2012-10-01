@@ -24,7 +24,7 @@ import java.io.Writer;
 import java.util.Map;
 
 import org.attoparser.AttoParseException;
-import org.attoparser.markup.AbstractSimpleMarkupAttoHandler;
+import org.attoparser.markup.AbstractStandardMarkupAttoHandler;
 
 
 
@@ -35,13 +35,13 @@ import org.attoparser.markup.AbstractSimpleMarkupAttoHandler;
  * @since 1.0
  *
  */
-public final class TracingSimpleMarkupAttoHandler extends AbstractSimpleMarkupAttoHandler {
+public final class TracingStandardMarkupAttoHandler extends AbstractStandardMarkupAttoHandler {
 
     
     private final Writer writer;
     
     
-    public TracingSimpleMarkupAttoHandler(final Writer writer) {
+    public TracingStandardMarkupAttoHandler(final Writer writer) {
         super();
         this.writer = writer;
     }

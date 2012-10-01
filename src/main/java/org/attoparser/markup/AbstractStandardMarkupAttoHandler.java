@@ -37,9 +37,9 @@ import org.attoparser.AttoParseException;
  * @since 1.0
  *
  */
-public abstract class AbstractSimpleMarkupAttoHandler 
-        extends AbstractMarkupBreakDownAttoHandler
-        implements ISimpleMarkupHandling {
+public abstract class AbstractStandardMarkupAttoHandler 
+        extends AbstractDetailedMarkupAttoHandler
+        implements IStandardMarkupHandling {
 
     
     private String currentElementName;
@@ -49,7 +49,7 @@ public abstract class AbstractSimpleMarkupAttoHandler
     
     
     
-    protected AbstractSimpleMarkupAttoHandler() {
+    protected AbstractStandardMarkupAttoHandler() {
         super();
     }
     

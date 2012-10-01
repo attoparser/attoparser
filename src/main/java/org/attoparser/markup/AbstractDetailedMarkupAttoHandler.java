@@ -33,13 +33,13 @@ import org.attoparser.AttoParseException;
  * @since 1.0
  *
  */
-public abstract class AbstractMarkupBreakDownAttoHandler 
-        extends AbstractMarkupAttoHandler
-        implements IElementBreakDownHandling, IDocTypeBreakDownHandling {
+public abstract class AbstractDetailedMarkupAttoHandler 
+        extends AbstractBasicMarkupAttoHandler
+        implements IDetailedElementHandling, IDetailedDocTypeHandling {
 
 
     
-    protected AbstractMarkupBreakDownAttoHandler() {
+    protected AbstractDetailedMarkupAttoHandler() {
         super();
     }
 
@@ -54,7 +54,7 @@ public abstract class AbstractMarkupBreakDownAttoHandler
             final int line, final int col)
             throws AttoParseException {
         
-        DocTypeMarkupParsingUtil.parseDocTypeBreakDown(
+        DocTypeMarkupParsingUtil.parseDetailedDocType(
                 buffer, outerOffset, outerLen, line, col, this);
         
     }
@@ -68,7 +68,7 @@ public abstract class AbstractMarkupBreakDownAttoHandler
             final int line, final int col) 
             throws AttoParseException {
         
-        ElementMarkupParsingUtil.parseStandaloneElementBreakDown(buffer, outerOffset, outerLen, line, col, this);
+        ElementMarkupParsingUtil.parseDetailedStandaloneElement(buffer, outerOffset, outerLen, line, col, this);
         
     }
 
@@ -81,7 +81,7 @@ public abstract class AbstractMarkupBreakDownAttoHandler
             final int line, final int col) 
             throws AttoParseException {
         
-        ElementMarkupParsingUtil.parseOpenElementBreakDown(buffer, outerOffset, outerLen, line, col, this);
+        ElementMarkupParsingUtil.parseDetailedOpenElement(buffer, outerOffset, outerLen, line, col, this);
         
     }
 
@@ -94,7 +94,7 @@ public abstract class AbstractMarkupBreakDownAttoHandler
             final int line, final int col)
             throws AttoParseException {
 
-        ElementMarkupParsingUtil.parseCloseElementBreakDown(buffer, outerOffset, outerLen, line, col, this);
+        ElementMarkupParsingUtil.parseDetailedCloseElement(buffer, outerOffset, outerLen, line, col, this);
 
     }
 

@@ -29,23 +29,9 @@ import org.attoparser.AttoParseException;
  * @since 1.0
  *
  */
-public interface IElementHandling {
+public interface IBasicDocTypeHandling {
 
-    public void standaloneElement(
-            final char[] buffer, 
-            final int contentOffset, final int contentLen,
-            final int outerOffset, final int outerLen,
-            final int line, final int col)
-            throws AttoParseException;
-    
-    public void openElement(
-            final char[] buffer, 
-            final int contentOffset, final int contentLen,
-            final int outerOffset, final int outerLen,
-            final int line, final int col)
-            throws AttoParseException;
-    
-    public void closeElement(
+    public void docType(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,

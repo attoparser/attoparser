@@ -19,8 +19,6 @@
  */
 package org.attoparser.markup;
 
-import java.util.Map;
-
 import org.attoparser.AttoParseException;
 
 
@@ -31,69 +29,67 @@ import org.attoparser.AttoParseException;
  * @since 1.0
  *
  */
-public interface ISimpleMarkupHandling {
+public interface IDetailedElementHandling extends IAttributeSequenceHandling {
 
     
-    public void startDocument()
+    public void standaloneElementStart(
+            final char[] buffer, 
+            final int offset, final int len,
+            final int line, final int col)
             throws AttoParseException;
 
-    
-    public void endDocument()
+    public void standaloneElementName(
+            final char[] buffer, 
+            final int offset, final int len,
+            final int line, final int col)
             throws AttoParseException;
     
-    
-    public void standaloneElement(
-            final String elementName, final Map<String,String> attributes,
+    public void standaloneElementEnd(
+            final char[] buffer, 
+            final int offset, final int len,
             final int line, final int col)
             throws AttoParseException;
 
     
-    public void openElement(
-            final String elementName, final Map<String,String> attributes,
+    
+    public void openElementStart(
+            final char[] buffer, 
+            final int offset, final int len,
             final int line, final int col)
             throws AttoParseException;
     
-    
-    public void closeElement(
-            final String elementName, final int line, final int col)
+    public void openElementName(
+            final char[] buffer, 
+            final int offset, final int len,
+            final int line, final int col)
             throws AttoParseException;
     
-    
-    public void xmlDeclaration(
-            final String version,
-            final String encoding,
-            final String standalone,
+    public void openElementEnd(
+            final char[] buffer, 
+            final int offset, final int len,
             final int line, final int col)
             throws AttoParseException;
 
     
-    public void docType(
-            final String elementName, final String publicId, final String systemId,
-            final String internalSubset, final int line, final int col)
-            throws AttoParseException;
     
-
-    public void processingInstruction(
-            final String target, final String content, 
-            int line, int col) 
+    public void closeElementStart(
+            final char[] buffer, 
+            final int offset, final int len,
+            final int line, final int col)
             throws AttoParseException;
 
-    
-    public void text(
-            final char[] buffer, final int offset, final int len, 
+    public void closeElementName(
+            final char[] buffer, 
+            final int offset, final int len,
             final int line, final int col)
             throws AttoParseException;
     
-    
-    public void comment(
-            final char[] buffer, final int offset, final int len, 
+    public void closeElementEnd(
+            final char[] buffer, 
+            final int offset, final int len,
             final int line, final int col)
             throws AttoParseException;
-    
-    
-    public void cdata(
-            final char[] buffer, final int offset, final int len, 
-            final int line, final int col)
-            throws AttoParseException;
+
+
     
 }

@@ -22,7 +22,7 @@ package org.attoparser.markup.duplicate;
 import java.io.Writer;
 
 import org.attoparser.AttoParseException;
-import org.attoparser.markup.AbstractMarkupBreakDownAttoHandler;
+import org.attoparser.markup.AbstractDetailedMarkupAttoHandler;
 
 
 
@@ -33,13 +33,13 @@ import org.attoparser.markup.AbstractMarkupBreakDownAttoHandler;
  * @since 1.0
  *
  */
-public final class DuplicatingMarkupBreakDownAttoHandler extends AbstractMarkupBreakDownAttoHandler {
+public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailedMarkupAttoHandler {
 
     
     private final Writer writer;
     
     
-    public DuplicatingMarkupBreakDownAttoHandler(final Writer writer) {
+    public DuplicatingDetailedMarkupAttoHandler(final Writer writer) {
         super();
         this.writer = writer;
     }
