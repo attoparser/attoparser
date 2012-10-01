@@ -24,7 +24,7 @@
   <groupId>org.attoparser</groupId>
   <artifactId>attoparser</artifactId>
   <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0-beta1</version>
   <name>attoparser</name>
   <url>http://www.attoparser.org</url>
 
@@ -47,6 +47,7 @@
     <url>scm:git:git@github.com:attoparser/attoparser.git</url>
     <connection>scm:git:git@github.com:attoparser/attoparser.git</connection>
     <developerConnection>scm:git:git@github.com:attoparser/attoparser.git</developerConnection>
+    <tag>attoparser-1.0-beta1</tag>
   </scm>
   
   <developers>
