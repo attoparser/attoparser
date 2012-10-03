@@ -41,7 +41,11 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
     
     
     public TracingDetailedMarkupAttoHandler(final Writer writer) {
-        super();
+        this(writer, false);
+    }
+    
+    public TracingDetailedMarkupAttoHandler(final Writer writer, final boolean wellFormed) {
+        super(wellFormed);
         this.writer = writer;
     }
     

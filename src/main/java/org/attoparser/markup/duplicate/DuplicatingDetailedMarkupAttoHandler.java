@@ -38,9 +38,14 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
     
     private final Writer writer;
     
+
     
     public DuplicatingDetailedMarkupAttoHandler(final Writer writer) {
-        super();
+        this(writer, false);
+    }
+    
+    public DuplicatingDetailedMarkupAttoHandler(final Writer writer, final boolean wellFormed) {
+        super(wellFormed);
         this.writer = writer;
     }
     

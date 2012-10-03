@@ -49,8 +49,8 @@ public abstract class AbstractStandardMarkupAttoHandler
     
     
     
-    protected AbstractStandardMarkupAttoHandler() {
-        super();
+    protected AbstractStandardMarkupAttoHandler(final boolean wellFormed) {
+        super(wellFormed);
     }
     
 

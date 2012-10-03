@@ -40,9 +40,14 @@ public final class TracingStandardMarkupAttoHandler extends AbstractStandardMark
     
     private final Writer writer;
     
+
     
     public TracingStandardMarkupAttoHandler(final Writer writer) {
-        super();
+        this(writer, false);
+    }
+    
+    public TracingStandardMarkupAttoHandler(final Writer writer, final boolean wellFormed) {
+        super(wellFormed);
         this.writer = writer;
     }
     
