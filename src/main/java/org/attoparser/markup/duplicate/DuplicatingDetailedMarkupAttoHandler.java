@@ -53,7 +53,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
     
     
     @Override
-    public void startDocument()
+    public void handleDocumentStart(final long startTimeNanos)
             throws AttoParseException {
         // Nothing to be done here
     }
@@ -61,7 +61,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
     
     
     @Override
-    public void endDocument()
+    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos)
             throws AttoParseException {
         // Nothing to be done here
     }
@@ -72,7 +72,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public void text(final char[] buffer, final int offset, final int len, final int line, final int col)
+    public void handleText(final char[] buffer, final int offset, final int len, final int line, final int col)
             throws AttoParseException {
         
         try {
@@ -88,7 +88,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
     
     @Override
-    public void comment(
+    public void handleComment(
             final char[] buffer, 
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
@@ -107,7 +107,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
     
     @Override
-    public void cdata(
+    public void handleCDATASection(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
@@ -128,7 +128,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public void standaloneElementStart(
+    public void handleStandaloneElementStart(
             final char[] buffer, final int offset, final int len,
             final int line, final int col) throws AttoParseException {
         
@@ -146,7 +146,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public void standaloneElementName(final char[] buffer, final int offset, final int len,
+    public void handleStandaloneElementName(final char[] buffer, final int offset, final int len,
             final int line, final int col) throws AttoParseException {
         
         try {
@@ -163,7 +163,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public void standaloneElementEnd(final char[] buffer, final int offset, final int len,
+    public void handleStandaloneElementEnd(final char[] buffer, final int offset, final int len,
             final int line, final int col) throws AttoParseException {
         
         try {
@@ -180,7 +180,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public void openElementStart(final char[] buffer, final int offset, final int len, final int line,
+    public void handleOpenElementStart(final char[] buffer, final int offset, final int len, final int line,
             final int col) throws AttoParseException {
         
         try {
@@ -197,7 +197,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public void openElementName(final char[] buffer, final int offset, final int len, final int line,
+    public void handleOpenElementName(final char[] buffer, final int offset, final int len, final int line,
             final int col) throws AttoParseException {
         
         try {
@@ -214,7 +214,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public void openElementEnd(final char[] buffer, final int offset, final int len, final int line,
+    public void handleOpenElementEnd(final char[] buffer, final int offset, final int len, final int line,
             final int col) throws AttoParseException {
         
         try {
@@ -231,7 +231,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public void closeElementStart(final char[] buffer, final int offset, final int len, final int line,
+    public void handleCloseElementStart(final char[] buffer, final int offset, final int len, final int line,
             final int col) throws AttoParseException {
         
         try {
@@ -248,7 +248,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public void closeElementName(final char[] buffer, final int offset, final int len, final int line,
+    public void handleCloseElementName(final char[] buffer, final int offset, final int len, final int line,
             final int col) throws AttoParseException {
         
         try {
@@ -265,7 +265,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public void closeElementEnd(final char[] buffer, final int offset, final int len, final int line,
+    public void handleCloseElementEnd(final char[] buffer, final int offset, final int len, final int line,
             final int col) throws AttoParseException {
         
         try {
@@ -282,7 +282,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public void attribute(final char[] buffer, final int nameOffset, final int nameLen,
+    public void handleAttribute(final char[] buffer, final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol, final int operatorOffset, final int operatorLen,
             final int operatorLine, final int operatorCol, final int valueContentOffset,
             final int valueContentLen, final int valueOuterOffset, final int valueOuterLen,
@@ -304,7 +304,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public void attributeSeparator(
+    public void handleAttributeSeparator(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col)
@@ -324,7 +324,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public void docType(
+    public void handleDocType(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol, 
@@ -355,7 +355,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
     
     
     @Override
-    public void xmlDeclaration(
+    public void handleXmlDeclaration(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -436,7 +436,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public void processingInstruction(
+    public void handleProcessingInstruction(
             final char[] buffer, 
             final int targetOffset, final int targetLen, 
             final int targetLine, final int targetCol,

@@ -133,7 +133,7 @@ public final class AttributeSequenceMarkupParsingUtil {
                 
                 final int wsOffset = current;
                 final int wsLen = maxi - current;
-                handler.attributeSeparator(buffer, wsOffset, wsLen, currentArtifactLine, currentArtifactCol);
+                handler.handleAttributeSeparator(buffer, wsOffset, wsLen, currentArtifactLine, currentArtifactCol);
                 i = maxi;
                 continue;
                 
@@ -143,7 +143,7 @@ public final class AttributeSequenceMarkupParsingUtil {
                 // We avoid empty whitespace fragments
                 final int wsOffset = current;
                 final int wsLen = wsEnd - current;
-                handler.attributeSeparator(buffer, wsOffset, wsLen, currentArtifactLine, currentArtifactCol);
+                handler.handleAttributeSeparator(buffer, wsOffset, wsLen, currentArtifactLine, currentArtifactCol);
                 i = wsEnd;
                 current = i;
             }
@@ -166,7 +166,7 @@ public final class AttributeSequenceMarkupParsingUtil {
                 
                 final int attributeNameOffset = current;
                 final int attributeNameLen = maxi - current;
-                handler.attribute(
+                handler.handleAttribute(
                         buffer,                                                               // name 
                         attributeNameOffset, attributeNameLen,                                // name
                         currentArtifactLine, currentArtifactCol,                              // name
@@ -227,7 +227,7 @@ public final class AttributeSequenceMarkupParsingUtil {
                     // It is a no value with equals, so we will consider everything
                     // to be an operator
                     
-                    handler.attribute(
+                    handler.handleAttribute(
                             buffer,                                                                // name 
                             attributeNameOffset, attributeNameLen,                                 // name 
                             attributeNameLine, attributeNameCol,                                   // name
@@ -240,7 +240,7 @@ public final class AttributeSequenceMarkupParsingUtil {
                     // There is no "=", so we will first output the attribute with no
                     // operator and then a whitespace
                     
-                    handler.attribute(
+                    handler.handleAttribute(
                             buffer,                                                                // name 
                             attributeNameOffset, attributeNameLen,                                 // name 
                             attributeNameLine, attributeNameCol,                                   // name
@@ -249,7 +249,7 @@ public final class AttributeSequenceMarkupParsingUtil {
                             0, 0, 0, 0,                                                            // value
                             currentArtifactLine, currentArtifactCol);                              // value
                     
-                    handler.attributeSeparator(
+                    handler.handleAttributeSeparator(
                             buffer, 
                             operatorOffset, operatorLen, 
                             currentArtifactLine, currentArtifactCol);
@@ -275,7 +275,7 @@ public final class AttributeSequenceMarkupParsingUtil {
                 // It is not an operator, but a whitespace between this and the next attribute,
                 // so we will first output the attribute with no operator and then a whitespace
                 
-                handler.attribute(
+                handler.handleAttribute(
                         buffer,                                                                // name 
                         attributeNameOffset, attributeNameLen,                                 // name 
                         attributeNameLine, attributeNameCol,                                   // name
@@ -284,7 +284,7 @@ public final class AttributeSequenceMarkupParsingUtil {
                         0, 0, 0, 0,                                                            // value
                         currentArtifactLine, currentArtifactCol);                              // value
                 
-                handler.attributeSeparator(
+                handler.handleAttributeSeparator(
                         buffer, 
                         current, (operatorEnd - current), 
                         currentArtifactLine, currentArtifactCol);
@@ -332,7 +332,7 @@ public final class AttributeSequenceMarkupParsingUtil {
                     valueContentLen = valueOuterLen - 2;
                 }
                         
-                handler.attribute(
+                handler.handleAttribute(
                         buffer,                                                               // name 
                         attributeNameOffset, attributeNameLen,                                // name
                         attributeNameLine, attributeNameCol,                                  // name
@@ -356,7 +356,7 @@ public final class AttributeSequenceMarkupParsingUtil {
                 valueContentLen = valueOuterLen - 2;
             }
                     
-            handler.attribute(
+            handler.handleAttribute(
                     buffer,                                                               // name 
                     attributeNameOffset, attributeNameLen,                                // name
                     attributeNameLine, attributeNameCol,                                  // name

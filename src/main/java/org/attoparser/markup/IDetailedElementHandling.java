@@ -32,39 +32,19 @@ import org.attoparser.AttoParseException;
 public interface IDetailedElementHandling extends IAttributeSequenceHandling {
 
     
-    public void standaloneElementStart(
+    public void handleStandaloneElementStart(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException;
 
-    public void standaloneElementName(
+    public void handleStandaloneElementName(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException;
     
-    public void standaloneElementEnd(
-            final char[] buffer, 
-            final int offset, final int len,
-            final int line, final int col)
-            throws AttoParseException;
-
-    
-    
-    public void openElementStart(
-            final char[] buffer, 
-            final int offset, final int len,
-            final int line, final int col)
-            throws AttoParseException;
-    
-    public void openElementName(
-            final char[] buffer, 
-            final int offset, final int len,
-            final int line, final int col)
-            throws AttoParseException;
-    
-    public void openElementEnd(
+    public void handleStandaloneElementEnd(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
@@ -72,19 +52,39 @@ public interface IDetailedElementHandling extends IAttributeSequenceHandling {
 
     
     
-    public void closeElementStart(
-            final char[] buffer, 
-            final int offset, final int len,
-            final int line, final int col)
-            throws AttoParseException;
-
-    public void closeElementName(
+    public void handleOpenElementStart(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException;
     
-    public void closeElementEnd(
+    public void handleOpenElementName(
+            final char[] buffer, 
+            final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException;
+    
+    public void handleOpenElementEnd(
+            final char[] buffer, 
+            final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException;
+
+    
+    
+    public void handleCloseElementStart(
+            final char[] buffer, 
+            final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException;
+
+    public void handleCloseElementName(
+            final char[] buffer, 
+            final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException;
+    
+    public void handleCloseElementEnd(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)

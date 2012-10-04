@@ -31,7 +31,7 @@ import org.attoparser.AttoParseException;
  */
 public interface ICommentHandling {
 
-    public void comment(
+    public void handleComment(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,

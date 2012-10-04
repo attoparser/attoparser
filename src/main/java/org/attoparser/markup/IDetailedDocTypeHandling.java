@@ -31,7 +31,7 @@ import org.attoparser.AttoParseException;
  */
 public interface IDetailedDocTypeHandling {
 
-    public void docType(
+    public void handleDocType(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,

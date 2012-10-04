@@ -82,7 +82,7 @@ public final class DocTypeMarkupParsingUtil {
             final int contentOffset =
                 ((c9 == ' ' || Character.isWhitespace(c9))? 10 : 9);
             
-            handler.docType(buffer, offset + contentOffset, (len - contentOffset) - 1, offset, len, line, col);
+            handler.handleDocType(buffer, offset + contentOffset, (len - contentOffset) - 1, offset, len, line, col);
             
             return true;
             
@@ -219,7 +219,7 @@ public final class DocTypeMarkupParsingUtil {
         if (keywordEnd == -1) {
             // The buffer only contains the DOCTYPE keyword. Weird but true.
             
-            handler.docType(
+            handler.handleDocType(
                     buffer, 
                     i, maxi - i,                                                // keyword 
                     line, col + 2,                                              // keyword
@@ -264,7 +264,7 @@ public final class DocTypeMarkupParsingUtil {
         if (elementNameStart == -1) {
             // There is no element name. Only whitespace until the end of the DOCTYPE structure
             
-            handler.docType(
+            handler.handleDocType(
                     buffer, 
                     keywordOffset, keywordLen,                                  // keyword 
                     keywordLine, keywordCol,                                    // keyword
@@ -304,7 +304,7 @@ public final class DocTypeMarkupParsingUtil {
         if (elementNameEnd == -1) {
             // The element name is the last thing to appear in the structure
             
-            handler.docType(
+            handler.handleDocType(
                     buffer, 
                     keywordOffset, keywordLen,                                  // keyword 
                     keywordLine, keywordCol,                                    // keyword
@@ -349,7 +349,7 @@ public final class DocTypeMarkupParsingUtil {
         if (typeStart == -1) {
             // There is no type. Only whitespace until the end of the DOCTYPE structure
             
-            handler.docType(
+            handler.handleDocType(
                     buffer, 
                     keywordOffset, keywordLen,                                  // keyword 
                     keywordLine, keywordCol,                                    // keyword
@@ -483,7 +483,7 @@ public final class DocTypeMarkupParsingUtil {
             if (isTypePublic) {
                 // If type is PUBLIC and we only have one spec, it is the publicId
                 
-                handler.docType(
+                handler.handleDocType(
                         buffer, 
                         keywordOffset, keywordLen,                                  // keyword 
                         keywordLine, keywordCol,                                    // keyword
@@ -505,7 +505,7 @@ public final class DocTypeMarkupParsingUtil {
                 
             }
             
-            handler.docType(
+            handler.handleDocType(
                     buffer, 
                     keywordOffset, keywordLen,                                  // keyword 
                     keywordLine, keywordCol,                                    // keyword
@@ -565,7 +565,7 @@ public final class DocTypeMarkupParsingUtil {
             if (isTypePublic) {
                 // If type is PUBLIC and we only have one spec, it is the publicId
                 
-                handler.docType(
+                handler.handleDocType(
                         buffer, 
                         keywordOffset, keywordLen,                                  // keyword 
                         keywordLine, keywordCol,                                    // keyword
@@ -587,7 +587,7 @@ public final class DocTypeMarkupParsingUtil {
                 
             }
             
-            handler.docType(
+            handler.handleDocType(
                     buffer, 
                     keywordOffset, keywordLen,                                  // keyword 
                     keywordLine, keywordCol,                                    // keyword
@@ -651,7 +651,7 @@ public final class DocTypeMarkupParsingUtil {
 
             }
             
-            handler.docType(
+            handler.handleDocType(
                     buffer, 
                     keywordOffset, keywordLen,                                  // keyword 
                     keywordLine, keywordCol,                                    // keyword
@@ -732,7 +732,7 @@ public final class DocTypeMarkupParsingUtil {
         
         // If everything we can find until the end of the clause is whitespace, we are fine
         
-        handler.docType(
+        handler.handleDocType(
                 buffer, 
                 keywordOffset, keywordLen,                                  // keyword 
                 keywordLine, keywordCol,                                    // keyword

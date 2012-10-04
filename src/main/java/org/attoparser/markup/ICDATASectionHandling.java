@@ -29,27 +29,13 @@ import org.attoparser.AttoParseException;
  * @since 1.0
  *
  */
-public interface IBasicElementHandling {
+public interface ICDATASectionHandling {
 
-    public void handleStandaloneElement(
+    public void handleCDATASection(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
-            final int line, final int col)
-            throws AttoParseException;
-    
-    public void handleOpenElement(
-            final char[] buffer, 
-            final int contentOffset, final int contentLen,
-            final int outerOffset, final int outerLen,
-            final int line, final int col)
-            throws AttoParseException;
-    
-    public void handleCloseElement(
-            final char[] buffer, 
-            final int contentOffset, final int contentLen,
-            final int outerOffset, final int outerLen,
-            final int line, final int col)
+            final int line, final int col) 
             throws AttoParseException;
     
 }

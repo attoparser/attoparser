@@ -169,7 +169,7 @@ public final class XmlDeclarationMarkupParsingUtil {
         attHandling.finalChecks(locator, buffer);
 
         
-        handler.xmlDeclaration(
+        handler.handleXmlDeclaration(
                 buffer, 
                 keywordOffset, keywordLen,                                // keyword
                 keywordLine, keywordCol,                                  // keyword
@@ -252,7 +252,7 @@ public final class XmlDeclarationMarkupParsingUtil {
         
         
         
-        public void attribute(
+        public void handleAttribute(
                 final char[] buffer, 
                 final int nameOffset, final int nameLen,
                 final int nameLine, final int nameCol, 
@@ -335,7 +335,7 @@ public final class XmlDeclarationMarkupParsingUtil {
         }
         
 
-        public void attributeSeparator(
+        public void handleAttributeSeparator(
                 final char[] buffer, 
                 final int offset, final int len,
                 final int line, final int col)

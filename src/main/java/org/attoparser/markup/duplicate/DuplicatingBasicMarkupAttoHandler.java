@@ -48,7 +48,7 @@ public final class DuplicatingBasicMarkupAttoHandler extends AbstractBasicMarkup
     
     
     @Override
-    public void startDocument()
+    public void handleDocumentStart(final long startTimeNanos)
             throws AttoParseException {
         // Nothing to be done here
     }
@@ -56,7 +56,7 @@ public final class DuplicatingBasicMarkupAttoHandler extends AbstractBasicMarkup
     
     
     @Override
-    public void endDocument()
+    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos)
             throws AttoParseException {
         // Nothing to be done here
     }
@@ -66,7 +66,7 @@ public final class DuplicatingBasicMarkupAttoHandler extends AbstractBasicMarkup
 
     
     @Override
-    public void docType(
+    public void handleDocType(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
@@ -85,7 +85,7 @@ public final class DuplicatingBasicMarkupAttoHandler extends AbstractBasicMarkup
 
 
     @Override
-    public void standaloneElement(
+    public void handleStandaloneElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
@@ -104,7 +104,7 @@ public final class DuplicatingBasicMarkupAttoHandler extends AbstractBasicMarkup
 
 
     @Override
-    public void openElement(
+    public void handleOpenElement(
             final char[] buffer, 
             int contentOffset, int contentLen,
             int outerOffset, int outerLen, int line, int col)
@@ -122,7 +122,7 @@ public final class DuplicatingBasicMarkupAttoHandler extends AbstractBasicMarkup
 
 
     @Override
-    public void closeElement(char[] buffer, int contentOffset, int contentLen,
+    public void handleCloseElement(char[] buffer, int contentOffset, int contentLen,
             int outerOffset, int outerLen, int line, int col)
             throws AttoParseException {
         
@@ -140,7 +140,7 @@ public final class DuplicatingBasicMarkupAttoHandler extends AbstractBasicMarkup
     
     
     @Override
-    public void text(final char[] buffer, final int offset, final int len, 
+    public void handleText(final char[] buffer, final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
         
@@ -157,7 +157,7 @@ public final class DuplicatingBasicMarkupAttoHandler extends AbstractBasicMarkup
 
     
     @Override
-    public void comment(
+    public void handleComment(
             final char[] buffer, 
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
@@ -176,7 +176,7 @@ public final class DuplicatingBasicMarkupAttoHandler extends AbstractBasicMarkup
 
     
     @Override
-    public void cdata(
+    public void handleCDATASection(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
@@ -197,7 +197,7 @@ public final class DuplicatingBasicMarkupAttoHandler extends AbstractBasicMarkup
     
     
     @Override
-    public void xmlDeclaration(
+    public void handleXmlDeclaration(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -226,7 +226,7 @@ public final class DuplicatingBasicMarkupAttoHandler extends AbstractBasicMarkup
 
 
     @Override
-    public void processingInstruction(
+    public void handleProcessingInstruction(
             final char[] buffer, 
             final int targetOffset, final int targetLen, 
             final int targetLine, final int targetCol,

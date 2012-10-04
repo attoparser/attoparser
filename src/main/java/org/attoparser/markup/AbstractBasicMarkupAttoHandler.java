@@ -35,7 +35,7 @@ import org.attoparser.AttoParseException;
  */
 public abstract class AbstractBasicMarkupAttoHandler 
         extends AbstractAttoHandler
-        implements IBasicElementHandling, IBasicDocTypeHandling, ICdataHandling, ICommentHandling,
+        implements IBasicElementHandling, IBasicDocTypeHandling, ICDATASectionHandling, ICommentHandling,
                    IXmlDeclarationHandling, IProcessingInstructionHandling {
 
 
@@ -47,7 +47,7 @@ public abstract class AbstractBasicMarkupAttoHandler
 
 
     @Override
-    public final void structure(
+    public final void handleStructure(
             final char[] buffer,
             final int offset, final int len, 
             final int line, final int col)
@@ -74,7 +74,7 @@ public abstract class AbstractBasicMarkupAttoHandler
 
 
 
-    public void docType(
+    public void handleDocType(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
@@ -85,7 +85,7 @@ public abstract class AbstractBasicMarkupAttoHandler
     
     
     
-    public void standaloneElement(
+    public void handleStandaloneElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
@@ -95,7 +95,7 @@ public abstract class AbstractBasicMarkupAttoHandler
     }
 
 
-    public void openElement(
+    public void handleOpenElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
@@ -105,7 +105,7 @@ public abstract class AbstractBasicMarkupAttoHandler
     }
 
     
-    public void closeElement(
+    public void handleCloseElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
@@ -115,7 +115,7 @@ public abstract class AbstractBasicMarkupAttoHandler
     }
 
     
-    public void comment(
+    public void handleComment(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
@@ -125,7 +125,7 @@ public abstract class AbstractBasicMarkupAttoHandler
     }
 
     
-    public void cdata(
+    public void handleCDATASection(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
@@ -135,7 +135,7 @@ public abstract class AbstractBasicMarkupAttoHandler
     }
 
 
-    public void xmlDeclaration(
+    public void handleXmlDeclaration(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -152,7 +152,7 @@ public abstract class AbstractBasicMarkupAttoHandler
     }
 
 
-    public void processingInstruction(
+    public void handleProcessingInstruction(
             final char[] buffer, 
             final int targetOffset, final int targetLen, 
             final int targetLine, final int targetCol,

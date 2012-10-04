@@ -34,32 +34,32 @@ import org.attoparser.AttoParseException;
 public interface IStandardMarkupHandling {
 
     
-    public void startDocument()
+    public void handleDocumentStart()
             throws AttoParseException;
 
     
-    public void endDocument()
+    public void handleDocumentEnd()
             throws AttoParseException;
     
     
-    public void standaloneElement(
+    public void handleStandaloneElement(
             final String elementName, final Map<String,String> attributes,
             final int line, final int col)
             throws AttoParseException;
 
     
-    public void openElement(
+    public void handleOpenElement(
             final String elementName, final Map<String,String> attributes,
             final int line, final int col)
             throws AttoParseException;
     
     
-    public void closeElement(
+    public void handleCloseElement(
             final String elementName, final int line, final int col)
             throws AttoParseException;
     
     
-    public void xmlDeclaration(
+    public void handleXmlDeclaration(
             final String version,
             final String encoding,
             final String standalone,
@@ -67,31 +67,31 @@ public interface IStandardMarkupHandling {
             throws AttoParseException;
 
     
-    public void docType(
+    public void handleDocType(
             final String elementName, final String publicId, final String systemId,
             final String internalSubset, final int line, final int col)
             throws AttoParseException;
     
 
-    public void processingInstruction(
+    public void handleProcessingInstruction(
             final String target, final String content, 
             int line, int col) 
             throws AttoParseException;
 
     
-    public void text(
+    public void handleText(
             final char[] buffer, final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException;
     
     
-    public void comment(
+    public void handleComment(
             final char[] buffer, final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException;
     
     
-    public void cdata(
+    public void handleCDATASection(
             final char[] buffer, final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException;

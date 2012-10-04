@@ -153,7 +153,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                 
                 if (tagStart > current) {
                     // We avoid empty-string text events
-                    handler.text(
+                    handler.handleText(
                             buffer, current, (tagStart - current), 
                             currentLine, currentCol);
                 }
@@ -186,13 +186,13 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                 if (inOpenElement) {
                     // This is a closing tag
                     
-                    handler.structure(buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
+                    handler.handleStructure(buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
                     inOpenElement = false;
                     
                 } else if (inCloseElement) {
                     // This is a closing tag
                     
-                    handler.structure(buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
+                    handler.handleStructure(buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
                     inCloseElement = false;
                     
                 } else if (inComment) {
@@ -210,7 +210,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                         
                     }
                     
-                    handler.structure(buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
+                    handler.handleStructure(buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
                     inComment = false;
                     
                 } else if (inCdata) {
@@ -228,19 +228,19 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                         
                     }
                     
-                    handler.structure(buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
+                    handler.handleStructure(buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
                     inCdata = false;
                     
                 } else if (inDocType) {
                     // This is a DOCTYPE clause
                     
-                    handler.structure(buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
+                    handler.handleStructure(buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
                     inDocType = false;
                     
                 } else if (inXmlDeclaration) {
                     // This is an XML Declaration
 
-                    handler.structure(buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
+                    handler.handleStructure(buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
                     inXmlDeclaration = false;
                     
                 } else if (inProcessingInstruction) {
@@ -259,7 +259,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                     }
                     
 
-                    handler.structure(buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
+                    handler.handleStructure(buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
                     inProcessingInstruction = false;
                     
                 } else {

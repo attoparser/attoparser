@@ -53,7 +53,7 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
     
     
     @Override
-    public void startDocument()
+    public void handleDocumentStart(final long startTimeNanos)
             throws AttoParseException {
         try {
             this.writer.write('[');
@@ -65,7 +65,7 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
     
     
     @Override
-    public void endDocument()
+    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos)
             throws AttoParseException {
         try {
             this.writer.write(']');
@@ -77,7 +77,7 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
 
 
     @Override
-    public void standaloneElementStart(
+    public void handleStandaloneElementStart(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
@@ -102,7 +102,7 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
     
     
     @Override
-    public void standaloneElementName(
+    public void handleStandaloneElementName(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
@@ -127,7 +127,7 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
 
 
     @Override
-    public void standaloneElementEnd(
+    public void handleStandaloneElementEnd(
             final char[] buffer, final int offset, final int len,
             final int line, final int col) 
             throws AttoParseException {
@@ -152,7 +152,7 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
 
     
     @Override
-    public void openElementStart(
+    public void handleOpenElementStart(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
@@ -177,7 +177,7 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
     
     
     @Override
-    public void openElementName(final char[] buffer, final int offset, final int len,
+    public void handleOpenElementName(final char[] buffer, final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         
@@ -201,7 +201,7 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
 
     
     @Override
-    public void openElementEnd(
+    public void handleOpenElementEnd(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
@@ -227,7 +227,7 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
 
     
     @Override
-    public void closeElementStart(
+    public void handleCloseElementStart(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
@@ -252,7 +252,7 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
 
     
     @Override
-    public void closeElementName(final char[] buffer, final int offset, final int len,
+    public void handleCloseElementName(final char[] buffer, final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         
@@ -276,7 +276,7 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
 
     
     @Override
-    public void closeElementEnd(
+    public void handleCloseElementEnd(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
@@ -302,7 +302,7 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
     
     
     @Override
-    public void attribute(
+    public void handleAttribute(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol,
@@ -339,7 +339,7 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
     
     
     @Override
-    public void text(final char[] buffer, final int offset, final int len, 
+    public void handleText(final char[] buffer, final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
         
@@ -360,7 +360,7 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
 
     
     @Override
-    public void comment(
+    public void handleComment(
             final char[] buffer, 
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
@@ -383,7 +383,7 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
 
     
     @Override
-    public void cdata(
+    public void handleCDATASection(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
@@ -408,7 +408,7 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
     
     
     @Override
-    public void xmlDeclaration(
+    public void handleXmlDeclaration(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -452,7 +452,7 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
 
 
     @Override
-    public void attributeSeparator(
+    public void handleAttributeSeparator(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col)
@@ -476,7 +476,7 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
 
 
     @Override
-    public void docType(
+    public void handleDocType(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -534,7 +534,7 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
 
 
     @Override
-    public void processingInstruction(
+    public void handleProcessingInstruction(
             final char[] buffer, 
             final int targetOffset, final int targetLen, 
             final int targetLine, final int targetCol,

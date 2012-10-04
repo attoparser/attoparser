@@ -55,13 +55,13 @@ public abstract class AbstractStandardMarkupAttoHandler
     
 
     @Override
-    public final void standaloneElementStart(
+    public final void handleStandaloneElementStart(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col) 
             throws AttoParseException {
         
-        super.standaloneElementStart(buffer, offset, len, line, col);
+        super.handleStandaloneElementStart(buffer, offset, len, line, col);
         
         this.currentElementName = null;
         this.currentElementAttributes = null;
@@ -73,13 +73,13 @@ public abstract class AbstractStandardMarkupAttoHandler
     
 
     @Override
-    public final void standaloneElementName(
+    public final void handleStandaloneElementName(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col) 
             throws AttoParseException {
 
-        super.standaloneElementName(buffer, offset, len, line, col);
+        super.handleStandaloneElementName(buffer, offset, len, line, col);
         
         this.currentElementName = new String(buffer, offset, len);
         
@@ -88,28 +88,28 @@ public abstract class AbstractStandardMarkupAttoHandler
     
     
     @Override
-    public final void standaloneElementEnd(
+    public final void handleStandaloneElementEnd(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         
-        super.standaloneElementEnd(buffer, offset, len, line, col);
+        super.handleStandaloneElementEnd(buffer, offset, len, line, col);
         
-        standaloneElement(this.currentElementName, this.currentElementAttributes, this.currentElementLine, this.currentElementCol);
+        handleStandaloneElement(this.currentElementName, this.currentElementAttributes, this.currentElementLine, this.currentElementCol);
         
     }
 
     
     
     @Override
-    public final void openElementStart(
+    public final void handleOpenElementStart(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col) 
             throws AttoParseException {
 
-        super.openElementStart(buffer, offset, len, line, col);
+        super.handleOpenElementStart(buffer, offset, len, line, col);
 
         this.currentElementName = null;
         this.currentElementAttributes = null;
@@ -121,13 +121,13 @@ public abstract class AbstractStandardMarkupAttoHandler
     
 
     @Override
-    public final void openElementName(
+    public final void handleOpenElementName(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
 
-        super.openElementName(buffer, offset, len, line, col);
+        super.handleOpenElementName(buffer, offset, len, line, col);
         
         this.currentElementName = new String(buffer, offset, len);
         
@@ -136,28 +136,28 @@ public abstract class AbstractStandardMarkupAttoHandler
     
     
     @Override
-    public final void openElementEnd(
+    public final void handleOpenElementEnd(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col) 
             throws AttoParseException {
 
-        super.openElementEnd(buffer, offset, len, line, col);
+        super.handleOpenElementEnd(buffer, offset, len, line, col);
         
-        openElement(this.currentElementName, this.currentElementAttributes, this.currentElementLine, this.currentElementCol);
+        handleOpenElement(this.currentElementName, this.currentElementAttributes, this.currentElementLine, this.currentElementCol);
         
     }
 
     
     
     @Override
-    public final void closeElementStart(
+    public final void handleCloseElementStart(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col) 
             throws AttoParseException {
 
-        super.closeElementStart(buffer, offset, len, line, col);
+        super.handleCloseElementStart(buffer, offset, len, line, col);
         
         this.currentElementName = null;
         this.currentElementAttributes = null;
@@ -169,13 +169,13 @@ public abstract class AbstractStandardMarkupAttoHandler
     
 
     @Override
-    public final void closeElementName(
+    public final void handleCloseElementName(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
 
-        super.closeElementName(buffer, offset, len, line, col);
+        super.handleCloseElementName(buffer, offset, len, line, col);
         
         this.currentElementName = new String(buffer, offset, len);
         
@@ -184,22 +184,22 @@ public abstract class AbstractStandardMarkupAttoHandler
     
     
     @Override
-    public final void closeElementEnd(
+    public final void handleCloseElementEnd(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col) 
             throws AttoParseException {
 
-        super.closeElementEnd(buffer, offset, len, line, col);
+        super.handleCloseElementEnd(buffer, offset, len, line, col);
 
-        closeElement(this.currentElementName, this.currentElementLine, this.currentElementCol);
+        handleCloseElement(this.currentElementName, this.currentElementLine, this.currentElementCol);
         
     }
 
     
     
     @Override
-    public final void attribute(
+    public final void handleAttribute(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol, 
@@ -210,7 +210,7 @@ public abstract class AbstractStandardMarkupAttoHandler
             final int valueLine, final int valueCol)
             throws AttoParseException {
 
-        super.attribute(buffer, nameOffset, nameLen, nameLine, nameCol,
+        super.handleAttribute(buffer, nameOffset, nameLen, nameLine, nameCol,
                 operatorOffset, operatorLen, operatorLine, operatorCol,
                 valueContentOffset, valueContentLen, valueOuterOffset, valueOuterLen,
                 valueLine, valueCol);
@@ -230,20 +230,20 @@ public abstract class AbstractStandardMarkupAttoHandler
     
     
     @Override
-    public final void attributeSeparator(
+    public final void handleAttributeSeparator(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col) 
             throws AttoParseException {
 
-        super.attributeSeparator(buffer, offset, len, line, col);
+        super.handleAttributeSeparator(buffer, offset, len, line, col);
         
     }
 
     
     
     @Override
-    public final void docType(
+    public final void handleDocType(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol, 
@@ -261,14 +261,14 @@ public abstract class AbstractStandardMarkupAttoHandler
             final int outerLine, final int outerCol)
             throws AttoParseException {
 
-        super.docType(buffer, keywordOffset, keywordLen, keywordLine, keywordCol,
+        super.handleDocType(buffer, keywordOffset, keywordLen, keywordLine, keywordCol,
                 elementNameOffset, elementNameLen, elementNameLine, elementNameCol,
                 typeOffset, typeLen, typeLine, typeCol, publicIdOffset, publicIdLen,
                 publicIdLine, publicIdCol, systemIdOffset, systemIdLen, systemIdLine,
                 systemIdCol, internalSubsetOffset, internalSubsetLen, internalSubsetLine, 
                 internalSubsetCol, outerOffset, outerLen, outerLine, outerCol);
         
-        docType(
+        handleDocType(
                 new String(buffer, elementNameOffset, elementNameLen),
                 (publicIdLen <= 0? null : new String(buffer, publicIdOffset, publicIdLen)),
                 (systemIdLen <= 0? null : new String(buffer, systemIdOffset, systemIdLen)),
@@ -280,39 +280,39 @@ public abstract class AbstractStandardMarkupAttoHandler
 
     
     @Override
-    public final void comment(
+    public final void handleComment(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
             final int line, final int col)
             throws AttoParseException {
 
-        super.comment(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
+        super.handleComment(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
         
-        comment(buffer, contentOffset, contentLen, line, col);
+        handleComment(buffer, contentOffset, contentLen, line, col);
         
     }
 
 
     
     @Override
-    public final void cdata(
+    public final void handleCDATASection(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
             final int line, final int col)
             throws AttoParseException {
 
-        super.cdata(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
+        super.handleCDATASection(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
         
-        cdata(buffer, contentOffset, contentLen, line, col);
+        handleCDATASection(buffer, contentOffset, contentLen, line, col);
         
     }
     
     
 
     @Override
-    public final void xmlDeclaration(
+    public final void handleXmlDeclaration(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -326,7 +326,7 @@ public abstract class AbstractStandardMarkupAttoHandler
             final int line, final int col)
             throws AttoParseException {
 
-        super.xmlDeclaration(
+        super.handleXmlDeclaration(
                 buffer, 
                 keywordOffset, keywordLen, keywordLine, keywordCol,
                 versionOffset, versionLen, versionLine, versionCol, 
@@ -338,14 +338,14 @@ public abstract class AbstractStandardMarkupAttoHandler
         final String encoding = new String(buffer, encodingOffset, encodingLen);
         final String standalone = new String(buffer, standaloneOffset, standaloneLen);
         
-        xmlDeclaration(version, encoding, standalone, line, col);
+        handleXmlDeclaration(version, encoding, standalone, line, col);
         
     }
 
 
     
     @Override
-    public final void processingInstruction(
+    public final void handleProcessingInstruction(
             final char[] buffer, 
             final int targetOffset, final int targetLen, 
             final int targetLine, final int targetCol,
@@ -355,13 +355,13 @@ public abstract class AbstractStandardMarkupAttoHandler
             final int line, final int col)
             throws AttoParseException {
 
-        super.processingInstruction(
+        super.handleProcessingInstruction(
                 buffer, 
                 targetOffset, targetLen, targetLine, targetCol, 
                 contentOffset, contentLen, contentLine, contentCol,
                 outerOffset, outerLen, line, col);
         
-        processingInstruction(
+        handleProcessingInstruction(
                 new String(buffer, targetOffset, targetLen), 
                 new String(buffer, contentOffset, contentLen), 
                 line, col);
@@ -372,7 +372,7 @@ public abstract class AbstractStandardMarkupAttoHandler
     
     
     
-    public void standaloneElement(
+    public void handleStandaloneElement(
             final String elementName, final Map<String,String> attributes,
             final int line, final int col)
             throws AttoParseException {
@@ -380,7 +380,7 @@ public abstract class AbstractStandardMarkupAttoHandler
     }
 
     
-    public void openElement(
+    public void handleOpenElement(
             final String elementName, final Map<String,String> attributes,
             final int line, final int col)
             throws AttoParseException {
@@ -388,14 +388,14 @@ public abstract class AbstractStandardMarkupAttoHandler
     }
     
     
-    public void closeElement(
+    public void handleCloseElement(
             final String elementName, final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
 
     
-    public void docType(
+    public void handleDocType(
             final String elementName, final String publicId, final String systemId, 
             final String internalSubset, final int line, final int col)
             throws AttoParseException {
@@ -403,7 +403,7 @@ public abstract class AbstractStandardMarkupAttoHandler
     }
     
     
-    public void comment(
+    public void handleComment(
             final char[] buffer, final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
@@ -411,7 +411,7 @@ public abstract class AbstractStandardMarkupAttoHandler
     }
     
     
-    public void cdata(
+    public void handleCDATASection(
             final char[] buffer, final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
@@ -419,7 +419,7 @@ public abstract class AbstractStandardMarkupAttoHandler
     }
 
 
-    public void xmlDeclaration(
+    public void handleXmlDeclaration(
             final String version, 
             final String encoding, 
             final String standalone, 
@@ -429,7 +429,7 @@ public abstract class AbstractStandardMarkupAttoHandler
     }
 
 
-    public void processingInstruction(
+    public void handleProcessingInstruction(
             final String target, final String content, 
             final int line, final int col) 
             throws AttoParseException {

@@ -31,7 +31,7 @@ import org.attoparser.AttoParseException;
  */
 public interface IProcessingInstructionHandling {
 
-    public void processingInstruction(
+    public void handleProcessingInstruction(
             final char[] buffer, 
             final int targetOffset, final int targetLen,
             final int targetLine, final int targetCol,

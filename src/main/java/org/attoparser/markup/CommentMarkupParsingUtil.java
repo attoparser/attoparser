@@ -75,7 +75,7 @@ public final class CommentMarkupParsingUtil {
                 buffer[offset + len - 3] == '-' &&
                 buffer[offset + len - 2] == '-' &&
                 buffer[offset + len - 1] == '>') {
-            handler.comment(buffer, offset + 4, len - 7, offset, len, line, col);
+            handler.handleComment(buffer, offset + 4, len - 7, offset, len, line, col);
             return true;
         }
         

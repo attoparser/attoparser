@@ -49,7 +49,7 @@ public final class TracingBasicMarkupAttoHandler extends AbstractBasicMarkupAtto
     
     
     @Override
-    public void startDocument()
+    public void handleDocumentStart(final long startTimeNanos)
             throws AttoParseException {
         try {
             this.writer.write('[');
@@ -61,7 +61,7 @@ public final class TracingBasicMarkupAttoHandler extends AbstractBasicMarkupAtto
     
     
     @Override
-    public void endDocument()
+    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos)
             throws AttoParseException {
         try {
             this.writer.write(']');
@@ -73,7 +73,7 @@ public final class TracingBasicMarkupAttoHandler extends AbstractBasicMarkupAtto
 
 
     @Override
-    public void standaloneElement(
+    public void handleStandaloneElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
@@ -100,7 +100,7 @@ public final class TracingBasicMarkupAttoHandler extends AbstractBasicMarkupAtto
 
     
     @Override
-    public void openElement(
+    public void handleOpenElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
@@ -127,7 +127,7 @@ public final class TracingBasicMarkupAttoHandler extends AbstractBasicMarkupAtto
 
     
     @Override
-    public void closeElement(
+    public void handleCloseElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
@@ -153,7 +153,7 @@ public final class TracingBasicMarkupAttoHandler extends AbstractBasicMarkupAtto
     
     
     @Override
-    public void text(final char[] buffer, final int offset, final int len, 
+    public void handleText(final char[] buffer, final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
         
@@ -174,7 +174,7 @@ public final class TracingBasicMarkupAttoHandler extends AbstractBasicMarkupAtto
 
     
     @Override
-    public void comment(
+    public void handleComment(
             final char[] buffer, 
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
@@ -197,7 +197,7 @@ public final class TracingBasicMarkupAttoHandler extends AbstractBasicMarkupAtto
 
     
     @Override
-    public void cdata(
+    public void handleCDATASection(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
@@ -222,7 +222,7 @@ public final class TracingBasicMarkupAttoHandler extends AbstractBasicMarkupAtto
     
     
     @Override
-    public void xmlDeclaration(
+    public void handleXmlDeclaration(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -261,7 +261,7 @@ public final class TracingBasicMarkupAttoHandler extends AbstractBasicMarkupAtto
 
 
     @Override
-    public void processingInstruction(
+    public void handleProcessingInstruction(
             final char[] buffer, 
             final int targetOffset, final int targetLen, 
             final int targetLine, final int targetCol,
@@ -296,7 +296,7 @@ public final class TracingBasicMarkupAttoHandler extends AbstractBasicMarkupAtto
 
 
     @Override
-    public void docType(
+    public void handleDocType(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 

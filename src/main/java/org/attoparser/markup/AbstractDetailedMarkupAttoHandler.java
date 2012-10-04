@@ -50,7 +50,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
 
     @Override
-    public final void docType(
+    public final void handleDocType(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
@@ -64,7 +64,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
     
     @Override
-    public final void standaloneElement(
+    public final void handleStandaloneElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
@@ -77,7 +77,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
     
     @Override
-    public final void openElement(
+    public final void handleOpenElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
@@ -90,7 +90,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
     
     @Override
-    public final void closeElement(
+    public final void handleCloseElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
@@ -102,7 +102,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
     }
 
 
-    public void standaloneElementStart(
+    public void handleStandaloneElementStart(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
@@ -110,7 +110,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
         // Nothing to be done here, meant to be overridden if required
     }
 
-    public void standaloneElementName(
+    public void handleStandaloneElementName(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
@@ -118,7 +118,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
         // Nothing to be done here, meant to be overridden if required
     }
 
-    public void standaloneElementEnd(
+    public void handleStandaloneElementEnd(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
@@ -128,7 +128,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
     
 
-    public void openElementStart(
+    public void handleOpenElementStart(
             final char[] buffer,
             final int offset,
             final int len, final int line,
@@ -137,7 +137,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
         // Nothing to be done here, meant to be overridden if required
     }
 
-    public void openElementName(
+    public void handleOpenElementName(
             final char[] buffer,
             final int offset,
             final int len, final int line,
@@ -146,7 +146,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
         // Nothing to be done here, meant to be overridden if required
     }
 
-    public void openElementEnd(
+    public void handleOpenElementEnd(
             final char[] buffer,
             final int offset,
             final int len, final int line,
@@ -157,7 +157,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
 
     
-    public void closeElementStart(
+    public void handleCloseElementStart(
             final char[] buffer,
             final int offset, final int len, 
             final int line, final int col)
@@ -165,7 +165,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
         // Nothing to be done here, meant to be overridden if required
     }
 
-    public void closeElementName(
+    public void handleCloseElementName(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col)
@@ -173,7 +173,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
         // Nothing to be done here, meant to be overridden if required
     }
 
-    public void closeElementEnd(
+    public void handleCloseElementEnd(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
@@ -183,7 +183,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
 
     
-    public void attribute(
+    public void handleAttribute(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol,
@@ -198,7 +198,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
 
     
-    public void attributeSeparator(
+    public void handleAttributeSeparator(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
@@ -208,7 +208,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
 
 
-    public void docType(
+    public void handleDocType(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -259,71 +259,71 @@ public abstract class AbstractDetailedMarkupAttoHandler
         }
 
         
-        public void standaloneElementStart(
+        public void handleStandaloneElementStart(
                 final char[] buffer, 
                 final int offset, final int len,
                 final int line, final int col)
                 throws AttoParseException {
-            this.handler.standaloneElementStart(buffer, offset, len, line, col);
+            this.handler.handleStandaloneElementStart(buffer, offset, len, line, col);
         }
 
-        public void standaloneElementName(
+        public void handleStandaloneElementName(
                 final char[] buffer, 
                 final int offset, final int len,
                 final int line, final int col)
                 throws AttoParseException {
-            this.handler.standaloneElementName(buffer, offset, len, line, col);
+            this.handler.handleStandaloneElementName(buffer, offset, len, line, col);
         }
 
-        public void standaloneElementEnd(
+        public void handleStandaloneElementEnd(
                 final char[] buffer,
                 final int offset, final int len,
                 final int line, final int col)
                 throws AttoParseException {
-            this.handler.standaloneElementEnd(buffer, offset, len, line, col);
+            this.handler.handleStandaloneElementEnd(buffer, offset, len, line, col);
         }
 
         
-        public void openElementStart(
+        public void handleOpenElementStart(
                 final char[] buffer,
                 final int offset,
                 final int len, final int line,
                 final int col)
                 throws AttoParseException {
-            this.handler.openElementStart(buffer, offset, len, line, col);
+            this.handler.handleOpenElementStart(buffer, offset, len, line, col);
         }
 
-        public void openElementName(
+        public void handleOpenElementName(
                 final char[] buffer,
                 final int offset,
                 final int len, final int line,
                 final int col)
                 throws AttoParseException {
-            this.handler.openElementName(buffer, offset, len, line, col);
+            this.handler.handleOpenElementName(buffer, offset, len, line, col);
             if (this.wellFormed) {
                 addToStack(buffer, offset, len);
             }
         }
 
-        public void openElementEnd(
+        public void handleOpenElementEnd(
                 final char[] buffer,
                 final int offset,
                 final int len, final int line,
                 final int col)
                 throws AttoParseException {
-            this.handler.openElementEnd(buffer, offset, len, line, col);
+            this.handler.handleOpenElementEnd(buffer, offset, len, line, col);
         }
 
         
-        public void closeElementStart(
+        public void handleCloseElementStart(
                 final char[] buffer,
                 final int offset, final int len, 
                 final int line, final int col)
                 throws AttoParseException {
-            this.handler.closeElementStart(buffer, offset, len, line, col);
+            this.handler.handleCloseElementStart(buffer, offset, len, line, col);
         }
 
-        public void closeElementName(
+        public void handleCloseElementName(
                 final char[] buffer, 
                 final int offset, final int len, 
                 final int line, final int col)
@@ -331,19 +331,19 @@ public abstract class AbstractDetailedMarkupAttoHandler
             if (this.wellFormed) {
                 checkStackForElement(buffer, offset, len, line, col);
             }
-            this.handler.closeElementName(buffer, offset, len, line, col);
+            this.handler.handleCloseElementName(buffer, offset, len, line, col);
         }
 
-        public void closeElementEnd(
+        public void handleCloseElementEnd(
                 final char[] buffer,
                 final int offset, final int len,
                 final int line, final int col)
                 throws AttoParseException {
-            this.handler.closeElementEnd(buffer, offset, len, line, col);
+            this.handler.handleCloseElementEnd(buffer, offset, len, line, col);
         }
 
         
-        public void attribute(
+        public void handleAttribute(
                 final char[] buffer,
                 final int nameOffset, final int nameLen,
                 final int nameLine, final int nameCol,
@@ -353,7 +353,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int valueOuterOffset, final int valueOuterLen,
                 final int valueLine, final int valueCol)
                 throws AttoParseException {
-            this.handler.attribute(
+            this.handler.handleAttribute(
                     buffer, 
                     nameOffset, nameLen, nameLine, nameCol, 
                     operatorOffset, operatorLen, operatorLine, operatorCol, 
@@ -362,17 +362,17 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
 
         
-        public void attributeSeparator(
+        public void handleAttributeSeparator(
                 final char[] buffer,
                 final int offset, final int len,
                 final int line, final int col)
                 throws AttoParseException {
-            this.handler.attributeSeparator(buffer, offset, len, line, col);
+            this.handler.handleAttributeSeparator(buffer, offset, len, line, col);
         }
 
 
 
-        public void docType(
+        public void handleDocType(
                 final char[] buffer, 
                 final int keywordOffset, final int keywordLen,
                 final int keywordLine, final int keywordCol,
@@ -389,7 +389,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int outerOffset, final int outerLen,
                 final int outerLine, final int outerCol) 
                 throws AttoParseException {
-            this.handler.docType(
+            this.handler.handleDocType(
                     buffer, 
                     keywordOffset, keywordLen, keywordLine, keywordCol, 
                     elementNameOffset, elementNameLen, elementNameLine, elementNameCol, 

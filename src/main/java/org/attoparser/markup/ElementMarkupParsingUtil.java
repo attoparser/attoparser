@@ -74,7 +74,7 @@ public final class ElementMarkupParsingUtil {
                 isCloseElementStart(buffer, offset, offset + len) &&
                 buffer[offset + len - 1] == '>') {
             
-            handler.closeElement(buffer, offset + 2, len - 3, offset, len, line, col);
+            handler.handleCloseElement(buffer, offset + 2, len - 3, offset, len, line, col);
             return true;
             
         } else if (len > 3 &&
@@ -82,14 +82,14 @@ public final class ElementMarkupParsingUtil {
                 buffer[offset + len - 2] == '/' &&
                 buffer[offset + len - 1] == '>') {
             
-            handler.standaloneElement(buffer, offset + 1, len - 3, offset, len, line, col);
+            handler.handleStandaloneElement(buffer, offset + 1, len - 3, offset, len, line, col);
             return true;
             
         } else if (len > 2 && 
                 isOpenElementStart(buffer, offset, offset + len) &&
                 buffer[offset + len - 1] == '>'){
             
-            handler.openElement(buffer, offset + 1, len - 2, offset, len, line, col);
+            handler.handleOpenElement(buffer, offset + 1, len - 2, offset, len, line, col);
             return true;
             
         }
@@ -223,9 +223,9 @@ public final class ElementMarkupParsingUtil {
             throws AttoParseException {
 
         if (isStandalone) {
-            handler.standaloneElementStart(buffer, outerOffset, 1, line, col);
+            handler.handleStandaloneElementStart(buffer, outerOffset, 1, line, col);
         } else {
-            handler.openElementStart(buffer, outerOffset, 1, line, col);
+            handler.handleOpenElementStart(buffer, outerOffset, 1, line, col);
         }
         
         final int maxi = contentOffset + contentLen;
@@ -243,17 +243,17 @@ public final class ElementMarkupParsingUtil {
             // The buffer only contains the element name
             
             if (isStandalone) {
-                handler.standaloneElementName(
+                handler.handleStandaloneElementName(
                         buffer, contentOffset, contentLen, 
                         line, col + 1);
-                handler.standaloneElementEnd(
+                handler.handleStandaloneElementEnd(
                         buffer, (outerOffset + outerLen - 2), 2, 
                         locator.line, locator.col);
             } else {
-                handler.openElementName(
+                handler.handleOpenElementName(
                         buffer, contentOffset, contentLen, 
                         line, col + 1);
-                handler.openElementEnd(
+                handler.handleOpenElementEnd(
                         buffer, (outerOffset + outerLen - 1), 1, 
                         locator.line, locator.col);
             }
@@ -264,11 +264,11 @@ public final class ElementMarkupParsingUtil {
 
         
         if (isStandalone) {
-            handler.standaloneElementName(
+            handler.handleStandaloneElementName(
                     buffer, contentOffset, (elementNameEnd - contentOffset),
                     line, col + 1);
         } else {
-            handler.openElementName(
+            handler.handleOpenElementName(
                     buffer, contentOffset, (elementNameEnd - contentOffset),
                     line, col + 1);
         }
@@ -280,11 +280,11 @@ public final class ElementMarkupParsingUtil {
         
         
         if (isStandalone) {
-            handler.standaloneElementEnd(
+            handler.handleStandaloneElementEnd(
                     buffer, (outerOffset + outerLen - 2), 2, 
                     locator.line, locator.col);
         } else {
-            handler.openElementEnd(
+            handler.handleOpenElementEnd(
                     buffer, (outerOffset + outerLen - 1), 1, 
                     locator.line, locator.col);
         }
@@ -304,7 +304,7 @@ public final class ElementMarkupParsingUtil {
             final IDetailedElementHandling handler)
             throws AttoParseException {
 
-        handler.closeElementStart(buffer, outerOffset, 2, line, col);
+        handler.handleCloseElementStart(buffer, outerOffset, 2, line, col);
         
         final int maxi = contentOffset + contentLen;
         
@@ -320,10 +320,10 @@ public final class ElementMarkupParsingUtil {
         if (elementNameEnd == -1) {
             // The buffer only contains the element name
         
-            handler.closeElementName(
+            handler.handleCloseElementName(
                     buffer, contentOffset, contentLen, 
                     line, col + 2);
-            handler.closeElementEnd(
+            handler.handleCloseElementEnd(
                     buffer, (outerOffset + outerLen - 1), 1, 
                     locator.line, locator.col);
             
@@ -332,7 +332,7 @@ public final class ElementMarkupParsingUtil {
         }
 
         
-        handler.closeElementName(
+        handler.handleCloseElementName(
                 buffer, contentOffset, (elementNameEnd - contentOffset),
                 line, col + 2);
         
@@ -357,10 +357,10 @@ public final class ElementMarkupParsingUtil {
         
         final int wsOffset = current;
         final int wsLen = maxi - current;
-        handler.attributeSeparator(buffer, wsOffset, wsLen, currentArtifactLine, currentArtifactCol);
+        handler.handleAttributeSeparator(buffer, wsOffset, wsLen, currentArtifactLine, currentArtifactCol);
 
         
-        handler.closeElementEnd(
+        handler.handleCloseElementEnd(
                 buffer, (outerOffset + outerLen - 1), 1, 
                 locator.line, locator.col);
         

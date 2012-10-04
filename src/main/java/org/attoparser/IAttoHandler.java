@@ -30,17 +30,17 @@ package org.attoparser;
  */
 public interface IAttoHandler {
 
-    public void startDocument()
+    public void handleDocumentStart()
             throws AttoParseException;
     
-    public void endDocument()
+    public void handleDocumentEnd()
             throws AttoParseException;
     
-    public void text(final char[] buffer, final int offset, final int len, 
+    public void handleText(final char[] buffer, final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException;
     
-    public void structure(final char[] buffer, final int offset, final int len, 
+    public void handleStructure(final char[] buffer, final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException;
     

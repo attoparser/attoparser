@@ -50,7 +50,7 @@ public final class CdataMarkupParsingUtil {
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col, 
-            final ICdataHandling handler)
+            final ICDATASectionHandling handler)
             throws AttoParseException {
         
         if (!tryParseCdata(buffer, offset, len, line, col, handler)) {
@@ -68,7 +68,7 @@ public final class CdataMarkupParsingUtil {
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col, 
-            final ICdataHandling handler)
+            final ICDATASectionHandling handler)
             throws AttoParseException {
 
         if (len >= 12 && 
@@ -76,7 +76,7 @@ public final class CdataMarkupParsingUtil {
                 buffer[offset + len - 3] == ']' &&
                 buffer[offset + len - 2] == ']' &&
                 buffer[offset + len - 1] == '>') {
-            handler.cdata(buffer, offset + 9, len - 12, offset, len, line, col);
+            handler.handleCDATASection(buffer, offset + 9, len - 12, offset, len, line, col);
             return true;
         }
         

@@ -17,9 +17,8 @@
  * 
  * =============================================================================
  */
-package org.attoparser.markup;
+package org.attoparser;
 
-import org.attoparser.AttoParseException;
 
 
 /**
@@ -29,13 +28,17 @@ import org.attoparser.AttoParseException;
  * @since 1.0
  *
  */
-public interface ICdataHandling {
+public interface ITimedDocumentHandling {
 
-    public void cdata(
-            final char[] buffer, 
-            final int contentOffset, final int contentLen,
-            final int outerOffset, final int outerLen,
-            final int line, final int col) 
-            throws AttoParseException;
+    public void handleDocumentStart(final long startTimeNanos) throws AttoParseException;
+    
+    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos) throws AttoParseException;
+    
+
+    public long getStartTimeNanos();
+    
+    public long getEndTimeNanos();
+    
+    public long getTotalTimeNanos();
     
 }

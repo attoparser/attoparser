@@ -112,7 +112,7 @@ public final class ProcessingInstructionMarkupParsingUtil {
         if (targetEnd == -1) {
             // There is no content, only target
             
-            handler.processingInstruction(
+            handler.handleProcessingInstruction(
                     buffer, 
                     i, maxi - i,                                      // target
                     line, col + 2,                                    // target
@@ -143,7 +143,7 @@ public final class ProcessingInstructionMarkupParsingUtil {
         if (contentStart == -1) {
             // There is no content. Only whitespace until the end of the structure
             
-            handler.processingInstruction(
+            handler.handleProcessingInstruction(
                     buffer, 
                     targetOffset, targetLen,                          // target
                     line, col + 2,                                    // target
@@ -157,7 +157,7 @@ public final class ProcessingInstructionMarkupParsingUtil {
         }
 
         
-        handler.processingInstruction(
+        handler.handleProcessingInstruction(
                 buffer, 
                 targetOffset, targetLen,                          // target
                 line, col + 2,                                    // target

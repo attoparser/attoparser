@@ -70,7 +70,7 @@ public abstract class AbstractBufferedAttoParser extends AbstractAttoParser {
 
         try {
 
-            handler.startDocument();
+            handler.handleDocumentStart();
             
             int bufferSize = initialBufferSize;
             char[] buffer = new char[bufferSize];
@@ -141,10 +141,10 @@ public abstract class AbstractBufferedAttoParser extends AbstractAttoParser {
                     throw new AttoParseException(
                             "Incomplete structure: \"" + new String(buffer, lastStart, lastLen) + "\"", bufferParseLine, bufferParseCol);
                 }
-                handler.text(buffer, lastStart, lastLen, bufferParseLine, bufferParseCol);
+                handler.handleText(buffer, lastStart, lastLen, bufferParseLine, bufferParseCol);
             }
             
-            handler.endDocument();
+            handler.handleDocumentEnd();
             
         } catch (final AttoParseException e) {
             throw e;

@@ -31,7 +31,7 @@ import org.attoparser.AttoParseException;
  */
 public interface IXmlDeclarationHandling {
 
-    public void xmlDeclaration(
+    public void handleXmlDeclaration(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,

@@ -55,7 +55,7 @@ public final class TracingStandardMarkupAttoHandler extends AbstractStandardMark
     
     
     @Override
-    public void startDocument()
+    public void handleDocumentStart(final long startTimeNanos)
             throws AttoParseException {
         
         try {
@@ -69,7 +69,7 @@ public final class TracingStandardMarkupAttoHandler extends AbstractStandardMark
     
     
     @Override
-    public void endDocument()
+    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos)
             throws AttoParseException {
         
         try {
@@ -83,7 +83,7 @@ public final class TracingStandardMarkupAttoHandler extends AbstractStandardMark
     
 
     @Override
-    public void standaloneElement(
+    public void handleStandaloneElement(
             final String elementName, final Map<String, String> attributes, 
             final int line, final int col) 
             throws AttoParseException {
@@ -106,7 +106,7 @@ public final class TracingStandardMarkupAttoHandler extends AbstractStandardMark
     
 
     @Override
-    public void openElement(
+    public void handleOpenElement(
             final String elementName, final Map<String, String> attributes, 
             final int line, final int col) 
             throws AttoParseException {
@@ -129,7 +129,7 @@ public final class TracingStandardMarkupAttoHandler extends AbstractStandardMark
 
 
     @Override
-    public void closeElement(final String elementName, final int line, final int col) 
+    public void handleCloseElement(final String elementName, final int line, final int col) 
             throws AttoParseException {
         
         try {
@@ -149,7 +149,7 @@ public final class TracingStandardMarkupAttoHandler extends AbstractStandardMark
 
 
     @Override
-    public void docType(
+    public void handleDocType(
             final String elementName, 
             final String publicId, 
             final String systemId, 
@@ -183,7 +183,7 @@ public final class TracingStandardMarkupAttoHandler extends AbstractStandardMark
 
 
     @Override
-    public void comment(
+    public void handleComment(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col) 
@@ -206,7 +206,7 @@ public final class TracingStandardMarkupAttoHandler extends AbstractStandardMark
 
 
     @Override
-    public void cdata(final char[] buffer, 
+    public void handleCDATASection(final char[] buffer, 
             final int offset, final int len, final int line, final int col) 
             throws AttoParseException {
         
@@ -229,7 +229,7 @@ public final class TracingStandardMarkupAttoHandler extends AbstractStandardMark
     
     
     @Override
-    public void text(final char[] buffer, final int offset, final int len, 
+    public void handleText(final char[] buffer, final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
         
@@ -251,7 +251,7 @@ public final class TracingStandardMarkupAttoHandler extends AbstractStandardMark
     
     
     @Override
-    public void xmlDeclaration(
+    public void handleXmlDeclaration(
             final String version, 
             final String encoding,
             final String standalone,
@@ -282,7 +282,7 @@ public final class TracingStandardMarkupAttoHandler extends AbstractStandardMark
 
 
     @Override
-    public void processingInstruction(
+    public void handleProcessingInstruction(
             final String target, final String content, 
             final int line, final int col) 
             throws AttoParseException {

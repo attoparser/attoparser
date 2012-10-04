@@ -30,35 +30,68 @@ package org.attoparser;
  * @since 1.0
  *
  */
-public abstract class AbstractAttoHandler implements IAttoHandler {
+public abstract class AbstractAttoHandler implements IAttoHandler, ITimedDocumentHandling {
 
+    private long parsingStartTimeNanos = -1L;
+    private long parsingEndTimeNanos = -1L;
+    
     
     protected AbstractAttoHandler() {
         super();
     }
     
     
-    public void startDocument() throws AttoParseException {
-        // Nothing to be done here
+    public final void handleDocumentStart() throws AttoParseException {
+        this.parsingStartTimeNanos = System.nanoTime();
+        handleDocumentStart(this.parsingStartTimeNanos);
     }
 
     
-    public void endDocument() throws AttoParseException {
-        // Nothing to be done here
+    public final void handleDocumentEnd() throws AttoParseException {
+        this.parsingEndTimeNanos = System.nanoTime();
+        final long totalTimeNanos = this.parsingEndTimeNanos - this.parsingStartTimeNanos;
+        handleDocumentEnd(this.parsingEndTimeNanos, totalTimeNanos);
     }
 
 
-    public void text(final char[] buffer, final int offset, final int len, 
+    public void handleText(final char[] buffer, final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here
     }
 
-    public void structure(final char[] buffer, final int offset, final int len, 
+    public void handleStructure(final char[] buffer, final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here
     }
     
+    
+    public void handleDocumentStart(final long startTimeNanos) 
+            throws AttoParseException {
+        // Nothing to be done here
+    }
+
+    
+    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos)
+           throws AttoParseException {
+        // Nothing to be done here
+    }
+
+    
+
+    public final long getStartTimeNanos() {
+        return this.parsingStartTimeNanos;
+    }
+
+
+    public final long getEndTimeNanos() {
+        return this.parsingEndTimeNanos;
+    }
+
+
+    public final long getTotalTimeNanos() {
+        return this.parsingEndTimeNanos - this.parsingStartTimeNanos;
+    }
     
 }

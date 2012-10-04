@@ -33,7 +33,7 @@ public interface IAttributeSequenceHandling {
 
     
     
-    public void attribute(
+    public void handleAttribute(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol,
@@ -45,7 +45,7 @@ public interface IAttributeSequenceHandling {
             throws AttoParseException;
 
     
-    public void attributeSeparator(
+    public void handleAttributeSeparator(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
