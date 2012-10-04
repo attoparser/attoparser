@@ -30,7 +30,8 @@ package org.attoparser;
  * @since 1.0
  *
  */
-public abstract class AbstractAttoHandler implements IAttoHandler, ITimedDocumentHandling {
+public abstract class AbstractAttoHandler 
+        implements IAttoHandler, ITimedDocumentHandling {
 
     private long parsingStartTimeNanos = -1L;
     private long parsingEndTimeNanos = -1L;

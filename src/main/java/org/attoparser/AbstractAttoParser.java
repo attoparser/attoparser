@@ -20,6 +20,7 @@
 package org.attoparser;
 
 import java.io.CharArrayReader;
+import java.io.Reader;
 import java.io.StringReader;
 
 
@@ -65,5 +66,21 @@ public abstract class AbstractAttoParser implements IAttoParser {
         parse(new CharArrayReader(document, offset, len), handler);
     }
     
+    public final void parse(
+            final Reader reader, final IAttoHandler handler) 
+            throws AttoParseException {
+        if (reader == null) {
+            throw new IllegalArgumentException("Reader cannot be null");
+        }
+        if (handler == null) {
+            throw new IllegalArgumentException("Handler cannot be null");
+        }
+        parseDocument(reader, handler);
+    }
+    
+    
+    protected abstract void parseDocument(
+            final Reader reader, final IAttoHandler handler)
+            throws AttoParseException;
     
 }

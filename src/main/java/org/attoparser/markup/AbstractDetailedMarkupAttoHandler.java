@@ -41,12 +41,25 @@ public abstract class AbstractDetailedMarkupAttoHandler
     private final WellFormedWrapper wrapper;
     
     
-    protected AbstractDetailedMarkupAttoHandler(final boolean wellFormed) {
+    protected AbstractDetailedMarkupAttoHandler(final boolean requireWellFormed) {
         super();
-        this.wrapper = new WellFormedWrapper(this, wellFormed);
+        this.wrapper = new WellFormedWrapper(this, requireWellFormed);
     }
 
 
+    
+    @Override
+    public final void handleDocumentStart(final long startTimeNanos)
+            throws AttoParseException {
+        this.wrapper.handleDocumentStart(startTimeNanos);
+    }
+
+
+    @Override
+    public final void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos)
+            throws AttoParseException {
+        this.wrapper.handleDocumentEnd(endTimeNanos, totalTimeNanos);
+    }
 
 
     @Override
@@ -101,7 +114,28 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
     }
 
+    
+    
+    
+    
+    
 
+    @SuppressWarnings("unused")
+    public void handleDocumentStart(final long startTimeNanos, final boolean requireWellFormed)
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
+    }
+
+
+    @SuppressWarnings("unused")
+    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final boolean requireWellFormed)
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
+    }
+    
+
+    
+    
     public void handleStandaloneElementStart(
             final char[] buffer, 
             final int offset, final int len,
@@ -242,23 +276,47 @@ public abstract class AbstractDetailedMarkupAttoHandler
         private static final int DEFAULT_STACK_SIZE = 10;
 
         
-        private final boolean wellFormed;
+        private final boolean requireWellFormed;
         
         private char[][] elementStack;
-        private int elementStackPos;
+        private int elementStackSize;
         
         
-        WellFormedWrapper(final AbstractDetailedMarkupAttoHandler handler, final boolean wellFormed) {
+        WellFormedWrapper(final AbstractDetailedMarkupAttoHandler handler, final boolean requireWellFormed) {
             super();
             this.handler = handler;
-            this.wellFormed = wellFormed;
-            if (this.wellFormed) {
+            this.requireWellFormed = requireWellFormed;
+            if (this.requireWellFormed) {
                 this.elementStack = new char[DEFAULT_STACK_SIZE][];
-                this.elementStackPos = 0;
+                this.elementStackSize = 0;
             }
         }
 
         
+        public void handleDocumentStart(final long startTimeNanos)
+                throws AttoParseException {
+            this.handler.handleDocumentStart(startTimeNanos, this.requireWellFormed);
+        }
+
+
+        public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos)
+                throws AttoParseException {
+            
+            if (this.requireWellFormed) {
+                if (this.elementStackSize > 0) {
+                    final char[] popped = popFromStack();
+                    throw new AttoParseException(
+                        "Malformed markup: element " +
+                        "\"" + new String(popped, 0, popped.length) + "\"" +
+                        " is never closed (no closing tag at the end of document)");
+                }
+            }
+            
+            this.handler.handleDocumentEnd(endTimeNanos, totalTimeNanos, this.requireWellFormed);
+            
+        }
+
+
         public void handleStandaloneElementStart(
                 final char[] buffer, 
                 final int offset, final int len,
@@ -300,7 +358,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int col)
                 throws AttoParseException {
             this.handler.handleOpenElementName(buffer, offset, len, line, col);
-            if (this.wellFormed) {
+            if (this.requireWellFormed) {
                 addToStack(buffer, offset, len);
             }
         }
@@ -328,7 +386,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int offset, final int len, 
                 final int line, final int col)
                 throws AttoParseException {
-            if (this.wellFormed) {
+            if (this.requireWellFormed) {
                 checkStackForElement(buffer, offset, len, line, col);
             }
             this.handler.handleCloseElementName(buffer, offset, len, line, col);
@@ -443,28 +501,28 @@ public abstract class AbstractDetailedMarkupAttoHandler
         private void addToStack(
                 final char[] buffer, final int offset, final int len) {
             
-            if (this.elementStackPos == this.elementStack.length) {
+            if (this.elementStackSize == this.elementStack.length) {
                 growStack();
             }
             
-            this.elementStack[this.elementStackPos] = new char[len];
-            System.arraycopy(buffer, offset, this.elementStack[this.elementStackPos], 0, len);
+            this.elementStack[this.elementStackSize] = new char[len];
+            System.arraycopy(buffer, offset, this.elementStack[this.elementStackSize], 0, len);
             
-            this.elementStackPos++;
+            this.elementStackSize++;
             
         }
 
         
         private char[] popFromStack() {
             
-            if (this.elementStackPos == 0) {
+            if (this.elementStackSize == 0) {
                 return null;
             }
             
-            this.elementStackPos--;
+            this.elementStackSize--;
             
-            final char[] popped = this.elementStack[this.elementStackPos];
-            this.elementStack[this.elementStackPos] = null;
+            final char[] popped = this.elementStack[this.elementStackSize];
+            this.elementStack[this.elementStackSize] = null;
 
             return popped;
             

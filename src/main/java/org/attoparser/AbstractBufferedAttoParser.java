@@ -45,24 +45,19 @@ public abstract class AbstractBufferedAttoParser extends AbstractAttoParser {
 
     
     
-    public final void parse(
+    protected final void parseDocument(
             final Reader reader, final IAttoHandler handler) 
             throws AttoParseException {
-        
-        if (reader == null) {
-            throw new IllegalArgumentException("Reader cannot be null");
-        }
-        if (handler == null) {
-            throw new IllegalArgumentException("Handler cannot be null");
-        }
-        
         parseDocument(reader, handler, BUFFER_SIZE);
-        
     }
 
 
 
-    
+
+    /*
+     * This method receiving the buffer size with package visibility allows
+     * testing different buffer sizes.
+     */
     final void parseDocument(
             final Reader reader, final IAttoHandler handler, final int initialBufferSize) 
             throws AttoParseException {

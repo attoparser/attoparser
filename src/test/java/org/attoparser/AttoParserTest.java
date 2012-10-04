@@ -921,15 +921,13 @@ public class AttoParserTest extends TestCase {
             "<p>Hello</h1>",
             null, null, 1, 11,
             true);
-        testDoc( 
+        testDocError( 
             "<p>Hello",
-            "[OES(<){1,1}OEN(p){1,2}OEE(>){1,3}T(Hello){1,4}CES(</){1,9}CEN(p){1,11}CEE(>){1,12}]",
-            "[OE(p){1,1}T(Hello){1,4}CE(p){1,9}]", 
+            null, null, -1, -1,
             true);
-        testDoc( 
+        testDocError( 
             "Hello</h1>",
-            "[OES(<){1,1}OEN(p){1,2}OEE(>){1,3}T(Hello){1,4}CES(</){1,9}CEN(p){1,11}CEE(>){1,12}]",
-            "[OE(p){1,1}T(Hello){1,4}CE(p){1,9}]", 
+            null, null, 1, 8, 
             true);
         testDoc( 
             "<h1>Hello</h1 >",
@@ -952,8 +950,13 @@ public class AttoParserTest extends TestCase {
             throw new ComparisonFailure(null, "exception", "no exception");
             
         } catch (final AttoParseException e) {
-            assertEquals(Integer.valueOf(errorLine), e.getLine());
-            assertEquals(Integer.valueOf(errorCol), e.getCol());
+            if (errorLine != -1 && errorCol != -1) {
+                assertEquals(Integer.valueOf(errorLine), e.getLine());
+                assertEquals(Integer.valueOf(errorCol), e.getCol());
+            } else {
+                assertNull(e.getLine());
+                assertNull(e.getCol());
+            }
         }
     }
 
@@ -964,8 +967,13 @@ public class AttoParserTest extends TestCase {
             throw new ComparisonFailure(null, "exception", "no exception");
             
         } catch (final AttoParseException e) {
-            assertEquals(Integer.valueOf(errorLine), e.getLine());
-            assertEquals(Integer.valueOf(errorCol), e.getCol());
+            if (errorLine != -1 && errorCol != -1) {
+                assertEquals(Integer.valueOf(errorLine), e.getLine());
+                assertEquals(Integer.valueOf(errorCol), e.getCol());
+            } else {
+                assertNull(e.getLine());
+                assertNull(e.getCol());
+            }
         }
     }
     
