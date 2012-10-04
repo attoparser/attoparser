@@ -38,8 +38,7 @@ import org.attoparser.AttoParseException;
  *
  */
 public abstract class AbstractStandardMarkupAttoHandler 
-        extends AbstractDetailedMarkupAttoHandler
-        implements IStandardMarkupHandling {
+        extends AbstractDetailedMarkupAttoHandler {
 
     
     private String currentElementName;
@@ -372,6 +371,7 @@ public abstract class AbstractStandardMarkupAttoHandler
     
     
     
+    @SuppressWarnings("unused")
     public void handleStandaloneElement(
             final String elementName, final Map<String,String> attributes,
             final int line, final int col)
@@ -380,6 +380,7 @@ public abstract class AbstractStandardMarkupAttoHandler
     }
 
     
+    @SuppressWarnings("unused")
     public void handleOpenElement(
             final String elementName, final Map<String,String> attributes,
             final int line, final int col)
@@ -388,6 +389,7 @@ public abstract class AbstractStandardMarkupAttoHandler
     }
     
     
+    @SuppressWarnings("unused")
     public void handleCloseElement(
             final String elementName, final int line, final int col)
             throws AttoParseException {
@@ -395,6 +397,7 @@ public abstract class AbstractStandardMarkupAttoHandler
     }
 
     
+    @SuppressWarnings("unused")
     public void handleDocType(
             final String elementName, final String publicId, final String systemId, 
             final String internalSubset, final int line, final int col)
@@ -403,6 +406,7 @@ public abstract class AbstractStandardMarkupAttoHandler
     }
     
     
+    @SuppressWarnings("unused")
     public void handleComment(
             final char[] buffer, final int offset, final int len, 
             final int line, final int col)
@@ -411,6 +415,7 @@ public abstract class AbstractStandardMarkupAttoHandler
     }
     
     
+    @SuppressWarnings("unused")
     public void handleCDATASection(
             final char[] buffer, final int offset, final int len, 
             final int line, final int col)
@@ -419,6 +424,7 @@ public abstract class AbstractStandardMarkupAttoHandler
     }
 
 
+    @SuppressWarnings("unused")
     public void handleXmlDeclaration(
             final String version, 
             final String encoding, 
@@ -429,6 +435,7 @@ public abstract class AbstractStandardMarkupAttoHandler
     }
 
 
+    @SuppressWarnings("unused")
     public void handleProcessingInstruction(
             final String target, final String content, 
             final int line, final int col) 
