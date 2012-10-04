@@ -53,6 +53,8 @@ public abstract class AbstractBasicMarkupAttoHandler
             final int line, final int col)
             throws AttoParseException {
         
+        super.handleStructure(buffer, offset, len, line, col);
+        
         if (!ElementMarkupParsingUtil.tryParseElement(buffer, offset, len, line, col, this)) {
             if (!CommentMarkupParsingUtil.tryParseComment(buffer, offset, len, line, col, this)) {
                  if (!CdataMarkupParsingUtil.tryParseCdata(buffer, offset, len, line, col, this )) {

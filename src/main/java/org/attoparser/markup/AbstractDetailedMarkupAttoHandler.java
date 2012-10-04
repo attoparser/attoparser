@@ -51,6 +51,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
     @Override
     public final void handleDocumentStart(final long startTimeNanos)
             throws AttoParseException {
+        super.handleDocumentStart(startTimeNanos);
         this.wrapper.handleDocumentStart(startTimeNanos);
     }
 
@@ -58,8 +59,43 @@ public abstract class AbstractDetailedMarkupAttoHandler
     @Override
     public final void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos)
             throws AttoParseException {
+        super.handleDocumentEnd(endTimeNanos, totalTimeNanos);
         this.wrapper.handleDocumentEnd(endTimeNanos, totalTimeNanos);
     }
+    
+
+    
+    @Override
+    public final void handleXmlDeclaration(
+            final char[] buffer, 
+            final int keywordOffset, final int keywordLen, 
+            final int keywordLine, final int keywordCol, 
+            final int versionOffset, final int versionLen, 
+            final int versionLine, final int versionCol,
+            final int encodingOffset, final int encodingLen, 
+            final int encodingLine, final int encodingCol, 
+            final int standaloneOffset, final int standaloneLen,
+            final int standaloneLine, final int standaloneCol, 
+            final int outerOffset, final int outerLen, 
+            final int line, final int col) 
+            throws AttoParseException {
+        
+        super.handleXmlDeclaration(buffer, keywordOffset, keywordLen, keywordLine,
+                keywordCol, versionOffset, versionLen, versionLine, versionCol,
+                encodingOffset, encodingLen, encodingLine, encodingCol,
+                standaloneOffset, standaloneLen, standaloneLine, standaloneCol,
+                outerOffset, outerLen, line, col);
+        
+        this.wrapper.handleXmlDeclaration(
+                buffer, 
+                keywordOffset, keywordLen, keywordLine, keywordCol, 
+                versionOffset, versionLen, versionLine, versionCol, 
+                encodingOffset, encodingLen, encodingLine, encodingCol, 
+                standaloneOffset, standaloneLen, standaloneLine, standaloneCol, 
+                outerOffset, outerLen, line, col);
+        
+    }
+
 
 
     @Override
@@ -70,11 +106,13 @@ public abstract class AbstractDetailedMarkupAttoHandler
             final int line, final int col)
             throws AttoParseException {
         
+        super.handleDocType(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
         DocTypeMarkupParsingUtil.parseDetailedDocType(
                 buffer, outerOffset, outerLen, line, col, this.wrapper);
         
     }
 
+    
     
     @Override
     public final void handleStandaloneElement(
@@ -83,7 +121,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
             final int outerOffset, final int outerLen, 
             final int line, final int col) 
             throws AttoParseException {
-        
+
+        super.handleStandaloneElement(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
         ElementMarkupParsingUtil.parseDetailedStandaloneElement(buffer, outerOffset, outerLen, line, col, this.wrapper);
         
     }
@@ -96,7 +135,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
             final int outerOffset, final int outerLen, 
             final int line, final int col) 
             throws AttoParseException {
-        
+
+        super.handleOpenElement(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
         ElementMarkupParsingUtil.parseDetailedOpenElement(buffer, outerOffset, outerLen, line, col, this.wrapper);
         
     }
@@ -110,6 +150,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
             final int line, final int col)
             throws AttoParseException {
 
+        super.handleCloseElement(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
         ElementMarkupParsingUtil.parseDetailedCloseElement(buffer, outerOffset, outerLen, line, col, this.wrapper);
 
     }
@@ -129,6 +170,25 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
     @SuppressWarnings("unused")
     public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final boolean requireWellFormed)
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
+    }
+    
+
+    
+    @SuppressWarnings("unused")
+    public void handleDetailedXmlDeclaration(
+            final char[] buffer, 
+            final int keywordOffset, final int keywordLen, 
+            final int keywordLine, final int keywordCol, 
+            final int versionOffset, final int versionLen, 
+            final int versionLine, final int versionCol,
+            final int encodingOffset, final int encodingLen, 
+            final int encodingLine, final int encodingCol, 
+            final int standaloneOffset, final int standaloneLen,
+            final int standaloneLine, final int standaloneCol, 
+            final int outerOffset, final int outerLen, 
+            final int line, final int col) 
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
@@ -281,6 +341,11 @@ public abstract class AbstractDetailedMarkupAttoHandler
         private char[][] elementStack;
         private int elementStackSize;
         
+        private boolean xmlDeclarationRead = false;
+        private boolean docTypeRead = false;
+        private boolean elementRead = false;
+        
+        
         
         WellFormedWrapper(final AbstractDetailedMarkupAttoHandler handler, final boolean requireWellFormed) {
             super();
@@ -316,6 +381,47 @@ public abstract class AbstractDetailedMarkupAttoHandler
             
         }
 
+        
+        public final void handleXmlDeclaration(
+                final char[] buffer, 
+                final int keywordOffset, final int keywordLen, 
+                final int keywordLine, final int keywordCol, 
+                final int versionOffset, final int versionLen, 
+                final int versionLine, final int versionCol,
+                final int encodingOffset, final int encodingLen, 
+                final int encodingLine, final int encodingCol, 
+                final int standaloneOffset, final int standaloneLen,
+                final int standaloneLine, final int standaloneCol, 
+                final int outerOffset, final int outerLen, 
+                final int line, final int col) 
+                throws AttoParseException {
+            
+            this.handler.handleDetailedXmlDeclaration(buffer, keywordOffset, keywordLen, keywordLine,
+                    keywordCol, versionOffset, versionLen, versionLine, versionCol,
+                    encodingOffset, encodingLen, encodingLine, encodingCol,
+                    standaloneOffset, standaloneLen, standaloneLine, standaloneCol,
+                    outerOffset, outerLen, line, col);
+            
+            if (this.requireWellFormed) {
+                if (this.xmlDeclarationRead) {
+                    throw new AttoParseException(
+                            "Malformed markup: Only one XML Declaration can appear in document");
+                }
+                if (this.docTypeRead) {
+                    throw new AttoParseException(
+                            "Malformed markup: XML Declaration must appear before DOCTYPE");
+                }
+                if (this.elementRead) {
+                    throw new AttoParseException(
+                            "Malformed markup: XML Declaration must appear before any " +
+                            "elements in document");
+                }
+            }
+            
+            this.xmlDeclarationRead = true;
+            
+        }
+        
 
         public void handleStandaloneElementStart(
                 final char[] buffer, 
@@ -339,6 +445,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int line, final int col)
                 throws AttoParseException {
             this.handler.handleStandaloneElementEnd(buffer, offset, len, line, col);
+            this.elementRead = true;
         }
 
         
@@ -370,6 +477,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int col)
                 throws AttoParseException {
             this.handler.handleOpenElementEnd(buffer, offset, len, line, col);
+            this.elementRead = true;
         }
 
         
@@ -398,6 +506,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int line, final int col)
                 throws AttoParseException {
             this.handler.handleCloseElementEnd(buffer, offset, len, line, col);
+            this.elementRead = true;
         }
 
         
@@ -447,6 +556,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int outerOffset, final int outerLen,
                 final int outerLine, final int outerCol) 
                 throws AttoParseException {
+            
             this.handler.handleDocType(
                     buffer, 
                     keywordOffset, keywordLen, keywordLine, keywordCol, 
@@ -456,6 +566,21 @@ public abstract class AbstractDetailedMarkupAttoHandler
                     systemIdOffset, systemIdLen, systemIdLine, systemIdCol, 
                     internalSubsetOffset, internalSubsetLen, internalSubsetLine, internalSubsetCol, 
                     outerOffset, outerLen, outerLine, outerCol);
+            
+            if (this.requireWellFormed) {
+                if (this.docTypeRead) {
+                    throw new AttoParseException(
+                            "Malformed markup: Only one DOCTYPE clause can appear in document");
+                }
+                if (this.elementRead) {
+                    throw new AttoParseException(
+                            "Malformed markup: XML Declaration must appear before any " +
+                            "elements in document");
+                }
+            }
+            
+            this.docTypeRead = true;
+            
         }
 
         

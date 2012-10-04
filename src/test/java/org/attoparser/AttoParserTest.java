@@ -935,6 +935,71 @@ public class AttoParserTest extends TestCase {
             "[OE(h1){1,1}T(Hello){1,5}CE(h1){1,10}]", 
             true);
         
+        testDoc( 
+            "<?xml version=\"1.0\"?>\n<!DOCTYPE html>\n<html></html>",
+            "[X(1.0){1,15}(){1,20}(){1,20}T(\n){1,22}DT(DOCTYPE){2,3}(html){2,11}(){2,15}(){2,15}(){2,15}(){2,15}T(\n){2,16}OES(<){3,1}OEN(html){3,2}OEE(>){3,6}CES(</){3,7}CEN(html){3,9}CEE(>){3,13}]",
+            "[X(1.0)()(){1,1}T(\n){1,22}DT(html)()()(){2,1}T(\n){2,16}OE(html){3,1}CE(html){3,7}]", 
+            true);
+        testDoc( 
+            "<?xml version=\"1.0\"?>\n<html></html>",
+            "[X(1.0){1,15}(){1,20}(){1,20}T(\n){1,22}OES(<){2,1}OEN(html){2,2}OEE(>){2,6}CES(</){2,7}CEN(html){2,9}CEE(>){2,13}]",
+            "[X(1.0)()(){1,1}T(\n){1,22}OE(html){2,1}CE(html){2,7}]", 
+            true);
+        testDoc( 
+            "<!DOCTYPE html>\n<html></html>",
+            "[DT(DOCTYPE){1,3}(html){1,11}(){1,15}(){1,15}(){1,15}(){1,15}T(\n){1,16}OES(<){2,1}OEN(html){2,2}OEE(>){2,6}CES(</){2,7}CEN(html){2,9}CEE(>){2,13}]",
+            "[DT(html)()()(){1,1}T(\n){1,16}OE(html){2,1}CE(html){2,7}]", 
+            true);
+        testDoc( 
+            "\n<!DOCTYPE html>\n<html></html>",
+            "[T(\n){1,1}DT(DOCTYPE){2,3}(html){2,11}(){2,15}(){2,15}(){2,15}(){2,15}T(\n){2,16}OES(<){3,1}OEN(html){3,2}OEE(>){3,6}CES(</){3,7}CEN(html){3,9}CEE(>){3,13}]",
+            "[T(\n){1,1}DT(html)()()(){2,1}T(\n){2,16}OE(html){3,1}CE(html){3,7}]", 
+            true);
+        testDoc( 
+            "\n<?xml version=\"1.0\"?>\n<!DOCTYPE html>\n<html></html>",
+            "[T(\n){1,1}X(1.0){2,15}(){2,20}(){2,20}T(\n){2,22}DT(DOCTYPE){3,3}(html){3,11}(){3,15}(){3,15}(){3,15}(){3,15}T(\n){3,16}OES(<){4,1}OEN(html){4,2}OEE(>){4,6}CES(</){4,7}CEN(html){4,9}CEE(>){4,13}]",
+            "[T(\n){1,1}X(1.0)()(){2,1}T(\n){2,22}DT(html)()()(){3,1}T(\n){3,16}OE(html){4,1}CE(html){4,7}]", 
+            true);
+        testDoc( 
+            "<?xml version=\"1.0\"?>\n<!-- a comment -->\n<!DOCTYPE html>\n<html></html>",
+            "[X(1.0){1,15}(){1,20}(){1,20}T(\n){1,22}C( a comment ){2,1}T(\n){2,19}DT(DOCTYPE){3,3}(html){3,11}(){3,15}(){3,15}(){3,15}(){3,15}T(\n){3,16}OES(<){4,1}OEN(html){4,2}OEE(>){4,6}CES(</){4,7}CEN(html){4,9}CEE(>){4,13}]",
+            "[X(1.0)()(){1,1}T(\n){1,22}C( a comment ){2,1}T(\n){2,19}DT(html)()()(){3,1}T(\n){3,16}OE(html){4,1}CE(html){4,7}]", 
+            true);
+        testDoc( 
+            "<!-- a comment -->\n<?xml version=\"1.0\"?>\n<!DOCTYPE html>\n<html></html>",
+            "[C( a comment ){1,1}T(\n){1,19}X(1.0){2,15}(){2,20}(){2,20}T(\n){2,22}DT(DOCTYPE){3,3}(html){3,11}(){3,15}(){3,15}(){3,15}(){3,15}T(\n){3,16}OES(<){4,1}OEN(html){4,2}OEE(>){4,6}CES(</){4,7}CEN(html){4,9}CEE(>){4,13}]",
+            "[C( a comment ){1,1}T(\n){1,19}X(1.0)()(){2,1}T(\n){2,22}DT(html)()()(){3,1}T(\n){3,16}OE(html){4,1}CE(html){4,7}]", 
+            true);
+        testDoc( 
+            "<!DOCTYPE html>\n<html><?xml version=\"1.0\"?>\n</html>",
+            "[DT(DOCTYPE){1,3}(html){1,11}(){1,15}(){1,15}(){1,15}(){1,15}T(\n){1,16}OES(<){2,1}OEN(html){2,2}OEE(>){2,6}X(1.0){2,21}(){2,26}(){2,26}T(\n){2,28}CES(</){3,1}CEN(html){3,3}CEE(>){3,7}]", 
+            "[DT(html)()()(){1,1}T(\n){1,16}OE(html){2,1}X(1.0)()(){2,7}T(\n){2,28}CE(html){3,1}]",
+            false);
+        testDocError( 
+            "<!DOCTYPE html>\n<?xml version=\"1.0\"?>\n<html></html>",
+            null, null, -1, -1,
+            true);
+        testDocError( 
+            "<!DOCTYPE html>\n<html><?xml version=\"1.0\"?>\n</html>",
+            null, null, -1, -1,
+            true);
+        testDocError( 
+            "<html><?xml version=\"1.0\"?>\n</html>",
+            null, null, -1, -1,
+            true);
+        testDocError( 
+            "<html><!DOCTYPE html>\n</html>",
+            null, null, -1, -1,
+            true);
+        testDocError( 
+            "<!DOCTYPE html><!DOCTYPE html>",
+            null, null, -1, -1,
+            true);
+        testDoc( 
+            "<!DOCTYPE html><!DOCTYPE html>",
+            "[DT(DOCTYPE){1,3}(html){1,11}(){1,15}(){1,15}(){1,15}(){1,15}DT(DOCTYPE){1,18}(html){1,26}(){1,30}(){1,30}(){1,30}(){1,30}]", 
+            null,
+            false);
         
         
         System.out.println("TOTAL Test executions: " + totalTestExecutions);
