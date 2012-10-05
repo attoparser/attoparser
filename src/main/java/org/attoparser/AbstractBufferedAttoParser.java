@@ -44,7 +44,7 @@ public abstract class AbstractBufferedAttoParser extends AbstractAttoParser {
     
 
     
-    
+    @Override
     protected final void parseDocument(
             final Reader reader, final IAttoHandler handler) 
             throws AttoParseException {

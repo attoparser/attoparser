@@ -977,29 +977,77 @@ public class AttoParserTest extends TestCase {
             false);
         testDocError( 
             "<!DOCTYPE html>\n<?xml version=\"1.0\"?>\n<html></html>",
-            null, null, -1, -1,
+            null, null, 2, 1,
             true);
         testDocError( 
             "<!DOCTYPE html>\n<html><?xml version=\"1.0\"?>\n</html>",
-            null, null, -1, -1,
+            null, null, 2, 7,
             true);
         testDocError( 
             "<html><?xml version=\"1.0\"?>\n</html>",
-            null, null, -1, -1,
+            null, null, 1, 7,
             true);
         testDocError( 
             "<html><!DOCTYPE html>\n</html>",
-            null, null, -1, -1,
+            null, null, 1, 7,
             true);
         testDocError( 
             "<!DOCTYPE html><!DOCTYPE html>",
-            null, null, -1, -1,
+            null, null, 1, 16,
             true);
         testDoc( 
             "<!DOCTYPE html><!DOCTYPE html>",
             "[DT(DOCTYPE){1,3}(html){1,11}(){1,15}(){1,15}(){1,15}(){1,15}DT(DOCTYPE){1,18}(html){1,26}(){1,30}(){1,30}(){1,30}(){1,30}]", 
             null,
             false);
+        
+        testDoc( 
+            "Hello, <br th:text=\"ll\"/>",
+            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}(=){1,19}(\"ll\"){1,20}SEE(/>){1,24}]",
+            "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]", 
+            true);
+        testDoc( 
+            "Hello, <br th:text='ll'/>",
+            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}(=){1,19}('ll'){1,20}SEE(/>){1,24}]",
+            "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]", 
+            true);
+        testDocError( 
+            "Hello, <br th:text=ll/>",
+            null, null, 1, 20,
+            true);
+        testDocError( 
+            "Hello, <br th:text=/>",
+            null, null, 1, 20,
+            true);
+        testDocError( 
+            "Hello, <br th:text/>",
+            null, null, 1, 19,
+            true);
+        testDocError( 
+            "<html></html><html></html>",
+            null, null, 1, 15, 
+            true);
+        testDocError( 
+            "<!DOCTYPE html><htmla></htmla>",
+            null, null, 1, 17,
+            true);
+        testDocError( 
+            "<!DOCTYPE html><htma></htma>",
+            null, null, 1, 17,
+            true);
+        testDocError( 
+            "<!DOCTYPE html><htma/>",
+            null, null, 1, 17,
+            true);
+        testDoc( 
+            "Hello, <br th:text=\"ll\" th:text=\"la\"/>",
+            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}(=){1,19}(\"ll\"){1,20}AS( ){1,24}A(th:text){1,25}(=){1,32}(\"la\"){1,33}SEE(/>){1,37}]",
+            "[T(Hello, ){1,1}SE(br[th:text='la']){1,8}]", 
+            false);
+        testDocError( 
+            "Hello, <br th:text=\"ll\" th:text=\"la\"/>",
+            null, null, 1, 25,
+            true);
         
         
         System.out.println("TOTAL Test executions: " + totalTestExecutions);
@@ -1015,11 +1063,14 @@ public class AttoParserTest extends TestCase {
             throw new ComparisonFailure(null, "exception", "no exception");
             
         } catch (final AttoParseException e) {
-            if (errorLine != -1 && errorCol != -1) {
+            if (errorLine != -1) {
                 assertEquals(Integer.valueOf(errorLine), e.getLine());
-                assertEquals(Integer.valueOf(errorCol), e.getCol());
             } else {
                 assertNull(e.getLine());
+            }
+            if (errorCol != -1) {
+                assertEquals(Integer.valueOf(errorCol), e.getCol());
+            } else {
                 assertNull(e.getCol());
             }
         }

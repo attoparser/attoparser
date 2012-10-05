@@ -328,12 +328,17 @@ public abstract class AbstractDetailedMarkupAttoHandler
     
     
     
+    
+    
+    
     static final class WellFormedWrapper
             implements IDetailedElementHandling, IDetailedDocTypeHandling {
         
-        private final AbstractDetailedMarkupAttoHandler handler;
+        private static final int DEFAULT_STACK_SIZE = 15;
+        private static final int DEFAULT_ATTRIBUTE_NAMES_SIZE = 5;
+
         
-        private static final int DEFAULT_STACK_SIZE = 10;
+        private final AbstractDetailedMarkupAttoHandler handler;
 
         
         private final boolean requireWellFormed;
@@ -344,6 +349,9 @@ public abstract class AbstractDetailedMarkupAttoHandler
         private boolean xmlDeclarationRead = false;
         private boolean docTypeRead = false;
         private boolean elementRead = false;
+        private char[] rootElementName = null;
+        private char[][] currentElementAttributeNames = null;
+        private int currentElementAttributeNamesSize = 0;
         
         
         
@@ -396,27 +404,32 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int line, final int col) 
                 throws AttoParseException {
             
+            if (this.requireWellFormed) {
+                
+                if (this.xmlDeclarationRead) {
+                    throw new AttoParseException(
+                            "Malformed markup: Only one XML Declaration can appear in document",
+                            line, col);
+                }
+                if (this.docTypeRead) {
+                    throw new AttoParseException(
+                            "Malformed markup: XML Declaration must appear before DOCTYPE",
+                            line, col);
+                }
+                if (this.elementRead) {
+                    throw new AttoParseException(
+                            "Malformed markup: XML Declaration must appear before any " +
+                            "elements in document",
+                            line, col);
+                }
+                
+            }
+            
             this.handler.handleDetailedXmlDeclaration(buffer, keywordOffset, keywordLen, keywordLine,
                     keywordCol, versionOffset, versionLen, versionLine, versionCol,
                     encodingOffset, encodingLen, encodingLine, encodingCol,
                     standaloneOffset, standaloneLen, standaloneLine, standaloneCol,
                     outerOffset, outerLen, line, col);
-            
-            if (this.requireWellFormed) {
-                if (this.xmlDeclarationRead) {
-                    throw new AttoParseException(
-                            "Malformed markup: Only one XML Declaration can appear in document");
-                }
-                if (this.docTypeRead) {
-                    throw new AttoParseException(
-                            "Malformed markup: XML Declaration must appear before DOCTYPE");
-                }
-                if (this.elementRead) {
-                    throw new AttoParseException(
-                            "Malformed markup: XML Declaration must appear before any " +
-                            "elements in document");
-                }
-            }
             
             this.xmlDeclarationRead = true;
             
@@ -428,7 +441,9 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int offset, final int len,
                 final int line, final int col)
                 throws AttoParseException {
+            
             this.handler.handleStandaloneElementStart(buffer, offset, len, line, col);
+            
         }
 
         public void handleStandaloneElementName(
@@ -436,7 +451,41 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int offset, final int len,
                 final int line, final int col)
                 throws AttoParseException {
+            
+            if (this.requireWellFormed) {
+                
+                if (this.elementStackSize == 0) {
+                    
+                    if (this.elementRead) {
+                        throw new AttoParseException(
+                                "Malformed markup: Only one root element is allowed",
+                                line, col);
+                    }
+
+                    if (this.docTypeRead) {
+                        boolean matches = (this.rootElementName.length == len);
+                        for (int i = 0; matches && i < len; i++) {
+                            if (buffer[offset + i] != this.rootElementName[i]) {
+                                matches = false;
+                            }
+                        }
+                        if (!matches) {
+                            throw new AttoParseException(
+                                "Malformed markup: Root element should be \"" + new String(this.rootElementName) + "\", " +
+                                "but \"" + new String(buffer, offset, len) + "\" has been found",
+                                line, col);
+                        }
+                    }
+                    
+                }
+                
+                this.currentElementAttributeNames = null;
+                this.currentElementAttributeNamesSize = 0;
+                
+            }
+            
             this.handler.handleStandaloneElementName(buffer, offset, len, line, col);
+            
         }
 
         public void handleStandaloneElementEnd(
@@ -444,8 +493,11 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int offset, final int len,
                 final int line, final int col)
                 throws AttoParseException {
+            
             this.handler.handleStandaloneElementEnd(buffer, offset, len, line, col);
+            
             this.elementRead = true;
+            
         }
 
         
@@ -455,7 +507,9 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int len, final int line,
                 final int col)
                 throws AttoParseException {
+            
             this.handler.handleOpenElementStart(buffer, offset, len, line, col);
+            
         }
 
         public void handleOpenElementName(
@@ -464,10 +518,45 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int len, final int line,
                 final int col)
                 throws AttoParseException {
+            
+            if (this.requireWellFormed) {
+                
+                if (this.elementStackSize == 0) {
+                    
+                    if (this.elementRead) {
+                        throw new AttoParseException(
+                                "Malformed markup: Only one root element is allowed",
+                                line, col);
+                    }
+
+                    if (this.docTypeRead) {
+                        boolean matches = (this.rootElementName.length == len);
+                        for (int i = 0; matches && i < len; i++) {
+                            if (buffer[offset + i] != this.rootElementName[i]) {
+                                matches = false;
+                            }
+                        }
+                        if (!matches) {
+                            throw new AttoParseException(
+                                "Malformed markup: Root element should be \"" + new String(this.rootElementName) + "\", " +
+                                "but \"" + new String(buffer, offset, len) + "\" has been found",
+                                line, col);
+                        }
+                    }
+                    
+                }
+                
+                this.currentElementAttributeNames = null;
+                this.currentElementAttributeNamesSize = 0;
+                
+            }
+            
             this.handler.handleOpenElementName(buffer, offset, len, line, col);
+            
             if (this.requireWellFormed) {
                 addToStack(buffer, offset, len);
             }
+            
         }
 
         public void handleOpenElementEnd(
@@ -476,8 +565,11 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int len, final int line,
                 final int col)
                 throws AttoParseException {
+            
             this.handler.handleOpenElementEnd(buffer, offset, len, line, col);
+            
             this.elementRead = true;
+            
         }
 
         
@@ -486,7 +578,9 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int offset, final int len, 
                 final int line, final int col)
                 throws AttoParseException {
+            
             this.handler.handleCloseElementStart(buffer, offset, len, line, col);
+            
         }
 
         public void handleCloseElementName(
@@ -494,10 +588,18 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int offset, final int len, 
                 final int line, final int col)
                 throws AttoParseException {
+            
             if (this.requireWellFormed) {
+                
                 checkStackForElement(buffer, offset, len, line, col);
+                
+                this.currentElementAttributeNames = null;
+                this.currentElementAttributeNamesSize = 0;
+                
             }
+            
             this.handler.handleCloseElementName(buffer, offset, len, line, col);
+            
         }
 
         public void handleCloseElementEnd(
@@ -505,8 +607,11 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int offset, final int len,
                 final int line, final int col)
                 throws AttoParseException {
+            
             this.handler.handleCloseElementEnd(buffer, offset, len, line, col);
+            
             this.elementRead = true;
+            
         }
 
         
@@ -520,11 +625,67 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int valueOuterOffset, final int valueOuterLen,
                 final int valueLine, final int valueCol)
                 throws AttoParseException {
+            
+            if (this.requireWellFormed) {
+                
+                // Check attribute name is unique in this element
+                if (this.currentElementAttributeNames == null) {
+                    // we only create this structure if there is at least one attribute
+                    this.currentElementAttributeNames = new char[DEFAULT_ATTRIBUTE_NAMES_SIZE][];
+                }
+                for (int i = 0; i < this.currentElementAttributeNamesSize; i++) {
+                    if (this.currentElementAttributeNames[i].length != nameLen) {
+                        continue;
+                    }
+                    int j;
+                    for (j = 0; j < nameLen; j++) {
+                        if (this.currentElementAttributeNames[i][j] != buffer[nameOffset + j]) {
+                            break;
+                        }
+                    }
+                    if (j == nameLen) {
+                        throw new AttoParseException(
+                            "Malformed markup: Attribute \"" + new String(buffer, nameOffset, nameLen) + "\" " +
+                            "appears more than once in element", 
+                            nameLine, nameCol);
+                    }
+                }
+                if (this.currentElementAttributeNamesSize == this.currentElementAttributeNames.length) {
+                    // we need to grow the array!
+                    final char[][] newCurrentElementAttributeNames = new char[this.currentElementAttributeNames.length * 2][];
+                    System.arraycopy(this.currentElementAttributeNames, 0, newCurrentElementAttributeNames, 0, this.currentElementAttributeNames.length);
+                    this.currentElementAttributeNames = newCurrentElementAttributeNames;
+                }
+                this.currentElementAttributeNames[this.currentElementAttributeNamesSize] = new char[nameLen];
+                System.arraycopy(buffer, nameOffset, this.currentElementAttributeNames[this.currentElementAttributeNamesSize], 0, nameLen);
+                this.currentElementAttributeNamesSize++;
+                
+                
+                // Check there is an operator
+                if (operatorLen == 0)  {
+                    throw new AttoParseException(
+                            "Malformed markup: Value for attribute \"" + new String(buffer, nameOffset, nameLen) + "\" " +
+                            "must include an equals (=) sign and a value surrounded by commas", 
+                            operatorLine, operatorCol);
+                }
+                
+                
+                // Check attribute is surrounded by commas (double or single)
+                if (valueOuterLen == 0 || valueOuterLen == valueContentLen)  {
+                    throw new AttoParseException(
+                            "Malformed markup: Value for attribute \"" + new String(buffer, nameOffset, nameLen) + "\" " +
+                            "must be surrounded by commas", 
+                            valueLine, valueCol);
+                }
+                
+            }
+            
             this.handler.handleAttribute(
                     buffer, 
                     nameOffset, nameLen, nameLine, nameCol, 
                     operatorOffset, operatorLen, operatorLine, operatorCol, 
                     valueContentOffset, valueContentLen, valueOuterOffset, valueOuterLen, valueLine, valueCol);
+            
         }
 
 
@@ -534,7 +695,9 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int offset, final int len,
                 final int line, final int col)
                 throws AttoParseException {
+            
             this.handler.handleAttributeSeparator(buffer, offset, len, line, col);
+            
         }
 
 
@@ -557,6 +720,26 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int outerLine, final int outerCol) 
                 throws AttoParseException {
             
+            if (this.requireWellFormed) {
+                
+                if (this.docTypeRead) {
+                    throw new AttoParseException(
+                            "Malformed markup: Only one DOCTYPE clause can appear in document",
+                            outerLine, outerCol);
+                }
+                
+                if (this.elementRead) {
+                    throw new AttoParseException(
+                            "Malformed markup: DOCTYPE must appear before any " +
+                            "elements in document",
+                            outerLine, outerCol);
+                }
+                
+                this.rootElementName = new char[elementNameLen];
+                System.arraycopy(buffer, elementNameOffset, this.rootElementName, 0, elementNameLen);
+                
+            }
+            
             this.handler.handleDocType(
                     buffer, 
                     keywordOffset, keywordLen, keywordLine, keywordCol, 
@@ -566,18 +749,6 @@ public abstract class AbstractDetailedMarkupAttoHandler
                     systemIdOffset, systemIdLen, systemIdLine, systemIdCol, 
                     internalSubsetOffset, internalSubsetLen, internalSubsetLine, internalSubsetCol, 
                     outerOffset, outerLen, outerLine, outerCol);
-            
-            if (this.requireWellFormed) {
-                if (this.docTypeRead) {
-                    throw new AttoParseException(
-                            "Malformed markup: Only one DOCTYPE clause can appear in document");
-                }
-                if (this.elementRead) {
-                    throw new AttoParseException(
-                            "Malformed markup: XML Declaration must appear before any " +
-                            "elements in document");
-                }
-            }
             
             this.docTypeRead = true;
             
@@ -599,11 +770,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
                         " is never open", line, col);
             }
 
-            boolean matches = true;
-            
-            if (len != popped.length) {
-                matches = false;
-            }
+            boolean matches = (len == popped.length);
             
             final int maxi = offset + len;
             for (int i = offset; matches && i < maxi; i++) {
@@ -658,11 +825,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
             
             final int newStackSize = this.elementStack.length * 2;
             final char[][] newStack = new char[newStackSize][];
-            
-            for (int i = 0; i < this.elementStack.length; i++) {
-                newStack[i] = this.elementStack[i];
-            }
-            
+            System.arraycopy(this.elementStack, 0, newStack, 0, this.elementStack.length);
             this.elementStack = newStack;
             
         }
