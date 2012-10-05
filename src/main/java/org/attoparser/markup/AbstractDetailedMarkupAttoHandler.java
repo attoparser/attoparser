@@ -383,6 +383,10 @@ public abstract class AbstractDetailedMarkupAttoHandler
                         "\"" + new String(popped, 0, popped.length) + "\"" +
                         " is never closed (no closing tag at the end of document)");
                 }
+                if (!this.elementRead) {
+                    throw new AttoParseException(
+                            "Malformed markup: no root element present");
+                }
             }
             
             this.handler.handleDocumentEnd(endTimeNanos, totalTimeNanos, this.requireWellFormed);

@@ -1048,6 +1048,10 @@ public class AttoParserTest extends TestCase {
             "Hello, <br th:text=\"ll\" th:text=\"la\"/>",
             null, null, 1, 25,
             true);
+        testDocError( 
+            "<!DOCTYPE html>",
+            null, null, -1, -1, 
+            true);
         
         
         System.out.println("TOTAL Test executions: " + totalTestExecutions);
