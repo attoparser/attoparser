@@ -311,7 +311,7 @@ public abstract class AbstractStandardMarkupAttoHandler
     
 
     @Override
-    public final void handleDetailedXmlDeclaration(
+    public final void handleXmlDeclarationDetail(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -325,7 +325,7 @@ public abstract class AbstractStandardMarkupAttoHandler
             final int line, final int col)
             throws AttoParseException {
 
-        super.handleDetailedXmlDeclaration(
+        super.handleXmlDeclarationDetail(
                 buffer, 
                 keywordOffset, keywordLen, keywordLine, keywordCol,
                 versionOffset, versionLen, versionLine, versionCol, 

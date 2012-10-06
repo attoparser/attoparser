@@ -27,6 +27,15 @@ import java.io.StringReader;
 
 
 /**
+ * <p>
+ *   Base abstract class for all {@link IAttoParser} implementations, providing
+ *   common code for unifying all the supported document formats (String, char[],
+ *   char[] segment, Reader) into just one (Reader).
+ * </p>
+ * <p>
+ *   Subclasses of this class should only implement the abstract
+ *   {@link #parseDocument(Reader, IAttoHandler)} method.
+ * </p>
  * 
  * @author Daniel Fern&aacute;ndez
  * 
@@ -78,7 +87,20 @@ public abstract class AbstractAttoParser implements IAttoParser {
         parseDocument(reader, handler);
     }
     
-    
+
+    /**
+     * <p>
+     *   Parse the document, as a {@link Reader}.
+     * </p>
+     * <p>
+     *   This method is meant for overriding, and is the only parsing method
+     *   that subclasses need to implement. 
+     * </p>
+     * 
+     * @param reader a Reader on the document.
+     * @param handler the handler to be used, an {@link IAttoHandler} implementation.
+     * @throws AttoParseException if the document cannot be parsed.
+     */
     protected abstract void parseDocument(
             final Reader reader, final IAttoHandler handler)
             throws AttoParseException;

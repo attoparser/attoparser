@@ -177,7 +177,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
     
     @SuppressWarnings("unused")
-    public void handleDetailedXmlDeclaration(
+    public void handleXmlDeclarationDetail(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen, 
             final int keywordLine, final int keywordCol, 
@@ -429,7 +429,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 
             }
             
-            this.handler.handleDetailedXmlDeclaration(buffer, keywordOffset, keywordLen, keywordLine,
+            this.handler.handleXmlDeclarationDetail(buffer, keywordOffset, keywordLen, keywordLine,
                     keywordCol, versionOffset, versionLen, versionLine, versionCol,
                     encodingOffset, encodingLen, encodingLine, encodingCol,
                     standaloneOffset, standaloneLen, standaloneLine, standaloneCol,

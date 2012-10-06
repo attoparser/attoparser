@@ -38,7 +38,7 @@ import org.attoparser.markup.AbstractStandardMarkupAttoHandler;
  * @since 1.0
  *
  */
-public final class DOMAttoHandler extends AbstractStandardMarkupAttoHandler {
+public final class DOMMarkupAttoHandler extends AbstractStandardMarkupAttoHandler {
 
     
     private Document document = null;
@@ -51,7 +51,7 @@ public final class DOMAttoHandler extends AbstractStandardMarkupAttoHandler {
     
 
     
-    public DOMAttoHandler() {
+    public DOMMarkupAttoHandler() {
         super(true /* well-formed */);
     }
 

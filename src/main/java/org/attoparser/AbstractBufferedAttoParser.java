@@ -25,6 +25,15 @@ import java.io.Reader;
 
 
 /**
+ * <p>
+ *   Base abstract class for {@link IAttoParser} implementations reading
+ *   the parsed document using a buffer.
+ * </p>
+ * <p>
+ *   Subclasses of this abstract class should only implement the abstract
+ *   {@link #parseBuffer(char[], int, int, IAttoHandler, int, int)} method.
+ * </p>
+ * 
  * 
  * @author Daniel Fern&aacute;ndez
  * 
@@ -34,7 +43,14 @@ import java.io.Reader;
 public abstract class AbstractBufferedAttoParser extends AbstractAttoParser {
 
     
-    private static final int BUFFER_SIZE = 4096;
+    /**
+     * <p>
+     *   Default buffer size to be used (buffer size will grow at runtime if 
+     *   an artifact (structure or text) is bigger than the whole buffer). 
+     *   Value: 4096 chars.
+     * </p>
+     */
+    public static final int BUFFER_SIZE = 4096;
 
 
     
@@ -154,7 +170,19 @@ public abstract class AbstractBufferedAttoParser extends AbstractAttoParser {
     
     
     
-    
+    /**
+     * <p>
+     * </p>
+     * 
+     * @param buffer
+     * @param offset
+     * @param len
+     * @param handler
+     * @param line
+     * @param col
+     * @return
+     * @throws AttoParseException
+     */
     protected abstract BufferParseResult parseBuffer(
             final char[] buffer, final int offset, final int len, 
             final IAttoHandler handler, final int line, final int col) 
@@ -164,7 +192,20 @@ public abstract class AbstractBufferedAttoParser extends AbstractAttoParser {
     
     
     
-
+    /**
+     * <p>
+     *   This class encapsulates the results of parsing a fragment
+     *   (a buffer) of a document.
+     * </p>
+     * <p>
+     *   Will only be used by implementations of {@link AbstractBufferedAttoParser}.
+     * </p>
+     * 
+     * @author Daniel Fern&aacute;ndez
+     * 
+     * @since 1.0
+     *
+     */
     public static final class BufferParseResult {
         
         private final int offset;

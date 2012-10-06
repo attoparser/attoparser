@@ -25,6 +25,34 @@ import java.io.Reader;
 
 
 /**
+ * <p>
+ *   Common interface for all <i>attoparser</i> instances.
+ *   Default implementation is {@link org.attoparser.markup.MarkupAttoParser}.
+ * </p>
+ * <p>
+ *   <i>Attoparser</i> implementations work as SAX-style parsers that need 
+ *   an <i>attohandler</i> instance for handling parsing events. Depending
+ *   on the desired level of detail in these events, several handler 
+ *   abstract and concrete implementations are offered out-of-the-box:
+ * </p>
+ * <ul>
+ *   <li>{@link AbstractAttoHandler}: basic implementation only differentiating
+ *       between <i>text</i> and <i>structures</i></li>
+ *   <li>{@link org.attoparser.markup.AbstractBasicMarkupAttoHandler}: markup-specialized
+ *       (XML and HTML) abstract handler able to differentiate between different
+ *       types of markup structures: Elements, comments, CDATA, DOCTYPE, etc.</li>
+ *   <li>{@link org.attoparser.markup.AbstractDetailedMarkupAttoHandler}: markup-specialized
+ *       (XML and HTML) abstract handler able not only to differentiate different
+ *       types of markup structures, but also of reporting lowel-level detail inside
+ *       elements (name, attributes, inner whitespace) and DOCTYPE clauses.</li>
+ *   <li>{@link org.attoparser.markup.AbstractStandardMarkupAttoHandler}: higher-level
+ *       markup-specialized (XML and HTML) abstract handler that offers an interface
+ *       more similar to the Standard SAX DocumentHandlers (use of Strings instead of
+ *       char[]'s, attribute maps, etc).</li>
+ *   <li>{@link org.attoparser.markup.dom.DOMMarkupAttoHandler}: handler implementation
+ *       (non-abstract) for building an attoDOM tree (DOM node tres based on classes
+ *       from the <tt>org.attoparser.markup.dom</tt> package).</li> 
+ * </ul>
  * 
  * @author Daniel Fern&aacute;ndez
  * 
@@ -33,16 +61,58 @@ import java.io.Reader;
  */
 public interface IAttoParser {
     
-    
+
+    /**
+     * <p>
+     *   Parse a document using the specified {@link IAttoHandler}.
+     * </p>
+     * 
+     * @param document the document to be parsed, as a String.
+     * @param handler the handler to be used, an {@link IAttoHandler} implementation.
+     * @throws AttoParseException if the document cannot be parsed.
+     */
     public void parse(final String document, final IAttoHandler handler) 
             throws AttoParseException;
+
     
+    /**
+     * <p>
+     *   Parse a document using the specified {@link IAttoHandler}.
+     * </p>
+     * 
+     * @param document the document to be parsed, as a char[].
+     * @param handler the handler to be used, an {@link IAttoHandler} implementation.
+     * @throws AttoParseException if the document cannot be parsed.
+     */
     public void parse(final char[] document, final IAttoHandler handler) 
             throws AttoParseException;
+
     
+    /**
+     * <p>
+     *   Parse a document using the specified {@link IAttoHandler}.
+     * </p>
+     * 
+     * @param document the document to be parsed, as a char[].
+     * @param offset the offset to be applied on the char[] document to determine the
+     *        start of the document contents.
+     * @param len the length (in chars) of the document stored in the char[].
+     * @param handler the handler to be used, an {@link IAttoHandler} implementation.
+     * @throws AttoParseException if the document cannot be parsed.
+     */
     public void parse(final char[] document, final int offset, final int len, final IAttoHandler handler) 
             throws AttoParseException;
     
+    
+    /**
+     * <p>
+     *   Parse a document using the specified {@link IAttoHandler}.
+     * </p>
+     * 
+     * @param reader a Reader on the document.
+     * @param handler the handler to be used, an {@link IAttoHandler} implementation.
+     * @throws AttoParseException if the document cannot be parsed.
+     */
     public void parse(final Reader reader, final IAttoHandler handler) 
             throws AttoParseException;
 

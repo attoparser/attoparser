@@ -408,7 +408,7 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
     
     
     @Override
-    public void handleDetailedXmlDeclaration(
+    public void handleXmlDeclarationDetail(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
