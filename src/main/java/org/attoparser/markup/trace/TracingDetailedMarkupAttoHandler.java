@@ -430,11 +430,19 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
             this.writer.write(')');
             writePosition(this.writer, versionLine, versionCol);
             this.writer.write('(');
-            this.writer.write(buffer, encodingOffset, encodingLen);
+            if (encodingOffset != 0) {
+                this.writer.write(buffer, encodingOffset, encodingLen);
+            } else {
+                this.writer.write("null");
+            }
             this.writer.write(')');
             writePosition(this.writer, encodingLine, encodingCol);
             this.writer.write('(');
-            this.writer.write(buffer, standaloneOffset, standaloneLen);
+            if (standaloneOffset != 0) {
+                this.writer.write(buffer, standaloneOffset, standaloneLen);
+            } else {
+                this.writer.write("null");
+            }
             this.writer.write(')');
             writePosition(this.writer, standaloneLine, standaloneCol);
             

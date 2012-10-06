@@ -334,8 +334,14 @@ public abstract class AbstractStandardMarkupAttoHandler
                 outerOffset, outerLen, line, col);
         
         final String version = new String(buffer, versionOffset, versionLen);
-        final String encoding = new String(buffer, encodingOffset, encodingLen);
-        final String standalone = new String(buffer, standaloneOffset, standaloneLen);
+        final String encoding =
+                (encodingOffset != 0?
+                        new String(buffer, encodingOffset, encodingLen) :
+                        null);
+        final String standalone =
+                (standaloneOffset != 0?
+                        new String(buffer, standaloneOffset, standaloneLen) :
+                        null);
         
         handleXmlDeclaration(version, encoding, standalone, line, col);
         
