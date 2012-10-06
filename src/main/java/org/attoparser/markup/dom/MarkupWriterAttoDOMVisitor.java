@@ -35,14 +35,14 @@ import java.util.Map;
  * @since 1.0
  *
  */
-public final class WriterAttoDOMVisitor extends AbstractAttoDOMVisitor {
+public final class MarkupWriterAttoDOMVisitor extends AbstractAttoDOMVisitor {
 
     
     private final Writer writer;
     
     
     
-    public WriterAttoDOMVisitor(final Writer writer) {
+    public MarkupWriterAttoDOMVisitor(final Writer writer) {
         super();
         this.writer = writer;
     }
