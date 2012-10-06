@@ -894,13 +894,13 @@ public class AttoParserTest extends TestCase {
             false);
         testDoc( 
             "<?xsl-stylesheet ?>",
-            "[P(xsl-stylesheet){1,3}(){1,18}]",
-            "[P(xsl-stylesheet)(){1,1}]", 
+            "[P(xsl-stylesheet){1,3}(null){1,18}]",
+            "[P(xsl-stylesheet)(null){1,1}]", 
             false);
         testDoc( 
             "<?xsl-stylesheet?>",
-            "[P(xsl-stylesheet){1,3}(){1,17}]",
-            "[P(xsl-stylesheet)(){1,1}]", 
+            "[P(xsl-stylesheet){1,3}(null){1,17}]",
+            "[P(xsl-stylesheet)(null){1,1}]", 
             false);
         testDoc( 
             "<?xsl-stylesheet a=\"1\" a b > uas23 ?>",
