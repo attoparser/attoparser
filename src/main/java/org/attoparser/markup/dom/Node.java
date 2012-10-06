@@ -37,28 +37,35 @@ public abstract class Node implements Serializable {
 
     private static final long serialVersionUID = 8123273476323610489L;
     
-    private final int line;
-    private final int col;
+    private final Integer line;
+    private final Integer col;
     
     Element parent;
     
     
 
-    Node(final int line, final int col) {
+    protected Node(final int line, final int col) {
         super();
-        this.line = line;
-        this.col = col;
+        this.line = Integer.valueOf(line);
+        this.col = Integer.valueOf(col);
+    }
+
+    
+    protected Node() {
+        super();
+        this.line = null;
+        this.col = null;
     }
 
 
     
 
-    public int getLine() {
+    public Integer getLine() {
         return this.line;
     }
 
     
-    public int getCol() {
+    public Integer getCol() {
         return this.col;
     }
 

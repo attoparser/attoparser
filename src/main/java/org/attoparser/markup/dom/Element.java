@@ -21,6 +21,7 @@ package org.attoparser.markup.dom;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,8 +44,8 @@ public final class Element extends Node {
     private static final long serialVersionUID = -8980986739486971174L;
 
     
-    private final String name;
-    private final boolean standalone;
+    private String name;
+    private boolean standalone;
     
     private List<Node> children = null;
     private int childrenLen = 0;
@@ -55,8 +56,16 @@ public final class Element extends Node {
 
 
 
-    Element(final String name, final boolean standalone, final int line, final int col) {
+    public Element(final String name, final boolean standalone, final int line, final int col) {
         super(line, col);
+        Validate.notNull(name, "Element name cannot be null");
+        this.name = name;
+        this.standalone = standalone;
+    }
+
+    public Element(final String name, final boolean standalone) {
+        super();
+        Validate.notNull(name, "Element name cannot be null");
         this.name = name;
         this.standalone = standalone;
     }
@@ -68,8 +77,22 @@ public final class Element extends Node {
         return this.name;
     }
     
+    public void setName(final String name) {
+        Validate.notNull(name, "Element name cannot be null");
+        this.name = name;
+    }
+    
+
+    
     public boolean isStandalone() {
         return this.standalone;
+    }
+    
+    public void setStandalone(final boolean standalone) {
+        this.standalone = standalone;
+        if (standalone) {
+            clearChildren();
+        }
     }
     
     
@@ -124,6 +147,17 @@ public final class Element extends Node {
             return Collections.emptyList();
         }
         return Collections.unmodifiableList(this.children);
+    }
+    
+
+    /**
+     * <p>
+     *   Clears all children from this node.
+     * </p>
+     */
+    public final void clearChildren() {
+        this.children = null;
+        this.childrenLen = 0;
     }
 
 
@@ -188,9 +222,10 @@ public final class Element extends Node {
     
 
     
-    void addChild(final Node newChild) {
+    public void addChild(final Node newChild) {
         
         if (newChild != null) {
+            
             if (this.childrenLen == 0) {
                 this.children = new ArrayList<Node>();
             }
@@ -198,6 +233,31 @@ public final class Element extends Node {
             this.childrenLen++;
             
             newChild.parent = this;
+            
+            this.standalone = false;
+            
+        }
+        
+    }
+
+    
+    
+    public void removeChild(final Node child) {
+        
+        if (child != null && child.parent == this) {
+            
+            final Iterator<Node> childrenIter = this.children.iterator();
+            while (childrenIter.hasNext()) {
+                final Node nodeChild = childrenIter.next();
+                if (nodeChild == child) {
+                    childrenIter.remove();
+                    this.childrenLen--;
+                    break;
+                }
+            }
+            if (this.childrenLen == 0) {
+                this.children = null;
+            }
             
         }
         
@@ -346,7 +406,7 @@ public final class Element extends Node {
     
 
 
-    void addAttribute(final String attributeName, final String attributeValue) {
+    public void addAttribute(final String attributeName, final String attributeValue) {
         
         if (this.attributesLen == 0) {
             this.attributes = new LinkedHashMap<String, String>();
@@ -357,8 +417,7 @@ public final class Element extends Node {
     }
 
 
-
-    void addAttributes(final Map<String,String> newAttributes) {
+    public void addAttributes(final Map<String,String> newAttributes) {
         
         if (newAttributes != null) {
             if (this.attributesLen == 0) {
@@ -370,6 +429,60 @@ public final class Element extends Node {
 
     }
     
+    
+    public void clearAttributes() {
+        this.attributes = null;
+        this.attributesLen = 0;
+    }
+
+    
+    public void removeAttribute(final String attributeName) {
+        
+        if (this.attributesLen > 0) {
+            
+            if (this.attributes.containsKey(attributeName)) {
+                this.attributes.remove(attributeName);
+                this.attributesLen--;
+                if (this.attributesLen == 0) {
+                    this.attributes = null;
+                }
+            }
+            
+        }
+        
+    }
+
+    
+    public void removeAttributeIgnoreCase(final String attributeName) {
+        
+        if (this.attributesLen > 0) {
+            
+            String realAttributeName = null;
+            boolean found = false;
+            for (final Map.Entry<String,String> attributeEntry : this.attributes.entrySet()) {
+                final String entryName = attributeEntry.getKey();
+                if (entryName == null) {
+                    if (attributeName == null) {
+                        found = true;
+                        break;
+                    }
+                } else if (entryName.equalsIgnoreCase(attributeName)) {
+                    realAttributeName = entryName;
+                    found = true;
+                    break;
+                }
+            }
+            if (found) {
+                this.attributes.remove(realAttributeName);
+                this.attributesLen--;
+                if (this.attributesLen == 0) {
+                    this.attributes = null;
+                }
+            }
+            
+        }
+        
+    }
     
 
     

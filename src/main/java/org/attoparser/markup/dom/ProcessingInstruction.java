@@ -37,13 +37,21 @@ public final class ProcessingInstruction extends Node {
     private static final long serialVersionUID = 7832638382597687056L;
     
     
-    private final String target;
-    private final String content;
+    private String target;
+    private String content;
 
 
 
-    ProcessingInstruction(final String target, final String content, final int line, final int col) {
+    public ProcessingInstruction(final String target, final String content, final int line, final int col) {
         super(line, col);
+        Validate.notNull(target, "Target cannot be null");
+        this.target = target;
+        this.content = content;
+    }
+
+    public ProcessingInstruction(final String target, final String content) {
+        super();
+        Validate.notNull(target, "Target cannot be null");
         this.target = target;
         this.content = content;
     }
@@ -60,6 +68,11 @@ public final class ProcessingInstruction extends Node {
     public String getTarget() {
         return this.target;
     }
+    
+    public void setTarget(final String target) {
+        Validate.notNull(target, "Target cannot be null");
+        this.target = target;
+    }
 
     
     /**
@@ -71,6 +84,10 @@ public final class ProcessingInstruction extends Node {
      */
     public String getContent() {
         return this.content;
+    }
+    
+    public void setContent(final String content) {
+        this.content = content;
     }
     
 

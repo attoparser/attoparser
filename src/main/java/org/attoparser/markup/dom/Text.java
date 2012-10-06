@@ -37,14 +37,22 @@ public final class Text extends Node {
     private static final long serialVersionUID = -6449838157196892217L;
     
     
-    private final String content;
+    private String content;
 
 
 
-    Text(final String content, final int line, final int col) {
+    public Text(final String content, final int line, final int col) {
         super(line, col);
+        Validate.notNull(content, "Content cannot be null");
         this.content = content;
     }
+
+    public Text(final String content) {
+        super();
+        Validate.notNull(content, "Content cannot be null");
+        this.content = content;
+    }
+
 
     
     
@@ -57,6 +65,12 @@ public final class Text extends Node {
      */
     public String getContent() {
         return this.content;
+    }
+    
+    
+    public void setContent(final String content) {
+        Validate.notNull(content, "Content cannot be null");
+        this.content = content;
     }
     
     

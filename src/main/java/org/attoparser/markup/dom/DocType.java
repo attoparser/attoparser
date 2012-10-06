@@ -35,44 +35,73 @@ public final class DocType extends Node {
     private static final long serialVersionUID = 763084654353190744L;
     
     
-    private final String rootElementName;
-    private final String publicId;
-    private final String systemId;
-    private final String internalSubset;
+    private String rootElementName;
+    private String publicId;
+    private String systemId;
+    private String internalSubset;
 
     
 
 
-    DocType(final String rootElementName, final String publicId, final String systemId,
+    public DocType(final String rootElementName, final String publicId, final String systemId,
             final String internalSubset, final int line, final int col) {
-        
         super(line, col);
-
+        Validate.notNull(rootElementName, "Root element name cannot be null");
         this.rootElementName = rootElementName;
         this.publicId = publicId;
         this.systemId = systemId;
         this.internalSubset = internalSubset;
-        
+    }
+
+    public DocType(final String rootElementName, final String publicId, final String systemId,
+            final String internalSubset) {
+        super();
+        Validate.notNull(rootElementName, "Root element name cannot be null");
+        this.rootElementName = rootElementName;
+        this.publicId = publicId;
+        this.systemId = systemId;
+        this.internalSubset = internalSubset;
     }
 
     
+    
+    
     public String getRootElementName() {
         return this.rootElementName;
-    }    
+    }
+    
+    public void setRootElementName(final String rootElementName) {
+        Validate.notNull(rootElementName, "Root element name cannot be null");
+        this.rootElementName = rootElementName;
+    }
+    
     
     public String getPublicId() {
         return this.publicId;
     }
     
+    public void setPublicId(final String publicId) {
+        this.publicId = publicId;
+    }
+    
+    
     public String getSystemId() {
         return this.systemId;
     }
     
+    public void setSystemId(final String systemId) {
+        this.systemId = systemId;
+    }
+    
+    
     public String getInternalSubset() {
         return this.internalSubset;
     }
-
     
+    public void setInternalSubset(final String internalSubset) {
+        this.internalSubset = internalSubset;
+    }
+
     
     
     

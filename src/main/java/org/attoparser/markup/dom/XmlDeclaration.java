@@ -35,36 +35,58 @@ public final class XmlDeclaration extends Node {
     private static final long serialVersionUID = 8210232665354213283L;
     
     
-    private final String version;
-    private final String encoding;
-    private final String standalone;
+    private String version;
+    private String encoding;
+    private String standalone;
 
     
 
 
-    XmlDeclaration(final String version, final String encoding, final String standalone,
+    public XmlDeclaration(final String version, final String encoding, final String standalone,
             final int line, final int col) {
-        
         super(line, col);
-
+        Validate.notNull(version, "Version cannot be null");
         this.version = version;
         this.encoding = encoding;
         this.standalone = standalone;
-        
     }
+
+    public XmlDeclaration(final String version, final String encoding, final String standalone) {
+        super();
+        Validate.notNull(version, "Version cannot be null");
+        this.version = version;
+        this.encoding = encoding;
+        this.standalone = standalone;
+    }
+
 
 
     
     public String getVersion() {
         return this.version;
     }
+    
+    public void setVersion(final String version) {
+        Validate.notNull(version, "Version cannot be null");
+        this.version = version;
+    }
+    
 
     public String getEncoding() {
         return this.encoding;
     }
+    
+    public void setEncoding(final String encoding) {
+        this.encoding = encoding;
+    }
+    
 
     public String getStandalone() {
         return this.standalone;
+    }
+    
+    public void setStandalone(final String standalone) {
+        this.standalone = standalone;
     }
 
     

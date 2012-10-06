@@ -37,12 +37,19 @@ public final class CDATASection extends Node {
     private static final long serialVersionUID = -131121996532074777L;
     
     
-    private final String content;
+    private String content;
 
 
 
-    CDATASection(final String content, final int line, final int col) {
+    public CDATASection(final String content, final int line, final int col) {
         super(line, col);
+        Validate.notNull(content, "Content cannot be null");
+        this.content = content;
+    }
+
+    public CDATASection(final String content) {
+        super();
+        Validate.notNull(content, "Content cannot be null");
         this.content = content;
     }
 
@@ -58,9 +65,16 @@ public final class CDATASection extends Node {
     public String getContent() {
         return this.content;
     }
+    
+    
+    public void setContent(final String content) {
+        Validate.notNull(content, "Content cannot be null");
+        this.content = content;
+    }
 
     
 
+    
     @Override
     public final void visit(final AttoDOMVisitor visitor)
             throws AttoDOMVisitorException {

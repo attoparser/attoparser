@@ -38,14 +38,22 @@ public final class Comment extends Node {
     private static final long serialVersionUID = -5222507854714214977L;
     
     
-    private final String content;
+    private String content;
 
 
     
-    Comment(final String content, final int line, final int col) {
+    public Comment(final String content, final int line, final int col) {
         super(line, col);
+        Validate.notNull(content, "Content cannot be null");
         this.content = content;
     }
+    
+    public Comment(final String content) {
+        super();
+        Validate.notNull(content, "Content cannot be null");
+        this.content = content;
+    }
+
     
     
     
@@ -59,6 +67,13 @@ public final class Comment extends Node {
     public String getContent() {
         return this.content;
     }
+    
+    
+    public void setContent(final String content) {
+        Validate.notNull(content, "Content cannot be null");
+        this.content = content;
+    }
+
     
 
     
