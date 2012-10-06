@@ -269,9 +269,9 @@ public abstract class AbstractStandardMarkupAttoHandler
         
         handleDocType(
                 new String(buffer, elementNameOffset, elementNameLen),
-                (publicIdLen <= 0? null : new String(buffer, publicIdOffset, publicIdLen)),
-                (systemIdLen <= 0? null : new String(buffer, systemIdOffset, systemIdLen)),
-                (internalSubsetLen <= 0? null : new String(buffer, internalSubsetOffset, internalSubsetLen)),
+                (publicIdOffset <= 0? null : new String(buffer, publicIdOffset, publicIdLen)),
+                (systemIdOffset <= 0? null : new String(buffer, systemIdOffset, systemIdLen)),
+                (internalSubsetOffset <= 0? null : new String(buffer, internalSubsetOffset, internalSubsetLen)),
                 outerLine, outerCol);
         
     }
@@ -335,11 +335,11 @@ public abstract class AbstractStandardMarkupAttoHandler
         
         final String version = new String(buffer, versionOffset, versionLen);
         final String encoding =
-                (encodingOffset != 0?
+                (encodingOffset > 0?
                         new String(buffer, encodingOffset, encodingLen) :
                         null);
         final String standalone =
-                (standaloneOffset != 0?
+                (standaloneOffset > 0?
                         new String(buffer, standaloneOffset, standaloneLen) :
                         null);
         
@@ -368,7 +368,7 @@ public abstract class AbstractStandardMarkupAttoHandler
         
         handleProcessingInstruction(
                 new String(buffer, targetOffset, targetLen), 
-                new String(buffer, contentOffset, contentLen), 
+                (contentOffset <= 0? null : new String(buffer, contentOffset, contentLen)), 
                 line, col);
         
     }
