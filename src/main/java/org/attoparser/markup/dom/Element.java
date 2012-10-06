@@ -239,6 +239,72 @@ public final class Element extends Node {
         }
         
     }
+    
+    
+
+    
+    public void insertChild(final int index, final Node newChild) {
+        
+        if (newChild != null) {
+            
+            if (this.childrenLen == 0) {
+                this.children = new ArrayList<Node>();
+            }
+            
+            if (index <= this.childrenLen) {
+                
+                this.children.add(index, newChild);
+                this.childrenLen++;
+                
+                newChild.parent = this;
+                
+                this.standalone = false;
+                
+            }
+            
+        }
+        
+    }
+
+    
+    
+    public void insertChildBefore(final Node before, final Node newChild) {
+        
+        if (newChild != null) {
+            
+            if (this.childrenLen > 0) {
+                for (int i = 0; i < this.childrenLen; i++) {
+                    final Node currentChild = this.children.get(i);
+                    if (currentChild == before) {
+                        insertChild(i, newChild);
+                        return;
+                    }
+                }
+            }
+            
+        }
+        
+    }
+
+    
+    
+    public void insertChildAfter(final Node after, final Node newChild) {
+        
+        if (newChild != null) {
+            
+            if (this.childrenLen > 0) {
+                for (int i = 0; i < this.childrenLen; i++) {
+                    final Node currentChild = this.children.get(i);
+                    if (currentChild == after) {
+                        insertChild(i + 1, newChild);
+                        return;
+                    }
+                }
+            }
+            
+        }
+        
+    }
 
     
     
