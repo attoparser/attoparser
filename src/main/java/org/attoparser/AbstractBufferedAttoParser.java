@@ -172,16 +172,18 @@ public abstract class AbstractBufferedAttoParser extends AbstractAttoParser {
     
     /**
      * <p>
+     *   Parse a buffer segment and return a {@link BufferParseResult} reporting
+     *   the results of this parsing.
      * </p>
      * 
-     * @param buffer
-     * @param offset
-     * @param len
-     * @param handler
-     * @param line
-     * @param col
-     * @return
-     * @throws AttoParseException
+     * @param buffer the document buffer.
+     * @param offset the offset (in the document buffer) of the segment to be parsed.
+     * @param len the length (in chars) of the segment to be parsed.
+     * @param handler the {@link IAttoHandler} implementation to be used for reporting events.
+     * @param line the line of the first position (offset) in buffer.
+     * @param col the column of the first position (offset) in buffer.
+     * @return a {@link BufferParseResult} reporting the parsing status.
+     * @throws AttoParseException if an error occurs.
      */
     protected abstract BufferParseResult parseBuffer(
             final char[] buffer, final int offset, final int len, 
@@ -200,6 +202,18 @@ public abstract class AbstractBufferedAttoParser extends AbstractAttoParser {
      * <p>
      *   Will only be used by implementations of {@link AbstractBufferedAttoParser}.
      * </p>
+     * <p>
+     *   It contains:
+     * </p>
+     * <ul>
+     *   <li><tt>offset</tt>: The <i>current artifact position</i>, initial position
+     *       of the last unfinished artifact found while parsing
+     *       a buffer segment.</li>
+     *   <li><tt>line</tt>, <tt>col</tt>: line and column number of the last unfinished 
+     *       artifact found while parsing a buffer segment.</li>
+     *   <li><tt>inStructure</tt>: signals whether the last unfinished artifact is
+     *       suspected to be a structure (in contrast to a text).</li>
+     * </ul>
      * 
      * @author Daniel Fern&aacute;ndez
      * 
@@ -214,6 +228,16 @@ public abstract class AbstractBufferedAttoParser extends AbstractAttoParser {
         private final boolean inStructure;
         
         
+        /**
+         * <p>
+         *   Create a new instance of this class.
+         * </p>
+         * 
+         * @param offset the offset of the last unfinished artifact.
+         * @param line line of the last unfinished artifact.
+         * @param col column of the last unfinished artifact.
+         * @param inStructure whether the last unfinished artifact is a structure or not.
+         */
         public BufferParseResult(final int offset, final int line, final int col, final boolean inStructure) {
             super();
             this.offset = offset;
