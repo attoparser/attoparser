@@ -80,8 +80,8 @@ package org.attoparser;
  *       elements (name, attributes, inner whitespace) and DOCTYPE clauses.</li>
  *   <li>{@link org.attoparser.markup.AbstractStandardMarkupAttoHandler}: higher-level
  *       markup-specialized (XML and HTML) abstract handler that offers an interface
- *       more similar to the Standard SAX DocumentHandlers (use of Strings instead of
- *       char[]'s, attribute maps, etc).</li>
+ *       more similar to the Standard SAX {@link org.xml.sax.ContentHandler}s (use of 
+ *       Strings instead of char[]'s, attribute maps, etc).</li>
  *   <li>{@link org.attoparser.markup.dom.DOMMarkupAttoHandler}: handler implementation
  *       (non-abstract) for building an attoDOM tree (DOM node tres based on classes
  *       from the <tt>org.attoparser.markup.dom</tt> package).</li> 

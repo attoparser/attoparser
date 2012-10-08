@@ -58,6 +58,10 @@ import org.attoparser.AttoParseException;
  *   <li><b>XML Declarations</b>: <tt>&lt;?xml version="1.0"?&gt;</tt></li>
  *   <li><b>Processing Instructions</b>: <tt>&lt;?xsl-stylesheet ...?&gt;</tt></li>
  * </ul>
+ * <p>
+ *   This class provides empty implementations for all event handlers, so that
+ *   subclasses can override only the methods they need.
+ * </p>
  * 
  * @author Daniel Fern&aacute;ndez
  * 
@@ -202,6 +206,15 @@ public abstract class AbstractDetailedMarkupAttoHandler
     
     
 
+    /**
+     * <p>
+     *   Called when document parsing starts.
+     * </p>
+     * 
+     * @param startTimeNanos the starting time, in nanoseconds.
+     * @param documentRestrictions the document restrictions being applied.
+     * @throws AttoParseException
+     */
     @SuppressWarnings("unused")
     public void handleDocumentStart(final long startTimeNanos, final DocumentRestrictions documentRestrictions)
             throws AttoParseException {
@@ -209,6 +222,16 @@ public abstract class AbstractDetailedMarkupAttoHandler
     }
 
 
+    /**
+     * <p>
+     *   Called when document parsing ends.
+     * </p>
+     * 
+     * @param endTimeNanos the parsing end time, in nanoseconds.
+     * @param totalTimeNanos the difference between parsing start and end times.
+     * @param documentRestrictions the document restrictions being applied.
+     * @throws AttoParseException
+     */
     @SuppressWarnings("unused")
     public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final DocumentRestrictions documentRestrictions)
             throws AttoParseException {

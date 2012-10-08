@@ -24,6 +24,14 @@ package org.attoparser;
 
 
 /**
+ * <p>
+ *   Base abstract class for {@link IAttoHandler} implementations,
+ *   providing timing.
+ * </p>
+ * <p>
+ *   This class provides empty implementations for all event handlers, so that
+ *   subclasses can override only the methods they need.
+ * </p>
  * 
  * @author Daniel Fern&aacute;ndez
  * 

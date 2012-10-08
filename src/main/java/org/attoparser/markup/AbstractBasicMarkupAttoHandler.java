@@ -44,6 +44,10 @@ import org.attoparser.AttoParseException;
  *   <li><b>XML Declarations</b>: <tt>&lt;?xml version="1.0"?&gt;</tt></li>
  *   <li><b>Processing Instructions</b>: <tt>&lt;?xsl-stylesheet ...?&gt;</tt></li>
  * </ul>
+ * <p>
+ *   This class provides empty implementations for all event handlers, so that
+ *   subclasses can override only the methods they need.
+ * </p>
  * 
  * 
  * @author Daniel Fern&aacute;ndez

@@ -31,6 +31,19 @@ import org.attoparser.AttoParseException;
 
 
 /**
+ * <p>
+ *   Base abstract implementations for markup-specialized attohandlers that offer an event
+ *   handling interface similar to that of the standard SAX {@link org.xml.sax.ContentHandler}.
+ * </p>
+ * <p>
+ *   Handlers extending from this class can make use of a {@link DocumentRestrictions} instance
+ *   specifying a set of restrictions to be applied during document parsing (for example, 
+ *   for ensuring that a document is well-formed from an XML/XHTML standpoint).
+ * </p>
+ * <p>
+ *   This class provides empty implementations for all event handlers, so that
+ *   subclasses can override only the methods they need.
+ * </p>
  * 
  * @author Daniel Fern&aacute;ndez
  * 
@@ -383,7 +396,21 @@ public abstract class AbstractStandardMarkupAttoHandler
 
     
     
-    
+
+    /**
+     * <p>
+     *   Called when a standalone element (a <i>minimized tag</i>) is found.
+     * </p>
+     * <p>
+     *   Note that <b>the element attributes map can be null if no attributes are present</b>. 
+     * </p>
+     * 
+     * @param elementName the element name (e.g. "&lt;img src="logo.png"&gt;" -> "img").
+     * @param attributes the element attributes map, or null if no attributes are present.
+     * @param line the line in the document where this elements appears.
+     * @param col the column in the document where this element appears.
+     * @throws AttoParseException
+     */
     @SuppressWarnings("unused")
     public void handleStandaloneElement(
             final String elementName, final Map<String,String> attributes,
@@ -392,7 +419,21 @@ public abstract class AbstractStandardMarkupAttoHandler
         // Nothing to be done here, meant to be overridden if required
     }
 
-    
+
+    /**
+     * <p>
+     *   Called when an open element (an <i>open tag</i>) is found.
+     * </p>
+     * <p>
+     *   Note that <b>the element attributes map can be null if no attributes are present</b>. 
+     * </p>
+     * 
+     * @param elementName the element name (e.g. "&lt;div class="content"&gt;" -> "div").
+     * @param attributes the element attributes map, or null if no attributes are present.
+     * @param line the line in the document where this elements appears.
+     * @param col the column in the document where this element appears.
+     * @throws AttoParseException
+     */
     @SuppressWarnings("unused")
     public void handleOpenElement(
             final String elementName, final Map<String,String> attributes,
@@ -401,7 +442,17 @@ public abstract class AbstractStandardMarkupAttoHandler
         // Nothing to be done here, meant to be overridden if required
     }
     
-    
+
+    /**
+     * <p>
+     *   Called when a close element (a <i>close tag</i>) is found.
+     * </p>
+     * 
+     * @param elementName the element name (e.g. "&lt;/div&gt;" -> "div").
+     * @param line the line in the document where this elements appears.
+     * @param col the column in the document where this element appears.
+     * @throws AttoParseException
+     */
     @SuppressWarnings("unused")
     public void handleCloseElement(
             final String elementName, final int line, final int col)
@@ -409,7 +460,21 @@ public abstract class AbstractStandardMarkupAttoHandler
         // Nothing to be done here, meant to be overridden if required
     }
 
+
     
+    /**
+     * <p>
+     *   Called when a DOCTYPE clause is found.
+     * </p>
+     * 
+     * @param elementName the root element name present in the DOCTYPE clause (e.g. "html").
+     * @param publicId the public ID specified, if present (might be null).
+     * @param systemId the system ID specified, if present (might be null).
+     * @param internalSubset the internal subset specified, if present (might be null).
+     * @param line the line in the document where this elements appears.
+     * @param col the column in the document where this element appears.
+     * @throws AttoParseException
+     */
     @SuppressWarnings("unused")
     public void handleDocType(
             final String elementName, final String publicId, final String systemId, 
@@ -418,7 +483,25 @@ public abstract class AbstractStandardMarkupAttoHandler
         // Nothing to be done here, meant to be overridden if required
     }
     
+
     
+    /**
+     * <p>
+     *   Called when a comment is found.
+     * </p>
+     * <p>
+     *   This artifact is returned as a <tt>char[]</tt> instead of a <tt>String</tt>
+     *   because its content can be large. In order to convert it into a <tt>String</tt>,
+     *   just do <tt>new String(buffer, offset, len)</tt>.
+     * </p>
+     * 
+     * @param buffer the document buffer.
+     * @param offset the offset of the artifact in the document buffer.
+     * @param len the length (in chars) of the artifact.
+     * @param line the line in the document where this elements appears.
+     * @param col the column in the document where this element appears.
+     * @throws AttoParseException
+     */
     @SuppressWarnings("unused")
     public void handleComment(
             final char[] buffer, final int offset, final int len, 
@@ -427,7 +510,25 @@ public abstract class AbstractStandardMarkupAttoHandler
         // Nothing to be done here, meant to be overridden if required
     }
     
+
     
+    /**
+     * <p>
+     *   Called when a CDATA section is found.
+     * </p>
+     * <p>
+     *   This artifact is returned as a <tt>char[]</tt> instead of a <tt>String</tt>
+     *   because its content can be large. In order to convert it into a <tt>String</tt>,
+     *   just do <tt>new String(buffer, offset, len)</tt>.
+     * </p>
+     * 
+     * @param buffer the document buffer.
+     * @param offset the offset of the artifact in the document buffer.
+     * @param len the length (in chars) of the artifact.
+     * @param line the line in the document where this elements appears.
+     * @param col the column in the document where this element appears.
+     * @throws AttoParseException
+     */
     @SuppressWarnings("unused")
     public void handleCDATASection(
             final char[] buffer, final int offset, final int len, 
@@ -437,6 +538,19 @@ public abstract class AbstractStandardMarkupAttoHandler
     }
 
 
+    
+    /**
+     * <p>
+     *   Called when an XML Declaration is found.
+     * </p>
+     * 
+     * @param version the version value specified (cannot be null).
+     * @param encoding the encoding value specified (can be null).
+     * @param standalone the standalone value specified (can be null).
+     * @param line the line in the document where this elements appears.
+     * @param col the column in the document where this element appears.
+     * @throws AttoParseException
+     */
     @SuppressWarnings("unused")
     public void handleXmlDeclaration(
             final String version, 
@@ -448,6 +562,18 @@ public abstract class AbstractStandardMarkupAttoHandler
     }
 
 
+    
+    /**
+     * <p>
+     *   Called when a Processing Instruction is found.
+     * </p>
+     * 
+     * @param target the target specified in the processing instruction.
+     * @param content the content of the processing instruction, if specified (might be null).
+     * @param line the line in the document where this elements appears.
+     * @param col the column in the document where this element appears.
+     * @throws AttoParseException
+     */
     @SuppressWarnings("unused")
     public void handleProcessingInstruction(
             final String target, final String content, 
