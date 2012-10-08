@@ -25,6 +25,7 @@ import java.io.StringWriter;
 import junit.framework.ComparisonFailure;
 import junit.framework.TestCase;
 
+import org.attoparser.markup.DocumentRestrictions;
 import org.attoparser.markup.MarkupAttoParser;
 import org.attoparser.markup.duplicate.DuplicatingBasicMarkupAttoHandler;
 import org.attoparser.markup.duplicate.DuplicatingDetailedMarkupAttoHandler;
@@ -1147,8 +1148,9 @@ public class AttoParserTest extends TestCase {
 
             // TEST WITH TRACING HANDLER
             {
+                final DocumentRestrictions dr = (wellFormed? DocumentRestrictions.wellFormed() : DocumentRestrictions.none());
                 final StringWriter sw = new StringWriter(); 
-                final IAttoHandler handler = new TracingDetailedMarkupAttoHandler(sw, wellFormed);
+                final IAttoHandler handler = new TracingDetailedMarkupAttoHandler(sw, dr);
                 if (offset == 0 && len == input.length) {
                     ((AbstractBufferedAttoParser)parser).parseDocument(new CharArrayReader(input), handler, bufferSize);
                 } else { 
@@ -1179,8 +1181,9 @@ public class AttoParserTest extends TestCase {
             
             // TEST WITH DUPLICATING MARKUP BREAKDOWN HANDLER (many events)
             {
+                final DocumentRestrictions dr = (wellFormed? DocumentRestrictions.wellFormed() : DocumentRestrictions.none());
                 final StringWriter sw = new StringWriter(); 
-                final IAttoHandler handler = new DuplicatingDetailedMarkupAttoHandler(sw, wellFormed);
+                final IAttoHandler handler = new DuplicatingDetailedMarkupAttoHandler(sw, dr);
                 if (offset == 0 && len == input.length) {
                     ((AbstractBufferedAttoParser)parser).parseDocument(new CharArrayReader(input), handler, bufferSize);
                 } else { 
@@ -1196,8 +1199,9 @@ public class AttoParserTest extends TestCase {
             if (outputSimple != null) {
                 // TEST WITH TRACING SIMPLE MARKUP HANDLER (String literals)
                 {
+                    final DocumentRestrictions dr = (wellFormed? DocumentRestrictions.wellFormed() : DocumentRestrictions.none());
                     final StringWriter sw = new StringWriter(); 
-                    final IAttoHandler handler = new TracingStandardMarkupAttoHandler(sw, wellFormed);
+                    final IAttoHandler handler = new TracingStandardMarkupAttoHandler(sw, dr);
                     if (offset == 0 && len == input.length) {
                         ((AbstractBufferedAttoParser)parser).parseDocument(new CharArrayReader(input), handler, bufferSize);
                     } else { 
