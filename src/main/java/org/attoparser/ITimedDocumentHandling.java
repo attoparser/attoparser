@@ -22,6 +22,13 @@ package org.attoparser;
 
 
 /**
+ * <p>
+ *   Handler feature interface to be implemented by {@link IAttoHandler} implementations
+ *   that time their execution.
+ * </p>
+ * <p>
+ *   All times are taken in nanoseconds.
+ * </p>
  * 
  * @author Daniel Fern&aacute;ndez
  * 
@@ -30,15 +37,55 @@ package org.attoparser;
  */
 public interface ITimedDocumentHandling {
 
-    public void handleDocumentStart(final long startTimeNanos) throws AttoParseException;
     
+    /**
+     * <p>
+     *   Called at the beginning of document parsing, adding timing information.
+     * </p>
+     * 
+     * @param startTimeNanos the current time (in nanoseconds) obtained when parsing starts.
+     * @throws AttoParseException
+     */
+    public void handleDocumentStart(final long startTimeNanos) throws AttoParseException;
+
+    /**
+     * <p>
+     *   Called at the end of document parsing, adding timing information.
+     * </p>
+     * 
+     * @param endTimeNanos the current time (in nanoseconds) obtained when parsing ends.
+     * @param totalTimeNanos the difference between current times at the start and end of
+     *        parsing (in nanoseconds)
+     * @throws AttoParseException
+     */
     public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos) throws AttoParseException;
     
 
+    /**
+     * <p>
+     *   Return the current time (in nanoseconds) obtained when parsing starts.
+     * </p>
+     * 
+     * @return the start time in nanos.
+     */
     public long getStartTimeNanos();
-    
+
+    /**
+     * <p>
+     *   Return the current time (in nanoseconds) obtained when parsing ends.
+     * </p>
+     * 
+     * @return the end time in nanos.
+     */
     public long getEndTimeNanos();
-    
+
+    /**
+     * <p>
+     *   Return the difference (in nanoseconds) between parsing start and end times.
+     * </p>
+     * 
+     * @return the difference between parsing start and end times.
+     */
     public long getTotalTimeNanos();
     
 }

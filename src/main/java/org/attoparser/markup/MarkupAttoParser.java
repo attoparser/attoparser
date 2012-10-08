@@ -26,6 +26,26 @@ import org.attoparser.IAttoHandler;
 
 
 /**
+ * <p>
+ *   Default implementation of the {@link org.attoparser.IAttoParser} interface, able of
+ *   parsing XML and HTML markup.
+ * </p>
+ * <p>
+ *   This parser reports as <i>structures</i>:
+ * </p>
+ * <ul>
+ *   <li><b>Tags (a.k.a. <i>elements</i>)</b>: <tt>&lt;body&gt;</tt>, <tt>&lt;img/&gt;</tt>, 
+ *       <tt>&lt;div class="content"&gt;</tt>, etc.</li>
+ *   <li><b>Comments</b>: <tt>&lt;!-- this is a comment --&gt;</tt></li>
+ *   <li><b>CDATA sections</b>: <tt>&lt;![CDATA[ ... ]]&gt;</tt></li>
+ *   <li><b>DOCTYPE clauses</b>: <tt>&lt;!DOCTYPE html&gt;</tt></li>
+ *   <li><b>XML Declarations</b>: <tt>&lt;?xml version="1.0"?&gt;</tt></li>
+ *   <li><b>Processing Instructions</b>: <tt>&lt;?xsl-stylesheet ...?&gt;</tt></li>
+ * </ul>
+ * <p>
+ *   This parser class is <b>thread-safe</b>. But take into account that, usually, the 
+ *   {@link IAttoHandler} implementations passed to parsers for event handling are not.
+ * </p>
  * 
  * @author Daniel Fern&aacute;ndez
  * 
@@ -36,6 +56,11 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
 
 
     
+    /**
+     * <p>
+     *   Creates a new instance of this parser.
+     * </p>
+     */
     public MarkupAttoParser() {
         super();
     }

@@ -27,6 +27,47 @@ import org.attoparser.AttoParseException;
 
 
 /**
+ * <p>
+ *   Base abstract implementations for markup-specialized attohandlers that not only differentiate
+ *   among the different types of markup structures (as its superclass {@link AbstractBasicMarkupAttoHandler}
+ *   does), but also divide both elements (<i>tags</i>) and DOCTYPE clauses into its components, lauching
+ *   different events for them.
+ * </p>
+ * <p>
+ *   Handlers extending from this class can require the parsed document to be <b>well-formed</b> by
+ *   setting the <tt>requireWellFormed</tt> to <tt>true</tt> when creating the handler instances. Requiring
+ *   well-formedness of the parsed markup will make the parser raise exceptions if any of the following requirements
+ *   is not met:
+ * </p>
+ * <ul>
+ *   <li><i>Document prolog</i> is well-formed: only one optional XML Declaration, followed by
+ *       only one optional DOCTYPE clause, followed by only one required root element (with any number
+ *       of comments among them).</li>
+ *   <li>All attribute values have to be surrounded by commas (double or single).</li>
+ *   <li>No element can have repeated attributes.</li>
+ *   <li>Elements are correctly nested, and no <i>open element</i> lacks its corresponding 
+ *       <i>close element</i>.</li>
+ * </ul>
+ * <p>
+ *   As for structures, this implementation differentiates among:
+ * </p>
+ * <ul>
+ *   <li><b>Tags (a.k.a. <i>elements</i>)</b>: <tt>&lt;body&gt;</tt>, <tt>&lt;img/&gt;</tt>, 
+ *       <tt>&lt;div class="content"&gt;</tt>, etc. Divided into:
+ *       <ul>
+ *         <li>Standalone elements: <b>start</b>, <b>name</b>, <b>attribute</b>,
+ *             <b>attribute separator</b> (whitespace) and <b>end</b>.</li>
+ *         <li>Open elements: <b>start</b>, <b>name</b>, <b>attribute</b>,
+ *             <b>attribute separator</b> (whitespace) and <b>end</b>.</li>
+ *         <li>Close elements: <b>start</b>, <b>name</b> and <b>end</b>.</li>
+ *       </ul>
+ *   </li>
+ *   <li><b>Comments</b>: <tt>&lt;!-- this is a comment --&gt;</tt></li>
+ *   <li><b>CDATA sections</b>: <tt>&lt;![CDATA[ ... ]]&gt;</tt></li>
+ *   <li><b>DOCTYPE clauses</b>: <tt>&lt;!DOCTYPE html&gt;</tt></li>
+ *   <li><b>XML Declarations</b>: <tt>&lt;?xml version="1.0"?&gt;</tt></li>
+ *   <li><b>Processing Instructions</b>: <tt>&lt;?xsl-stylesheet ...?&gt;</tt></li>
+ * </ul>
  * 
  * @author Daniel Fern&aacute;ndez
  * 
@@ -176,6 +217,53 @@ public abstract class AbstractDetailedMarkupAttoHandler
     
 
     
+    /**
+     * <p>
+     *   Called when a XML Declaration is found when using a handler extending from
+     *   {@link AbstractDetailedMarkupAttoHandler}.
+     * </p>
+     * <p>
+     *   Five [offset, len] pairs are provided for five partitions (<i>outer</i>,
+     *   <i>keyword</i>, <i>version</i>, <i>encoding</i> and <i>standalone</i>):
+     * </p>
+     * <p>
+     *   <tt>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;</tt><br />
+     *   <tt><b>|&nbsp;[K]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[V]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ENC]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[S]&nbsp;&nbsp;|</b></tt><br />
+     *   <tt><b>[OUTER------------------------------------------------]</b></tt>
+     * </p>
+     * <p>
+     *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
+     *   should not be considered to be immutable, so reported structures should be copied if they need
+     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
+     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification). 
+     * </p>
+     * <p>
+     *   <b>Implementations of this handler should never modify the document buffer.</b> 
+     * </p>
+     * 
+     * @param buffer the document buffer (not copied)
+     * @param keywordOffset offset for the <i>keyword</i> partition.
+     * @param keywordLen length of the <i>keyword</i> partition.
+     * @param keywordLine the line in the original document where the <i>keyword</i> partition starts.
+     * @param keywordCol the column in the original document where the <i>keyword</i> partition starts.
+     * @param versionOffset offset for the <i>version</i> partition.
+     * @param versionLen length of the <i>version</i> partition.
+     * @param versionLine the line in the original document where the <i>version</i> partition starts.
+     * @param versionCol the column in the original document where the <i>version</i> partition starts.
+     * @param encodingOffset offset for the <i>encoding</i> partition.
+     * @param encodingLen length of the <i>encoding</i> partition.
+     * @param encodingLine the line in the original document where the <i>encoding</i> partition starts.
+     * @param encodingCol the column in the original document where the <i>encoding</i> partition starts.
+     * @param standaloneOffset offset for the <i>standalone</i> partition.
+     * @param standaloneLen length of the <i>standalone</i> partition.
+     * @param standaloneLine the line in the original document where the <i>standalone</i> partition starts.
+     * @param standaloneCol the column in the original document where the <i>standalone</i> partition starts.
+     * @param outerOffset offset for the <i>outer</i> partition.
+     * @param outerLen length of the <i>outer</i> partition.
+     * @param line the line in the original document where this artifact starts.
+     * @param col the column in the original document where this artifact starts.
+     * @throws AttoParseException
+     */
     @SuppressWarnings("unused")
     public void handleXmlDeclarationDetail(
             final char[] buffer, 

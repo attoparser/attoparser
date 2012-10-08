@@ -23,6 +23,10 @@ import org.attoparser.AttoParseException;
 
 
 /**
+ * <p>
+ *   Handler feature interface to be implemented by {@link org.attoparser.IAttoHandler} implementations
+ *   that offer reporting of CDATA sections.
+ * </p>
  * 
  * @author Daniel Fern&aacute;ndez
  * 
@@ -31,6 +35,38 @@ import org.attoparser.AttoParseException;
  */
 public interface ICDATASectionHandling {
 
+    
+    /**
+     * <p>
+     *   Called when a CDATA section is found.
+     * </p>
+     * <p>
+     *   Two [offset, len] pairs are provided for two partitions (<i>outer</i> and <i>content</i>):
+     * </p>
+     * <p>
+     *   <tt>&lt;![CDATA[ this is a CDATA section ]]&gt;</tt><br />
+     *   <tt><b>|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[CONTENT----------------]&nbsp;&nbsp;|</b></tt><br />
+     *   <tt><b>[OUTER------------------------------]</b></tt>
+     * </p>
+     * <p>
+     *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
+     *   should not be considered to be immutable, so reported structures should be copied if they need
+     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
+     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification). 
+     * </p>
+     * <p>
+     *   <b>Implementations of this handler should never modify the document buffer.</b> 
+     * </p>
+     * 
+     * @param buffer the document buffer (not copied)
+     * @param contentOffset offset for the <i>content</i> partition.
+     * @param contentLen length of the <i>content</i> partition.
+     * @param outerOffset offset for the <i>outer</i> partition.
+     * @param outerLen length of the <i>outer</i> partition.
+     * @param line the line in the original document where this artifact starts.
+     * @param col the column in the original document where this artifact starts.
+     * @throws AttoParseException
+     */
     public void handleCDATASection(
             final char[] buffer, 
             final int contentOffset, final int contentLen,

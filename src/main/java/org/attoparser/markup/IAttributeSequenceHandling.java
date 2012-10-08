@@ -23,6 +23,10 @@ import org.attoparser.AttoParseException;
 
 
 /**
+ * <p>
+ *   Handler feature interface to be implemented by {@link org.attoparser.IAttoHandler} implementations
+ *   that offer detailed reporting of DOCTYPE clauses (typically inside <i>elements</i>).
+ * </p>
  * 
  * @author Daniel Fern&aacute;ndez
  * 
@@ -33,6 +37,47 @@ public interface IAttributeSequenceHandling {
 
     
     
+    /**
+     * <p>
+     *   Called when an attribute is found.
+     * </p>
+     * <p>
+     *   Three [offset, len] pairs are provided for three partitions (<i>name</i>,
+     *   <i>operator</i>, <i>valueContent</i> and <i>valueOuter</i>):
+     * </p>
+     * <p>
+     *   <tt>class="basic_column"</tt><br />
+     *   <tt><b>[NAM]*&nbsp;[VALUECONTE]|   (*) = [OPERATOR]</b></tt><br />
+     *   <tt><b>|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[VALUEOUTER--]</b></tt><br />
+     *   <tt><b>[OUTER-------------]</b></tt>
+     * </p>
+     * <p>
+     *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
+     *   should not be considered to be immutable, so reported structures should be copied if they need
+     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
+     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification). 
+     * </p>
+     * <p>
+     *   <b>Implementations of this handler should never modify the document buffer.</b> 
+     * </p>
+     * 
+     * @param buffer the document buffer (not copied)
+     * @param nameOffset offset for the <i>name</i> partition.
+     * @param nameLen length of the <i>name</i> partition.
+     * @param nameLine the line in the original document where the <i>name</i> partition starts.
+     * @param nameCol the column in the original document where the <i>name</i> partition starts.
+     * @param operatorOffset offset for the <i>operator</i> partition.
+     * @param operatorLen length of the <i>operator</i> partition.
+     * @param operatorLine the line in the original document where the <i>operator</i> partition starts.
+     * @param operatorCol the column in the original document where the <i>operator</i> partition starts.
+     * @param valueContentOffset offset for the <i>valueContent</i> partition.
+     * @param valueContentLen length of the <i>valueContent</i> partition.
+     * @param valueOuterOffset offset for the <i>valueOuter</i> partition.
+     * @param valueOuterLen length of the <i>valueOuter</i> partition.
+     * @param valueLine the line in the original document where the <i>value</i> (outer) partition starts.
+     * @param valueCol the column in the original document where the <i>value</i> (outer) partition starts.
+     * @throws AttoParseException
+     */
     public void handleAttribute(
             final char[] buffer,
             final int nameOffset, final int nameLen,
@@ -45,6 +90,35 @@ public interface IAttributeSequenceHandling {
             throws AttoParseException;
 
     
+    /**
+     * <p>
+     *   Called when a separation between attributes is found.
+     * </p>
+     * <p>
+     *   This attribute separators can contain any amount of whitespace, including
+     *   line feeds:
+     * </p>
+     * <p>
+     *   <tt>&lt;div id="main"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;class="basic_column"&gt;</tt><br />
+     *   <tt><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ATTSEP]</b></tt><br />
+     * </p>
+     * <p>
+     *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
+     *   should not be considered to be immutable, so reported structures should be copied if they need
+     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
+     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification). 
+     * </p>
+     * <p>
+     *   <b>Implementations of this handler should never modify the document buffer.</b> 
+     * </p>
+     * 
+     * @param buffer the document buffer (not copied)
+     * @param offset offset for the artifact.
+     * @param len length of the artifact.
+     * @param line the line in the original document where the artifact starts.
+     * @param col the column in the original document where the artifact starts.
+     * @throws AttoParseException
+     */
     public void handleAttributeSeparator(
             final char[] buffer, 
             final int offset, final int len,

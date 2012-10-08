@@ -27,6 +27,24 @@ import org.attoparser.AttoParseException;
 
 
 /**
+ * <p>
+ *   Base abstract implementations for markup-specialized attohandlers that need differentiation
+ *   among the different types of markup structures.
+ * </p>
+ * <p>
+ *   This implementation differentiates among:
+ * </p>
+ * <ul>
+ *   <li><b>Tags (a.k.a. <i>elements</i>)</b>: <tt>&lt;body&gt;</tt>, <tt>&lt;img/&gt;</tt>, 
+ *       <tt>&lt;div class="content"&gt;</tt>, etc. (note that elemens are returned as a whole,
+ *       without differentiating their arguments)</li>
+ *   <li><b>Comments</b>: <tt>&lt;!-- this is a comment --&gt;</tt></li>
+ *   <li><b>CDATA sections</b>: <tt>&lt;![CDATA[ ... ]]&gt;</tt></li>
+ *   <li><b>DOCTYPE clauses</b>: <tt>&lt;!DOCTYPE html&gt;</tt></li>
+ *   <li><b>XML Declarations</b>: <tt>&lt;?xml version="1.0"?&gt;</tt></li>
+ *   <li><b>Processing Instructions</b>: <tt>&lt;?xsl-stylesheet ...?&gt;</tt></li>
+ * </ul>
+ * 
  * 
  * @author Daniel Fern&aacute;ndez
  * 
@@ -86,7 +104,7 @@ public abstract class AbstractBasicMarkupAttoHandler
     }
     
     
-    
+
     public void handleStandaloneElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
