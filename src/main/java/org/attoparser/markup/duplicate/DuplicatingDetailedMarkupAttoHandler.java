@@ -23,6 +23,7 @@ import java.io.Writer;
 
 import org.attoparser.AttoParseException;
 import org.attoparser.markup.AbstractDetailedMarkupAttoHandler;
+import org.attoparser.markup.DocumentRestrictions;
 
 
 
@@ -41,11 +42,12 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
     
     public DuplicatingDetailedMarkupAttoHandler(final Writer writer) {
-        this(writer, false);
+        super();
+        this.writer = writer;
     }
     
-    public DuplicatingDetailedMarkupAttoHandler(final Writer writer, final boolean wellFormed) {
-        super(wellFormed);
+    public DuplicatingDetailedMarkupAttoHandler(final Writer writer, final DocumentRestrictions documentRestrictions) {
+        super(documentRestrictions);
         this.writer = writer;
     }
     

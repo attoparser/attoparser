@@ -78,14 +78,24 @@ public abstract class AbstractDetailedMarkupAttoHandler
         extends AbstractBasicMarkupAttoHandler
         implements IDetailedElementHandling, IDetailedDocTypeHandling {
 
+    private static final DocumentRestrictions RESTRICTIONS_NONE = DocumentRestrictions.none(); 
     
-    private final WellFormedWrapper wrapper;
+    private final RestrictedWrapper wrapper;
     
     
-    protected AbstractDetailedMarkupAttoHandler(final boolean requireWellFormed) {
-        super();
-        this.wrapper = new WellFormedWrapper(this, requireWellFormed);
+    
+    
+    protected AbstractDetailedMarkupAttoHandler() {
+        this(RESTRICTIONS_NONE);
     }
+
+    
+    protected AbstractDetailedMarkupAttoHandler(final DocumentRestrictions documentRestrictions) {
+        super();
+        this.wrapper = new RestrictedWrapper(this, documentRestrictions);
+    }
+
+    
 
 
     
@@ -419,7 +429,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
     
     
     
-    static final class WellFormedWrapper
+    static final class RestrictedWrapper
             implements IDetailedElementHandling, IDetailedDocTypeHandling {
         
         private static final int DEFAULT_STACK_SIZE = 15;
@@ -428,7 +438,11 @@ public abstract class AbstractDetailedMarkupAttoHandler
         
         private final AbstractDetailedMarkupAttoHandler handler;
 
-        
+        private final boolean requireBalancedElements;
+        private final boolean requireWellFormedProlog;
+        private final boolean requireUniqueRootElement;
+        private final boolean requireWellFormedAttributeValues;
+        private final boolean requireUniqueAttributesInElement;
         private final boolean requireWellFormed;
         
         private char[][] elementStack;
@@ -443,14 +457,27 @@ public abstract class AbstractDetailedMarkupAttoHandler
         
         
         
-        WellFormedWrapper(final AbstractDetailedMarkupAttoHandler handler, final boolean requireWellFormed) {
+        RestrictedWrapper(final AbstractDetailedMarkupAttoHandler handler, final DocumentRestrictions wellFormednessSpec) {
+            
             super();
+            
             this.handler = handler;
-            this.requireWellFormed = requireWellFormed;
+            
+            this.requireBalancedElements = wellFormednessSpec.getRequireBalancedElements();
+            this.requireWellFormedProlog = wellFormednessSpec.getRequireWellFormedProlog();
+            this.requireUniqueRootElement = wellFormednessSpec.getRequireUniqueRootElement();
+            this.requireWellFormedAttributeValues = wellFormednessSpec.getRequireWellFormedAttributeValues();
+            this.requireUniqueAttributesInElement = wellFormednessSpec.getRequireUniqueAttributesInElement();
+            
+            this.requireWellFormed = 
+                    (this.requireBalancedElements || this.requireWellFormedProlog || this.requireUniqueRootElement ||
+                     this.requireWellFormedAttributeValues || this.requireUniqueAttributesInElement);
+            
             if (this.requireWellFormed) {
                 this.elementStack = new char[DEFAULT_STACK_SIZE][];
                 this.elementStackSize = 0;
             }
+            
         }
 
         
@@ -464,14 +491,14 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 throws AttoParseException {
             
             if (this.requireWellFormed) {
-                if (this.elementStackSize > 0) {
+                if (this.requireBalancedElements && this.elementStackSize > 0) {
                     final char[] popped = popFromStack();
                     throw new AttoParseException(
                         "Malformed markup: element " +
                         "\"" + new String(popped, 0, popped.length) + "\"" +
                         " is never closed (no closing tag at the end of document)");
                 }
-                if (!this.elementRead) {
+                if (this.requireUniqueRootElement && !this.elementRead) {
                     throw new AttoParseException(
                             "Malformed markup: no root element present");
                 }
@@ -498,17 +525,17 @@ public abstract class AbstractDetailedMarkupAttoHandler
             
             if (this.requireWellFormed) {
                 
-                if (this.xmlDeclarationRead) {
+                if (this.requireWellFormedProlog && this.xmlDeclarationRead) {
                     throw new AttoParseException(
                             "Malformed markup: Only one XML Declaration can appear in document",
                             line, col);
                 }
-                if (this.docTypeRead) {
+                if (this.requireWellFormedProlog && this.docTypeRead) {
                     throw new AttoParseException(
                             "Malformed markup: XML Declaration must appear before DOCTYPE",
                             line, col);
                 }
-                if (this.elementRead) {
+                if (this.requireWellFormedProlog && this.elementRead) {
                     throw new AttoParseException(
                             "Malformed markup: XML Declaration must appear before any " +
                             "elements in document",
@@ -548,13 +575,13 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 
                 if (this.elementStackSize == 0) {
                     
-                    if (this.elementRead) {
+                    if (this.requireUniqueRootElement && this.elementRead) {
                         throw new AttoParseException(
                                 "Malformed markup: Only one root element is allowed",
                                 line, col);
                     }
 
-                    if (this.docTypeRead) {
+                    if (this.requireWellFormedProlog && this.docTypeRead) {
                         boolean matches = (this.rootElementName.length == len);
                         for (int i = 0; matches && i < len; i++) {
                             if (buffer[offset + i] != this.rootElementName[i]) {
@@ -615,13 +642,13 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 
                 if (this.elementStackSize == 0) {
                     
-                    if (this.elementRead) {
+                    if (this.requireUniqueRootElement && this.elementRead) {
                         throw new AttoParseException(
                                 "Malformed markup: Only one root element is allowed",
                                 line, col);
                     }
 
-                    if (this.docTypeRead) {
+                    if (this.requireWellFormedProlog && this.docTypeRead) {
                         boolean matches = (this.rootElementName.length == len);
                         for (int i = 0; matches && i < len; i++) {
                             if (buffer[offset + i] != this.rootElementName[i]) {
@@ -645,7 +672,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
             
             this.handler.handleOpenElementName(buffer, offset, len, line, col);
             
-            if (this.requireWellFormed) {
+            if (this.requireBalancedElements) {
                 addToStack(buffer, offset, len);
             }
             
@@ -682,8 +709,10 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 throws AttoParseException {
             
             if (this.requireWellFormed) {
-                
-                checkStackForElement(buffer, offset, len, line, col);
+
+                if (this.requireBalancedElements) {
+                    checkStackForElement(buffer, offset, len, line, col);
+                }
                 
                 this.currentElementAttributeNames = null;
                 this.currentElementAttributeNamesSize = 0;
@@ -719,55 +748,63 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 throws AttoParseException {
             
             if (this.requireWellFormed) {
-                
-                // Check attribute name is unique in this element
-                if (this.currentElementAttributeNames == null) {
-                    // we only create this structure if there is at least one attribute
-                    this.currentElementAttributeNames = new char[DEFAULT_ATTRIBUTE_NAMES_SIZE][];
-                }
-                for (int i = 0; i < this.currentElementAttributeNamesSize; i++) {
-                    if (this.currentElementAttributeNames[i].length != nameLen) {
-                        continue;
+
+                if (this.requireUniqueAttributesInElement) {
+                    
+                    // Check attribute name is unique in this element
+                    if (this.currentElementAttributeNames == null) {
+                        // we only create this structure if there is at least one attribute
+                        this.currentElementAttributeNames = new char[DEFAULT_ATTRIBUTE_NAMES_SIZE][];
                     }
-                    int j;
-                    for (j = 0; j < nameLen; j++) {
-                        if (this.currentElementAttributeNames[i][j] != buffer[nameOffset + j]) {
-                            break;
+                    for (int i = 0; i < this.currentElementAttributeNamesSize; i++) {
+                        if (this.currentElementAttributeNames[i].length != nameLen) {
+                            continue;
+                        }
+                        int j;
+                        for (j = 0; j < nameLen; j++) {
+                            if (this.currentElementAttributeNames[i][j] != buffer[nameOffset + j]) {
+                                break;
+                            }
+                        }
+                        if (j == nameLen) {
+                            throw new AttoParseException(
+                                "Malformed markup: Attribute \"" + new String(buffer, nameOffset, nameLen) + "\" " +
+                                "appears more than once in element", 
+                                nameLine, nameCol);
                         }
                     }
-                    if (j == nameLen) {
-                        throw new AttoParseException(
-                            "Malformed markup: Attribute \"" + new String(buffer, nameOffset, nameLen) + "\" " +
-                            "appears more than once in element", 
-                            nameLine, nameCol);
+                    if (this.currentElementAttributeNamesSize == this.currentElementAttributeNames.length) {
+                        // we need to grow the array!
+                        final char[][] newCurrentElementAttributeNames = new char[this.currentElementAttributeNames.length * 2][];
+                        System.arraycopy(this.currentElementAttributeNames, 0, newCurrentElementAttributeNames, 0, this.currentElementAttributeNames.length);
+                        this.currentElementAttributeNames = newCurrentElementAttributeNames;
                     }
+                    this.currentElementAttributeNames[this.currentElementAttributeNamesSize] = new char[nameLen];
+                    System.arraycopy(buffer, nameOffset, this.currentElementAttributeNames[this.currentElementAttributeNamesSize], 0, nameLen);
+                    this.currentElementAttributeNamesSize++;
+                    
                 }
-                if (this.currentElementAttributeNamesSize == this.currentElementAttributeNames.length) {
-                    // we need to grow the array!
-                    final char[][] newCurrentElementAttributeNames = new char[this.currentElementAttributeNames.length * 2][];
-                    System.arraycopy(this.currentElementAttributeNames, 0, newCurrentElementAttributeNames, 0, this.currentElementAttributeNames.length);
-                    this.currentElementAttributeNames = newCurrentElementAttributeNames;
-                }
-                this.currentElementAttributeNames[this.currentElementAttributeNamesSize] = new char[nameLen];
-                System.arraycopy(buffer, nameOffset, this.currentElementAttributeNames[this.currentElementAttributeNamesSize], 0, nameLen);
-                this.currentElementAttributeNamesSize++;
+
                 
-                
-                // Check there is an operator
-                if (operatorLen == 0)  {
-                    throw new AttoParseException(
-                            "Malformed markup: Value for attribute \"" + new String(buffer, nameOffset, nameLen) + "\" " +
-                            "must include an equals (=) sign and a value surrounded by commas", 
-                            operatorLine, operatorCol);
-                }
-                
-                
-                // Check attribute is surrounded by commas (double or single)
-                if (valueOuterLen == 0 || valueOuterLen == valueContentLen)  {
-                    throw new AttoParseException(
-                            "Malformed markup: Value for attribute \"" + new String(buffer, nameOffset, nameLen) + "\" " +
-                            "must be surrounded by commas", 
-                            valueLine, valueCol);
+                if (this.requireWellFormedAttributeValues) {
+                    
+                    // Check there is an operator
+                    if (operatorLen == 0)  {
+                        throw new AttoParseException(
+                                "Malformed markup: Value for attribute \"" + new String(buffer, nameOffset, nameLen) + "\" " +
+                                "must include an equals (=) sign and a value surrounded by commas", 
+                                operatorLine, operatorCol);
+                    }
+                    
+                    
+                    // Check attribute is surrounded by commas (double or single)
+                    if (valueOuterLen == 0 || valueOuterLen == valueContentLen)  {
+                        throw new AttoParseException(
+                                "Malformed markup: Value for attribute \"" + new String(buffer, nameOffset, nameLen) + "\" " +
+                                "must be surrounded by commas", 
+                                valueLine, valueCol);
+                    }
+                    
                 }
                 
             }
@@ -814,13 +851,13 @@ public abstract class AbstractDetailedMarkupAttoHandler
             
             if (this.requireWellFormed) {
                 
-                if (this.docTypeRead) {
+                if (this.requireWellFormedProlog && this.docTypeRead) {
                     throw new AttoParseException(
                             "Malformed markup: Only one DOCTYPE clause can appear in document",
                             outerLine, outerCol);
                 }
                 
-                if (this.elementRead) {
+                if (this.requireWellFormedProlog && this.elementRead) {
                     throw new AttoParseException(
                             "Malformed markup: DOCTYPE must appear before any " +
                             "elements in document",

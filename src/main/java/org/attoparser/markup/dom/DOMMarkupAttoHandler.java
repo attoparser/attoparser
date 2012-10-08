@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.attoparser.AttoParseException;
 import org.attoparser.markup.AbstractStandardMarkupAttoHandler;
+import org.attoparser.markup.DocumentRestrictions;
 
 
 
@@ -52,7 +53,8 @@ public final class DOMMarkupAttoHandler extends AbstractStandardMarkupAttoHandle
 
     
     public DOMMarkupAttoHandler() {
-        super(true /* well-formed */);
+        // Must be well-formed in order to create an adequate DOM tree
+        super(DocumentRestrictions.wellFormed());
     }
 
     

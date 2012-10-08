@@ -48,9 +48,16 @@ public abstract class AbstractStandardMarkupAttoHandler
     
     
     
-    protected AbstractStandardMarkupAttoHandler(final boolean wellFormed) {
-        super(wellFormed);
+    
+    
+    protected AbstractStandardMarkupAttoHandler() {
+        super();
     }
+    
+    protected AbstractStandardMarkupAttoHandler(final DocumentRestrictions documentRestrictions) {
+        super(documentRestrictions);
+    }
+    
     
 
     @Override

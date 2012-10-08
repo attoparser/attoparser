@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.attoparser.AttoParseException;
 import org.attoparser.markup.AbstractStandardMarkupAttoHandler;
+import org.attoparser.markup.DocumentRestrictions;
 
 
 
@@ -43,11 +44,12 @@ public final class TracingStandardMarkupAttoHandler extends AbstractStandardMark
 
     
     public TracingStandardMarkupAttoHandler(final Writer writer) {
-        this(writer, false);
+        super();
+        this.writer = writer;
     }
     
-    public TracingStandardMarkupAttoHandler(final Writer writer, final boolean wellFormed) {
-        super(wellFormed);
+    public TracingStandardMarkupAttoHandler(final Writer writer, final DocumentRestrictions documentRestrictions) {
+        super(documentRestrictions);
         this.writer = writer;
     }
     
