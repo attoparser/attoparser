@@ -55,7 +55,7 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
     
     
     @Override
-    public void handleDocumentStart(final long startTimeNanos, final boolean requireWellFormed)
+    public void handleDocumentStart(final long startTimeNanos, final DocumentRestrictions documentRestrictions)
             throws AttoParseException {
         try {
             this.writer.write('[');
@@ -67,7 +67,7 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
     
     
     @Override
-    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final boolean requireWellFormed)
+    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final DocumentRestrictions documentRestrictions)
             throws AttoParseException {
         try {
             this.writer.write(']');

@@ -34,20 +34,10 @@ import org.attoparser.AttoParseException;
  *   different events for them.
  * </p>
  * <p>
- *   Handlers extending from this class can require the parsed document to be <b>well-formed</b> by
- *   setting the <tt>requireWellFormed</tt> to <tt>true</tt> when creating the handler instances. Requiring
- *   well-formedness of the parsed markup will make the parser raise exceptions if any of the following requirements
- *   is not met:
+ *   Handlers extending from this class can make use of a {@link DocumentRestrictions} instance
+ *   specifying a set of restrictions to be applied during document parsing (for example, 
+ *   for ensuring that a document is well-formed from an XML/XHTML standpoint).
  * </p>
- * <ul>
- *   <li><i>Document prolog</i> is well-formed: only one optional XML Declaration, followed by
- *       only one optional DOCTYPE clause, followed by only one required root element (with any number
- *       of comments among them).</li>
- *   <li>All attribute values have to be surrounded by commas (double or single).</li>
- *   <li>No element can have repeated attributes.</li>
- *   <li>Elements are correctly nested, and no <i>open element</i> lacks its corresponding 
- *       <i>close element</i>.</li>
- * </ul>
  * <p>
  *   As for structures, this implementation differentiates among:
  * </p>
@@ -213,14 +203,14 @@ public abstract class AbstractDetailedMarkupAttoHandler
     
 
     @SuppressWarnings("unused")
-    public void handleDocumentStart(final long startTimeNanos, final boolean requireWellFormed)
+    public void handleDocumentStart(final long startTimeNanos, final DocumentRestrictions documentRestrictions)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
 
 
     @SuppressWarnings("unused")
-    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final boolean requireWellFormed)
+    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final DocumentRestrictions documentRestrictions)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
@@ -438,6 +428,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
         
         private final AbstractDetailedMarkupAttoHandler handler;
 
+        private final DocumentRestrictions documentRestrictions; 
+        
         private final boolean requireBalancedElements;
         private final boolean requireWellFormedProlog;
         private final boolean requireUniqueRootElement;
@@ -464,6 +456,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
             super();
             
             this.handler = handler;
+            this.documentRestrictions = documentRestrictions;
             
             this.requireBalancedElements = documentRestrictions.getRequireBalancedElements();
             this.requireWellFormedProlog = documentRestrictions.getRequireWellFormedProlog();
@@ -487,7 +480,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
         
         public void handleDocumentStart(final long startTimeNanos)
                 throws AttoParseException {
-            this.handler.handleDocumentStart(startTimeNanos, this.requireWellFormed);
+            this.handler.handleDocumentStart(startTimeNanos, this.documentRestrictions);
         }
 
 
@@ -508,7 +501,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 }
             }
             
-            this.handler.handleDocumentEnd(endTimeNanos, totalTimeNanos, this.requireWellFormed);
+            this.handler.handleDocumentEnd(endTimeNanos, totalTimeNanos, this.documentRestrictions);
             
         }
 

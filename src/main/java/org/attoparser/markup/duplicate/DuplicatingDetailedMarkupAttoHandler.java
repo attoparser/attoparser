@@ -55,7 +55,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
     
     
     @Override
-    public void handleDocumentStart(final long startTimeNanos, final boolean requireWellFormed)
+    public void handleDocumentStart(final long startTimeNanos, final DocumentRestrictions documentRestrictions)
             throws AttoParseException {
         // Nothing to be done here
     }
@@ -63,7 +63,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
     
     
     @Override
-    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final boolean requireWellFormed)
+    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final DocumentRestrictions documentRestrictions)
             throws AttoParseException {
         // Nothing to be done here
     }

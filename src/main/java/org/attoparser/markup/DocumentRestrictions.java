@@ -27,6 +27,29 @@ import java.io.Serializable;
 
 
 /**
+ * <p>
+ *   Models a series of restrictions that can be applied during document parsing
+ *   by subclasses of {@link AbstractDetailedMarkupAttoHandler}.
+ * </p>
+ * <p>
+ *   A fixed set of these restrictions can be used for checking the well-formedness
+ *   (from an XML/XHTML standpoint) of a document:
+ * </p>
+ * <ul>
+ *   <li><tt>requireBalancedElements</tt>: Elements are correctly nested, and no <i>open element</i> lacks its corresponding 
+ *       <i>close element</i>.</li>
+ *   <li><tt>requireUniqueRootElement</tt>: Require the existance of only one element at root level.</li>
+ *   <li><tt>requireWellFormedProlog</tt>: <i>Document prolog</i> is well-formed: only one optional XML Declaration, followed by
+ *       only one optional DOCTYPE clause, followed by only one required root element (with any number
+ *       of comments among them).</li>
+ *   <li><tt>requireWellFormedAttributeValues</tt>: All attribute values must have an equals sign (=) and must be surrounded 
+ *       by commas (double or single).</li>
+ *   <li><tt>requireUniqueAttributesInElement</tt>: No element can have repeated attributes.</li>
+ * </ul>
+ * <p>
+ *   Besides these well-formedness related restrictions, there is also a <tt>requireNoProlog</tt>
+ *   restriction that ensures no XML Declaration or DOCTYPE clause appears in the parsed document.
+ * </p>
  * 
  * 
  * @author Daniel Fern&aacute;ndez
@@ -50,7 +73,14 @@ public final class DocumentRestrictions implements Serializable {
 
 
     
-    
+
+    /**
+     * <p>
+     *   Creates a {@link DocumentRestrictions} instance enforcing no restrictions at all.
+     * </p>
+     * 
+     * @return the new instance.
+     */
     public static DocumentRestrictions none() {
         final DocumentRestrictions spec = new DocumentRestrictions();
         spec.requireBalancedElements = false;
@@ -62,7 +92,18 @@ public final class DocumentRestrictions implements Serializable {
         return spec;
     }
 
-    
+
+    /**
+     * <p>
+     *   Creates a {@link DocumentRestrictions} instance enforcing the set of restrictions
+     *   that check the well-formedness (from an XML/XHTML standpoint): 
+     *   <tt>requireBalancedElements</tt>, <tt>requireWellFormedProlog</tt>,
+     *   <tt>requireUniqueRootElement</tt>, <tt>requireWellFormedAttributeValues</tt>
+     *   and <tt>requireUniqueAttributesInElement</tt>. 
+     * </p>
+     * 
+     * @return the new instance.
+     */
     public static DocumentRestrictions wellFormed() {
         final DocumentRestrictions spec = new DocumentRestrictions();
         spec.requireBalancedElements = true;

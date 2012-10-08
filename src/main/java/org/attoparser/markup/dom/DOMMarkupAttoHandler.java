@@ -86,10 +86,10 @@ public final class DOMMarkupAttoHandler extends AbstractStandardMarkupAttoHandle
 
     @Override
     public void handleDocumentStart(
-            final long startTimeNanos, final boolean requireWellFormed) 
+            final long startTimeNanos, final DocumentRestrictions documentRestrictions) 
             throws AttoParseException {
         
-        super.handleDocumentStart(startTimeNanos, requireWellFormed);
+        super.handleDocumentStart(startTimeNanos, documentRestrictions);
         
         this.document = new Document();
         this.parsingStartTimeNanos = startTimeNanos;
@@ -100,11 +100,11 @@ public final class DOMMarkupAttoHandler extends AbstractStandardMarkupAttoHandle
     
     @Override
     public void handleDocumentEnd(
-            final long endTimeNanos, final long totalTimeNanos,
-            final boolean requireWellFormed)
+            final long endTimeNanos, final long totalTimeNanos, 
+            final DocumentRestrictions documentRestrictions)
             throws AttoParseException {
 
-        super.handleDocumentEnd(endTimeNanos, totalTimeNanos, requireWellFormed);
+        super.handleDocumentEnd(endTimeNanos, totalTimeNanos, documentRestrictions);
         
         this.parsingEndTimeNanos = endTimeNanos;
         this.parsingTotalTimeNanos = totalTimeNanos;

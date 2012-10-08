@@ -57,7 +57,7 @@ public final class TracingStandardMarkupAttoHandler extends AbstractStandardMark
     
     
     @Override
-    public void handleDocumentStart(final long startTimeNanos, final boolean requireWellFormed)
+    public void handleDocumentStart(final long startTimeNanos, final DocumentRestrictions documentRestrictions)
             throws AttoParseException {
         
         try {
@@ -71,7 +71,7 @@ public final class TracingStandardMarkupAttoHandler extends AbstractStandardMark
     
     
     @Override
-    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final boolean requireWellFormed)
+    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final DocumentRestrictions documentRestrictions)
             throws AttoParseException {
         
         try {
