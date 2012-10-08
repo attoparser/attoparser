@@ -27,6 +27,13 @@ import java.util.List;
 
 
 /**
+ * <p>
+ *   An attoDOM document, obtained from parsing a document using a
+ *   {@link DOMMarkupAttoHandler} handler object.
+ * </p>
+ * <p>
+ *   Note that attoDOM trees are <b>mutable</b>.
+ * </p>
  * 
  * @author Daniel Fern&aacute;ndez
  * 
@@ -49,6 +56,13 @@ public final class Document implements Serializable {
     
 
     
+    /**
+     * <p>
+     *   Return the XML Declaration found at the document, if it exists.
+     * </p>
+     * 
+     * @return the XML declaration, or null if none was found.
+     */
     public XmlDeclaration getXmlDeclaration() {
         for (final Node rootNode : this.rootNodes) {
             if (rootNode instanceof XmlDeclaration) {
@@ -58,6 +72,14 @@ public final class Document implements Serializable {
         return null;
     }
 
+    
+    /**
+     * <p>
+     *   Return the DOCTYPE clause found at the document, if it exists.
+     * </p>
+     * 
+     * @return the DOCTYPE clause, or null if none was found.
+     */
     public DocType getDocType() {
         for (final Node rootNode : this.rootNodes) {
             if (rootNode instanceof DocType) {
@@ -136,7 +158,19 @@ public final class Document implements Serializable {
 
     
     
-    
+
+    /**
+     * <p>
+     *   Apply a visitor (implementation of {@link AttoDOMVisitorException}) 
+     *   to this document, traversing all its nodes.
+     * </p>
+     * <p>
+     *   A typical visitor implementation is {@link MarkupWriterAttoDOMVisitor}.
+     * </p>
+     * 
+     * @param visitor the visitor to be applied
+     * @throws AttoDOMVisitorException
+     */
     public final void visit(final AttoDOMVisitor visitor)
             throws AttoDOMVisitorException {
         visitor.visitStartDocument(this);

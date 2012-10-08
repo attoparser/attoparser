@@ -30,7 +30,11 @@ import org.attoparser.markup.DocumentRestrictions;
 
 /**
  * <p>
- *   A Comment node in a attoDOM tree.
+ *   Implementation of {@link org.attoparser.IAttoHandler} that builds an attoDOM tree,
+ *   with objects from package <tt>org.attoparser.markup.dom</tt>. 
+ * </p>
+ * <p>
+ *   Use of this handler requires the document to be well-formed from the XML/XHTML standpoint.
  * </p>
  * 
  * 
@@ -51,7 +55,12 @@ public final class DOMMarkupAttoHandler extends AbstractStandardMarkupAttoHandle
     private Element currentElement = null;
     
 
-    
+
+    /**
+     * <p>
+     *   Creates a new instance of this handler.
+     * </p> 
+     */
     public DOMMarkupAttoHandler() {
         // Must be well-formed in order to create an adequate DOM tree
         super(DocumentRestrictions.wellFormed());
@@ -59,24 +68,60 @@ public final class DOMMarkupAttoHandler extends AbstractStandardMarkupAttoHandle
 
     
     
+    /**
+     * <p>
+     *   Returns the attoDOM {@link Document} created during parsing.
+     * </p>
+     * 
+     * @return the built DOM document object. 
+     */
     public Document getDocument() {
         return this.document;
     }
 
     
-    
+
+    /**
+     * <p>
+     *   Returns the time (in nanoseconds) when parsing started.
+     * </p>
+     * 
+     * @return the start time.
+     */
     public long getParsingStartTimeNanos() {
         return this.parsingStartTimeNanos;
     }
 
+    /**
+     * <p>
+     *   Returns the time (in nanoseconds) when parsing ended.
+     * </p>
+     * 
+     * @return the end time.
+     */
     public long getParsingEndTimeNanos() {
         return this.parsingEndTimeNanos;
     }
 
+    /**
+     * <p>
+     *   Returns the difference (in nanoseconds) between parsing start and end.
+     * </p>
+     * 
+     * @return the parsing time in nanos.
+     */
     public long getParsingTotalTimeNanos() {
         return this.parsingTotalTimeNanos;
     }
+
     
+    /**
+     * <p>
+     *   Returns whether parsing has already finished or not.
+     * </p>
+     * 
+     * @return <tt>true</tt> if parsing has finished, <tt>false</tt> if not.
+     */
     public boolean isParsingFinished() {
         return this.parsingFinished;
     }

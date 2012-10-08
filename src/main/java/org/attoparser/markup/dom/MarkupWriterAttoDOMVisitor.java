@@ -27,7 +27,8 @@ import java.util.Map;
 
 /**
  * <p>
- *   Common abstract class for visitors capable of traversing a attoDOM tree.
+ *   Implementation of {@link AttoDOMVisitor} capable of writing an attoDOM
+ *   tree as markup code.
  * </p>
  * 
  * @author Daniel Fern&aacute;ndez
@@ -41,7 +42,19 @@ public final class MarkupWriterAttoDOMVisitor extends AbstractAttoDOMVisitor {
     private final Writer writer;
     
     
-    
+
+    /**
+     * <p>
+     *   Create a new instance of this visitor, specifying the {@link Writer}
+     *   that will be used for outputting the markup code.
+     * </p>
+     * <p>
+     *   For example, this writer could be a <tt>StringWriter</tt> (for obtaining
+     *   a <tt>String</tt>), an <tt>HttpServletResponse.getWriter()</tt>, etc. 
+     * </p>
+     * 
+     * @param writer the writer to be used as output.
+     */
     public MarkupWriterAttoDOMVisitor(final Writer writer) {
         super();
         this.writer = writer;
