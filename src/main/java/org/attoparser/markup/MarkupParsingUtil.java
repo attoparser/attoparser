@@ -23,6 +23,9 @@ package org.attoparser.markup;
 
 
 /**
+ * <p>
+ *   Class containing utility methods for general markup parsing.
+ * </p>
  * 
  * @author Daniel Fern&aacute;ndez
  * 

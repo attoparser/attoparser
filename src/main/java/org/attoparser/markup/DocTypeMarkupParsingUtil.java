@@ -24,6 +24,9 @@ import org.attoparser.AttoParseException;
 
 
 /**
+ * <p>
+ *   Class containing utility methods for parsing DOCTYPE clauses.
+ * </p>
  * 
  * @author Daniel Fern&aacute;ndez
  * 
