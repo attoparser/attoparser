@@ -445,6 +445,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
         private final boolean requireUniqueAttributesInElement;
         private final boolean requireWellFormed;
         
+        private final boolean requireNoProlog;
+        
         private char[][] elementStack;
         private int elementStackSize;
         
@@ -457,17 +459,17 @@ public abstract class AbstractDetailedMarkupAttoHandler
         
         
         
-        RestrictedWrapper(final AbstractDetailedMarkupAttoHandler handler, final DocumentRestrictions wellFormednessSpec) {
+        RestrictedWrapper(final AbstractDetailedMarkupAttoHandler handler, final DocumentRestrictions documentRestrictions) {
             
             super();
             
             this.handler = handler;
             
-            this.requireBalancedElements = wellFormednessSpec.getRequireBalancedElements();
-            this.requireWellFormedProlog = wellFormednessSpec.getRequireWellFormedProlog();
-            this.requireUniqueRootElement = wellFormednessSpec.getRequireUniqueRootElement();
-            this.requireWellFormedAttributeValues = wellFormednessSpec.getRequireWellFormedAttributeValues();
-            this.requireUniqueAttributesInElement = wellFormednessSpec.getRequireUniqueAttributesInElement();
+            this.requireBalancedElements = documentRestrictions.getRequireBalancedElements();
+            this.requireWellFormedProlog = documentRestrictions.getRequireWellFormedProlog();
+            this.requireUniqueRootElement = documentRestrictions.getRequireUniqueRootElement();
+            this.requireWellFormedAttributeValues = documentRestrictions.getRequireWellFormedAttributeValues();
+            this.requireUniqueAttributesInElement = documentRestrictions.getRequireUniqueAttributesInElement();
             
             this.requireWellFormed = 
                     (this.requireBalancedElements || this.requireWellFormedProlog || this.requireUniqueRootElement ||
@@ -477,6 +479,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 this.elementStack = new char[DEFAULT_STACK_SIZE][];
                 this.elementStackSize = 0;
             }
+            
+            this.requireNoProlog = documentRestrictions.getRequireNoProlog();
             
         }
 
@@ -522,6 +526,12 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int outerOffset, final int outerLen, 
                 final int line, final int col) 
                 throws AttoParseException {
+
+            if (this.requireNoProlog) {
+                throw new AttoParseException(
+                        "No prolog is allowed by document restrictions, but an XML Declaration has been found",
+                        line, col);
+            }
             
             if (this.requireWellFormed) {
                 
@@ -848,6 +858,12 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int outerOffset, final int outerLen,
                 final int outerLine, final int outerCol) 
                 throws AttoParseException {
+            
+            if (this.requireNoProlog) {
+                throw new AttoParseException(
+                        "No prolog is allowed by document restrictions, but a DOCTYPE clause has been found",
+                        outerLine, outerCol);
+            }
             
             if (this.requireWellFormed) {
                 

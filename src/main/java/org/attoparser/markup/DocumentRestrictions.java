@@ -45,6 +45,7 @@ public final class DocumentRestrictions implements Serializable {
     private boolean requireUniqueRootElement = false;
     private boolean requireWellFormedAttributeValues = false;
     private boolean requireUniqueAttributesInElement = false;
+    private boolean requireNoProlog = false;
     
 
 
@@ -57,6 +58,7 @@ public final class DocumentRestrictions implements Serializable {
         spec.requireUniqueRootElement = false;
         spec.requireWellFormedAttributeValues = false;
         spec.requireUniqueAttributesInElement = false;
+        spec.requireNoProlog = false;
         return spec;
     }
 
@@ -68,6 +70,7 @@ public final class DocumentRestrictions implements Serializable {
         spec.requireUniqueRootElement = true;
         spec.requireWellFormedAttributeValues = true;
         spec.requireUniqueAttributesInElement = true;
+        spec.requireNoProlog = false;
         return spec;
     }
     
@@ -129,6 +132,16 @@ public final class DocumentRestrictions implements Serializable {
 
     public void setRequireUniqueRootElement(final boolean requireUniqueRootElement) {
         this.requireUniqueRootElement = requireUniqueRootElement;
+    }
+
+
+    public boolean getRequireNoProlog() {
+        return this.requireNoProlog;
+    }
+
+
+    public void setRequireNoProlog(final boolean requireNoProlog) {
+        this.requireNoProlog = requireNoProlog;
     }
     
         
