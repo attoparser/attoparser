@@ -9,14 +9,14 @@
   
   <fileSets>
     <fileSet>
-      <directory>${basedir}/../attoparser/target/apidocs/</directory>
+      <directory>${basedir}/target/apidocs/</directory>
       <outputDirectory>/apidocs</outputDirectory>
       <includes>
         <include>**/*</include>
       </includes>
     </fileSet>
     <fileSet>
-      <directory>${basedir}/../attoparser/target/</directory>
+      <directory>${basedir}/target/</directory>
       <outputDirectory>/dist</outputDirectory>
       <includes>
         <include>attoparser-${version}.jar</include>
