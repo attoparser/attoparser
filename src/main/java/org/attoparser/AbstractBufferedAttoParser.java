@@ -50,7 +50,7 @@ public abstract class AbstractBufferedAttoParser extends AbstractAttoParser {
      *   Value: 4096 chars.
      * </p>
      */
-    public static final int BUFFER_SIZE = 4096;
+    public static final int BUFFER_SIZE = 8192;
 
 
     

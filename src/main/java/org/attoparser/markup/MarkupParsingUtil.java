@@ -60,62 +60,79 @@ public final class MarkupParsingUtil {
         boolean inQuotes = false;
         boolean inApos = false;
 
+        int colIndex = offset;
         for (int i = offset; i < maxi; i++) {
             
             final char c = text[i];
-            
-            if (!inApos && c == '"') {
+
+            if (c == '\n') {
+                colIndex = i;
+                locator.col = 0;
+                locator.line++;
+            } else if (c == '"' && !inApos) {
                 inQuotes = !inQuotes;
-            } else if (!inQuotes && c == '\'') {
+            } else if (c == '\'' && !inQuotes) {
                 inApos = !inApos;
-            } else if (!inQuotes && !inApos && c == '>') {
+            } else if (c == '>' && !inQuotes && !inApos) {
+                locator.col += (i - colIndex);
                 return i;
             }
-
-            MarkupParsingLocator.countChar(locator, c);
             
         }
             
+        locator.col += (maxi - colIndex);
         return -1;
         
     }
+    
     
     static int findNextStructureEndDontAvoidQuotes(
             final char[] text, final int offset, final int maxi, 
             final MarkupParsingLocator locator) {
         
+        int colIndex = offset;
         for (int i = offset; i < maxi; i++) {
             
             final char c = text[i];
             
-            if (c == '>') {
+            if (c == '\n') {
+                colIndex = i;
+                locator.col = 0;
+                locator.line++;
+            } else if (c == '>') {
+                locator.col += (i - colIndex);
                 return i;
             }
-
-            MarkupParsingLocator.countChar(locator, c);
             
         }
             
+        locator.col += (maxi - colIndex);
         return -1;
         
     }
+
     
     static int findNextStructureStart(
             final char[] text, final int offset, final int maxi, 
             final MarkupParsingLocator locator) {
-        
+
+        int colIndex = offset;
         for (int i = offset; i < maxi; i++) {
             
             final char c = text[i];
             
-            if (c == '<') {
+            if (c == '\n') {
+                colIndex = i;
+                locator.col = 0;
+                locator.line++;
+            } else if (c == '<') {
+                locator.col += (i - colIndex);
                 return i;
             }
-
-            MarkupParsingLocator.countChar(locator, c);
             
         }
             
+        locator.col += (maxi - colIndex);
         return -1;
         
     }
