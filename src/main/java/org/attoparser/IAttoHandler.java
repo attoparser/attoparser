@@ -72,10 +72,10 @@ package org.attoparser;
  *   <li>{@link AbstractAttoHandler}: basic implementation only differentiating
  *       between <i>text</i> and <i>structures</i></li>
  *   <li>{@link org.attoparser.markup.AbstractBasicMarkupAttoHandler}: markup-specialized
- *       (XML and HTML) abstract handler able to differentiate between different
+ *       (XML and HTML) abstract handler able to differentiate among different
  *       types of markup structures: Elements, comments, CDATA, DOCTYPE, etc.</li>
  *   <li>{@link org.attoparser.markup.AbstractDetailedMarkupAttoHandler}: markup-specialized
- *       (XML and HTML) abstract handler able not only to differentiate different
+ *       (XML and HTML) abstract handler able not only to differentiate among different
  *       types of markup structures, but also of reporting lowel-level detail inside
  *       elements (name, attributes, inner whitespace) and DOCTYPE clauses.</li>
  *   <li>{@link org.attoparser.markup.AbstractStandardMarkupAttoHandler}: higher-level

@@ -39,15 +39,15 @@ import java.io.Reader;
  *   <li>{@link AbstractAttoHandler}: basic implementation only differentiating
  *       between <i>text</i> and <i>structures</i></li>
  *   <li>{@link org.attoparser.markup.AbstractBasicMarkupAttoHandler}: markup-specialized
- *       (XML and HTML) abstract handler able to differentiate between different
+ *       (XML and HTML) abstract handler able to differentiate among different
  *       types of markup structures: Elements, comments, CDATA, DOCTYPE, etc.</li>
  *   <li>{@link org.attoparser.markup.AbstractDetailedMarkupAttoHandler}: markup-specialized
- *       (XML and HTML) abstract handler able not only to differentiate different
+ *       (XML and HTML) abstract handler able not only to differentiate among different
  *       types of markup structures, but also of reporting lowel-level detail inside
  *       elements (name, attributes, inner whitespace) and DOCTYPE clauses.</li>
  *   <li>{@link org.attoparser.markup.AbstractStandardMarkupAttoHandler}: higher-level
  *       markup-specialized (XML and HTML) abstract handler that offers an interface
- *       more similar to the Standard SAX DocumentHandlers (use of Strings instead of
+ *       more similar to the Standard SAX ContentHandlers (use of Strings instead of
  *       char[]'s, attribute maps, etc).</li>
  *   <li>{@link org.attoparser.markup.dom.DOMMarkupAttoHandler}: handler implementation
  *       (non-abstract) for building an attoDOM tree (DOM node tres based on classes

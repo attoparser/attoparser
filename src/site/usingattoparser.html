@@ -63,8 +63,9 @@
             </p>
             <ul class="nav">
               <li><a href="index.html">home</a></li>
-              <li class="active"><a href="usingattoparser.html">using attoparser</a></li>
               <li><a href="download.html">download</a></li>
+              <li class="active"><a href="usingattoparser.html">using attoparser</a></li>
+              <li><a href="javadoc.html">javadoc</a></li>
             </ul>
           </div>
         </div>
@@ -92,10 +93,16 @@
               <li class="nav-header">DOCS &amp; HELP</li>
             
               <li class="active"><a href="usingattoparser.html">using attoparser</a></li>
-              <li><a href="issuetracking.html">issue Tracking</a></li>
+              <li><a href="javadoc.html">javadoc API</a></li>
+              <li><a href="issuetracking.html">issue tracking</a></li>
               <li><a href="license.html">license</a></li>
               <li><a href="faq.html">faq</a></li>
               <li><a href="team.html">team</a></li>
+            
+              <li class="nav-header">SOURCE REPOSITORIES</li>
+              
+              <li><a href="http://github.com/attoparser/attoparser">attoparser @GitHub</a></li>
+              
             </ul>
           </div>
         </div>
@@ -107,8 +114,248 @@
               
         <div class="span10">
         
-          <h3>The handler implementations</h3>
+          <h3>Glossary</h3>
           
+          <p>
+            In order to fully understand how attoparser works, you will first need to know some basic
+            concepts:
+          </p>
+          
+          <table class="table table-striped">
+            <tbody>
+              <tr>
+                <td class="span3"><strong>markup</strong></td>
+                <td class="span9">
+                  For the sake of conciseness, in attoparser we will consider this term as a synonym of <em>"XML and/or HTML"</em>.
+                </td>
+              </tr>
+              <tr>
+                <td><strong>structure</strong></td>
+                <td>
+                  A <em>structure</em> is an artifact in the parsed document that is not simply <em>text</em>, this
+                  is, some kind of directive, format, metadata... for example: elements, DOCTYPE clauses, comments, etc.
+                </td>
+              </tr>
+              <tr>
+                <td><strong>element</strong></td>
+                <td>
+                  The term <em>element</em> is just the official standard name for a markup <em>tag</em>.  
+                </td>
+              </tr>
+              <tr>
+                <td><strong><kbd>(offset,len)</kbd> pair</strong></td>
+                <td>
+                  An <kbd>(offset,len)</kbd> pair is a couple of integer numbers that specify a subsequence of elements
+                  in an array. The first component (<em>offset</em>) signals the first position in the array to be
+                  included in the subsequence, and the second component (<em>len</em>) indicates the length of the
+                  subsequence. <br /> 
+                  These pairs are extensively used in attoparser in order to delimit parsed
+                  artifacts on the original <kbd>char[]</kbd> buffer. Converting an <kbd>(offset,len)</kbd> pair
+                  into a <kbd>String</kbd> object is easy, just do <code>new String(buffer, offset, len)</code>.  
+                </td>
+              </tr>
+              <tr>
+                <td><strong>attoDOM</strong></td>
+                <td>
+                  A DOM-style interface offered by attoparser similar to the standard DOM, but implemented
+                  with classes from the <kbd>org.attoparser.markup.dom</kbd> package.  
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        
+          <h3>Handlers</h3>
+
+          <p>
+            The first thing we need to do for using attoparser is creating an <em>event handler</em>.
+            This event handler will be an implementation of the <kbd>IAttoHandler</kbd> interface,
+            but we will normally not use this interface directly, creating instead a subclass of one
+            of the several abstract base classes already provided by attoparser.
+          </p>
+          <p>
+            Each of these abstract base classes provide a set of overriddable methods &mdash;all of them
+            having a default empty implementation&mdash;, and each of these sets of methods will
+            offer a different level of detail to us:
+          </p>
+
+          
+          <table class="table table-striped">
+            <tbody>
+              <tr>
+                <td class="span4"><strong><kbd>AbstractAttoHandler</kbd></strong></td>
+                <td class="span8">
+                  Basic implementation only differentiating between <i>text</i> and <i>structures</i>.
+                </td>
+              </tr>
+              <tr>
+                <td><strong><kbd>AbstractBasicMarkupAttoHandler</kbd></strong></td>
+                <td>
+                  Abstract handler able to differentiate among different types of markup structures: 
+                  elements, comments, CDATA, DOCTYPE, etc. without breaking them down (for example, 
+                  elements will be offered as a whole, without differentiating name and attributes).
+                </td>
+              </tr>
+              <tr>
+                <td><strong><kbd>AbstractDetailedMarkupAttoHandler</kbd></strong></td>
+                <td>
+                  Abstract handler able not only to differentiate among different types of markup structures, 
+                  but also of reporting lowel-level detail inside elements (name, attributes, inner 
+                  whitespace) and DOCTYPE clauses (keyword, root element name, public and system ID, etc.).  
+                </td>
+              </tr>
+              <tr>
+                <td><strong><kbd>AbstractStandardMarkupAttoHandler</kbd></strong></td>
+                <td>
+                  Higher-level abstract handler that offers an interface
+                  more similar to the Standard SAX <kbd>ContentHandler</kbd>s (fewer
+                  events, use of <kbd>String</kbd> instead of <kbd>char[]</kbd>, 
+                  attributes reported as <kbd>Map&lt;String,String&gt;</kbd>, etc).  
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        
+          <h5>Creating a handler</h5>
+        
+          <p>
+            For example, we could choose <kbd>AbstractStandardMarkupAttoHandler</kbd> and create a
+            very simple handler for counting the number of standalone elements in our parsed documents, like:
+          </p>
+
+<pre class="prettyprint linenums language-java">
+public class StandaloneCountingAttoHandler extends AbstractStandardMarkupAttoHandler {
+
+    // Let's count the number of standalone elements in our document!
+    private int standaloneCount = 0;
+    
+    public BenchmarkAttoHandler() {
+        super(DocumentRestrictions.wellFormed());
+    }
+    
+    public int getStandaloneCount() {
+        return this.standaloneCount;
+    }
+
+    @Override
+    public void handleStandaloneElement(
+            final String elementName, final Map&lt;String, String&gt; attributes, 
+            final int line, final int col)
+            throws AttoParseException {
+        this.standaloneCount++;
+    }
+
+}
+</pre>
+
+          <p>
+            Looking at the code above, note that attoparser offers different handlers for
+            <em>opening elements</em> and <em>standalone elements</em>, a differentiation that is
+            not easy to achieve using standard SAX parsers. 
+          </p>
+          <p>
+            Also note the <code>line</code> and <code>col</code> arguments, specifying the exact position 
+            of these standalone elements in the document.
+          </p>
+          <p>
+            And finally, note the <code>DocumentRestrictions.wellFormed()</code> constructor
+            argument that instructs attoparser to require the parsed document to be well-formed from an
+            XML/XHTML standpoint. This means a well-formed prolog, balanced tags, correctly formatted 
+            attribute values, etc. We could have disabled these checks by using
+            <code>DocumentRestrictions.none()</code> instead, or even enable or disable each of these
+            restrictions separately.
+          </p>
+        
+        
+        
+          <h3>Parsers</h3>
+
+          <p>
+            attoparser offers a parser interface called <kbd>IAttoParser</kbd>, and only one implementation
+            for it: <kbd>MarkupAttoParser</kbd>.
+          </p>
+          <p>
+            This <kbd>MarkupAttoParser</kbd> class should be directly used (without extending) and its 
+            instances are <em>thread-safe</em>, so they can be safely reused without synchronization.
+            Also note that this <em>thread-safety</em> feature usually does not apply to <em>handlers</em>.  
+          </p>
+          
+          <h5>Parsing our document</h5>
+          
+          <p>
+            <kbd>MarkupAttoParser</kbd> allows us to specify the document to be parsed in several useful
+            ways: as a <kbd>java.io.Reader</kbd>, a <kbd>String</kbd> or a <kbd>char[]</kbd>. 
+          </p>
+          
+          <p>
+            Let's say we have a document in our classpath and we want to parse it using our recently created
+            <em>handler</em> in order to count the number of standalone elements it contains. For the sake
+            of simplicity, we will ignore the <code>try..finally</code> code required to adequately close 
+            the streams: 
+          </p>
+
+<pre class="prettyprint linenums language-java">
+final InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName);
+// We know our file's encoding is ISO-8859-1, and we need that info to create a Reader
+final Reader reader = new BufferedReader(new InputStreamReader(is, "ISO-8859-1"));
+                
+final StandaloneCountingAttoHandler handler = new StandaloneCountingAttoHandler();
+parser.parse(reader, handler);
+
+final int standaloneCount = handler.getStandaloneCount();
+</pre>          
+        
+          <p>
+            And we are done!
+          </p>
+        
+          <h3>Using the DOM features</h3>
+
+          <p>
+            As a plus to its main SAX-style parsing capabilities, attoparser offers us a DOM-style
+            interface that enables us to handle a document as an attoDOM tree.
+          </p>
+          <p>
+            Using it is easy: we just need to use the prebuilt <kbd>DOMMarkupAttoHandler</kbd>:
+          </p>
+
+<pre class="prettyprint linenums language-java">
+final Reader reader = ...
+                
+final DOMMarkupAttoHandler handler = new DOMMarkupAttoHandler();
+parser.parse(reader, handler);
+
+final Document doc = handler.getDocument();
+final DocType docType = doc.getDocType();
+final List&lt;Element&gt; elements = doc.getRootElement().getElementChildren();
+...
+</pre>          
+        
+        <h5>DOM visitors</h5>
+        
+        <p>
+          attoDOM trees have a nice feature: they allow the execution of <em>visitors</em> on them. Visitors are classes implementing
+          the <kbd>AttoDOMVisitor</kbd> or extending its abstract base implementation <kbd>AbstractAttoDOMVisitor</kbd>.
+        </p>
+        <p>
+          attoparser provides, out-of-the-box, a visitor implementation capable of writing an attoDOM tree as
+          markup code again. It's the <kbd>MarkupWriterAttoDOMVisitor</kbd>:
+        </p>
+          
+<pre class="prettyprint linenums language-java">
+final Document doc = ...
+
+// Modify our document if we wish 
+...
+                
+final StringWriter writer = new StringWriter();
+final MarkupWriterAttoDOMVisitor visitor = new MarkupWriterAttoDOMVisitor(writer); 
+
+// Apply the visitor
+doc.visit(visitor);
+
+// Obtain the result of executing the visitor            
+final String markup = writer.toString();
+</pre>
         
         </div>
         
