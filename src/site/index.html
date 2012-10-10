@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  
+	<title>attoparser: powerful and easy java parser for XML and HTML markup</title>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="powerful and easy java parser for XML and HTML markup" />
+    <meta name="author" content="The ATTOPARSER Team" />
+
+    <!-- Le styles -->
+    <link href="css/bootstrap.css" rel="stylesheet" />
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+      .sidebar-nav {
+        padding: 9px 0;
+      }
+    </style>
+    <link href="css/bootstrap-responsive.css" rel="stylesheet" />
+    <link href="css/google-code-prettify/prettify.css" rel="stylesheet" />
+        
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-1276954-10']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    
+  </head>
+
+
+  <body lang="en" dir="ltr" onload="prettyPrint()">
+
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="index.html"><img src="img/attoparser.png" alt="attoparser" /></a>
+          <div class="nav-collapse collapse">
+            <p class="navbar-text pull-right">
+              <img src="img/attoparser_motto.png" alt="powerful and easy java parser for XML and HTML markup" />
+            </p>
+            <ul class="nav">
+              <li class="active"><a href="index.html">home</a></li>
+              <li><a href="usingattoparser.html">using attoparser</a></li>
+              <li><a href="download.html">download</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="container-fluid">
+    
+      <div class="row-fluid">
+
+        <!-- --------------------------------------------------------------------- -->      
+        <!--   SIDEBAR                                                             -->      
+        <!-- --------------------------------------------------------------------- -->
+              
+        <div class="span2">
+          <div class="well sidebar-nav">
+            <ul class="nav nav-list">
+            
+              <li class="nav-header">ATTOPARSER</li>
+            
+              <li class="active"><a href="index.html">home</a></li>
+              <li><a href="download.html">download</a></li>
+            
+              <li class="nav-header">DOCS &amp; HELP</li>
+            
+              <li><a href="usingattoparser.html">using attoparser</a></li>
+              <li><a href="issuetracking.html">issue Tracking</a></li>
+              <li><a href="license.html">license</a></li>
+              <li><a href="faq.html">faq</a></li>
+              <li><a href="team.html">team</a></li>
+            </ul>
+          </div>
+        </div>
+
+        
+        <!-- --------------------------------------------------------------------- -->      
+        <!--   CONTENT                                                             -->      
+        <!-- --------------------------------------------------------------------- -->
+              
+        <div class="span10">
+        
+          <h3>What is attoparser?</h3>
+          
+          <p>
+            <strong>attoparser</strong> is a Java parser for XML and HTML markup. <br /> 
+            It is a SAX-style event-based parser &mdash;though it does not implement the SAX standard&mdash;
+            but it can also act as a DOM-style parser.
+          </p>
+          <p>
+            Its goals are:  
+          </p>
+          <ul>
+            <li>To be <strong>easy to use</strong>. Few lines of code needed. And no more <em>parser library hell</em> worring about your JDK's parser versions.</li>
+            <li>To be <strong>fast</strong>. As fast as the fastest standard parsers. And in many scenarios, <em>faster</em>.</li>
+            <li>To offer a <strong>powerful interface</strong>. Consider well-formedness <em>optional</em>, line + column location, ability to reconstruct the original document, etc.</li>
+            <li>To <strong>simplify your parsing experience</strong>. By removing the need to worry about <em>validation</em>
+                or <em>entity resolution</em> &mdash;both unneeded in many cases.
+          </ul>
+        
+        <hr />
+        
+          <h3>Can it be <em>my</em> parser instead of the standard ones?</h3>
+          
+          <p>
+            The answer is simple: if you don't need neither <em>DTD/Schema validation</em> 
+            nor <em>entity resolution</em>, then <strong>yes, it can</strong>.
+          </p>
+        
+          <h3>What does it look like?</h3>
+
+          <p>
+            First, you should create an implementation of <kbd>IAttoHandler</kbd>, usually by
+            extending one of its predefined abstract implementations:
+          </p>
+          
+<pre class="prettyprint linenums">
+public class MyHandler extends AbstractStandardMarkupAttoHandler {
+    /*
+     * Provide implementations for the events you are interested on.
+     */
+}   
+</pre>
+
+          <p>
+            Then simply execute the parser using your handler:
+          </p>
+          
+<pre class="prettyprint linenums">
+final Reader documentReader = ...;
+
+final IAttoParser parser = new MarkupAttoParser(); // this is thread-safe and can be reused
+final IAttoHandler handler = new MyHandler();
+
+parser.parse(documentReader, handler);
+</pre>
+
+        
+          <h3>The features</h3>
+
+          <table class="table table-striped">
+            <tbody>
+            
+              <tr>
+                <td class="span3">
+                  <strong>Java-based</strong>
+                </td>
+                <td class="span9">
+                  Requires Java SE 5.0 or newer.
+                </td>
+              </tr>
+            
+              <tr>
+                <td>
+                  <strong>Easy to deploy</strong>
+                </td>
+                <td>
+                  attoparser is just a <kbd>.jar</kbd> library with no additional dependencies. No need
+                  to worry about the versions your JDK build includes of the SAX, DOM or any other XML-related
+                  standards. 
+                </td>
+              </tr>
+            
+              <tr>
+                <td>
+                  <strong>Light</strong>
+                </td>
+                <td>
+                  attoparser's only <kbd>.jar</kbd> file weighs just about 85 Kbytes. 
+                </td>
+              </tr>
+            
+              <tr>
+                <td>
+                  <strong>Event-based (SAX style)</strong>
+                </td>
+                <td>
+                  attoparser offers an event-based interface, calling <em>handler</em> methods
+                  on a user-provided <em>handler class</em> implementing a specific interface &mdash;usually
+                  extending one of the provided abstract classes providing different levels of
+                  event detail&mdash;. This works in an equivalent way to the implementation of the 
+                  <kbd>ContentHandler</kbd> interface when using standard SAX parsers. 
+                </td>
+              </tr>
+            
+              <tr>
+                <td>
+                  <strong>Optional DOM-style</strong>
+                </td>
+                <td>
+                  attoparser also offers a prebuilt <em>handler class</em> that translates
+                  parsing events into a fully-featured <em>attoDOM</em> (attoparser-customized Document Object Model) 
+                  tree of nodes, which can be modified and written back to markup if needed.
+                </td>
+              </tr>
+            
+              <tr>
+                <td>
+                  <strong>Optional well-formedness</strong>
+                </td>
+                <td>
+                  Users are not restricted to parsing only well-formed markup (from an XML standpoint). attoparser can
+                  be configured to ignore well-formedness rules like tag balancing, attribute values delimited 
+                  by commas, correct XML/XHTML/HTML prolog specification, etc. This makes attoparser especially
+                  well-suited for parsing HTML code.  
+                </td>
+              </tr>
+            
+              <tr>
+                <td>
+                  <strong>Small memory footprint</strong>
+                </td>
+                <td>
+                  Unless specifically required by the user's handler implementation, attoparser 
+                  avoids copying the document contents in memory by working always with the original 
+                  <kbd>char[]</kbd> buffer, providing <kbd>(offset,len)</kbd> pairs for delimiting event artifacts.
+                </td>
+              </tr>
+            
+              <tr>
+                <td>
+                  <strong>Full event location</strong>
+                </td>
+                <td>
+                  Each event artifact (and attoDOM node) provides its location at the original document 
+                  with its line and column number.
+                </td>
+              </tr>
+            
+              <tr>
+                <td>
+                  <strong>Several levels of detail</strong>
+                </td>
+                <td>
+                  Users can specify the level of detail they need for their events by choosing a specific abstract base
+                  class for their <em>handler implementations</em>. For example, if a user is not interested in
+                  delimiting element (tag) names or attributes, he/she can choose a detail level that ignores 
+                  tag contents, resulting in a performance improvement.
+                </td>
+              </tr>
+            
+              <tr>
+                <td>
+                  <strong>Document reconstruction</strong>
+                </td>
+                <td>
+                  attoparser takes all the required measures to ensure that, when needed, the original markup will be 
+                  completely reconstructable after parsing. No single character or artifact is ignored or left 
+                  out of event reporting at the most detailed level. This is a useful feature when the parser is used
+                  for processing templates.
+                </td>
+              </tr>
+            
+              <tr>
+                <td>
+                  <strong>No escaping/unescaping</strong>
+                </td>
+                <td>
+                  No text escaping or unescaping is applied to parsed artifacts, and also no entity substitution
+                  &mdash;e.g. <code>&amp;aacute;</code> to <code>&aacute;</code>&mdash; is performed, allowing
+                  the user to apply his/her own rules where required. This frees the parser from making
+                  possibly invalid assumptions about markup due to differences between XML and HTML escaping rules,
+                  and also allows a complete reconstruction of the original document after parsing, if needed.
+                </td>
+              </tr>
+              
+            </tbody>
+          </table>
+
+
+          <h3>How is it distributed?</h3>
+          
+          <p>
+            attoparser is Open Source Software, and it is distributed under the terms of the <a href="license.html">Apache License 2.0</a>.
+          </p>
+
+          <h3>Project status</h3>
+
+          <p>
+            attoparser is currently in beta stage. Current version is <b>1.0-beta2</b>. 
+          </p>
+          
+        </div>
+        
+        
+      </div>
+
+      <hr />
+            
+      <footer>
+        <p>Copyright &copy; The <a href="team.html">ATTOPARSER Team</a>.</p>
+      </footer>
+      
+    </div>
+    
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <script src="js/google-code-prettify/prettify.js"></script>
+    
+  </body>
+  
+</html>
