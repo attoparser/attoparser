@@ -228,7 +228,7 @@ public class StandaloneCountingAttoHandler extends AbstractStandardMarkupAttoHan
     // Let's count the number of standalone elements in our document!
     private int standaloneCount = 0;
     
-    public BenchmarkAttoHandler() {
+    public StandaloneCountingAttoHandler() {
         super(DocumentRestrictions.wellFormed());
     }
     
@@ -266,6 +266,41 @@ public class StandaloneCountingAttoHandler extends AbstractStandardMarkupAttoHan
           </p>
         
         
+          <h5>Just one more...</h5>
+        
+          <p>
+            What if we wanted to strip our document of markup tags, leaving only the text? We could easily
+            create a handler for this by extending <kbd>AbstractBasicMarkupAttoHandler</kbd>:
+          </p>
+        
+<pre class="prettyprint linenums language-java">
+public class TagStrippingAttoHandler extends AbstractBasicMarkupAttoHandler {
+
+    private final StringBuilder strBuilder;
+    
+    public TagStrippingAttoHandler() {
+        super();
+        this.strBuilder = new StringBuilder();
+    }
+    
+    public String getTagStrippedText() {
+        return this.strBuilder.toString();
+    }
+
+    @Override
+    public void handleText(
+            final char[] buffer, final int offset, final int len, 
+            final int line, final int col)
+            throws AttoParseException {
+        this.strBuilder.append(buffer, offset, len);
+    }
+    
+
+}
+</pre>
+          <p>
+            Quite easy, right?
+          </p>
         
           <h3>Parsers</h3>
 

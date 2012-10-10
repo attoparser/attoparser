@@ -105,6 +105,7 @@ public final class DocType extends Node {
     
     
     
+    @Override
     public final void visit(final AttoDOMVisitor visitor)
             throws AttoDOMVisitorException {
         visitor.visitDocType(this);

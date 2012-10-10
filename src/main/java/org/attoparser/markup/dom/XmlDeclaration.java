@@ -93,6 +93,7 @@ public final class XmlDeclaration extends Node {
     
     
     
+    @Override
     public final void visit(final AttoDOMVisitor visitor)
             throws AttoDOMVisitorException {
         visitor.visitXmlDeclaration(this);
