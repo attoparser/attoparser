@@ -107,7 +107,160 @@
               
         <div class="span10">
         
-          <h3>FAQ</h3>
+            <h3>Frequently Asked Questions</h3>
+           
+            <ul>
+              <li><b>About attoparser</b>
+                <ul>
+                  <li><a href="#where-come-from">Where does attoparser come from? Is it made or backed by any software company?</a>.</li>
+                  <li><a href="#does-offer-support">Does attoparser offer any type of commercial support?</a></li>
+                  <li><a href="#is-it-stable">Is it stable? Can it be considered production-ready?</a></li>
+                  <li><a href="#how-can-i-contribute">How can I contribute to attoparser?</a></li>
+                </ul>
+              </li>
+              <li><b>General</b>
+                <ul>
+                  <li><a href="#is-SAX">Is attoparser a SAX parser?</a></li>
+                  <li><a href="#use-snapshot">How can I use a SNAPSHOT release of attoparser?</a></li>
+                </ul>
+              </li>
+            </ul>
+            
+        
+        
+        
+            <hr />
+        
+        
+        
+            <h3>About attoparser</h3>
+
+            <a id="where-come-from"></a><hr />
+        
+            <h4>Where does attoparser come from? Is it made or backed by any software company?</h4>
+            
+            <p>
+              attoparser is Open Source Software created in his spare time by a Spanish Software Engineer
+              called <a href="team.html">Daniel Fernández</a>, who's also the author
+              of other popular java libraries like <a href="http://www.thymeleaf.org">thymeleaf</a>, 
+              <a href="http://www.jasypt.org">jasypt</a>, <a href="http://www.op4j.org">op4j</a>
+              or <a href="http://www.javatuples.org">javatuples</a>.
+            </p>
+            <p>
+              It is neither made nor backed
+              by any software (or any other type of) company, and it is offered to the public
+              totally free of charge, both in binary and in source code forms, under the <b>Apache License 2.0</b>.
+            </p>
+            
+            <a id="does-offer-support"></a><hr />
+        
+            <h4>Does attoparser offer any type of commercial support?</h4>
+            
+            <p>
+              No, it does not. Commercial support is not offered at the moment, but
+              there is an <a href="https://github.com/attoparser/attoparser/issues">issue tracking system</a> at your disposal.
+            </p>
+
+            
+            <a id="is-it-stable"></a><hr />
+        
+            <h4>Is it stable? Can it be considered production-ready?</h4>
+            
+            <p>
+              Yes, all stable (non-beta) releases can be considered production-ready. 
+            </p>
+
+
+            <a id="how-can-i-contribute"></a><hr />
+
+
+            <h4>How can I contribute to attoparser?</h4>
+            
+            <p>
+              In many ways:
+            </p>
+            <ul>
+              <li>You can write in the <a href="https://github.com/attoparser/attoparser/issues">issue 
+                  tracking system</a> (or directly to the <a href="team.html">Team</a>) with your
+                  ideas for improving attoparser.</li>
+              <li>You can contribute some code, write a patch for a new feature
+                  or behaviour (please, tell the project admins first about your idea so 
+                  that effort can be adequately coordinated).</li> 
+              <li>You can write articles, reviews, blog posts, etc. about attoparser, showing
+                  how it works or how it integrates with other technologies.</li> 
+              <li>You can promote attoparser in your company/work and among your colleague developers.</li>
+            </ul>
+            <p>
+              If you want to contribute some code to attoparser, please read first the
+              page on <a href="contributing.html">Contributing to attoparser</a>.
+            </p>
+        
+            <hr />
+        
+            <h2>General</h2>
+        
+            <a id="is-SAX"></a><hr />
+        
+            <h3>Is attoparser a SAX parser?</h3>
+            
+            <p>
+              Strictly speaking, no, it isn't, because it does not implement the standard SAX API.
+            </p>
+            <p>
+              But it is a <em>SAX-style</em> parser in the sense that it works in a similar way to standard
+              SAX parsers, this is, by triggering <em>parsing events</em> like <em>element</em>, <em>attribute</em>,
+              <em>text</em>, <em>document start</em>, etc. so that they can be handled by specifically created
+              <em>handler methods</em>. This contrasts with the way DOM parsers work, which
+              parse entire documents and convert them into DOM (Document Object Model) node trees before 
+              returning control to the user.
+            </p>
+
+        
+            <a id="use-snapshot"></a><hr />
+        
+            <h3>How can I use a SNAPSHOT release of attoparser?</h3>
+            
+            <p>    
+              From time to time, attoparser will produce a <i>snapshot</i> release that will allow
+              you to test new or being-developed features. These are <b>non production ready</b>
+              releases, but will be stable enough for most testing purposes, and will enable you
+              to try new features before they are generally available.
+            </p> 
+            <p>
+              In order to use snapshot releases, you need to add the Sonatype OSS Snapshots
+              repository in your Maven <kbd>pom.xml</kbd> file, like this:
+            </p>
+            
+<pre class="prettyprint linenums language-xml">
+&lt;repositories&gt;
+  &lt;repository&gt;
+    &lt;id&gt;sonatype-nexus-snapshots&lt;/id&gt;
+    &lt;name&gt;Sonatype Nexus Snapshots&lt;/name&gt;
+    &lt;url&gt;<b>https://oss.sonatype.org/content/repositories/snapshots</b>&lt;/url&gt;
+    &lt;snapshots&gt;
+      &lt;enabled&gt;true&lt;/enabled&gt;
+    &lt;/snapshots&gt;
+  &lt;/repository&gt;
+&lt;/repositories&gt;
+</pre>
+            
+            <p>
+              Also, you will have to modify your attoparser dependency/ies to use a 
+              <i>snapshot version</i>, which usually consists of the version number of the
+              <b>next</b> release (not the current one), followed by <kbd>-SNAPSHOT</kbd>.
+              For example, while <kbd>1.0</kbd> is the latest published stable release,
+              snapshots will probably appear under the <kbd>1.1-SNAPSHOT</kbd> or
+              maybe <kbd>2.0-SNAPSHOT</kbd> version numbers:
+            </p>
+        
+<pre class="prettyprint linenums language-xml">
+&lt;dependency&gt;
+  &lt;groupId&gt;org.attoparser&lt;/groupId&gt;
+  &lt;artifactId&gt;attoparser&lt;/artifactId&gt;
+  &lt;version&gt;<b>1.1-SNAPSHOT</b>&lt;/version&gt;
+  &lt;scope&gt;compile&lt;/scope&gt;
+&lt;/dependency&gt;
+</pre>            
           
         
         </div>

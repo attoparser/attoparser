@@ -141,7 +141,7 @@
             extending one of its predefined abstract implementations:
           </p>
           
-<pre class="prettyprint linenums">
+<pre class="prettyprint linenums language-java">
 public class MyHandler extends AbstractStandardMarkupAttoHandler {
     /*
      * Provide implementations for the events you are interested on.
@@ -153,7 +153,7 @@ public class MyHandler extends AbstractStandardMarkupAttoHandler {
             Then simply execute the parser using your handler:
           </p>
           
-<pre class="prettyprint linenums">
+<pre class="prettyprint linenums language-java">
 final Reader documentReader = ...;
 
 final IAttoParser parser = new MarkupAttoParser(); // this is thread-safe and can be reused
