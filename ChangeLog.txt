@@ -1,3 +1,9 @@
+1.1
+=======
+- Added new "noUnbalancedCloseElements" restriction to DocumentRestrictions. This allows unbalanced
+  open tags, but not unbalanced close tags (as happens in HTML).
+
+
 1.0
 =======
 

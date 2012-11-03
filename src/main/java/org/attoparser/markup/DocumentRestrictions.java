@@ -64,6 +64,7 @@ public final class DocumentRestrictions implements Serializable {
     
     
     private boolean requireBalancedElements = false;
+    private boolean requireNoUnbalancedCloseElements = false;
     private boolean requireWellFormedProlog = false;
     private boolean requireUniqueRootElement = false;
     private boolean requireWellFormedAttributeValues = false;
@@ -84,6 +85,7 @@ public final class DocumentRestrictions implements Serializable {
     public static DocumentRestrictions none() {
         final DocumentRestrictions spec = new DocumentRestrictions();
         spec.requireBalancedElements = false;
+        spec.requireNoUnbalancedCloseElements = false;
         spec.requireWellFormedProlog = false;
         spec.requireUniqueRootElement = false;
         spec.requireWellFormedAttributeValues = false;
@@ -107,6 +109,7 @@ public final class DocumentRestrictions implements Serializable {
     public static DocumentRestrictions wellFormed() {
         final DocumentRestrictions spec = new DocumentRestrictions();
         spec.requireBalancedElements = true;
+        spec.requireNoUnbalancedCloseElements = true;
         spec.requireWellFormedProlog = true;
         spec.requireUniqueRootElement = true;
         spec.requireWellFormedAttributeValues = true;
@@ -132,6 +135,22 @@ public final class DocumentRestrictions implements Serializable {
 
     public void setRequireBalancedElements(final boolean requireBalancedElements) {
         this.requireBalancedElements = requireBalancedElements;
+    }
+
+
+    /**
+     * @since 1.1
+     */
+    public boolean getRequireNoUnbalancedCloseElements() {
+        return this.requireNoUnbalancedCloseElements;
+    }
+
+
+    /**
+     * @since 1.1
+     */
+    public void setRequireNoUnbalancedCloseElements(final boolean requireNoUnbalancedCloseElements) {
+        this.requireNoUnbalancedCloseElements = requireNoUnbalancedCloseElements;
     }
 
 

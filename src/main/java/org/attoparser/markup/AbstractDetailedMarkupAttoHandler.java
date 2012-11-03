@@ -454,6 +454,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
         private final DocumentRestrictions documentRestrictions; 
         
         private final boolean requireBalancedElements;
+        private final boolean requireNoUnbalancedCloseElements;
         private final boolean requireWellFormedProlog;
         private final boolean requireUniqueRootElement;
         private final boolean requireWellFormedAttributeValues;
@@ -480,15 +481,19 @@ public abstract class AbstractDetailedMarkupAttoHandler
             
             this.handler = handler;
             this.documentRestrictions = documentRestrictions;
-            
+
+            // IMPORTANT: When a well-formedness flag is added here, it should also be added
+            // to the "this.requireWellFormed" expression below
             this.requireBalancedElements = documentRestrictions.getRequireBalancedElements();
+            this.requireNoUnbalancedCloseElements = documentRestrictions.getRequireNoUnbalancedCloseElements();
             this.requireWellFormedProlog = documentRestrictions.getRequireWellFormedProlog();
             this.requireUniqueRootElement = documentRestrictions.getRequireUniqueRootElement();
             this.requireWellFormedAttributeValues = documentRestrictions.getRequireWellFormedAttributeValues();
             this.requireUniqueAttributesInElement = documentRestrictions.getRequireUniqueAttributesInElement();
             
             this.requireWellFormed = 
-                    (this.requireBalancedElements || this.requireWellFormedProlog || this.requireUniqueRootElement ||
+                    (this.requireBalancedElements || this.requireNoUnbalancedCloseElements || 
+                     this.requireWellFormedProlog || this.requireUniqueRootElement ||
                      this.requireWellFormedAttributeValues || this.requireUniqueAttributesInElement);
             
             if (this.requireWellFormed) {
@@ -698,7 +703,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
             
             this.handler.handleOpenElementName(buffer, offset, len, line, col);
             
-            if (this.requireBalancedElements) {
+            if (this.requireBalancedElements || this.requireNoUnbalancedCloseElements) {
                 addToStack(buffer, offset, len);
             }
             
@@ -736,7 +741,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
             
             if (this.requireWellFormed) {
 
-                if (this.requireBalancedElements) {
+                if (this.requireBalancedElements || this.requireNoUnbalancedCloseElements) {
                     checkStackForElement(buffer, offset, len, line, col);
                 }
                 
