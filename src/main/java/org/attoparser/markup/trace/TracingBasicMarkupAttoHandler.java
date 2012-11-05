@@ -49,7 +49,7 @@ public final class TracingBasicMarkupAttoHandler extends AbstractBasicMarkupAtto
     
     
     @Override
-    public void handleDocumentStart(final long startTimeNanos)
+    public void handleDocumentStart(final long startTimeNanos, final int line, final int col)
             throws AttoParseException {
         try {
             this.writer.write('[');
@@ -61,7 +61,7 @@ public final class TracingBasicMarkupAttoHandler extends AbstractBasicMarkupAtto
     
     
     @Override
-    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos)
+    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
             throws AttoParseException {
         try {
             this.writer.write(']');

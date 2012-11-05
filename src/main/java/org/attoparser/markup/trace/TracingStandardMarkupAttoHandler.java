@@ -57,7 +57,9 @@ public final class TracingStandardMarkupAttoHandler extends AbstractStandardMark
     
     
     @Override
-    public void handleDocumentStart(final long startTimeNanos, final DocumentRestrictions documentRestrictions)
+    public void handleDocumentStart(final long startTimeNanos, 
+            final int line, final int col,
+            final DocumentRestrictions documentRestrictions)
             throws AttoParseException {
         
         try {
@@ -71,7 +73,9 @@ public final class TracingStandardMarkupAttoHandler extends AbstractStandardMark
     
     
     @Override
-    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final DocumentRestrictions documentRestrictions)
+    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, 
+            final int line, final int col,
+            final DocumentRestrictions documentRestrictions)
             throws AttoParseException {
         
         try {
@@ -137,6 +141,26 @@ public final class TracingStandardMarkupAttoHandler extends AbstractStandardMark
         try {
             
             this.writer.write("CE");
+            this.writer.write('(');
+            this.writer.write(elementName);
+            this.writer.write(')');
+            writePosition(this.writer, line, col);
+            
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        }
+        
+    }
+
+
+
+    @Override
+    public void handleBalancedCloseElement(final String elementName, final int line, final int col) 
+            throws AttoParseException {
+        
+        try {
+            
+            this.writer.write("BCE");
             this.writer.write('(');
             this.writer.write(elementName);
             this.writer.write(')');

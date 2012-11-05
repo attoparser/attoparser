@@ -59,6 +59,9 @@ import org.attoparser.AttoParseException;
  *   <li><b>Processing Instructions</b>: <tt>&lt;?xsl-stylesheet ...?&gt;</tt></li>
  * </ul>
  * <p>
+ *   Unclosed elements are balanced by means of the <tt>handleBalanced*</tt> handler methods.
+ * </p>
+ * <p>
  *   This class provides empty implementations for all event handlers, so that
  *   subclasses can override only the methods they need.
  * </p>
@@ -70,7 +73,7 @@ import org.attoparser.AttoParseException;
  */
 public abstract class AbstractDetailedMarkupAttoHandler 
         extends AbstractBasicMarkupAttoHandler
-        implements IDetailedElementHandling, IDetailedDocTypeHandling {
+        implements IDetailedBalancedElementHandling, IDetailedDocTypeHandling {
 
     private static final DocumentRestrictions RESTRICTIONS_NONE = DocumentRestrictions.none(); 
     
@@ -94,18 +97,18 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
     
     @Override
-    public final void handleDocumentStart(final long startTimeNanos)
+    public final void handleDocumentStart(final long startTimeNanos, final int line, final int col)
             throws AttoParseException {
-        super.handleDocumentStart(startTimeNanos);
-        this.wrapper.handleDocumentStart(startTimeNanos);
+        super.handleDocumentStart(startTimeNanos, line, col);
+        this.wrapper.handleDocumentStart(startTimeNanos, line, col);
     }
 
 
     @Override
-    public final void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos)
+    public final void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
             throws AttoParseException {
-        super.handleDocumentEnd(endTimeNanos, totalTimeNanos);
-        this.wrapper.handleDocumentEnd(endTimeNanos, totalTimeNanos);
+        super.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col);
+        this.wrapper.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col);
     }
     
 
@@ -216,7 +219,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
      * @throws AttoParseException
      */
     @SuppressWarnings("unused")
-    public void handleDocumentStart(final long startTimeNanos, final DocumentRestrictions documentRestrictions)
+    public void handleDocumentStart(final long startTimeNanos, 
+            final int line, final int col, final DocumentRestrictions documentRestrictions)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
@@ -233,7 +237,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
      * @throws AttoParseException
      */
     @SuppressWarnings("unused")
-    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final DocumentRestrictions documentRestrictions)
+    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, 
+            final int line, final int col, final DocumentRestrictions documentRestrictions)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
@@ -388,6 +393,32 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
 
     
+    public void handleBalancedCloseElementStart(
+            final char[] buffer,
+            final int offset, final int len, 
+            final int line, final int col)
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
+    }
+
+    public void handleBalancedCloseElementName(
+            final char[] buffer, 
+            final int offset, final int len, 
+            final int line, final int col)
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
+    }
+
+    public void handleBalancedCloseElementEnd(
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
+    }
+
+
+    
     public void handleAttribute(
             final char[] buffer,
             final int nameOffset, final int nameLen,
@@ -448,6 +479,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
         private static final int DEFAULT_STACK_SIZE = 15;
         private static final int DEFAULT_ATTRIBUTE_NAMES_SIZE = 5;
 
+        private static final char[] CLOSING_START = "</".toCharArray();
+        private static final char[] CLOSING_END = ">".toCharArray();
         
         private final AbstractDetailedMarkupAttoHandler handler;
 
@@ -459,7 +492,6 @@ public abstract class AbstractDetailedMarkupAttoHandler
         private final boolean requireUniqueRootElement;
         private final boolean requireWellFormedAttributeValues;
         private final boolean requireUniqueAttributesInElement;
-        private final boolean requireWellFormed;
         
         private final boolean requireNoProlog;
         
@@ -482,54 +514,47 @@ public abstract class AbstractDetailedMarkupAttoHandler
             this.handler = handler;
             this.documentRestrictions = documentRestrictions;
 
-            // IMPORTANT: When a well-formedness flag is added here, it should also be added
-            // to the "this.requireWellFormed" expression below
             this.requireBalancedElements = documentRestrictions.getRequireBalancedElements();
-            this.requireNoUnbalancedCloseElements = documentRestrictions.getRequireNoUnbalancedCloseElements();
+            this.requireNoUnbalancedCloseElements = 
+                    (this.requireBalancedElements || documentRestrictions.getRequireNoUnbalancedCloseElements());
             this.requireWellFormedProlog = documentRestrictions.getRequireWellFormedProlog();
             this.requireUniqueRootElement = documentRestrictions.getRequireUniqueRootElement();
             this.requireWellFormedAttributeValues = documentRestrictions.getRequireWellFormedAttributeValues();
             this.requireUniqueAttributesInElement = documentRestrictions.getRequireUniqueAttributesInElement();
             
-            this.requireWellFormed = 
-                    (this.requireBalancedElements || this.requireNoUnbalancedCloseElements || 
-                     this.requireWellFormedProlog || this.requireUniqueRootElement ||
-                     this.requireWellFormedAttributeValues || this.requireUniqueAttributesInElement);
-            
-            if (this.requireWellFormed) {
-                this.elementStack = new char[DEFAULT_STACK_SIZE][];
-                this.elementStackSize = 0;
-            }
+            this.elementStack = new char[DEFAULT_STACK_SIZE][];
+            this.elementStackSize = 0;
             
             this.requireNoProlog = documentRestrictions.getRequireNoProlog();
             
         }
 
         
-        public void handleDocumentStart(final long startTimeNanos)
+        public void handleDocumentStart(final long startTimeNanos, final int line, final int col)
                 throws AttoParseException {
-            this.handler.handleDocumentStart(startTimeNanos, this.documentRestrictions);
+            this.handler.handleDocumentStart(startTimeNanos, line, col, this.documentRestrictions);
         }
 
 
-        public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos)
+        public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
                 throws AttoParseException {
             
-            if (this.requireWellFormed) {
-                if (this.requireBalancedElements && this.elementStackSize > 0) {
-                    final char[] popped = popFromStack();
-                    throw new AttoParseException(
-                        "Malformed markup: element " +
-                        "\"" + new String(popped, 0, popped.length) + "\"" +
-                        " is never closed (no closing tag at the end of document)");
-                }
-                if (this.requireUniqueRootElement && !this.elementRead) {
-                    throw new AttoParseException(
-                            "Malformed markup: no root element present");
-                }
+            if (this.requireBalancedElements && this.elementStackSize > 0) {
+                final char[] popped = popFromStack();
+                throw new AttoParseException(
+                    "Malformed markup: element " +
+                    "\"" + new String(popped, 0, popped.length) + "\"" +
+                    " is never closed (no closing tag at the end of document)");
             }
             
-            this.handler.handleDocumentEnd(endTimeNanos, totalTimeNanos, this.documentRestrictions);
+            if (this.requireUniqueRootElement && !this.elementRead) {
+                throw new AttoParseException(
+                        "Malformed markup: no root element present");
+            }
+            
+            cleanStack(line, col);
+            
+            this.handler.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col, this.documentRestrictions);
             
         }
 
@@ -554,19 +579,19 @@ public abstract class AbstractDetailedMarkupAttoHandler
                         line, col);
             }
             
-            if (this.requireWellFormed) {
+            if (this.requireWellFormedProlog) {
                 
-                if (this.requireWellFormedProlog && this.xmlDeclarationRead) {
+                if (this.xmlDeclarationRead) {
                     throw new AttoParseException(
                             "Malformed markup: Only one XML Declaration can appear in document",
                             line, col);
                 }
-                if (this.requireWellFormedProlog && this.docTypeRead) {
+                if (this.docTypeRead) {
                     throw new AttoParseException(
                             "Malformed markup: XML Declaration must appear before DOCTYPE",
                             line, col);
                 }
-                if (this.requireWellFormedProlog && this.elementRead) {
+                if (this.elementRead) {
                     throw new AttoParseException(
                             "Malformed markup: XML Declaration must appear before any " +
                             "elements in document",
@@ -602,36 +627,34 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int line, final int col)
                 throws AttoParseException {
             
-            if (this.requireWellFormed) {
+            if (this.elementStackSize == 0) {
                 
-                if (this.elementStackSize == 0) {
-                    
-                    if (this.requireUniqueRootElement && this.elementRead) {
-                        throw new AttoParseException(
-                                "Malformed markup: Only one root element is allowed",
-                                line, col);
-                    }
+                if (this.requireUniqueRootElement && this.elementRead) {
+                    throw new AttoParseException(
+                            "Malformed markup: Only one root element is allowed",
+                            line, col);
+                }
 
-                    if (this.requireWellFormedProlog && this.docTypeRead) {
-                        boolean matches = (this.rootElementName.length == len);
-                        for (int i = 0; matches && i < len; i++) {
-                            if (buffer[offset + i] != this.rootElementName[i]) {
-                                matches = false;
-                            }
-                        }
-                        if (!matches) {
-                            throw new AttoParseException(
-                                "Malformed markup: Root element should be \"" + new String(this.rootElementName) + "\", " +
-                                "but \"" + new String(buffer, offset, len) + "\" has been found",
-                                line, col);
+                if (this.requireWellFormedProlog && this.docTypeRead) {
+                    boolean matches = (this.rootElementName.length == len);
+                    for (int i = 0; matches && i < len; i++) {
+                        if (buffer[offset + i] != this.rootElementName[i]) {
+                            matches = false;
                         }
                     }
-                    
+                    if (!matches) {
+                        throw new AttoParseException(
+                            "Malformed markup: Root element should be \"" + new String(this.rootElementName) + "\", " +
+                            "but \"" + new String(buffer, offset, len) + "\" has been found",
+                            line, col);
+                    }
                 }
                 
+            }
+
+            if (this.requireUniqueAttributesInElement) {
                 this.currentElementAttributeNames = null;
                 this.currentElementAttributeNamesSize = 0;
-                
             }
             
             this.handler.handleStandaloneElementName(buffer, offset, len, line, col);
@@ -669,43 +692,39 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int col)
                 throws AttoParseException {
             
-            if (this.requireWellFormed) {
+            if (this.elementStackSize == 0) {
                 
-                if (this.elementStackSize == 0) {
-                    
-                    if (this.requireUniqueRootElement && this.elementRead) {
-                        throw new AttoParseException(
-                                "Malformed markup: Only one root element is allowed",
-                                line, col);
-                    }
+                if (this.requireUniqueRootElement && this.elementRead) {
+                    throw new AttoParseException(
+                            "Malformed markup: Only one root element is allowed",
+                            line, col);
+                }
 
-                    if (this.requireWellFormedProlog && this.docTypeRead) {
-                        boolean matches = (this.rootElementName.length == len);
-                        for (int i = 0; matches && i < len; i++) {
-                            if (buffer[offset + i] != this.rootElementName[i]) {
-                                matches = false;
-                            }
-                        }
-                        if (!matches) {
-                            throw new AttoParseException(
-                                "Malformed markup: Root element should be \"" + new String(this.rootElementName) + "\", " +
-                                "but \"" + new String(buffer, offset, len) + "\" has been found",
-                                line, col);
+                if (this.requireWellFormedProlog && this.docTypeRead) {
+                    boolean matches = (this.rootElementName.length == len);
+                    for (int i = 0; matches && i < len; i++) {
+                        if (buffer[offset + i] != this.rootElementName[i]) {
+                            matches = false;
                         }
                     }
-                    
+                    if (!matches) {
+                        throw new AttoParseException(
+                            "Malformed markup: Root element should be \"" + new String(this.rootElementName) + "\", " +
+                            "but \"" + new String(buffer, offset, len) + "\" has been found",
+                            line, col);
+                    }
                 }
                 
+            }
+
+            if (this.requireUniqueAttributesInElement) {
                 this.currentElementAttributeNames = null;
                 this.currentElementAttributeNamesSize = 0;
-                
             }
             
             this.handler.handleOpenElementName(buffer, offset, len, line, col);
             
-            if (this.requireBalancedElements || this.requireNoUnbalancedCloseElements) {
-                addToStack(buffer, offset, len);
-            }
+            addToStack(buffer, offset, len);
             
         }
 
@@ -729,7 +748,10 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int line, final int col)
                 throws AttoParseException {
             
-            this.handler.handleCloseElementStart(buffer, offset, len, line, col);
+            // We will not do anything here because we have to
+            // wait for the corresponding "elementName" event
+            // to execute and check the balancing (we might need
+            // some balancing events to be executed before this one).
             
         }
 
@@ -739,17 +761,14 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int line, final int col)
                 throws AttoParseException {
             
-            if (this.requireWellFormed) {
-
-                if (this.requireBalancedElements || this.requireNoUnbalancedCloseElements) {
-                    checkStackForElement(buffer, offset, len, line, col);
-                }
-                
+            checkStackForElement(buffer, offset, len, line, col);
+            
+            if (this.requireUniqueAttributesInElement) {
                 this.currentElementAttributeNames = null;
                 this.currentElementAttributeNamesSize = 0;
-                
             }
             
+            this.handler.handleCloseElementStart(CLOSING_START, 0, CLOSING_START.length, line, col - 2);
             this.handler.handleCloseElementName(buffer, offset, len, line, col);
             
         }
@@ -778,66 +797,62 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int valueLine, final int valueCol)
                 throws AttoParseException {
             
-            if (this.requireWellFormed) {
-
-                if (this.requireUniqueAttributesInElement) {
-                    
-                    // Check attribute name is unique in this element
-                    if (this.currentElementAttributeNames == null) {
-                        // we only create this structure if there is at least one attribute
-                        this.currentElementAttributeNames = new char[DEFAULT_ATTRIBUTE_NAMES_SIZE][];
-                    }
-                    for (int i = 0; i < this.currentElementAttributeNamesSize; i++) {
-                        if (this.currentElementAttributeNames[i].length != nameLen) {
-                            continue;
-                        }
-                        int j;
-                        for (j = 0; j < nameLen; j++) {
-                            if (this.currentElementAttributeNames[i][j] != buffer[nameOffset + j]) {
-                                break;
-                            }
-                        }
-                        if (j == nameLen) {
-                            throw new AttoParseException(
-                                "Malformed markup: Attribute \"" + new String(buffer, nameOffset, nameLen) + "\" " +
-                                "appears more than once in element", 
-                                nameLine, nameCol);
-                        }
-                    }
-                    if (this.currentElementAttributeNamesSize == this.currentElementAttributeNames.length) {
-                        // we need to grow the array!
-                        final char[][] newCurrentElementAttributeNames = new char[this.currentElementAttributeNames.length * 2][];
-                        System.arraycopy(this.currentElementAttributeNames, 0, newCurrentElementAttributeNames, 0, this.currentElementAttributeNames.length);
-                        this.currentElementAttributeNames = newCurrentElementAttributeNames;
-                    }
-                    this.currentElementAttributeNames[this.currentElementAttributeNamesSize] = new char[nameLen];
-                    System.arraycopy(buffer, nameOffset, this.currentElementAttributeNames[this.currentElementAttributeNamesSize], 0, nameLen);
-                    this.currentElementAttributeNamesSize++;
-                    
+            if (this.requireUniqueAttributesInElement) {
+                
+                // Check attribute name is unique in this element
+                if (this.currentElementAttributeNames == null) {
+                    // we only create this structure if there is at least one attribute
+                    this.currentElementAttributeNames = new char[DEFAULT_ATTRIBUTE_NAMES_SIZE][];
                 }
+                for (int i = 0; i < this.currentElementAttributeNamesSize; i++) {
+                    if (this.currentElementAttributeNames[i].length != nameLen) {
+                        continue;
+                    }
+                    int j;
+                    for (j = 0; j < nameLen; j++) {
+                        if (this.currentElementAttributeNames[i][j] != buffer[nameOffset + j]) {
+                            break;
+                        }
+                    }
+                    if (j == nameLen) {
+                        throw new AttoParseException(
+                            "Malformed markup: Attribute \"" + new String(buffer, nameOffset, nameLen) + "\" " +
+                            "appears more than once in element", 
+                            nameLine, nameCol);
+                    }
+                }
+                if (this.currentElementAttributeNamesSize == this.currentElementAttributeNames.length) {
+                    // we need to grow the array!
+                    final char[][] newCurrentElementAttributeNames = new char[this.currentElementAttributeNames.length * 2][];
+                    System.arraycopy(this.currentElementAttributeNames, 0, newCurrentElementAttributeNames, 0, this.currentElementAttributeNames.length);
+                    this.currentElementAttributeNames = newCurrentElementAttributeNames;
+                }
+                this.currentElementAttributeNames[this.currentElementAttributeNamesSize] = new char[nameLen];
+                System.arraycopy(buffer, nameOffset, this.currentElementAttributeNames[this.currentElementAttributeNamesSize], 0, nameLen);
+                this.currentElementAttributeNamesSize++;
+                
+            }
 
                 
-                if (this.requireWellFormedAttributeValues) {
-                    
-                    // Check there is an operator
-                    if (operatorLen == 0)  {
-                        throw new AttoParseException(
-                                "Malformed markup: Value for attribute \"" + new String(buffer, nameOffset, nameLen) + "\" " +
-                                "must include an equals (=) sign and a value surrounded by commas", 
-                                operatorLine, operatorCol);
-                    }
-                    
-                    
-                    // Check attribute is surrounded by commas (double or single)
-                    if (valueOuterLen == 0 || valueOuterLen == valueContentLen)  {
-                        throw new AttoParseException(
-                                "Malformed markup: Value for attribute \"" + new String(buffer, nameOffset, nameLen) + "\" " +
-                                "must be surrounded by commas", 
-                                valueLine, valueCol);
-                    }
-                    
+            if (this.requireWellFormedAttributeValues) {
+                
+                // Check there is an operator
+                if (operatorLen == 0)  {
+                    throw new AttoParseException(
+                            "Malformed markup: Value for attribute \"" + new String(buffer, nameOffset, nameLen) + "\" " +
+                            "must include an equals (=) sign and a value surrounded by commas", 
+                            operatorLine, operatorCol);
                 }
                 
+                
+                // Check attribute is surrounded by commas (double or single)
+                if (valueOuterLen == 0 || valueOuterLen == valueContentLen)  {
+                    throw new AttoParseException(
+                            "Malformed markup: Value for attribute \"" + new String(buffer, nameOffset, nameLen) + "\" " +
+                            "must be surrounded by commas", 
+                            valueLine, valueCol);
+                }
+            
             }
             
             this.handler.handleAttribute(
@@ -886,25 +901,21 @@ public abstract class AbstractDetailedMarkupAttoHandler
                         outerLine, outerCol);
             }
             
-            if (this.requireWellFormed) {
-                
-                if (this.requireWellFormedProlog && this.docTypeRead) {
-                    throw new AttoParseException(
-                            "Malformed markup: Only one DOCTYPE clause can appear in document",
-                            outerLine, outerCol);
-                }
-                
-                if (this.requireWellFormedProlog && this.elementRead) {
-                    throw new AttoParseException(
-                            "Malformed markup: DOCTYPE must appear before any " +
-                            "elements in document",
-                            outerLine, outerCol);
-                }
-                
-                this.rootElementName = new char[elementNameLen];
-                System.arraycopy(buffer, elementNameOffset, this.rootElementName, 0, elementNameLen);
-                
+            if (this.requireWellFormedProlog && this.docTypeRead) {
+                throw new AttoParseException(
+                        "Malformed markup: Only one DOCTYPE clause can appear in document",
+                        outerLine, outerCol);
             }
+            
+            if (this.requireWellFormedProlog && this.elementRead) {
+                throw new AttoParseException(
+                        "Malformed markup: DOCTYPE must appear before any " +
+                        "elements in document",
+                        outerLine, outerCol);
+            }
+            
+            this.rootElementName = new char[elementNameLen];
+            System.arraycopy(buffer, elementNameOffset, this.rootElementName, 0, elementNameLen);
             
             this.handler.handleDocType(
                     buffer, 
@@ -928,28 +939,76 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final char[] buffer, final int offset, final int len, final int line, final int col) 
                 throws AttoParseException {
             
-            final char[] popped = popFromStack();
-            if (popped == null) {
+            char[] popped = popFromStack();
+
+            while (popped != null) {
+
+                boolean matches = (len == popped.length);
+            
+                final int maxi = offset + len;
+                for (int i = offset; matches && i < maxi; i++) {
+                    if (buffer[i] != popped[i - offset]) {
+                        matches = false;
+                    }
+                }
+    
+                if (matches) {
+                    // We found the corresponding opening element!
+                    return;
+                }
+                
+                // does not match...
+                
+                if (this.requireBalancedElements) {
+                    throw new AttoParseException(
+                            "Malformed markup: element " +
+                            "\"" + new String(popped, 0, popped.length) + "\"" +
+                            " is never closed", line, col - 2);
+                }
+                
+                this.handler.handleBalancedCloseElementStart(CLOSING_START, 0, CLOSING_START.length, line, col - 2);
+                this.handler.handleBalancedCloseElementName(popped, 0, popped.length, line, col - 2);
+                this.handler.handleBalancedCloseElementEnd(CLOSING_END, 0, CLOSING_END.length, line, col - 2);
+                
+                popped = popFromStack();
+                
+            }
+
+            // closing element at the root level
+            if (this.requireNoUnbalancedCloseElements) {
                 throw new AttoParseException(
                         "Malformed markup: closing element " +
                         "\"" + new String(buffer, offset, len) + "\"" +
-                        " is never open", line, col);
+                        " is never open", line, col - 2);
             }
-
-            boolean matches = (len == popped.length);
             
-            final int maxi = offset + len;
-            for (int i = offset; matches && i < maxi; i++) {
-                if (buffer[i] != popped[i - offset]) {
-                    matches = false;
-                }
-            }
+            // Nothing to check! just return.
+            
+        }
+        
 
-            if (!matches) {
-                throw new AttoParseException(
-                        "Malformed markup: element " +
-                        "\"" + new String(popped, 0, popped.length) + "\"" +
-                        " is never closed", line, col);
+        
+        
+        private void cleanStack(final int line, final int col) 
+                throws AttoParseException {
+            
+            if (this.elementStackSize > 0) {
+
+                // When we arrive here we know that "requireBalancedElements" is
+                // false. If it were true, an exception would have been raised before.
+                
+                char[] popped = popFromStack();
+
+                while (popped != null) {
+                    
+                    this.handler.handleBalancedCloseElementStart(CLOSING_START, 0, CLOSING_START.length, line, col);
+                    this.handler.handleBalancedCloseElementName(popped, 0, popped.length, line, col);
+                    this.handler.handleBalancedCloseElementEnd(CLOSING_END, 0, CLOSING_END.length, line, col);
+                    
+                    popped = popFromStack();
+                    
+                }
+                
             }
             
         }

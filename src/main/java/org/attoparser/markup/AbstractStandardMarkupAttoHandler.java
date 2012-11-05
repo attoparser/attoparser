@@ -217,6 +217,55 @@ public abstract class AbstractStandardMarkupAttoHandler
 
     
     
+    
+    @Override
+    public final void handleBalancedCloseElementStart(
+            final char[] buffer, 
+            final int offset, final int len, 
+            final int line, final int col) 
+            throws AttoParseException {
+
+        super.handleBalancedCloseElementStart(buffer, offset, len, line, col);
+        
+        this.currentElementName = null;
+        this.currentElementAttributes = null;
+        this.currentElementLine = line;
+        this.currentElementCol = col;
+        
+    }
+    
+    
+
+    @Override
+    public final void handleBalancedCloseElementName(
+            final char[] buffer, 
+            final int offset, final int len, 
+            final int line, final int col)
+            throws AttoParseException {
+
+        super.handleBalancedCloseElementName(buffer, offset, len, line, col);
+        
+        this.currentElementName = new String(buffer, offset, len);
+        
+    }
+
+    
+    
+    @Override
+    public final void handleBalancedCloseElementEnd(
+            final char[] buffer, 
+            final int offset, final int len,
+            final int line, final int col) 
+            throws AttoParseException {
+
+        super.handleBalancedCloseElementEnd(buffer, offset, len, line, col);
+
+        handleBalancedCloseElement(this.currentElementName, this.currentElementLine, this.currentElementCol);
+        
+    }
+
+    
+    
     @Override
     public final void handleAttribute(
             final char[] buffer, 
@@ -455,6 +504,28 @@ public abstract class AbstractStandardMarkupAttoHandler
      */
     @SuppressWarnings("unused")
     public void handleCloseElement(
+            final String elementName, final int line, final int col)
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
+    }
+    
+
+    /**
+     * <p>
+     *   Called when a close element (a <i>close tag</i>) is needed in order
+     *   to correctly balance the markup.
+     * </p>
+     * <p>
+     *   Implementors might choose to ignore these balancing events.
+     * </p>
+     * 
+     * @param elementName the element name (e.g. "&lt;/div&gt;" -> "div").
+     * @param line the line in the document where this elements appears.
+     * @param col the column in the document where this element appears.
+     * @throws AttoParseException
+     */
+    @SuppressWarnings("unused")
+    public void handleBalancedCloseElement(
             final String elementName, final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required

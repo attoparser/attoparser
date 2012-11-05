@@ -116,9 +116,11 @@ public interface IAttoHandler {
      *   Called at the beginning of document parsing.
      * </p>
      * 
+     * @param line the line of the document where parsing starts (usually number 1)
+     * @param col the column of the document where parsing starts (usually number 1)
      * @throws AttoParseException
      */
-    public void handleDocumentStart()
+    public void handleDocumentStart(final int line, final int col)
             throws AttoParseException;
     
     
@@ -127,9 +129,11 @@ public interface IAttoHandler {
      *   Called at the end of document parsing.
      * </p>
      * 
+     * @param line the line of the document where parsing ends (usually the last one)
+     * @param col the column of the document where the parsing ends (usually the last one)
      * @throws AttoParseException
      */
-    public void handleDocumentEnd()
+    public void handleDocumentEnd(final int line, final int col)
             throws AttoParseException;
 
     

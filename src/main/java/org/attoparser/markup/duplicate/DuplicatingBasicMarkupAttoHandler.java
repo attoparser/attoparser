@@ -48,7 +48,7 @@ public final class DuplicatingBasicMarkupAttoHandler extends AbstractBasicMarkup
     
     
     @Override
-    public void handleDocumentStart(final long startTimeNanos)
+    public void handleDocumentStart(final long startTimeNanos, final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here
     }
@@ -56,7 +56,8 @@ public final class DuplicatingBasicMarkupAttoHandler extends AbstractBasicMarkup
     
     
     @Override
-    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos)
+    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, 
+            final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here
     }

@@ -44,9 +44,12 @@ public interface ITimedDocumentHandling {
      * </p>
      * 
      * @param startTimeNanos the current time (in nanoseconds) obtained when parsing starts.
+     * @param line the line of the document where parsing starts (usually number 1)
+     * @param col the column of the document where parsing starts (usually number 1)
      * @throws AttoParseException
      */
-    public void handleDocumentStart(final long startTimeNanos) throws AttoParseException;
+    public void handleDocumentStart(final long startTimeNanos, final int line, final int col) 
+            throws AttoParseException;
 
     /**
      * <p>
@@ -56,10 +59,12 @@ public interface ITimedDocumentHandling {
      * @param endTimeNanos the current time (in nanoseconds) obtained when parsing ends.
      * @param totalTimeNanos the difference between current times at the start and end of
      *        parsing (in nanoseconds)
+     * @param line the line of the document where parsing ends (usually the last one)
+     * @param col the column of the document where the parsing ends (usually the last one)
      * @throws AttoParseException
      */
-    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos) throws AttoParseException;
-    
+    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final int line, final int col) 
+            throws AttoParseException;
 
     /**
      * <p>

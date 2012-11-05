@@ -81,7 +81,7 @@ public abstract class AbstractBufferedAttoParser extends AbstractAttoParser {
 
         try {
 
-            handler.handleDocumentStart();
+            handler.handleDocumentStart(1, 1);
             
             int bufferSize = initialBufferSize;
             char[] buffer = new char[bufferSize];
@@ -145,17 +145,37 @@ public abstract class AbstractBufferedAttoParser extends AbstractAttoParser {
 
             }
 
+            int lastLine = bufferParseLine;
+            int lastCol = bufferParseCol;
+            
             final int lastStart = bufferParseOffset;
-            final int lastLen = bufferContentSize - lastStart; 
+            final int lastLen = bufferContentSize - lastStart;
+            
             if (lastLen > 0) {
+                
                 if (bufferParseInStructure) {
                     throw new AttoParseException(
                             "Incomplete structure: \"" + new String(buffer, lastStart, lastLen) + "\"", bufferParseLine, bufferParseCol);
                 }
+                
                 handler.handleText(buffer, lastStart, lastLen, bufferParseLine, bufferParseCol);
+                
+                // As we have produced an additional text event, we need to fast-forward the
+                // lastLine and lastCol position to include the last text structure.
+                for (int i = lastStart; i < (lastStart + lastLen); i++) {
+                    final char c = buffer[i];
+                    if (c == '\n') {
+                        lastLine++;
+                        lastCol = 1;
+                    } else {
+                        lastCol++;
+                    }
+
+                }
+                
             }
             
-            handler.handleDocumentEnd();
+            handler.handleDocumentEnd(lastLine, lastCol);
             
         } catch (final AttoParseException e) {
             throw e;

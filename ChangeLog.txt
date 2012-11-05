@@ -1,5 +1,6 @@
 1.1
 =======
+- Added new events to handlers for automatically balancing tags, by creating synthetic closing elements.
 - Added new "noUnbalancedCloseElements" restriction to DocumentRestrictions. This allows unbalanced
   open tags, but not unbalanced close tags (as happens in HTML).
 

@@ -55,7 +55,9 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
     
     
     @Override
-    public void handleDocumentStart(final long startTimeNanos, final DocumentRestrictions documentRestrictions)
+    public void handleDocumentStart(final long startTimeNanos, 
+            final int line, final int col,
+            final DocumentRestrictions documentRestrictions)
             throws AttoParseException {
         try {
             this.writer.write('[');
@@ -67,7 +69,9 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
     
     
     @Override
-    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final DocumentRestrictions documentRestrictions)
+    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, 
+            final int line, final int col, 
+            final DocumentRestrictions documentRestrictions)
             throws AttoParseException {
         try {
             this.writer.write(']');
@@ -286,6 +290,84 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
         
         try {
             
+            this.writer.write('C');
+            this.writer.write('E');
+            this.writer.write('E');
+            this.writer.write('(');
+            this.writer.write(buffer, offset, len);
+            this.writer.write(')');
+            writePosition(this.writer, line, col);
+            
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        }
+        
+    }
+    
+    
+
+    
+    @Override
+    public void handleBalancedCloseElementStart(
+            final char[] buffer, 
+            final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException {
+        
+        try {
+            
+            this.writer.write('B');
+            this.writer.write('C');
+            this.writer.write('E');
+            this.writer.write('S');
+            this.writer.write('(');
+            this.writer.write(buffer, offset, len);
+            this.writer.write(')');
+            writePosition(this.writer, line, col);
+            
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        }
+        
+    }
+
+
+    
+    @Override
+    public void handleBalancedCloseElementName(final char[] buffer, final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException {
+        
+        try {
+            
+            this.writer.write('B');
+            this.writer.write('C');
+            this.writer.write('E');
+            this.writer.write('N');
+            this.writer.write('(');
+            this.writer.write(buffer, offset, len);
+            this.writer.write(')');
+            writePosition(this.writer, line, col);
+            
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        }
+        
+    }
+    
+    
+
+    
+    @Override
+    public void handleBalancedCloseElementEnd(
+            final char[] buffer, 
+            final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException {
+        
+        try {
+            
+            this.writer.write('B');
             this.writer.write('C');
             this.writer.write('E');
             this.writer.write('E');

@@ -131,10 +131,12 @@ public final class DOMMarkupAttoHandler extends AbstractStandardMarkupAttoHandle
 
     @Override
     public void handleDocumentStart(
-            final long startTimeNanos, final DocumentRestrictions documentRestrictions) 
+            final long startTimeNanos, 
+            final int line, final int col,
+            final DocumentRestrictions documentRestrictions) 
             throws AttoParseException {
         
-        super.handleDocumentStart(startTimeNanos, documentRestrictions);
+        super.handleDocumentStart(startTimeNanos, line, col, documentRestrictions);
         
         this.document = new Document();
         this.parsingStartTimeNanos = startTimeNanos;
@@ -146,10 +148,11 @@ public final class DOMMarkupAttoHandler extends AbstractStandardMarkupAttoHandle
     @Override
     public void handleDocumentEnd(
             final long endTimeNanos, final long totalTimeNanos, 
+            final int line, final int col, 
             final DocumentRestrictions documentRestrictions)
             throws AttoParseException {
 
-        super.handleDocumentEnd(endTimeNanos, totalTimeNanos, documentRestrictions);
+        super.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col, documentRestrictions);
         
         this.parsingEndTimeNanos = endTimeNanos;
         this.parsingTotalTimeNanos = totalTimeNanos;

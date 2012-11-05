@@ -50,16 +50,16 @@ public abstract class AbstractAttoHandler
     }
     
     
-    public final void handleDocumentStart() throws AttoParseException {
+    public final void handleDocumentStart(final int line, final int col) throws AttoParseException {
         this.parsingStartTimeNanos = System.nanoTime();
-        handleDocumentStart(this.parsingStartTimeNanos);
+        handleDocumentStart(this.parsingStartTimeNanos, line, col);
     }
 
     
-    public final void handleDocumentEnd() throws AttoParseException {
+    public final void handleDocumentEnd(final int line, final int col) throws AttoParseException {
         this.parsingEndTimeNanos = System.nanoTime();
         final long totalTimeNanos = this.parsingEndTimeNanos - this.parsingStartTimeNanos;
-        handleDocumentEnd(this.parsingEndTimeNanos, totalTimeNanos);
+        handleDocumentEnd(this.parsingEndTimeNanos, totalTimeNanos, line, col);
     }
 
 
@@ -76,13 +76,13 @@ public abstract class AbstractAttoHandler
     }
     
     
-    public void handleDocumentStart(final long startTimeNanos) 
+    public void handleDocumentStart(final long startTimeNanos, final int line, final int col) 
             throws AttoParseException {
         // Nothing to be done here
     }
 
     
-    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos)
+    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
            throws AttoParseException {
         // Nothing to be done here
     }
