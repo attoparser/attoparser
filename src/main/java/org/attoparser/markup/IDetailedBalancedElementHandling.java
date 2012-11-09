@@ -42,7 +42,7 @@ public interface IDetailedBalancedElementHandling extends IDetailedElementHandli
      * <p>
      *   Called when the start of a close element (a <i>close tag</i>) is needed for
      *   balancing an unclosed tag. This
-     *   "start" is considered to be the "<tt>&lt;</tt>" symbol the element starts with.
+     *   "start" is considered to be the "<tt>&lt;/</tt>" sequence the element starts with.
      * </p>
      * <p>
      *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
