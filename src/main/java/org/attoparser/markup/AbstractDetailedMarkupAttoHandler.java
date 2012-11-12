@@ -479,8 +479,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
         private static final int DEFAULT_STACK_SIZE = 15;
         private static final int DEFAULT_ATTRIBUTE_NAMES_SIZE = 5;
 
-        private static final char[] CLOSING_START = "</".toCharArray();
-        private static final char[] CLOSING_END = ">".toCharArray();
+        private static final char[] CLOSE_START = "</".toCharArray();
+        private static final char[] CLOSE_END = ">".toCharArray();
         
         private final AbstractDetailedMarkupAttoHandler handler;
 
@@ -768,7 +768,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 this.currentElementAttributeNamesSize = 0;
             }
             
-            this.handler.handleCloseElementStart(CLOSING_START, 0, CLOSING_START.length, line, col - 2);
+            this.handler.handleCloseElementStart(CLOSE_START, 0, CLOSE_START.length, line, col - 2);
             this.handler.handleCloseElementName(buffer, offset, len, line, col);
             
         }
@@ -966,9 +966,9 @@ public abstract class AbstractDetailedMarkupAttoHandler
                             " is never closed", line, col - 2);
                 }
                 
-                this.handler.handleBalancedCloseElementStart(CLOSING_START, 0, CLOSING_START.length, line, col - 2);
+                this.handler.handleBalancedCloseElementStart(CLOSE_START, 0, CLOSE_START.length, line, col - 2);
                 this.handler.handleBalancedCloseElementName(popped, 0, popped.length, line, col - 2);
-                this.handler.handleBalancedCloseElementEnd(CLOSING_END, 0, CLOSING_END.length, line, col - 2);
+                this.handler.handleBalancedCloseElementEnd(CLOSE_END, 0, CLOSE_END.length, line, col - 2);
                 
                 popped = popFromStack();
                 
@@ -1001,9 +1001,9 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
                 while (popped != null) {
                     
-                    this.handler.handleBalancedCloseElementStart(CLOSING_START, 0, CLOSING_START.length, line, col);
+                    this.handler.handleBalancedCloseElementStart(CLOSE_START, 0, CLOSE_START.length, line, col);
                     this.handler.handleBalancedCloseElementName(popped, 0, popped.length, line, col);
-                    this.handler.handleBalancedCloseElementEnd(CLOSING_END, 0, CLOSING_END.length, line, col);
+                    this.handler.handleBalancedCloseElementEnd(CLOSE_END, 0, CLOSE_END.length, line, col);
                     
                     popped = popFromStack();
                     

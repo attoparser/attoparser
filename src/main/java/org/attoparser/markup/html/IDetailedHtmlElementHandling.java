@@ -30,7 +30,7 @@ import org.attoparser.markup.IAttributeSequenceHandling;
  * @since 1.1
  *
  */
-public interface IHtmlDetailedElementHandling extends IAttributeSequenceHandling {
+public interface IDetailedHtmlElementHandling extends IAttributeSequenceHandling {
 
     
 
@@ -509,6 +509,7 @@ public interface IHtmlDetailedElementHandling extends IAttributeSequenceHandling
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException;
+
 
 
     
