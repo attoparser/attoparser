@@ -54,11 +54,9 @@ public abstract class AbstractDetailedHtmlAttoHandler
 
     
     private IHtmlElement[] elementStack;
-    private int elementStackSize;
-    
     private IHtmlElement[][] siblingStack;
-    private int[] siblingSizes;
-    private int siblingStackSize;
+    private int elementStackSize;
+    private int[] siblingStackSizes;
     
 
     
@@ -67,11 +65,9 @@ public abstract class AbstractDetailedHtmlAttoHandler
         super();
         
         this.elementStack = new IHtmlElement[DEFAULT_STACK_SIZE];
-        this.elementStackSize = 0;
-        
         this.siblingStack = new IHtmlElement[DEFAULT_STACK_SIZE][];
-        this.siblingSizes = new int[DEFAULT_STACK_SIZE];
-        this.siblingStackSize = 0;
+        this.elementStackSize = 0;
+        this.siblingStackSizes = new int[DEFAULT_STACK_SIZE];
         
     }
     
@@ -420,11 +416,15 @@ public abstract class AbstractDetailedHtmlAttoHandler
     private void addToElementStack(final IHtmlElement element) {
         
         if (this.elementStackSize == this.elementStack.length) {
-            growElementStack();
+            this.elementStack = growStack(this.elementStack);
+            this.siblingStack = growStack(this.siblingStack);
+            this.siblingStackSizes = growStack(this.siblingStackSizes);
         }
         
         this.elementStack[this.elementStackSize] = element;
         this.elementStackSize++;
+        
+        t
         
     }
 
@@ -455,14 +455,37 @@ public abstract class AbstractDetailedHtmlAttoHandler
         
     }
     
+
     
     private void growElementStack() {
-        
-        final int newStackSize = this.elementStack.length * 2;
+        if (this.elementStack == null) {
+            this.elementStack = new IHtmlElement[DEFAULT_STACK_SIZE];
+            return;
+        }
+        final int newStackSize = stack.length * 2;
         final IHtmlElement[] newStack = new IHtmlElement[newStackSize];
-        System.arraycopy(this.elementStack, 0, newStack, 0, this.elementStack.length);
-        this.elementStack = newStack;
-        
+        System.arraycopy(stack, 0, newStack, 0, stack.length);
+        return newStack;
+    }
+    
+    private IHtmlElement[] growStack(final IHtmlElement[] stack) {
+        if (stack == null) {
+            return new IHtmlElement[DEFAULT_STACK_SIZE];
+        }
+        final int newStackSize = stack.length * 2;
+        final IHtmlElement[] newStack = new IHtmlElement[newStackSize];
+        System.arraycopy(stack, 0, newStack, 0, stack.length);
+        return newStack;
+    }
+    
+    private IHtmlElement[] growStack(final IHtmlElement[] stack) {
+        if (stack == null) {
+            return new IHtmlElement[DEFAULT_STACK_SIZE];
+        }
+        final int newStackSize = stack.length * 2;
+        final IHtmlElement[] newStack = new IHtmlElement[newStackSize];
+        System.arraycopy(stack, 0, newStack, 0, stack.length);
+        return newStack;
     }
     
     
