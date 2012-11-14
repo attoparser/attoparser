@@ -59,13 +59,11 @@ public final class DOMMarkupAttoHandler extends AbstractStandardMarkupAttoHandle
 
     
     static {
-        
         XML_PARSING_CONFIGURATION = new MarkupParsingConfiguration();
         XML_PARSING_CONFIGURATION.setElementBalancing(ElementBalancing.REQUIRE_BALANCED);
         XML_PARSING_CONFIGURATION.setRequireUniqueAttributesInElement(true);
         XML_PARSING_CONFIGURATION.setRequireWellFormedAttributeValues(true);
         XML_PARSING_CONFIGURATION.setRequireWellFormedProlog(true);
-
     }
     
 
