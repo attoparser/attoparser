@@ -23,7 +23,7 @@ import java.io.Writer;
 
 import org.attoparser.AttoParseException;
 import org.attoparser.markup.AbstractDetailedMarkupAttoHandler;
-import org.attoparser.markup.DocumentRestrictions;
+import org.attoparser.markup.MarkupParsingConfiguration;
 
 
 
@@ -46,8 +46,8 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
         this.writer = writer;
     }
     
-    public DuplicatingDetailedMarkupAttoHandler(final Writer writer, final DocumentRestrictions documentRestrictions) {
-        super(documentRestrictions);
+    public DuplicatingDetailedMarkupAttoHandler(final Writer writer, final MarkupParsingConfiguration markupParsingConfiguration) {
+        super(markupParsingConfiguration);
         this.writer = writer;
     }
     
@@ -57,7 +57,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
     @Override
     public void handleDocumentStart(final long startTimeNanos, 
             final int line, final int col,
-            final DocumentRestrictions documentRestrictions)
+            final MarkupParsingConfiguration markupParsingConfiguration)
             throws AttoParseException {
         // Nothing to be done here
     }
@@ -67,7 +67,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
     @Override
     public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, 
             final int line, final int col,
-            final DocumentRestrictions documentRestrictions)
+            final MarkupParsingConfiguration markupParsingConfiguration)
             throws AttoParseException {
         // Nothing to be done here
     }
@@ -288,7 +288,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public void handleBalancedCloseElementStart(final char[] buffer, final int offset, final int len, final int line,
+    public void handleAutoCloseElementStart(final char[] buffer, final int offset, final int len, final int line,
             final int col) throws AttoParseException {
         // Nothing to be done... balanced elements were not present at the original template!
     }
@@ -297,7 +297,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public void handleBalancedCloseElementName(final char[] buffer, final int offset, final int len, final int line,
+    public void handleAutoCloseElementName(final char[] buffer, final int offset, final int len, final int line,
             final int col) throws AttoParseException {
         // Nothing to be done... balanced elements were not present at the original template!
     }
@@ -306,7 +306,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public void handleBalancedCloseElementEnd(final char[] buffer, final int offset, final int len, final int line,
+    public void handleAutoCloseElementEnd(final char[] buffer, final int offset, final int len, final int line,
             final int col) throws AttoParseException {
         // Nothing to be done... balanced elements were not present at the original template!
     }

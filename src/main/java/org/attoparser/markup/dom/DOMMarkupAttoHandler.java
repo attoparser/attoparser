@@ -23,7 +23,8 @@ import java.util.Map;
 
 import org.attoparser.AttoParseException;
 import org.attoparser.markup.AbstractStandardMarkupAttoHandler;
-import org.attoparser.markup.DocumentRestrictions;
+import org.attoparser.markup.MarkupParsingConfiguration;
+import org.attoparser.markup.MarkupParsingConfiguration.ElementBalancing;
 
 
 
@@ -45,6 +46,7 @@ import org.attoparser.markup.DocumentRestrictions;
  */
 public final class DOMMarkupAttoHandler extends AbstractStandardMarkupAttoHandler {
 
+    private static final MarkupParsingConfiguration XML_PARSING_CONFIGURATION;
     
     private Document document = null;
     private boolean parsingFinished = false;
@@ -55,6 +57,17 @@ public final class DOMMarkupAttoHandler extends AbstractStandardMarkupAttoHandle
     private Element currentElement = null;
     
 
+    
+    static {
+        
+        XML_PARSING_CONFIGURATION = new MarkupParsingConfiguration();
+        XML_PARSING_CONFIGURATION.setElementBalancing(ElementBalancing.REQUIRE_BALANCED);
+        XML_PARSING_CONFIGURATION.setRequireUniqueAttributesInElement(true);
+        XML_PARSING_CONFIGURATION.setRequireWellFormedAttributeValues(true);
+        XML_PARSING_CONFIGURATION.setRequireWellFormedProlog(true);
+
+    }
+    
 
     /**
      * <p>
@@ -63,7 +76,7 @@ public final class DOMMarkupAttoHandler extends AbstractStandardMarkupAttoHandle
      */
     public DOMMarkupAttoHandler() {
         // Must be well-formed in order to create an adequate DOM tree
-        super(DocumentRestrictions.wellFormed());
+        super(XML_PARSING_CONFIGURATION);
     }
 
     
@@ -133,10 +146,10 @@ public final class DOMMarkupAttoHandler extends AbstractStandardMarkupAttoHandle
     public void handleDocumentStart(
             final long startTimeNanos, 
             final int line, final int col,
-            final DocumentRestrictions documentRestrictions) 
+            final MarkupParsingConfiguration markupParsingConfiguration) 
             throws AttoParseException {
         
-        super.handleDocumentStart(startTimeNanos, line, col, documentRestrictions);
+        super.handleDocumentStart(startTimeNanos, line, col, markupParsingConfiguration);
         
         this.document = new Document();
         this.parsingStartTimeNanos = startTimeNanos;
@@ -149,10 +162,10 @@ public final class DOMMarkupAttoHandler extends AbstractStandardMarkupAttoHandle
     public void handleDocumentEnd(
             final long endTimeNanos, final long totalTimeNanos, 
             final int line, final int col, 
-            final DocumentRestrictions documentRestrictions)
+            final MarkupParsingConfiguration markupParsingConfiguration)
             throws AttoParseException {
 
-        super.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col, documentRestrictions);
+        super.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col, markupParsingConfiguration);
         
         this.parsingEndTimeNanos = endTimeNanos;
         this.parsingTotalTimeNanos = totalTimeNanos;

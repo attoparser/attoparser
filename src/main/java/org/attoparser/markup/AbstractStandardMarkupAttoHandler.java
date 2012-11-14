@@ -36,8 +36,8 @@ import org.attoparser.AttoParseException;
  *   handling interface similar to that of the standard SAX {@link org.xml.sax.ContentHandler}.
  * </p>
  * <p>
- *   Handlers extending from this class can make use of a {@link DocumentRestrictions} instance
- *   specifying a set of restrictions to be applied during document parsing (for example, 
+ *   Handlers extending from this class can make use of a {@link MarkupParsingConfiguration} instance
+ *   specifying a markup parsing configuration to be applied during document parsing (for example, 
  *   for ensuring that a document is well-formed from an XML/XHTML standpoint).
  * </p>
  * <p>
@@ -67,8 +67,8 @@ public abstract class AbstractStandardMarkupAttoHandler
         super();
     }
     
-    protected AbstractStandardMarkupAttoHandler(final DocumentRestrictions documentRestrictions) {
-        super(documentRestrictions);
+    protected AbstractStandardMarkupAttoHandler(final MarkupParsingConfiguration markupParsingConfiguration) {
+        super(markupParsingConfiguration);
     }
     
     
@@ -219,13 +219,13 @@ public abstract class AbstractStandardMarkupAttoHandler
     
     
     @Override
-    public final void handleBalancedCloseElementStart(
+    public final void handleAutoCloseElementStart(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col) 
             throws AttoParseException {
 
-        super.handleBalancedCloseElementStart(buffer, offset, len, line, col);
+        super.handleAutoCloseElementStart(buffer, offset, len, line, col);
         
         this.currentElementName = null;
         this.currentElementAttributes = null;
@@ -237,13 +237,13 @@ public abstract class AbstractStandardMarkupAttoHandler
     
 
     @Override
-    public final void handleBalancedCloseElementName(
+    public final void handleAutoCloseElementName(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
 
-        super.handleBalancedCloseElementName(buffer, offset, len, line, col);
+        super.handleAutoCloseElementName(buffer, offset, len, line, col);
         
         this.currentElementName = new String(buffer, offset, len);
         
@@ -252,13 +252,13 @@ public abstract class AbstractStandardMarkupAttoHandler
     
     
     @Override
-    public final void handleBalancedCloseElementEnd(
+    public final void handleAutoCloseElementEnd(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col) 
             throws AttoParseException {
 
-        super.handleBalancedCloseElementEnd(buffer, offset, len, line, col);
+        super.handleAutoCloseElementEnd(buffer, offset, len, line, col);
 
         handleBalancedCloseElement(this.currentElementName, this.currentElementLine, this.currentElementCol);
         

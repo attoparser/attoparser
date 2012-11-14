@@ -24,7 +24,7 @@ import java.io.Writer;
 
 import org.attoparser.AttoParseException;
 import org.attoparser.markup.AbstractDetailedMarkupAttoHandler;
-import org.attoparser.markup.DocumentRestrictions;
+import org.attoparser.markup.MarkupParsingConfiguration;
 
 
 
@@ -46,8 +46,8 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
         this.writer = writer;
     }
     
-    public TracingDetailedMarkupAttoHandler(final Writer writer, final DocumentRestrictions documentRestrictions) {
-        super(documentRestrictions);
+    public TracingDetailedMarkupAttoHandler(final Writer writer, final MarkupParsingConfiguration markupParsingConfiguration) {
+        super(markupParsingConfiguration);
         this.writer = writer;
     }
     
@@ -57,7 +57,7 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
     @Override
     public void handleDocumentStart(final long startTimeNanos, 
             final int line, final int col,
-            final DocumentRestrictions documentRestrictions)
+            final MarkupParsingConfiguration markupParsingConfiguration)
             throws AttoParseException {
         try {
             this.writer.write('[');
@@ -71,7 +71,7 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
     @Override
     public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, 
             final int line, final int col, 
-            final DocumentRestrictions documentRestrictions)
+            final MarkupParsingConfiguration markupParsingConfiguration)
             throws AttoParseException {
         try {
             this.writer.write(']');
@@ -308,7 +308,7 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
 
     
     @Override
-    public void handleBalancedCloseElementStart(
+    public void handleAutoCloseElementStart(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
@@ -334,7 +334,7 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
 
     
     @Override
-    public void handleBalancedCloseElementName(final char[] buffer, final int offset, final int len,
+    public void handleAutoCloseElementName(final char[] buffer, final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         
@@ -359,7 +359,7 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
 
     
     @Override
-    public void handleBalancedCloseElementEnd(
+    public void handleAutoCloseElementEnd(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)

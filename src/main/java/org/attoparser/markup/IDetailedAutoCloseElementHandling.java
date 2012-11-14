@@ -25,8 +25,8 @@ import org.attoparser.AttoParseException;
 /**
  * <p>
  *   Handler feature interface to be implemented by {@link org.attoparser.IAttoHandler} implementations
- *   that offer detailed reporting of elements (markup <i>tags</i>), including automatic balancing of 
- *   unclosed elements.
+ *   that offer detailed reporting of elements (markup <i>tags</i>), including automatic closing of 
+ *   unclosed elements (a <i>tag balancing</i> operation).
  * </p>
  * 
  * @author Daniel Fern&aacute;ndez
@@ -34,7 +34,7 @@ import org.attoparser.AttoParseException;
  * @since 1.1
  *
  */
-public interface IDetailedBalancedElementHandling extends IDetailedElementHandling {
+public interface IDetailedAutoCloseElementHandling extends IDetailedElementHandling {
     
     
     
@@ -61,7 +61,7 @@ public interface IDetailedBalancedElementHandling extends IDetailedElementHandli
      * @param col the column in the original document where this artifact starts.
      * @throws AttoParseException
      */
-    public void handleBalancedCloseElementStart(
+    public void handleAutoCloseElementStart(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
@@ -90,7 +90,7 @@ public interface IDetailedBalancedElementHandling extends IDetailedElementHandli
      * @param col the column in the original document where this artifact starts.
      * @throws AttoParseException
      */
-    public void handleBalancedCloseElementName(
+    public void handleAutoCloseElementName(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
@@ -119,7 +119,7 @@ public interface IDetailedBalancedElementHandling extends IDetailedElementHandli
      * @param col the column in the original document where this artifact starts.
      * @throws AttoParseException
      */
-    public void handleBalancedCloseElementEnd(
+    public void handleAutoCloseElementEnd(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)

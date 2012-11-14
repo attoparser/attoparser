@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.attoparser.AttoParseException;
 import org.attoparser.markup.AbstractStandardMarkupAttoHandler;
-import org.attoparser.markup.DocumentRestrictions;
+import org.attoparser.markup.MarkupParsingConfiguration;
 
 
 
@@ -48,8 +48,8 @@ public final class TracingStandardMarkupAttoHandler extends AbstractStandardMark
         this.writer = writer;
     }
     
-    public TracingStandardMarkupAttoHandler(final Writer writer, final DocumentRestrictions documentRestrictions) {
-        super(documentRestrictions);
+    public TracingStandardMarkupAttoHandler(final Writer writer, final MarkupParsingConfiguration markupParsingConfiguration) {
+        super(markupParsingConfiguration);
         this.writer = writer;
     }
     
@@ -59,7 +59,7 @@ public final class TracingStandardMarkupAttoHandler extends AbstractStandardMark
     @Override
     public void handleDocumentStart(final long startTimeNanos, 
             final int line, final int col,
-            final DocumentRestrictions documentRestrictions)
+            final MarkupParsingConfiguration markupParsingConfiguration)
             throws AttoParseException {
         
         try {
@@ -75,7 +75,7 @@ public final class TracingStandardMarkupAttoHandler extends AbstractStandardMark
     @Override
     public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, 
             final int line, final int col,
-            final DocumentRestrictions documentRestrictions)
+            final MarkupParsingConfiguration markupParsingConfiguration)
             throws AttoParseException {
         
         try {

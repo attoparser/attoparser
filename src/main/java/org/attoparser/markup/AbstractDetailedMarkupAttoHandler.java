@@ -20,6 +20,7 @@
 package org.attoparser.markup;
 
 import org.attoparser.AttoParseException;
+import org.attoparser.markup.MarkupParsingConfiguration.ElementBalancing;
 
 
 
@@ -34,7 +35,7 @@ import org.attoparser.AttoParseException;
  *   different events for them.
  * </p>
  * <p>
- *   Handlers extending from this class can make use of a {@link DocumentRestrictions} instance
+ *   Handlers extending from this class can make use of a {@link MarkupParsingConfiguration} instance
  *   specifying a set of restrictions to be applied during document parsing (for example, 
  *   for ensuring that a document is well-formed from an XML/XHTML standpoint).
  * </p>
@@ -73,9 +74,9 @@ import org.attoparser.AttoParseException;
  */
 public abstract class AbstractDetailedMarkupAttoHandler 
         extends AbstractBasicMarkupAttoHandler
-        implements IDetailedBalancedElementHandling, IDetailedDocTypeHandling {
+        implements IDetailedAutoCloseElementHandling, IDetailedDocTypeHandling {
 
-    private static final DocumentRestrictions RESTRICTIONS_NONE = DocumentRestrictions.none(); 
+    private static final MarkupParsingConfiguration NO_RESTRICTIONS = MarkupParsingConfiguration.noRestrictions(); 
     
     private final RestrictedWrapper wrapper;
     
@@ -83,13 +84,13 @@ public abstract class AbstractDetailedMarkupAttoHandler
     
     
     protected AbstractDetailedMarkupAttoHandler() {
-        this(RESTRICTIONS_NONE);
+        this(NO_RESTRICTIONS);
     }
 
     
-    protected AbstractDetailedMarkupAttoHandler(final DocumentRestrictions documentRestrictions) {
+    protected AbstractDetailedMarkupAttoHandler(final MarkupParsingConfiguration markupParsingConfiguration) {
         super();
-        this.wrapper = new RestrictedWrapper(this, documentRestrictions);
+        this.wrapper = new RestrictedWrapper(this, markupParsingConfiguration);
     }
 
     
@@ -220,7 +221,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
      */
     @SuppressWarnings("unused")
     public void handleDocumentStart(final long startTimeNanos, 
-            final int line, final int col, final DocumentRestrictions documentRestrictions)
+            final int line, final int col, final MarkupParsingConfiguration documentRestrictions)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
@@ -238,7 +239,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
      */
     @SuppressWarnings("unused")
     public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, 
-            final int line, final int col, final DocumentRestrictions documentRestrictions)
+            final int line, final int col, final MarkupParsingConfiguration documentRestrictions)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
@@ -393,7 +394,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
 
     
-    public void handleBalancedCloseElementStart(
+    public void handleAutoCloseElementStart(
             final char[] buffer,
             final int offset, final int len, 
             final int line, final int col)
@@ -401,7 +402,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
         // Nothing to be done here, meant to be overridden if required
     }
 
-    public void handleBalancedCloseElementName(
+    public void handleAutoCloseElementName(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col)
@@ -409,7 +410,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
         // Nothing to be done here, meant to be overridden if required
     }
 
-    public void handleBalancedCloseElementEnd(
+    public void handleAutoCloseElementEnd(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
@@ -484,8 +485,9 @@ public abstract class AbstractDetailedMarkupAttoHandler
         
         private final AbstractDetailedMarkupAttoHandler handler;
 
-        private final DocumentRestrictions documentRestrictions; 
-        
+        private final MarkupParsingConfiguration markupParsingConfiguration; 
+
+        private final boolean autoClose;
         private final boolean requireBalancedElements;
         private final boolean requireNoUnbalancedCloseElements;
         private final boolean requireWellFormedProlog;
@@ -507,32 +509,35 @@ public abstract class AbstractDetailedMarkupAttoHandler
         
         
         
-        RestrictedWrapper(final AbstractDetailedMarkupAttoHandler handler, final DocumentRestrictions documentRestrictions) {
+        RestrictedWrapper(final AbstractDetailedMarkupAttoHandler handler, final MarkupParsingConfiguration markupParsingConfiguration) {
             
             super();
             
             this.handler = handler;
-            this.documentRestrictions = documentRestrictions;
+            this.markupParsingConfiguration = markupParsingConfiguration;
 
-            this.requireBalancedElements = documentRestrictions.getRequireBalancedElements();
+            this.autoClose =
+                    ElementBalancing.AUTO_CLOSE.equals(markupParsingConfiguration.getElementBalancing());
+            this.requireBalancedElements = 
+                    ElementBalancing.REQUIRE_BALANCED.equals(markupParsingConfiguration.getElementBalancing());
             this.requireNoUnbalancedCloseElements = 
-                    (this.requireBalancedElements || documentRestrictions.getRequireNoUnbalancedCloseElements());
-            this.requireWellFormedProlog = documentRestrictions.getRequireWellFormedProlog();
-            this.requireUniqueRootElement = documentRestrictions.getRequireUniqueRootElement();
-            this.requireWellFormedAttributeValues = documentRestrictions.getRequireWellFormedAttributeValues();
-            this.requireUniqueAttributesInElement = documentRestrictions.getRequireUniqueAttributesInElement();
+                    (this.requireBalancedElements || markupParsingConfiguration.getRequireNoUnbalancedCloseElements());
+            this.requireWellFormedProlog = markupParsingConfiguration.getRequireWellFormedProlog();
+            this.requireUniqueRootElement = markupParsingConfiguration.getRequireUniqueRootElement();
+            this.requireWellFormedAttributeValues = markupParsingConfiguration.getRequireWellFormedAttributeValues();
+            this.requireUniqueAttributesInElement = markupParsingConfiguration.getRequireUniqueAttributesInElement();
             
             this.elementStack = new char[DEFAULT_STACK_SIZE][];
             this.elementStackSize = 0;
             
-            this.requireNoProlog = documentRestrictions.getRequireNoProlog();
+            this.requireNoProlog = markupParsingConfiguration.getRequireNoProlog();
             
         }
 
         
         public void handleDocumentStart(final long startTimeNanos, final int line, final int col)
                 throws AttoParseException {
-            this.handler.handleDocumentStart(startTimeNanos, line, col, this.documentRestrictions);
+            this.handler.handleDocumentStart(startTimeNanos, line, col, this.markupParsingConfiguration);
         }
 
 
@@ -554,7 +559,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
             
             cleanStack(line, col);
             
-            this.handler.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col, this.documentRestrictions);
+            this.handler.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col, this.markupParsingConfiguration);
             
         }
 
@@ -965,10 +970,12 @@ public abstract class AbstractDetailedMarkupAttoHandler
                             "\"" + new String(popped, 0, popped.length) + "\"" +
                             " is never closed", line, col - 2);
                 }
-                
-                this.handler.handleBalancedCloseElementStart(CLOSE_START, 0, CLOSE_START.length, line, col - 2);
-                this.handler.handleBalancedCloseElementName(popped, 0, popped.length, line, col - 2);
-                this.handler.handleBalancedCloseElementEnd(CLOSE_END, 0, CLOSE_END.length, line, col - 2);
+
+                if (this.autoClose) {
+                    this.handler.handleAutoCloseElementStart(CLOSE_START, 0, CLOSE_START.length, line, col - 2);
+                    this.handler.handleAutoCloseElementName(popped, 0, popped.length, line, col - 2);
+                    this.handler.handleAutoCloseElementEnd(CLOSE_END, 0, CLOSE_END.length, line, col - 2);
+                }
                 
                 popped = popFromStack();
                 
@@ -1000,10 +1007,12 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 char[] popped = popFromStack();
 
                 while (popped != null) {
-                    
-                    this.handler.handleBalancedCloseElementStart(CLOSE_START, 0, CLOSE_START.length, line, col);
-                    this.handler.handleBalancedCloseElementName(popped, 0, popped.length, line, col);
-                    this.handler.handleBalancedCloseElementEnd(CLOSE_END, 0, CLOSE_END.length, line, col);
+
+                    if (this.autoClose) {
+                        this.handler.handleAutoCloseElementStart(CLOSE_START, 0, CLOSE_START.length, line, col);
+                        this.handler.handleAutoCloseElementName(popped, 0, popped.length, line, col);
+                        this.handler.handleAutoCloseElementEnd(CLOSE_END, 0, CLOSE_END.length, line, col);
+                    }
                     
                     popped = popFromStack();
                     
