@@ -78,7 +78,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
     private static final MarkupParsingConfiguration NO_RESTRICTIONS = MarkupParsingConfiguration.noRestrictions(); 
     
-    private final RestrictedWrapper wrapper;
+    private final StackAwareWrapper wrapper;
     
     
     
@@ -90,7 +90,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
     
     protected AbstractDetailedMarkupAttoHandler(final MarkupParsingConfiguration markupParsingConfiguration) {
         super();
-        this.wrapper = new RestrictedWrapper(this, markupParsingConfiguration);
+        this.wrapper = new StackAwareWrapper(this, markupParsingConfiguration);
     }
 
     
@@ -474,7 +474,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
     
     
     
-    static final class RestrictedWrapper
+    static final class StackAwareWrapper
             implements IDetailedElementHandling, IDetailedDocTypeHandling {
         
         private static final int DEFAULT_STACK_SIZE = 15;
@@ -509,7 +509,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
         
         
         
-        RestrictedWrapper(final AbstractDetailedMarkupAttoHandler handler, final MarkupParsingConfiguration markupParsingConfiguration) {
+        StackAwareWrapper(final AbstractDetailedMarkupAttoHandler handler, final MarkupParsingConfiguration markupParsingConfiguration) {
             
             super();
             
