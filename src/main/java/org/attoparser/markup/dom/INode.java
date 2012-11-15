@@ -21,40 +21,31 @@ package org.attoparser.markup.dom;
 
 
 
+
 /**
  * <p>
- *   General exception for problems occurred during DOM visiting.
- * </p>
- * <p>
- *   May be extended for more specific exception handling. 
+ *   Base interface for all nodes in attoDOM trees.
  * </p>
  * 
  * @author Daniel Fern&aacute;ndez
  * 
- * @since 1.0
+ * @since 1.1
  *
  */
-public class AttoDOMVisitorException extends Exception {
+public interface INode {
+    
+    public boolean hasLine();
+    public Integer getLine();
+    public void setLine(final Integer line);
+    
+    public boolean hasCol();
+    public Integer getCol();
+    public void setCol(final Integer col);
 
-    private static final long serialVersionUID = 2075102526340746026L;
+    public boolean hasParent();
+    public INestableNode getParent();
+    public void setParent(final INestableNode parent);
+   
+    public INode cloneNode(final INestableNode parent);
 
-    
-    
-    public AttoDOMVisitorException() {
-        super();
-    }
-    
-    public AttoDOMVisitorException(final String message, final Throwable throwable) {
-        super(message, throwable);
-    }
-
-    public AttoDOMVisitorException(final String message) {
-        super(message);
-    }
-
-    public AttoDOMVisitorException(final Throwable throwable) {
-        super(throwable);
-    }
-    
-    
 }

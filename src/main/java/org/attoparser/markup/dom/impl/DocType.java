@@ -17,20 +17,27 @@
  * 
  * =============================================================================
  */
-package org.attoparser.markup.dom;
+package org.attoparser.markup.dom.impl;
+
+import java.io.Serializable;
+
+import org.attoparser.markup.dom.IDocType;
+import org.attoparser.markup.dom.INestableNode;
 
 
 /**
  * <p>
- *   Models a DOCTYPE clause in a attoDOM Document.
+ *   Default implementation of the {@link IDocType} interface.
  * </p>
  * 
  * @author Daniel Fern&aacute;ndez
  * 
- * @since 1.0
+ * @since 1.1
  *
  */
-public final class DocType extends Node {
+public class DocType 
+        extends AbstractNode
+        implements IDocType, Serializable {
 
     private static final long serialVersionUID = 763084654353190744L;
     
@@ -42,16 +49,6 @@ public final class DocType extends Node {
 
     
 
-
-    public DocType(final String rootElementName, final String publicId, final String systemId,
-            final String internalSubset, final int line, final int col) {
-        super(line, col);
-        Validate.notNull(rootElementName, "Root element name cannot be null");
-        this.rootElementName = rootElementName;
-        this.publicId = publicId;
-        this.systemId = systemId;
-        this.internalSubset = internalSubset;
-    }
 
     public DocType(final String rootElementName, final String publicId, final String systemId,
             final String internalSubset) {
@@ -102,14 +99,17 @@ public final class DocType extends Node {
         this.internalSubset = internalSubset;
     }
 
-    
-    
-    
-    @Override
-    public final void visit(final AttoDOMVisitor visitor)
-            throws AttoDOMVisitorException {
-        visitor.visitDocType(this);
+
+
+
+    public DocType cloneNode(final INestableNode parent) {
+        final DocType docType = new DocType(this.rootElementName, this.publicId, this.systemId, this.internalSubset);
+        docType.setLine(getLine());
+        docType.setCol(getCol());
+        docType.setParent(parent);
+        return docType;
     }
+
     
     
 }

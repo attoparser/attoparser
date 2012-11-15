@@ -17,37 +17,35 @@
  * 
  * =============================================================================
  */
-package org.attoparser.markup.dom;
+package org.attoparser.markup.dom.impl;
+
+import java.io.Serializable;
+
+import org.attoparser.markup.dom.INestableNode;
+import org.attoparser.markup.dom.IProcessingInstruction;
 
 
 
 
 /**
  * <p>
- *   A Processing Instruction node in a attoDOM tree.
+ *   Default implementation of the {@link IProcessingInstruction} interface.
  * </p>
  * 
  * @author Daniel Fern&aacute;ndez
  * 
- * @since 1.0
+ * @since 1.1
  *
  */
-public final class ProcessingInstruction extends Node {
+public class ProcessingInstruction 
+        extends AbstractNode
+        implements IProcessingInstruction, Serializable {
     
     private static final long serialVersionUID = 7832638382597687056L;
-    
     
     private String target;
     private String content;
 
-
-
-    public ProcessingInstruction(final String target, final String content, final int line, final int col) {
-        super(line, col);
-        Validate.notNull(target, "Target cannot be null");
-        this.target = target;
-        this.content = content;
-    }
 
     public ProcessingInstruction(final String target, final String content) {
         super();
@@ -58,13 +56,6 @@ public final class ProcessingInstruction extends Node {
 
     
     
-    /**
-     * <p>
-     *   Returns the target of the Processing Instruction.
-     * </p>
-     * 
-     * @return the target of the PI.
-     */
     public String getTarget() {
         return this.target;
     }
@@ -75,13 +66,6 @@ public final class ProcessingInstruction extends Node {
     }
 
     
-    /**
-     * <p>
-     *   Returns the content of the Processing Instruction.
-     * </p>
-     * 
-     * @return the content of the PI.
-     */
     public String getContent() {
         return this.content;
     }
@@ -89,14 +73,14 @@ public final class ProcessingInstruction extends Node {
     public void setContent(final String content) {
         this.content = content;
     }
-    
 
-    
 
-    @Override
-    public final void visit(final AttoDOMVisitor visitor)
-            throws AttoDOMVisitorException {
-        visitor.visitProcessingInstruction(this);
+    public ProcessingInstruction cloneNode(final INestableNode parent) {
+        final ProcessingInstruction processingInstruction = new ProcessingInstruction(this.target, this.content);
+        processingInstruction.setLine(getLine());
+        processingInstruction.setCol(getCol());
+        processingInstruction.setParent(parent);
+        return processingInstruction;
     }
     
     

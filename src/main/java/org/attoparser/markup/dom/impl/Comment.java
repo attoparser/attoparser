@@ -17,23 +17,30 @@
  * 
  * =============================================================================
  */
-package org.attoparser.markup.dom;
+package org.attoparser.markup.dom.impl;
+
+import java.io.Serializable;
+
+import org.attoparser.markup.dom.IComment;
+import org.attoparser.markup.dom.INestableNode;
 
 
 
 
 /**
  * <p>
- *   A Comment node in a attoDOM tree.
+ *   Default implementation of the {@link IComment} interface.
  * </p>
  * 
  * 
  * @author Daniel Fern&aacute;ndez
  * 
- * @since 1.0
+ * @since 1.1
  *
  */
-public final class Comment extends Node {
+public class Comment 
+        extends AbstractNode 
+        implements IComment, Serializable {
     
     private static final long serialVersionUID = -5222507854714214977L;
     
@@ -41,13 +48,6 @@ public final class Comment extends Node {
     private String content;
 
 
-    
-    public Comment(final String content, final int line, final int col) {
-        super(line, col);
-        Validate.notNull(content, "Content cannot be null");
-        this.content = content;
-    }
-    
     public Comment(final String content) {
         super();
         Validate.notNull(content, "Content cannot be null");
@@ -57,31 +57,33 @@ public final class Comment extends Node {
     
     
     
-    /**
-     * <p>
-     *   Returns the textual content of this node.
-     * </p>
-     * 
-     * @return the textual content of this node.
-     */
     public String getContent() {
         return this.content;
     }
     
-    
+
     public void setContent(final String content) {
         Validate.notNull(content, "Content cannot be null");
         this.content = content;
     }
 
     
+    public void setContent(final char[] buffer, final int offset, final int len) {
+        this.content = new String(buffer, offset, len);
+    }
 
     
-    @Override
-    public final void visit(final AttoDOMVisitor visitor)
-            throws AttoDOMVisitorException {
-        visitor.visitComment(this);
+    
+    public Comment cloneNode(final INestableNode parent) {
+        final Comment comment = new Comment(this.content);
+        comment.setLine(getLine());
+        comment.setCol(getCol());
+        comment.setParent(parent);
+        return comment;
     }
+
+    
+
 
     
 }

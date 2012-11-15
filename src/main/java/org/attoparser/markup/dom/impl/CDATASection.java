@@ -17,69 +17,42 @@
  * 
  * =============================================================================
  */
-package org.attoparser.markup.dom;
+package org.attoparser.markup.dom.impl;
+
+import org.attoparser.markup.dom.ICDATASection;
+import org.attoparser.markup.dom.INestableNode;
+
 
 
 
 
 /**
  * <p>
- *   A CDATA Section node in a attoDOM tree.
+ *   Default implementation of the {@link ICDATASection} interface.
  * </p>
  * 
  * @author Daniel Fern&aacute;ndez
  * 
- * @since 1.0
+ * @since 1.1
  *
  */
-public final class CDATASection extends Node {
+public class CDATASection 
+        extends Text
+        implements ICDATASection {
     
     private static final long serialVersionUID = -131121996532074777L;
-    
-    
-    private String content;
-
-
-
-    public CDATASection(final String content, final int line, final int col) {
-        super(line, col);
-        Validate.notNull(content, "Content cannot be null");
-        this.content = content;
-    }
 
     public CDATASection(final String content) {
-        super();
-        Validate.notNull(content, "Content cannot be null");
-        this.content = content;
+        super(content);
     }
-
-    
-    
-    /**
-     * <p>
-     *   Returns the textual content of this node.
-     * </p>
-     * 
-     * @return the textual content of this node.
-     */
-    public String getContent() {
-        return this.content;
-    }
-    
-    
-    public void setContent(final String content) {
-        Validate.notNull(content, "Content cannot be null");
-        this.content = content;
-    }
-
-    
-
     
     @Override
-    public final void visit(final AttoDOMVisitor visitor)
-            throws AttoDOMVisitorException {
-        visitor.visitCDATASection(this);
+    public CDATASection cloneNode(final INestableNode parent) {
+        final CDATASection cdataSection = new CDATASection(getContent());
+        cdataSection.setLine(getLine());
+        cdataSection.setCol(getCol());
+        cdataSection.setParent(parent);
+        return cdataSection;
     }
-    
     
 }

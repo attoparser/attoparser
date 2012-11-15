@@ -17,29 +17,32 @@
  * 
  * =============================================================================
  */
-package org.attoparser.markup.dom;
+package org.attoparser.markup.dom.impl;
 
-import java.util.ArrayList;
+import java.io.Serializable;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
+
+import org.attoparser.markup.dom.IElement;
+import org.attoparser.markup.dom.INode;
 
 
 
 /**
  * <p>
- *   Base abstract class for all nodes in a attoDOM tree which have
- *   children.
+ *   Default implementation of the {@link IElement} interface.
  * </p>
+ * 
  * 
  * @author Daniel Fern&aacute;ndez
  * 
- * @since 1.0
+ * @since 1.1
  *
  */
-public final class Element extends Node {
+public class Element 
+        extends AbstractNestableNode
+        implements IElement, Serializable {
 
     private static final long serialVersionUID = -8980986739486971174L;
 
@@ -47,21 +50,11 @@ public final class Element extends Node {
     private String name;
     private boolean standalone;
     
-    private List<Node> children = null;
-    private int childrenLen = 0;
-    
     private Map<String,String> attributes = null;
     private int attributesLen = 0;
     
 
 
-
-    public Element(final String name, final boolean standalone, final int line, final int col) {
-        super(line, col);
-        Validate.notNull(name, "Element name cannot be null");
-        this.name = name;
-        this.standalone = standalone;
-    }
 
     public Element(final String name, final boolean standalone) {
         super();
@@ -108,225 +101,23 @@ public final class Element extends Node {
      */
 
     
-    
-    
-    /**
-     * <p>
-     *   Returns whether this node has any children.
-     * </p>
-     * 
-     * @return true if the node as any children, false if not.
-     */
-    public final boolean hasChildren() {
-        return this.childrenLen != 0;
-    }
-    
 
-    /**
-     * <p>
-     *   Returns the number of children in this node.
-     * </p>
-     * 
-     * @return the number of children.
-     */
-    public final int numChildren() {
-        return this.childrenLen;
-    }
-    
-
-    /**
-     * <p>
-     *   Returns the children of this node. The returned list is immutable.
-     * </p>
-     * 
-     * @return the list of children.
-     */
-    public final List<Node> getChildren() {
-        
-        if (this.childrenLen == 0) {
-            return Collections.emptyList();
-        }
-        return Collections.unmodifiableList(this.children);
-    }
-    
-
-    /**
-     * <p>
-     *   Clears all children from this node.
-     * </p>
-     */
-    public final void clearChildren() {
-        this.children = null;
-        this.childrenLen = 0;
-    }
-
-
-    /**
-     * <p>
-     *   Returns only the {@link Element} children
-     *   of this node, discarding children of any other types.
-     *   The returned list is immutable.
-     * </p>
-     * 
-     * @return the list of Element children.
-     */
-    public final List<Element> getElementChildren() {
-        if (this.childrenLen == 0) {
-            return Collections.emptyList();
-        }
-        final List<Element> elementChildren = new ArrayList<Element>();
-        for (final Node child : this.children) {
-            if (child instanceof Element) {
-                elementChildren.add((Element)child);
-            }
-        }
-        return Collections.unmodifiableList(elementChildren);
-    }
-    
-
-    /**
-     * <p>
-     *   Returns the first child of this node.
-     * </p>
-     * 
-     * @return the first child, or null if there are no children.
-     */
-    public final Node getFirstChild() {
-        if (this.childrenLen == 0) {
-            return null;
-        }
-        return this.children.get(0);
-    }
-
-
-    /**
-     * <p>
-     *   Returns the first child of type {@link Element}.
-     * </p>
-     * 
-     * @return the first Element child, or null if there are no children
-     *         or there are but none is an Element.
-     */
-    public final Element getFirstElementChild() {
-        if (this.childrenLen == 0) {
-            return null;
-        }
-        for (final Node child : this.children) {
-            if (child instanceof Element) {
-                return (Element)child;
-            }
-        }
-        return null;
-    }
-    
-    
-
-    
-    public void addChild(final Node newChild) {
-        
+    @Override
+    public void addChild(final INode newChild) {
+        super.addChild(newChild);
         if (newChild != null) {
-            
-            if (this.childrenLen == 0) {
-                this.children = new ArrayList<Node>();
-            }
-            this.children.add(newChild);
-            this.childrenLen++;
-            
-            newChild.parent = this;
-            
             this.standalone = false;
-            
         }
-        
     }
     
     
 
     
-    public void insertChild(final int index, final Node newChild) {
-        
+    public void insertChild(final int index, final AbstractNode newChild) {
+        super.insertChild(index, newChild);
         if (newChild != null) {
-            
-            if (this.childrenLen == 0) {
-                this.children = new ArrayList<Node>();
-            }
-            
-            if (index <= this.childrenLen) {
-                
-                this.children.add(index, newChild);
-                this.childrenLen++;
-                
-                newChild.parent = this;
-                
-                this.standalone = false;
-                
-            }
-            
+            this.standalone = false;
         }
-        
-    }
-
-    
-    
-    public void insertChildBefore(final Node before, final Node newChild) {
-        
-        if (newChild != null) {
-            
-            if (this.childrenLen > 0) {
-                for (int i = 0; i < this.childrenLen; i++) {
-                    final Node currentChild = this.children.get(i);
-                    if (currentChild == before) {
-                        insertChild(i, newChild);
-                        return;
-                    }
-                }
-            }
-            
-        }
-        
-    }
-
-    
-    
-    public void insertChildAfter(final Node after, final Node newChild) {
-        
-        if (newChild != null) {
-            
-            if (this.childrenLen > 0) {
-                for (int i = 0; i < this.childrenLen; i++) {
-                    final Node currentChild = this.children.get(i);
-                    if (currentChild == after) {
-                        insertChild(i + 1, newChild);
-                        return;
-                    }
-                }
-            }
-            
-        }
-        
-    }
-
-    
-    
-    public void removeChild(final Node child) {
-        
-        if (child != null && child.parent == this) {
-            
-            final Iterator<Node> childrenIter = this.children.iterator();
-            while (childrenIter.hasNext()) {
-                final Node nodeChild = childrenIter.next();
-                if (nodeChild == child) {
-                    childrenIter.remove();
-                    this.childrenLen--;
-                    break;
-                }
-            }
-            if (this.childrenLen == 0) {
-                this.children = null;
-            }
-            
-        }
-        
     }
     
     
@@ -565,7 +356,7 @@ public final class Element extends Node {
     
     
     @Override
-    public final void visit(final AttoDOMVisitor visitor)
+    public final void visit(final IAttoDOMVisitor visitor)
             throws AttoDOMVisitorException {
         
         if (this.standalone) {
@@ -573,7 +364,7 @@ public final class Element extends Node {
         } else {
             visitor.visitOpenElement(this);
             if (this.childrenLen > 0) {
-                for (final Node child : this.children) {
+                for (final AbstractNode child : this.children) {
                     child.visit(visitor);
                 }
             }

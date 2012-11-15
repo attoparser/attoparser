@@ -17,22 +17,30 @@
  * 
  * =============================================================================
  */
-package org.attoparser.markup.dom;
+package org.attoparser.markup.dom.impl;
+
+import java.io.Serializable;
+
+import org.attoparser.markup.dom.INestableNode;
+import org.attoparser.markup.dom.IText;
+
 
 
 
 
 /**
  * <p>
- *   A Text node in a attoDOM tree.
+ *   Default implementation of the {@link IText} interface.
  * </p>
  * 
  * @author Daniel Fern&aacute;ndez
  * 
- * @since 1.0
+ * @since 1.1
  *
  */
-public final class Text extends Node {
+public class Text 
+        extends AbstractNode 
+        implements IText, Serializable {
 
     private static final long serialVersionUID = -6449838157196892217L;
     
@@ -40,47 +48,38 @@ public final class Text extends Node {
     private String content;
 
 
-
-    public Text(final String content, final int line, final int col) {
-        super(line, col);
-        Validate.notNull(content, "Content cannot be null");
-        this.content = content;
-    }
-
     public Text(final String content) {
         super();
         Validate.notNull(content, "Content cannot be null");
         this.content = content;
     }
 
-
     
     
-    /**
-     * <p>
-     *   Returns the textual content of this node.
-     * </p>
-     * 
-     * @return the textual content of this node.
-     */
     public String getContent() {
         return this.content;
     }
     
-    
+
     public void setContent(final String content) {
         Validate.notNull(content, "Content cannot be null");
         this.content = content;
     }
-    
-    
 
-    @Override
-    public final void visit(final AttoDOMVisitor visitor)
-            throws AttoDOMVisitorException {
-        visitor.visitText(this);
+    
+    public void setContent(final char[] buffer, final int offset, final int len) {
+        this.content = new String(buffer, offset, len);
     }
+
     
     
+    public Text cloneNode(final INestableNode parent) {
+        final Text text = new Text(this.content);
+        text.setLine(getLine());
+        text.setCol(getCol());
+        text.setParent(parent);
+        return text;
+    }
+
     
 }

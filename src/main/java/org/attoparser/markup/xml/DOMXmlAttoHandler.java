@@ -17,36 +17,42 @@
  * 
  * =============================================================================
  */
-package org.attoparser.markup.dom;
+package org.attoparser.markup.xml;
 
 import java.util.Map;
 
 import org.attoparser.AttoParseException;
 import org.attoparser.markup.AbstractStandardMarkupAttoHandler;
 import org.attoparser.markup.MarkupParsingConfiguration;
-import org.attoparser.markup.MarkupParsingConfiguration.ElementBalancing;
+import org.attoparser.markup.dom.impl.CDATASection;
+import org.attoparser.markup.dom.impl.Comment;
+import org.attoparser.markup.dom.impl.DocType;
+import org.attoparser.markup.dom.impl.Document;
+import org.attoparser.markup.dom.impl.Element;
+import org.attoparser.markup.dom.impl.ProcessingInstruction;
+import org.attoparser.markup.dom.impl.Text;
+import org.attoparser.markup.dom.impl.XmlDeclaration;
 
 
 
 
 /**
  * <p>
- *   Implementation of {@link org.attoparser.IAttoHandler} that builds an attoDOM tree,
- *   with objects from package <tt>org.attoparser.markup.dom</tt>. 
+ *   Implementation of {@link org.attoparser.IAttoHandler} that considers input
+ *   as XML code and builds an attoDOM tree with objects from package 
+ *   <tt>org.attoparser.markup.dom</tt>. 
  * </p>
  * <p>
- *   Use of this handler requires the document to be well-formed from the XML/XHTML standpoint.
+ *   Use of this handler requires the document to be well-formed from the XML standpoint.
  * </p>
  * 
  * 
  * @author Daniel Fern&aacute;ndez
  * 
- * @since 1.0
+ * @since 1.1
  *
  */
-public final class DOMMarkupAttoHandler extends AbstractStandardMarkupAttoHandler {
-
-    private static final MarkupParsingConfiguration XML_PARSING_CONFIGURATION;
+public final class DOMXmlAttoHandler extends AbstractStandardMarkupAttoHandler {
     
     private Document document = null;
     private boolean parsingFinished = false;
@@ -56,15 +62,6 @@ public final class DOMMarkupAttoHandler extends AbstractStandardMarkupAttoHandle
 
     private Element currentElement = null;
     
-
-    
-    static {
-        XML_PARSING_CONFIGURATION = new MarkupParsingConfiguration();
-        XML_PARSING_CONFIGURATION.setElementBalancing(ElementBalancing.REQUIRE_BALANCED);
-        XML_PARSING_CONFIGURATION.setRequireUniqueAttributesInElement(true);
-        XML_PARSING_CONFIGURATION.setRequireWellFormedAttributeValues(true);
-        XML_PARSING_CONFIGURATION.setRequireWellFormedProlog(true);
-    }
     
 
     /**
@@ -72,9 +69,9 @@ public final class DOMMarkupAttoHandler extends AbstractStandardMarkupAttoHandle
      *   Creates a new instance of this handler.
      * </p> 
      */
-    public DOMMarkupAttoHandler() {
+    public DOMXmlAttoHandler() {
         // Must be well-formed in order to create an adequate DOM tree
-        super(XML_PARSING_CONFIGURATION);
+        super(XmlParsing.XML_PARSING_CONFIGURATION);
     }
 
     
@@ -270,7 +267,7 @@ public final class DOMMarkupAttoHandler extends AbstractStandardMarkupAttoHandle
 
         super.handleCloseElement(elementName, line, col);
 
-        this.currentElement = this.currentElement.parent;
+        this.currentElement = this.currentElement.getParent();
         
     }
 

@@ -22,7 +22,6 @@ package org.attoparser.markup.xml;
 import org.attoparser.AttoParseException;
 import org.attoparser.markup.AbstractDetailedMarkupAttoHandler;
 import org.attoparser.markup.MarkupParsingConfiguration;
-import org.attoparser.markup.MarkupParsingConfiguration.ElementBalancing;
 
 
 
@@ -41,28 +40,36 @@ public abstract class AbstractDetailedXmlAttoHandler
         implements IDetailedXmlElementHandling {
 
 
-    private static final MarkupParsingConfiguration XML_PARSING_CONFIGURATION;
-
-    
-    static {
-        XML_PARSING_CONFIGURATION = new MarkupParsingConfiguration();
-        XML_PARSING_CONFIGURATION.setElementBalancing(ElementBalancing.REQUIRE_BALANCED);
-        XML_PARSING_CONFIGURATION.setRequireUniqueAttributesInElement(true);
-        XML_PARSING_CONFIGURATION.setRequireWellFormedAttributeValues(true);
-        XML_PARSING_CONFIGURATION.setRequireWellFormedProlog(true);
-    }
-
     
     
     public AbstractDetailedXmlAttoHandler() {
-        super(XML_PARSING_CONFIGURATION);
+        super(XmlParsing.XML_PARSING_CONFIGURATION);
+    }
+    
+    
+
+    
+    @Override
+    public final void handleDocumentStart(final long startTimeNanos, 
+            final int line, final int col, final MarkupParsingConfiguration documentRestrictions)
+            throws AttoParseException {
+        super.handleDocumentStart(startTimeNanos, line, col, documentRestrictions);
+        handleXmlDocumentStart(startTimeNanos, line, col);
     }
 
-    
-    
-    
 
-    
+    @Override
+    public final void handleDocumentEnd(
+            final long endTimeNanos, final long totalTimeNanos,
+            final int line, final int col, final MarkupParsingConfiguration documentRestrictions)
+            throws AttoParseException {
+        super.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col, documentRestrictions);
+        handleXmlDocumentEnd(endTimeNanos, totalTimeNanos, line, col);
+    }
+
+
+
+
     @Override
     public final void handleStandaloneElementStart(
             final char[] buffer, 
@@ -207,6 +214,25 @@ public abstract class AbstractDetailedXmlAttoHandler
 
 
 
+    
+    
+
+    
+    @SuppressWarnings("unused")
+    public void handleXmlDocumentStart(final long startTimeNanos, 
+            final int line, final int col)
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
+    }
+
+
+    @SuppressWarnings("unused")
+    public void handleXmlDocumentEnd(
+            final long endTimeNanos, final long totalTimeNanos,
+            final int line, final int col)
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
+    }
 
 
     public void handleXmlStandaloneElementStart(

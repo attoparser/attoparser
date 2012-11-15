@@ -17,20 +17,27 @@
  * 
  * =============================================================================
  */
-package org.attoparser.markup.dom;
+package org.attoparser.markup.dom.impl;
+
+import java.io.Serializable;
+
+import org.attoparser.markup.dom.INestableNode;
+import org.attoparser.markup.dom.IXmlDeclaration;
 
 
 /**
  * <p>
- *   Models a XML Declaration in a attoDOM Document.
+ *   Default implementation of the {@link IXmlDeclaration} interface.
  * </p>
  * 
  * @author Daniel Fern&aacute;ndez
  * 
- * @since 1.0
+ * @since 1.1
  *
  */
-public final class XmlDeclaration extends Node {
+public class XmlDeclaration 
+        extends AbstractNode
+        implements IXmlDeclaration, Serializable {
     
     private static final long serialVersionUID = 8210232665354213283L;
     
@@ -41,15 +48,6 @@ public final class XmlDeclaration extends Node {
 
     
 
-
-    public XmlDeclaration(final String version, final String encoding, final String standalone,
-            final int line, final int col) {
-        super(line, col);
-        Validate.notNull(version, "Version cannot be null");
-        this.version = version;
-        this.encoding = encoding;
-        this.standalone = standalone;
-    }
 
     public XmlDeclaration(final String version, final String encoding, final String standalone) {
         super();
@@ -89,15 +87,17 @@ public final class XmlDeclaration extends Node {
         this.standalone = standalone;
     }
 
-    
-    
-    
-    
-    @Override
-    public final void visit(final AttoDOMVisitor visitor)
-            throws AttoDOMVisitorException {
-        visitor.visitXmlDeclaration(this);
+
+
+
+    public XmlDeclaration cloneNode(final INestableNode parent) {
+        final XmlDeclaration xmlDeclaration = new XmlDeclaration(this.version, this.encoding, this.standalone);
+        xmlDeclaration.setLine(getLine());
+        xmlDeclaration.setCol(getCol());
+        xmlDeclaration.setParent(parent);
+        return xmlDeclaration;
     }
+
     
     
 }

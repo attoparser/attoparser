@@ -17,19 +17,22 @@
  * 
  * =============================================================================
  */
-package org.attoparser.markup.dom;
+package org.attoparser.markup.dom.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+
+import org.attoparser.markup.dom.IDocument;
 
 
 
 /**
  * <p>
  *   An attoDOM document, obtained from parsing a document using a
- *   {@link DOMMarkupAttoHandler} handler object.
+ *   {@link DOMXmlAttoHandler} handler object.
  * </p>
  * <p>
  *   Note that attoDOM trees are <b>mutable</b>.
@@ -40,12 +43,14 @@ import java.util.List;
  * @since 1.0
  *
  */
-public final class Document implements Serializable {
+public class Document
+        extends AbstractNode
+        implements IDocument, Serializable {
     
     private static final long serialVersionUID = 8618216149622786146L;
     
     
-    private List<Node> rootNodes = new ArrayList<Node>();
+    private List<AbstractNode> rootNodes = new ArrayList<AbstractNode>();
     
     
     
@@ -64,7 +69,7 @@ public final class Document implements Serializable {
      * @return the XML declaration, or null if none was found.
      */
     public XmlDeclaration getXmlDeclaration() {
-        for (final Node rootNode : this.rootNodes) {
+        for (final AbstractNode rootNode : this.rootNodes) {
             if (rootNode instanceof XmlDeclaration) {
                 return (XmlDeclaration) rootNode;
             }
@@ -81,7 +86,7 @@ public final class Document implements Serializable {
      * @return the DOCTYPE clause, or null if none was found.
      */
     public DocType getDocType() {
-        for (final Node rootNode : this.rootNodes) {
+        for (final AbstractNode rootNode : this.rootNodes) {
             if (rootNode instanceof DocType) {
                 return (DocType) rootNode;
             }
@@ -114,7 +119,7 @@ public final class Document implements Serializable {
      * 
      * @return the root nodes.
      */
-    public final List<Node> getRootNodes() {
+    public final List<AbstractNode> getRootNodes() {
         
         if (this.rootNodes.size() == 0) {
             throw new IllegalStateException("No root Element!");
@@ -134,7 +139,7 @@ public final class Document implements Serializable {
         if (this.rootNodes.size() == 0) {
             throw new IllegalStateException("No root Element!");
         }
-        for (final Node child : this.rootNodes) {
+        for (final AbstractNode child : this.rootNodes) {
             if (child instanceof Element) {
                 return (Element)child;
             }
@@ -145,14 +150,49 @@ public final class Document implements Serializable {
     
     
 
-    
-    void addRootNode(final Node newRootNode) {
+
+    /**
+     * <p>
+     *   Adds a new root node to the document.
+     * </p>
+     * 
+     * @param newRootNode
+     */
+    public void addRootNode(final AbstractNode newRootNode) {
         
         if (newRootNode != null) {
+            newRootNode.parent = null;
             this.rootNodes.add(newRootNode);
         }
         
     }
+
+    
+
+    /**
+     * <p>
+     *   Removes one root node from the document.
+     * </p>
+     * 
+     * @param rootNode
+     */
+    public void removeRootNode(final AbstractNode rootNode) {
+        
+        if (rootNode != null && rootNode.parent == null) {
+            
+            final Iterator<AbstractNode> rootNodesIter = this.rootNodes.iterator();
+            while (rootNodesIter.hasNext()) {
+                final AbstractNode node = rootNodesIter.next();
+                if (rootNode == node) {
+                    rootNodesIter.remove();
+                    break;
+                }
+            }
+            
+        }
+        
+    }
+    
 
     
 
@@ -165,16 +205,16 @@ public final class Document implements Serializable {
      *   to this document, traversing all its nodes.
      * </p>
      * <p>
-     *   A typical visitor implementation is {@link MarkupWriterAttoDOMVisitor}.
+     *   A typical visitor implementation is {@link XmlWriterAttoDOMVisitor}.
      * </p>
      * 
      * @param visitor the visitor to be applied
      * @throws AttoDOMVisitorException
      */
-    public final void visit(final AttoDOMVisitor visitor)
+    public final void visit(final IAttoDOMVisitor visitor)
             throws AttoDOMVisitorException {
         visitor.visitStartDocument(this);
-        for (final Node rootNode : this.rootNodes) {
+        for (final AbstractNode rootNode : this.rootNodes) {
             rootNode.visit(visitor);
         }
         visitor.visitEndDocument(this);

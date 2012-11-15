@@ -17,17 +17,27 @@
  * 
  * =============================================================================
  */
-package org.attoparser.markup.dom;
+package org.attoparser.markup.xml;
 
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
 
+import org.attoparser.markup.dom.impl.CDATASection;
+import org.attoparser.markup.dom.impl.Comment;
+import org.attoparser.markup.dom.impl.DocType;
+import org.attoparser.markup.dom.impl.Element;
+import org.attoparser.markup.dom.impl.ProcessingInstruction;
+import org.attoparser.markup.dom.impl.Text;
+import org.attoparser.markup.dom.impl.XmlDeclaration;
+import org.attoparser.markup.dom.visitor.AbstractAttoDOMVisitor;
+import org.attoparser.markup.dom.visitor.AttoDOMVisitorException;
+
 
 
 /**
  * <p>
- *   Implementation of {@link AttoDOMVisitor} capable of writing an attoDOM
+ *   Implementation of {@link IAttoDOMVisitor} capable of writing an attoDOM
  *   tree as markup code.
  * </p>
  * 
@@ -36,7 +46,7 @@ import java.util.Map;
  * @since 1.0
  *
  */
-public final class MarkupWriterAttoDOMVisitor extends AbstractAttoDOMVisitor {
+public final class XmlWriterAttoDOMVisitor extends AbstractAttoDOMVisitor {
 
     
     private final Writer writer;
@@ -55,7 +65,7 @@ public final class MarkupWriterAttoDOMVisitor extends AbstractAttoDOMVisitor {
      * 
      * @param writer the writer to be used as output.
      */
-    public MarkupWriterAttoDOMVisitor(final Writer writer) {
+    public XmlWriterAttoDOMVisitor(final Writer writer) {
         super();
         this.writer = writer;
     }

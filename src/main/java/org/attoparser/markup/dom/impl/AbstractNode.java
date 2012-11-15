@@ -17,9 +17,11 @@
  * 
  * =============================================================================
  */
-package org.attoparser.markup.dom;
+package org.attoparser.markup.dom.impl;
 
-import java.io.Serializable;
+import org.attoparser.markup.dom.INestableNode;
+import org.attoparser.markup.dom.INode;
+
 
 
 
@@ -33,60 +35,61 @@ import java.io.Serializable;
  * @since 1.0
  *
  */
-public abstract class Node implements Serializable {
+public abstract class AbstractNode implements INode {
+    
+    
+    private Integer line = null;
+    private Integer col = null;
+    
+    private INestableNode parent;
+    
+    
 
-    private static final long serialVersionUID = 8123273476323610489L;
-    
-    private final Integer line;
-    private final Integer col;
-    
-    Element parent;
-    
-    
-
-    protected Node(final int line, final int col) {
+    protected AbstractNode() {
         super();
-        this.line = Integer.valueOf(line);
-        this.col = Integer.valueOf(col);
-    }
-
-    
-    protected Node() {
-        super();
-        this.line = null;
-        this.col = null;
     }
 
 
-    
+
+    public boolean hasLine() {
+        return this.line != null;
+    }
 
     public Integer getLine() {
         return this.line;
     }
 
+    public void setLine(final Integer line) {
+        this.line = line;
+    }
+
     
+    
+    public boolean hasCol() {
+        return this.col != null;
+    }
+
     public Integer getCol() {
         return this.col;
     }
 
-    
-    
+    public void setCol(final Integer col) {
+        this.col = col;
+    }
+
 
     
-    public final boolean hasParent() {
+    public boolean hasParent() {
         return this.parent != null;
     }
-
     
-    public final Element getParent() {
+    public INestableNode getParent() {
         return this.parent;
     }
-    
 
+    public void setParent(final INestableNode parent) {
+        this.parent = parent;
+    }
 
     
-    public abstract void visit(final AttoDOMVisitor visitor)
-            throws AttoDOMVisitorException;
-    
-
 }

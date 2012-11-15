@@ -22,30 +22,24 @@ package org.attoparser.markup.dom;
 
 
 /**
+ * <p>
+ *   Common interface for XML Declarations in attoDOM trees.
+ * </p>
  * 
  * @author Daniel Fern&aacute;ndez
  * 
- * @since 1.0
+ * @since 1.1
  *
  */
-final class Validate {
+public interface IXmlDeclaration extends INode {
 
+    public String getVersion();
+    public void setVersion(final String version);
+
+    public String getEncoding();
+    public void setEncoding(final String encoding);
     
-    static void notNull(final Object object, final String message) {
-        if (object == null) {
-            throw new IllegalArgumentException(message);
-        }
-    }
-    
-    static void notEmpty(final String object, final String message) {
-        if (object == null || object.trim().equals("")) {
-            throw new IllegalArgumentException(message);
-        }
-    }
-    
-    
-    private Validate() {
-        super();
-    }
+    public String getStandalone();
+    public void setStandalone(final String standalone);
     
 }
