@@ -35,8 +35,7 @@ package org.attoparser.markup.dom;
  */
 public interface IElement 
         extends INamedNode, INestableNode, IAttributeContainerNode {
-    
-    public boolean isStandalone();
-    public void setStandalone(final boolean standalone);
 
+    // No methods to be added here
+    
 }

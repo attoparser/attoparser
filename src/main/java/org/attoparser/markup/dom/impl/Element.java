@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.attoparser.markup.dom.IElement;
+import org.attoparser.markup.dom.INestableNode;
 import org.attoparser.markup.dom.INode;
 
 
@@ -46,9 +47,7 @@ public class Element
 
     private static final long serialVersionUID = -8980986739486971174L;
 
-    
-    private String name;
-    private boolean standalone;
+    private String elementName;
     
     private Map<String,String> attributes = null;
     private int attributesLen = 0;
@@ -56,117 +55,51 @@ public class Element
 
 
 
-    public Element(final String name, final boolean standalone) {
+    public Element(final String name) {
         super();
         Validate.notNull(name, "Element name cannot be null");
-        this.name = name;
-        this.standalone = standalone;
+        this.elementName = name;
     }
 
     
     
     
-    public String getName() {
-        return this.name;
+    public String getElementName() {
+        return this.elementName;
     }
     
-    public void setName(final String name) {
-        Validate.notNull(name, "Element name cannot be null");
-        this.name = name;
+    public void setElementName(final String name) {
+        Validate.notNull(name, "Element elementName cannot be null");
+        this.elementName = name;
     }
     
-
-    
-    public boolean isStandalone() {
-        return this.standalone;
-    }
-    
-    public void setStandalone(final boolean standalone) {
-        this.standalone = standalone;
-        if (standalone) {
-            clearChildren();
-        }
+    public boolean elementNameMatches(final String name) {
+        return this.elementName.equals(name);
     }
     
     
-
     
     
     /*
-     * ************************
-     * ************************
-     *        CHILDREN
-     * ************************
-     * ************************
+     * **********************
+     *  ATTRIBUTE MANAGEMENT
+     * **********************
      */
 
-    
 
-    @Override
-    public void addChild(final INode newChild) {
-        super.addChild(newChild);
-        if (newChild != null) {
-            this.standalone = false;
-        }
-    }
-    
-    
 
-    
-    public void insertChild(final int index, final AbstractNode newChild) {
-        super.insertChild(index, newChild);
-        if (newChild != null) {
-            this.standalone = false;
-        }
-    }
-    
-    
-
-    
-    
-    /*
-     * ************************
-     * ************************
-     *        ATTRIBUTES
-     * ************************
-     * ************************
-     */
-
-    
-    
-    
-    /**
-     * <p>
-     *   Returns whether this element has any attributes or not.
-     * </p>
-     * 
-     * @return true if this element has attributes, false if not.
-     */
-    public boolean hasAttributes() {
-        return this.attributesLen != 0;
-    }
-    
-
-    /**
-     * <p>
-     *   Returns the number of attributes contained in this element.
-     * </p>
-     * 
-     * @return the number of attributes.
-     */
     public int numAttributes() {
         return this.attributesLen;
     }
+    
 
+    public boolean hasAttributes() {
+        return this.attributesLen != 0;
+    }
 
-    /**
-     * <p>
-     *   Returns whether an attribute exists in the element or not.
-     * </p>
-     * 
-     * @param attributeName the name of the attribute to be checked.
-     * @return true if the attribute exists, false if not.
-     */
+    
+    
+    
     public boolean hasAttribute(final String attributeName) {
         if (this.attributesLen > 0) {
             return this.attributes.containsKey(attributeName);
@@ -174,94 +107,26 @@ public class Element
         return false;
     }
 
-
-    /**
-     * <p>
-     *   Returns whether an attribute exists in the element or not,
-     *   ignoring case differences.
-     * </p>
-     * 
-     * @param attributeName the name of the attribute to be checked.
-     * @return true if the attribute exists, false if not.
-     */
-    public boolean hasAttributeIgnoreCase(final String attributeName) {
-        if (this.attributesLen > 0) {
-            for (final Map.Entry<String,String> attributeEntry : this.attributes.entrySet()) {
-                final String entryName = attributeEntry.getKey();
-                if (entryName == null) {
-                    if (attributeName == null) {
-                        return true;
-                    }
-                } else if (entryName.equalsIgnoreCase(attributeName)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
     
-
-    /**
-     * <p>
-     *   Returns the value of an attribute from its attribute name.
-     * </p>
-     * 
-     * @param attributeName the attribute name.
-     * @return the value of the attribute.
-     */
     public String getAttributeValue(final String attributeName) {
         if (this.attributesLen > 0) {
             return this.attributes.get(attributeName);
         }
         return null;
     }
-    
 
-    /**
-     * <p>
-     *   Returns the value of an attribute from its attribute name, ignoring
-     *   case in attribute name.
-     * </p>
-     * 
-     * @param attributeName the attribute name.
-     * @return the value of the attribute.
-     */
-    public String getAttributeValueIgnoreCase(final String attributeName) {
-        if (this.attributesLen > 0) {
-            for (final Map.Entry<String,String> attributeEntry : this.attributes.entrySet()) {
-                final String entryName = attributeEntry.getKey();
-                if (entryName == null) {
-                    if (attributeName == null) {
-                        return attributeEntry.getValue();
-                    }
-                } else if (entryName.equalsIgnoreCase(attributeName)) {
-                    return attributeEntry.getValue();
-                }
-            }
-        }
-        return null;
-    }
     
-
-    /**
-     * <p>
-     *   Returns a map with all the names and values of the element attributes.
-     * </p>
-     * <p>
-     *   The map object returned by this method is immutable.
-     * </p>
-     * 
-     * @return the map of all current attributes in the element.
-     */
+    
+    
     public Map<String,String> getAttributeMap() {
         if (this.attributesLen > 0) {
             return Collections.unmodifiableMap(this.attributes);
         }
         return Collections.emptyMap();
     }
-    
-    
 
+
+    
 
     public void addAttribute(final String attributeName, final String attributeValue) {
         
@@ -285,13 +150,9 @@ public class Element
         }
 
     }
-    
-    
-    public void clearAttributes() {
-        this.attributes = null;
-        this.attributesLen = 0;
-    }
 
+    
+    
     
     public void removeAttribute(final String attributeName) {
         
@@ -310,68 +171,37 @@ public class Element
     }
 
     
-    public void removeAttributeIgnoreCase(final String attributeName) {
-        
-        if (this.attributesLen > 0) {
-            
-            String realAttributeName = null;
-            boolean found = false;
-            for (final Map.Entry<String,String> attributeEntry : this.attributes.entrySet()) {
-                final String entryName = attributeEntry.getKey();
-                if (entryName == null) {
-                    if (attributeName == null) {
-                        found = true;
-                        break;
-                    }
-                } else if (entryName.equalsIgnoreCase(attributeName)) {
-                    realAttributeName = entryName;
-                    found = true;
-                    break;
-                }
-            }
-            if (found) {
-                this.attributes.remove(realAttributeName);
-                this.attributesLen--;
-                if (this.attributesLen == 0) {
-                    this.attributes = null;
-                }
-            }
-            
-        }
-        
+    
+    
+    public void clearAttributes() {
+        this.attributes = null;
+        this.attributesLen = 0;
     }
     
 
     
+
     
     /*
-     * ************************
-     * ************************
-     *        VISITOR
-     * ************************
-     * ************************
+     * *********
+     *  CLONING
+     * *********
      */
 
-    
-    
-    
-    @Override
-    public final void visit(final IAttoDOMVisitor visitor)
-            throws AttoDOMVisitorException {
-        
-        if (this.standalone) {
-            visitor.visitStandaloneElement(this);
-        } else {
-            visitor.visitOpenElement(this);
-            if (this.childrenLen > 0) {
-                for (final AbstractNode child : this.children) {
-                    child.visit(visitor);
-                }
-            }
-            visitor.visitCloseElement(this);
+
+    public Element cloneNode(final INestableNode parent) {
+        final Element element = new Element(this.elementName);
+        element.addAttributes(this.attributes);
+        for (final INode child : getChildren()) {
+            final INode clonedChild = child.cloneNode(element);
+            element.addChild(clonedChild);
         }
-        
+        element.setLine(getLine());
+        element.setCol(getCol());
+        element.setParent(parent);
+        return element;
     }
+
     
 
 }

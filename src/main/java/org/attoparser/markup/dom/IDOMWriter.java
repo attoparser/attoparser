@@ -19,14 +19,15 @@
  */
 package org.attoparser.markup.dom;
 
-import java.util.Map;
+import java.io.IOException;
+import java.io.Writer;
 
 
 
 /**
  * <p>
- *   Common interface for all nodes in attoDOM trees that
- *   can serve as attribute containers.
+ *   Common interface for objects able of writing an attoDOM tree 
+ *   as markup to the specified output.
  * </p>
  * 
  * @author Daniel Fern&aacute;ndez
@@ -34,22 +35,8 @@ import java.util.Map;
  * @since 1.1
  *
  */
-public interface IAttributeContainerNode extends INode {
-    
-    
-    public int numAttributes();
-    public boolean hasAttributes();
-    
-    public boolean hasAttribute(final String name);
-    public String getAttributeValue(final String name);
-    
-    public Map<String,String> getAttributeMap();
+public interface IDOMWriter {
 
-    public void addAttribute(final String name, final String value);
-    public void addAttributes(final Map<String,String> newAttributes);
+    public void write(final INode node, final Writer writer) throws IOException;
     
-    public void removeAttribute(final String attributeName);
-    public void clearAttributes();
-    
-
 }

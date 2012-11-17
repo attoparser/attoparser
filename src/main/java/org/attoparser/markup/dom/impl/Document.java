@@ -20,207 +20,58 @@
 package org.attoparser.markup.dom.impl;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 
 import org.attoparser.markup.dom.IDocument;
+import org.attoparser.markup.dom.INestableNode;
 
 
 
 /**
  * <p>
- *   An attoDOM document, obtained from parsing a document using a
- *   {@link DOMXmlAttoHandler} handler object.
+ *   Default implementation of the {@link IDocument} interface.
  * </p>
- * <p>
- *   Note that attoDOM trees are <b>mutable</b>.
- * </p>
+ * 
  * 
  * @author Daniel Fern&aacute;ndez
  * 
- * @since 1.0
+ * @since 1.1
  *
  */
 public class Document
-        extends AbstractNode
+        extends AbstractNestableNode
         implements IDocument, Serializable {
     
-    private static final long serialVersionUID = 8618216149622786146L;
+    private static final long serialVersionUID = 1L;
     
     
-    private List<AbstractNode> rootNodes = new ArrayList<AbstractNode>();
+    private String documentName = null;
     
     
-    
-    public Document() {
+    public Document(final String documentName) {
         super();
-    }
-    
-    
-
-    
-    /**
-     * <p>
-     *   Return the XML Declaration found at the document, if it exists.
-     * </p>
-     * 
-     * @return the XML declaration, or null if none was found.
-     */
-    public XmlDeclaration getXmlDeclaration() {
-        for (final AbstractNode rootNode : this.rootNodes) {
-            if (rootNode instanceof XmlDeclaration) {
-                return (XmlDeclaration) rootNode;
-            }
-        }
-        return null;
+        this.documentName = documentName;
     }
 
-    
-    /**
-     * <p>
-     *   Return the DOCTYPE clause found at the document, if it exists.
-     * </p>
-     * 
-     * @return the DOCTYPE clause, or null if none was found.
-     */
-    public DocType getDocType() {
-        for (final AbstractNode rootNode : this.rootNodes) {
-            if (rootNode instanceof DocType) {
-                return (DocType) rootNode;
-            }
-        }
-        return null;
+
+    public String getDocumentName() {
+        return this.documentName;
     }
 
-    
-    
-    
-    
-    
-    /**
-     * <p>
-     *   Returns the number of root nodes. Only one of them can be an
-     *   {@link Element}.
-     * </p>
-     * 
-     * @return the number of root nodes.
-     */
-    public final int numRootNodes() {
-        return this.rootNodes.size();
-    }
-    
 
-    /**
-     * <p>
-     *   Returns the document root nodes. The returned list is immutable.
-     * </p>
-     * 
-     * @return the root nodes.
-     */
-    public final List<AbstractNode> getRootNodes() {
-        
-        if (this.rootNodes.size() == 0) {
-            throw new IllegalStateException("No root Element!");
-        }
-        return Collections.unmodifiableList(this.rootNodes);
-    }
-    
-    
-    /**
-     * <p>
-     *   Returns the only {@link Element} root node.
-     * </p>
-     * 
-     * @return the root Element.
-     */
-    public final Element getRootElement() {
-        if (this.rootNodes.size() == 0) {
-            throw new IllegalStateException("No root Element!");
-        }
-        for (final AbstractNode child : this.rootNodes) {
-            if (child instanceof Element) {
-                return (Element)child;
-            }
-        }
-        // This should never happen
-        throw new IllegalStateException("No root Element!");
-    }
-    
-    
-
-
-    /**
-     * <p>
-     *   Adds a new root node to the document.
-     * </p>
-     * 
-     * @param newRootNode
-     */
-    public void addRootNode(final AbstractNode newRootNode) {
-        
-        if (newRootNode != null) {
-            newRootNode.parent = null;
-            this.rootNodes.add(newRootNode);
-        }
-        
+    public void setDocumentName(final String documentName) {
+        this.documentName = documentName;
     }
 
-    
 
-    /**
-     * <p>
-     *   Removes one root node from the document.
-     * </p>
-     * 
-     * @param rootNode
-     */
-    public void removeRootNode(final AbstractNode rootNode) {
-        
-        if (rootNode != null && rootNode.parent == null) {
-            
-            final Iterator<AbstractNode> rootNodesIter = this.rootNodes.iterator();
-            while (rootNodesIter.hasNext()) {
-                final AbstractNode node = rootNodesIter.next();
-                if (rootNode == node) {
-                    rootNodesIter.remove();
-                    break;
-                }
-            }
-            
-        }
-        
+    
+    
+    public Document cloneNode(INestableNode parent) {
+        final Document document = new Document(this.documentName);
+        document.setLine(getLine());
+        document.setCol(getCol());
+        document.setParent(parent);
+        return document;
     }
-    
-
-    
-
-    
-    
-
-    /**
-     * <p>
-     *   Apply a visitor (implementation of {@link AttoDOMVisitorException}) 
-     *   to this document, traversing all its nodes.
-     * </p>
-     * <p>
-     *   A typical visitor implementation is {@link XmlWriterAttoDOMVisitor}.
-     * </p>
-     * 
-     * @param visitor the visitor to be applied
-     * @throws AttoDOMVisitorException
-     */
-    public final void visit(final IAttoDOMVisitor visitor)
-            throws AttoDOMVisitorException {
-        visitor.visitStartDocument(this);
-        for (final AbstractNode rootNode : this.rootNodes) {
-            rootNode.visit(visitor);
-        }
-        visitor.visitEndDocument(this);
-    }
-    
-    
     
 
 }

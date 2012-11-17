@@ -24,6 +24,7 @@ import java.util.Map;
 import org.attoparser.AttoParseException;
 import org.attoparser.markup.AbstractStandardMarkupAttoHandler;
 import org.attoparser.markup.MarkupParsingConfiguration;
+import org.attoparser.markup.dom.INestableNode;
 import org.attoparser.markup.dom.impl.CDATASection;
 import org.attoparser.markup.dom.impl.Comment;
 import org.attoparser.markup.dom.impl.DocType;
@@ -54,13 +55,15 @@ import org.attoparser.markup.dom.impl.XmlDeclaration;
  */
 public final class DOMXmlAttoHandler extends AbstractStandardMarkupAttoHandler {
     
+    private final String documentName;
+    
     private Document document = null;
     private boolean parsingFinished = false;
     private long parsingStartTimeNanos = -1L;
     private long parsingEndTimeNanos = -1L;
     private long parsingTotalTimeNanos = -1L;
 
-    private Element currentElement = null;
+    private INestableNode currentParent = null;
     
     
 
@@ -70,8 +73,20 @@ public final class DOMXmlAttoHandler extends AbstractStandardMarkupAttoHandler {
      * </p> 
      */
     public DOMXmlAttoHandler() {
+        this(null);
+    }
+
+    /**
+     * <p>
+     *   Creates a new instance of this handler.
+     * </p> 
+     */
+    public DOMXmlAttoHandler(final String documentName) {
         // Must be well-formed in order to create an adequate DOM tree
         super(XmlParsing.XML_PARSING_CONFIGURATION);
+        this.documentName = 
+                (documentName == null? 
+                        String.valueOf(System.identityHashCode(this)) : documentName);
     }
 
     
@@ -146,7 +161,7 @@ public final class DOMXmlAttoHandler extends AbstractStandardMarkupAttoHandler {
         
         super.handleDocumentStart(startTimeNanos, line, col, markupParsingConfiguration);
         
-        this.document = new Document();
+        this.document = new Document(this.documentName);
         this.parsingStartTimeNanos = startTimeNanos;
         
     }
@@ -181,12 +196,15 @@ public final class DOMXmlAttoHandler extends AbstractStandardMarkupAttoHandler {
 
         super.handleXmlDeclaration(version, encoding, standalone, line, col);
         
-        final XmlDeclaration xmlDeclaration = new XmlDeclaration(version, encoding, standalone, line, col);
+        final XmlDeclaration xmlDeclaration = new XmlDeclaration(version, encoding, standalone);
+        xmlDeclaration.setLine(Integer.valueOf(line));
+        xmlDeclaration.setLine(Integer.valueOf(col));
         
-        if (this.currentElement == null) {
-            this.document.addRootNode(xmlDeclaration);
+        
+        if (this.currentParent == null) {
+            this.document.addChild(xmlDeclaration);
         } else {
-            this.currentElement.addChild(xmlDeclaration);
+            this.currentParent.addChild(xmlDeclaration);
         }
         
     }
@@ -202,12 +220,14 @@ public final class DOMXmlAttoHandler extends AbstractStandardMarkupAttoHandler {
 
         super.handleDocType(elementName, publicId, systemId, internalSubset, line, col);
 
-        final DocType docType = new DocType(elementName, publicId, systemId, internalSubset, line, col);
+        final DocType docType = new DocType(elementName, publicId, systemId, internalSubset);
+        docType.setLine(Integer.valueOf(line));
+        docType.setLine(Integer.valueOf(col));
         
-        if (this.currentElement == null) {
-            this.document.addRootNode(docType);
+        if (this.currentParent == null) {
+            this.document.addChild(docType);
         } else {
-            this.currentElement.addChild(docType);
+            this.currentParent.addChild(docType);
         }
         
     }
@@ -224,13 +244,15 @@ public final class DOMXmlAttoHandler extends AbstractStandardMarkupAttoHandler {
 
         super.handleStandaloneElement(elementName, attributes, line, col);
 
-        final Element element = new Element(elementName, true, line, col);
+        final Element element = new Element(elementName);
         element.addAttributes(attributes);
+        element.setLine(Integer.valueOf(line));
+        element.setLine(Integer.valueOf(col));
         
-        if (this.currentElement == null) {
-            this.document.addRootNode(element);
+        if (this.currentParent == null) {
+            this.document.addChild(element);
         } else {
-            this.currentElement.addChild(element);
+            this.currentParent.addChild(element);
         }
         
     }
@@ -245,15 +267,17 @@ public final class DOMXmlAttoHandler extends AbstractStandardMarkupAttoHandler {
 
         super.handleOpenElement(elementName, attributes, line, col);
 
-        final Element element = new Element(elementName, false, line, col);
+        final Element element = new Element(elementName);
         element.addAttributes(attributes);
+        element.setLine(Integer.valueOf(line));
+        element.setLine(Integer.valueOf(col));
         
-        if (this.currentElement == null) {
-            this.document.addRootNode(element);
+        if (this.currentParent == null) {
+            this.document.addChild(element);
         } else {
-            this.currentElement.addChild(element);
+            this.currentParent.addChild(element);
         }
-        this.currentElement = element;
+        this.currentParent = element;
         
     }
 
@@ -267,7 +291,7 @@ public final class DOMXmlAttoHandler extends AbstractStandardMarkupAttoHandler {
 
         super.handleCloseElement(elementName, line, col);
 
-        this.currentElement = this.currentElement.getParent();
+        this.currentParent = this.currentParent.getParent();
         
     }
 
@@ -284,12 +308,14 @@ public final class DOMXmlAttoHandler extends AbstractStandardMarkupAttoHandler {
 
         super.handleComment(buffer, offset, len, line, col);
         
-        final Comment comment = new Comment(new String(buffer, offset, len), line, col);
+        final Comment comment = new Comment(new String(buffer, offset, len));
+        comment.setLine(Integer.valueOf(line));
+        comment.setLine(Integer.valueOf(col));
         
-        if (this.currentElement == null) {
-            this.document.addRootNode(comment);
+        if (this.currentParent == null) {
+            this.document.addChild(comment);
         } else {
-            this.currentElement.addChild(comment);
+            this.currentParent.addChild(comment);
         }
         
     }
@@ -304,12 +330,14 @@ public final class DOMXmlAttoHandler extends AbstractStandardMarkupAttoHandler {
 
         super.handleCDATASection(buffer, offset, len, line, col);
         
-        final CDATASection cdataSection = new CDATASection(new String(buffer, offset, len), line, col);
+        final CDATASection cdataSection = new CDATASection(new String(buffer, offset, len));
+        cdataSection.setLine(Integer.valueOf(line));
+        cdataSection.setLine(Integer.valueOf(col));
         
-        if (this.currentElement == null) {
-            this.document.addRootNode(cdataSection);
+        if (this.currentParent == null) {
+            this.document.addChild(cdataSection);
         } else {
-            this.currentElement.addChild(cdataSection);
+            this.currentParent.addChild(cdataSection);
         }
         
     }
@@ -324,12 +352,14 @@ public final class DOMXmlAttoHandler extends AbstractStandardMarkupAttoHandler {
 
         super.handleText(buffer, offset, len, line, col);
         
-        final Text text = new Text(new String(buffer, offset, len), line, col);
+        final Text text = new Text(new String(buffer, offset, len));
+        text.setLine(Integer.valueOf(line));
+        text.setLine(Integer.valueOf(col));
         
-        if (this.currentElement == null) {
-            this.document.addRootNode(text);
+        if (this.currentParent == null) {
+            this.document.addChild(text);
         } else {
-            this.currentElement.addChild(text);
+            this.currentParent.addChild(text);
         }
         
     }
@@ -347,12 +377,14 @@ public final class DOMXmlAttoHandler extends AbstractStandardMarkupAttoHandler {
         super.handleProcessingInstruction(target, content, line, col);
         
         final ProcessingInstruction processingInstruction = 
-                new ProcessingInstruction(target, content, line, col);
+                new ProcessingInstruction(target, content);
+        processingInstruction.setLine(Integer.valueOf(line));
+        processingInstruction.setLine(Integer.valueOf(col));
         
-        if (this.currentElement == null) {
-            this.document.addRootNode(processingInstruction);
+        if (this.currentParent == null) {
+            this.document.addChild(processingInstruction);
         } else {
-            this.currentElement.addChild(processingInstruction);
+            this.currentParent.addChild(processingInstruction);
         }
         
     }
