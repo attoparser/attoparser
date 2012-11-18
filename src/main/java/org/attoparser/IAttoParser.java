@@ -49,9 +49,15 @@ import java.io.Reader;
  *       markup-specialized (XML and HTML) abstract handler that offers an interface
  *       more similar to the Standard SAX ContentHandlers (use of Strings instead of
  *       char[]'s, attribute maps, etc).</li>
- *   <li>{@link org.attoparser.markup.dom.DOMMarkupAttoHandler}: handler implementation
+ *   <li>{@link org.attoparser.markup.xml.AbstractDetailedXmlAttoHandler}: XML-specialized
+ *       abstract handler equivalent to {@link org.attoparser.markup.AbstractDetailedMarkupAttoHandler}
+ *       but only allowing XML markup.</li>
+ *   <li>{@link org.attoparser.markup.xml.AbstractStandardXmlAttoHandler}: XML-specialized
+ *       abstract handler equivalent to {@link org.attoparser.markup.AbstractStandardMarkupAttoHandler}
+ *       but only allowing XML markup.</li>
+ *   <li>{@link org.attoparser.markup.xml.DOMXmlAttoHandler}: handler implementation
  *       (non-abstract) for building an attoDOM tree (DOM node tres based on classes
- *       from the <tt>org.attoparser.markup.dom</tt> package).</li> 
+ *       from the <tt>org.attoparser.markup.dom</tt> package) from XML markup.</li> 
  * </ul>
  * 
  * @author Daniel Fern&aacute;ndez

@@ -56,8 +56,6 @@ public final class XmlDOMWriter extends AbstractDOMWriter {
      * <p>
      *   Create a new instance of this DOM writer.
      * </p>
-     * 
-     * @param writer the writer to be used as output.
      */
     public XmlDOMWriter() {
         super();

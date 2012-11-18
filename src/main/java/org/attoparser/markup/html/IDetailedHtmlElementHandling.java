@@ -145,7 +145,7 @@ public interface IDetailedHtmlElementHandling extends IAttributeSequenceHandling
      *   A <i>unclosed standalone element</i> is a standalone (i.e. <i>no body, no end tag</i>) element
      *   that is not well-formed from the XML standpoint because it isn't closed. 
      *   For example: <tt>&lt;img src="..."&gt;</tt>. In HTML, this is valid and completely equivalent to
-     *   <tt>&lt;img src="..." /&gt;</tt> because the HTML specifications say the <tt>&lt;img&gt;</img>
+     *   <tt>&lt;img src="..." /&gt;</tt> because the HTML specifications say the <tt>&lt;img&gt;</tt>
      *   tag cannot have a body.
      * </p>
      * <p>
@@ -187,7 +187,7 @@ public interface IDetailedHtmlElementHandling extends IAttributeSequenceHandling
      *   A <i>unclosed standalone element</i> is a standalone (i.e. <i>no body, no end tag</i>) element
      *   that is not well-formed from the XML standpoint because it isn't closed. 
      *   For example: <tt>&lt;img src="..."&gt;</tt>. In HTML, this is valid and completely equivalent to
-     *   <tt>&lt;img src="..." /&gt;</tt> because the HTML specifications say the <tt>&lt;img&gt;</img>
+     *   <tt>&lt;img src="..." /&gt;</tt> because the HTML specifications say the <tt>&lt;img&gt;</tt>
      *   tag cannot have a body.
      * </p>
      * <p>
@@ -228,7 +228,7 @@ public interface IDetailedHtmlElementHandling extends IAttributeSequenceHandling
      *   A <i>unclosed standalone element</i> is a standalone (i.e. <i>no body, no end tag</i>) element
      *   that is not well-formed from the XML standpoint because it isn't closed. 
      *   For example: <tt>&lt;img src="..."&gt;</tt>. In HTML, this is valid and completely equivalent to
-     *   <tt>&lt;img src="..." /&gt;</tt> because the HTML specifications say the <tt>&lt;img&gt;</img>
+     *   <tt>&lt;img src="..." /&gt;</tt> because the HTML specifications say the <tt>&lt;img&gt;</tt>
      *   tag cannot have a body.
      * </p>
      * <p>

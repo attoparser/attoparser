@@ -31,9 +31,9 @@ package org.attoparser;
  *   At its most basic, a handler processes four events:
  * </p>
  * <ul>
- *   <li><b>document start</b> (see {@link #handleDocumentStart()}): triggered at the beginning of
+ *   <li><b>document start</b> (see {@link #handleDocumentStart(int, int)}): triggered at the beginning of
  *       document parsing.</li>
- *   <li><b>document end</b> (see {@link #handleDocumentEnd()}): triggered at the end of document
+ *   <li><b>document end</b> (see {@link #handleDocumentEnd(int, int)}): triggered at the end of document
  *       parsing.</li>
  *   <li><b>text</b> (see {@link #handleText(char[], int, int, int, int)}): for texts inside the 
  *       document being parsed, containing no instructions or metainformation of any kind.</li>
@@ -82,9 +82,15 @@ package org.attoparser;
  *       markup-specialized (XML and HTML) abstract handler that offers an interface
  *       more similar to the Standard SAX {@link org.xml.sax.ContentHandler}s (use of 
  *       Strings instead of char[]'s, attribute maps, etc).</li>
- *   <li>{@link org.attoparser.markup.dom.DOMMarkupAttoHandler}: handler implementation
+ *   <li>{@link org.attoparser.markup.xml.AbstractDetailedXmlAttoHandler}: XML-specialized
+ *       abstract handler equivalent to {@link org.attoparser.markup.AbstractDetailedMarkupAttoHandler}
+ *       but only allowing XML markup.</li>
+ *   <li>{@link org.attoparser.markup.xml.AbstractStandardXmlAttoHandler}: XML-specialized
+ *       abstract handler equivalent to {@link org.attoparser.markup.AbstractStandardMarkupAttoHandler}
+ *       but only allowing XML markup.</li>
+ *   <li>{@link org.attoparser.markup.xml.DOMXmlAttoHandler}: handler implementation
  *       (non-abstract) for building an attoDOM tree (DOM node tres based on classes
- *       from the <tt>org.attoparser.markup.dom</tt> package).</li> 
+ *       from the <tt>org.attoparser.markup.dom</tt> package) from XML markup.</li> 
  * </ul>
  * <p><b>Creating handler implementations</b></p>
  * <p>
