@@ -36,11 +36,12 @@ public interface IDetailedHtmlElementHandling extends IAttributeSequenceHandling
 
     /**
      * <p>
-     *   Called when the start of a standalone element (a <i>minimized tag</i>) is found. This
+     *   Called when the start of a closed standalone element is found. This
      *   "start" is considered to be the "<tt>&lt;</tt>" symbol the element starts with.
      * </p>
      * <p>
-     *   An example: <tt>&lt;input type="text" /&gt;</tt>
+     *   A <i>closed standalone element</i> is a standalone (i.e. <i>no body, no end tag</i>) element
+     *   that is well-formed from the XML standpoint. For example: <tt>&lt;img src="..." /&gt;</tt> 
      * </p>
      * <p>
      *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
@@ -59,7 +60,7 @@ public interface IDetailedHtmlElementHandling extends IAttributeSequenceHandling
      * @param col the column in the original document where this artifact starts.
      * @throws AttoParseException
      */
-    public void handleHtmlStandaloneElementStart(
+    public void handleHtmlClosedStandaloneElementStart(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
@@ -67,9 +68,13 @@ public interface IDetailedHtmlElementHandling extends IAttributeSequenceHandling
 
     /**
      * <p>
-     *   Called when the name of a standalone element (a <i>minimized tag</i>) is found. E.g., the
+     *   Called when the name of a closed standalone element is found. E.g., the
      *   "element name" of an element like <tt>&lt;img src="images/logo.png" /&gt;</tt> would be 
      *   "<tt>img</tt>".
+     * </p>
+     * <p>
+     *   A <i>closed standalone element</i> is a standalone (i.e. <i>no body, no end tag</i>) element
+     *   that is well-formed from the XML standpoint. For example: <tt>&lt;img src="..." /&gt;</tt> 
      * </p>
      * <p>
      *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
@@ -88,7 +93,7 @@ public interface IDetailedHtmlElementHandling extends IAttributeSequenceHandling
      * @param col the column in the original document where this artifact starts.
      * @throws AttoParseException
      */
-    public void handleHtmlStandaloneElementName(
+    public void handleHtmlClosedStandaloneElementName(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
@@ -96,11 +101,12 @@ public interface IDetailedHtmlElementHandling extends IAttributeSequenceHandling
     
     /**
      * <p>
-     *   Called when the end of a standalone element (a <i>minimized tag</i>) is found. This
+     *   Called when the end of a standalone element is found. This
      *   "end" is considered to be the "<tt>/&gt;</tt>" sequence the element ends with.
      * </p>
      * <p>
-     *   An example: <tt>&lt;input type="text" /&gt;</tt>
+     *   A <i>closed standalone element</i> is a standalone (i.e. <i>no body, no end tag</i>) element
+     *   that is well-formed from the XML standpoint. For example: <tt>&lt;img src="..." /&gt;</tt> 
      * </p>
      * <p>
      *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
@@ -119,7 +125,7 @@ public interface IDetailedHtmlElementHandling extends IAttributeSequenceHandling
      * @param col the column in the original document where this artifact starts.
      * @throws AttoParseException
      */
-    public void handleHtmlStandaloneElementEnd(
+    public void handleHtmlClosedStandaloneElementEnd(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
@@ -136,9 +142,16 @@ public interface IDetailedHtmlElementHandling extends IAttributeSequenceHandling
      *   "start" is considered to be the "<tt>&lt;</tt>" symbol the element starts with.
      * </p>
      * <p>
-     *   An unclosed standalone element looks like this: <tt>&lt;input type="text"&gt;</tt>. This
-     *   element could be written as <tt>&lt;input type="text" /&gt;</tt>, but instead is left
-     *   unclosed.
+     *   A <i>unclosed standalone element</i> is a standalone (i.e. <i>no body, no end tag</i>) element
+     *   that is not well-formed from the XML standpoint because it isn't closed. 
+     *   For example: <tt>&lt;img src="..."&gt;</tt>. In HTML, this is valid and completely equivalent to
+     *   <tt>&lt;img src="..." /&gt;</tt> because the HTML specifications say the <tt>&lt;img&gt;</img>
+     *   tag cannot have a body.
+     * </p>
+     * <p>
+     *   Whenever parsing finds a <i>close element</i> that corresponds to an <i>unclosed standalone 
+     *   element</i> (like for example, <tt>&lt;/img&gt;</tt>, it is reported as an <i>unmatched close
+     *   element</i>, because it is considered ill-formed HTML code and not a real <i>body closer</i>.
      * </p>
      * <p>
      *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
@@ -167,13 +180,20 @@ public interface IDetailedHtmlElementHandling extends IAttributeSequenceHandling
      * <p>
      *   Called when the name of an unclosed standalone element (a tag that should have no
      *   body but is not minimized) is found. E.g., the
-     *   "element name" of an element like <tt>&lt;img src="images/logo.png" &gt;</tt> would be 
+     *   "element name" of an element like <tt>&lt;img src="images/logo.png"&gt;</tt> would be 
      *   "<tt>img</tt>".
      * </p>
      * <p>
-     *   An unclosed standalone element looks like this: <tt>&lt;input type="text"&gt;</tt>. This
-     *   element could be written as <tt>&lt;input type="text" /&gt;</tt>, but instead is left
-     *   unclosed.
+     *   A <i>unclosed standalone element</i> is a standalone (i.e. <i>no body, no end tag</i>) element
+     *   that is not well-formed from the XML standpoint because it isn't closed. 
+     *   For example: <tt>&lt;img src="..."&gt;</tt>. In HTML, this is valid and completely equivalent to
+     *   <tt>&lt;img src="..." /&gt;</tt> because the HTML specifications say the <tt>&lt;img&gt;</img>
+     *   tag cannot have a body.
+     * </p>
+     * <p>
+     *   Whenever parsing finds a <i>close element</i> that corresponds to an <i>unclosed standalone 
+     *   element</i> (like for example, <tt>&lt;/img&gt;</tt>, it is reported as an <i>unmatched close
+     *   element</i>, because it is considered ill-formed HTML code and not a real <i>body closer</i>.
      * </p>
      * <p>
      *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
@@ -205,9 +225,16 @@ public interface IDetailedHtmlElementHandling extends IAttributeSequenceHandling
      *   "end" is considered to be the "<tt>&gt;</tt>" symbol the element ends with.
      * </p>
      * <p>
-     *   An unclosed standalone element looks like this: <tt>&lt;input type="text"&gt;</tt>. This
-     *   element could be written as <tt>&lt;input type="text" /&gt;</tt>, but instead is left
-     *   unclosed.
+     *   A <i>unclosed standalone element</i> is a standalone (i.e. <i>no body, no end tag</i>) element
+     *   that is not well-formed from the XML standpoint because it isn't closed. 
+     *   For example: <tt>&lt;img src="..."&gt;</tt>. In HTML, this is valid and completely equivalent to
+     *   <tt>&lt;img src="..." /&gt;</tt> because the HTML specifications say the <tt>&lt;img&gt;</img>
+     *   tag cannot have a body.
+     * </p>
+     * <p>
+     *   Whenever parsing finds a <i>close element</i> that corresponds to an <i>unclosed standalone 
+     *   element</i> (like for example, <tt>&lt;/img&gt;</tt>, it is reported as an <i>unmatched close
+     *   element</i>, because it is considered ill-formed HTML code and not a real <i>body closer</i>.
      * </p>
      * <p>
      *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
@@ -408,19 +435,27 @@ public interface IDetailedHtmlElementHandling extends IAttributeSequenceHandling
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException;
+
+    
+
     
     
     
     /**
      * <p>
-     *   Called when the start of a close element (a <i>close tag</i>) is needed for
-     *   balancing an unclosed tag. This
-     *   "start" is considered to be the "<tt>&lt;/</tt>" sequence the element starts with.
+     *   Called when the start of an unmatched close element (or <i>close tag</i>) is found. This
+     *   "start" is considered to be the "<tt>&lt;</tt>" symbol the element starts with.
      * </p>
      * <p>
-     *   HTML-specific intelligence should be used in order to determine when an element should be closed, instead
-     *   of basing this decision on mere hierarchy as done by {@link AbstractDetailedMarkupAttoHandler}.
+     *   An <i>unmatched close element</i> is an HTML-invalid <i>close element</i> that can appear 
+     *   under two circumstances:
      * </p>
+     * <ul>
+     *   <li>Markup contains a <i>close element</i> that simply does not correspond to any previously
+     *       open elements.</li>
+     *   <li>Markup contains a <i>close element</i> that corresponds to a previously parsed
+     *       <i>unclosed standalone element</i>.</li>
+     * </ul>
      * <p>
      *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
      *   should not be considered to be immutable, so reported structures should be copied if they need
@@ -438,7 +473,7 @@ public interface IDetailedHtmlElementHandling extends IAttributeSequenceHandling
      * @param col the column in the original document where this artifact starts.
      * @throws AttoParseException
      */
-    public void handleHtmlBalancedCloseElementStart(
+    public void handleHtmlUnmatchedCloseElementStart(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
@@ -446,14 +481,19 @@ public interface IDetailedHtmlElementHandling extends IAttributeSequenceHandling
 
     /**
      * <p>
-     *   Called when the name of a close element (a <i>close tag</i>) is needed for
-     *   balancing an unclosed tag. E.g., the
+     *   Called when the name of an unmatched close element (a <i>close tag</i>) is found. E.g., the
      *   "element name" of an element like <tt>&lt;/div&gt;</tt> would be "<tt>div</tt>".
      * </p>
      * <p>
-     *   HTML-specific intelligence should be used in order to determine when an element should be closed, instead
-     *   of basing this decision on mere hierarchy as done by {@link AbstractDetailedMarkupAttoHandler}.
+     *   An <i>unmatched close element</i> is an HTML-invalid <i>close element</i> that can appear 
+     *   under two circumstances:
      * </p>
+     * <ul>
+     *   <li>Markup contains a <i>close element</i> that simply does not correspond to any previously
+     *       open elements.</li>
+     *   <li>Markup contains a <i>close element</i> that corresponds to a previously parsed
+     *       <i>unclosed standalone element</i>.</li>
+     * </ul>
      * <p>
      *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
      *   should not be considered to be immutable, so reported structures should be copied if they need
@@ -471,7 +511,7 @@ public interface IDetailedHtmlElementHandling extends IAttributeSequenceHandling
      * @param col the column in the original document where this artifact starts.
      * @throws AttoParseException
      */
-    public void handleHtmlBalancedCloseElementName(
+    public void handleHtmlUnmatchedCloseElementName(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
@@ -479,13 +519,63 @@ public interface IDetailedHtmlElementHandling extends IAttributeSequenceHandling
     
     /**
      * <p>
-     *   Called when the end of a close element (a <i>close tag</i>) is needed for
-     *   balancing an unclosed tag. This
+     *   Called when the end of an unmatched close element (a <i>close tag</i>) is found. This
      *   "end" is considered to be the "<tt>&gt;</tt>" symbol the element ends with.
      * </p>
      * <p>
-     *   HTML-specific intelligence should be used in order to determine when an element should be closed, instead
-     *   of basing this decision on mere hierarchy as done by {@link AbstractDetailedMarkupAttoHandler}.
+     *   An <i>unmatched close element</i> is an HTML-invalid <i>close element</i> that can appear 
+     *   under two circumstances:
+     * </p>
+     * <ul>
+     *   <li>Markup contains a <i>close element</i> that simply does not correspond to any previously
+     *       open elements.</li>
+     *   <li>Markup contains a <i>close element</i> that corresponds to a previously parsed
+     *       <i>unclosed standalone element</i>.</li>
+     * </ul>
+     * <p>
+     *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
+     *   should not be considered to be immutable, so reported structures should be copied if they need
+     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
+     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification). 
+     * </p>
+     * <p>
+     *   <b>Implementations of this handler should never modify the document buffer.</b> 
+     * </p>
+     * 
+     * @param buffer the document buffer (not copied)
+     * @param offset the offset (position in buffer) where the artifact starts.
+     * @param len the length (in chars) of the artifact, starting in offset.
+     * @param line the line in the original document where this artifact starts.
+     * @param col the column in the original document where this artifact starts.
+     * @throws AttoParseException
+     */
+    public void handleHtmlUnmatchedCloseElementEnd(
+            final char[] buffer, 
+            final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException;
+
+    
+
+    
+    
+    
+    /**
+     * <p>
+     *   Called when the start of a forced close element (a <i>close tag</i> that does not
+     *   appear in markup but is needed) is found. This
+     *   "start" is considered to be the "<tt>&lt;</tt>" symbol the element starts with.
+     * </p>
+     * <p>
+     *   A <i>forced close element</i> is an HTML <i>close element</i> that does not exist in
+     *   the parsed markup, but is automatically generated in order to close an element when
+     *   the HTML specifications determine it has to be closed.
+     * </p>
+     * <p>
+     *   For example, <tt>&lt;p&gt;</tt> elements cannot be nested, and therefore if there
+     *   are two <tt>&lt;p&gt;</tt> open elements at the same hierarchy level in sequence,
+     *   a <tt>&lt;/p&gt;</tt> <i>forced close element</i> will be emitted before the second 
+     *   <tt>&lt;p&gt;</tt> open element in order to close the first one. 
      * </p>
      * <p>
      *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
@@ -504,12 +594,104 @@ public interface IDetailedHtmlElementHandling extends IAttributeSequenceHandling
      * @param col the column in the original document where this artifact starts.
      * @throws AttoParseException
      */
-    public void handleHtmlBalancedCloseElementEnd(
+    public void handleHtmlForcedCloseElementStart(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException;
 
+    /**
+     * <p>
+     *   Called when the name of a forced close element (a <i>close tag</i> that does not
+     *   appear in markup but is needed) is found. E.g., the
+     *   "element name" of an element like <tt>&lt;/div&gt;</tt> would be "<tt>div</tt>".
+     * </p>
+     * <p>
+     *   A <i>forced close element</i> is an HTML <i>close element</i> that does not exist in
+     *   the parsed markup, but is automatically generated in order to close an element when
+     *   the HTML specifications determine it has to be closed.
+     * </p>
+     * <p>
+     *   For example, <tt>&lt;p&gt;</tt> elements cannot be nested, and therefore if there
+     *   are two <tt>&lt;p&gt;</tt> open elements at the same hierarchy level in sequence,
+     *   a <tt>&lt;/p&gt;</tt> <i>forced close element</i> will be emitted before the second 
+     *   <tt>&lt;p&gt;</tt> open element in order to close the first one. 
+     * </p>
+     * <ul>
+     *   <li>Markup contains a <i>close element</i> that simply does not correspond to any previously
+     *       open elements.</li>
+     *   <li>Markup contains a <i>close element</i> that corresponds to a previously parsed
+     *       <i>unclosed standalone element</i>.</li>
+     * </ul>
+     * <p>
+     *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
+     *   should not be considered to be immutable, so reported structures should be copied if they need
+     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
+     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification). 
+     * </p>
+     * <p>
+     *   <b>Implementations of this handler should never modify the document buffer.</b> 
+     * </p>
+     * 
+     * @param buffer the document buffer (not copied)
+     * @param offset the offset (position in buffer) where the artifact starts.
+     * @param len the length (in chars) of the artifact, starting in offset.
+     * @param line the line in the original document where this artifact starts.
+     * @param col the column in the original document where this artifact starts.
+     * @throws AttoParseException
+     */
+    public void handleHtmlForcedCloseElementName(
+            final char[] buffer, 
+            final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException;
+    
+    /**
+     * <p>
+     *   Called when the end of a forced close element (a <i>close tag</i> that does not
+     *   appear in markup but is needed) is found. This
+     *   "end" is considered to be the "<tt>&gt;</tt>" symbol the element ends with.
+     * </p>
+     * <p>
+     *   A <i>forced close element</i> is an HTML <i>close element</i> that does not exist in
+     *   the parsed markup, but is automatically generated in order to close an element when
+     *   the HTML specifications determine it has to be closed.
+     * </p>
+     * <p>
+     *   For example, <tt>&lt;p&gt;</tt> elements cannot be nested, and therefore if there
+     *   are two <tt>&lt;p&gt;</tt> open elements at the same hierarchy level in sequence,
+     *   a <tt>&lt;/p&gt;</tt> <i>forced close element</i> will be emitted before the second 
+     *   <tt>&lt;p&gt;</tt> open element in order to close the first one. 
+     * </p>
+     * <ul>
+     *   <li>Markup contains a <i>close element</i> that simply does not correspond to any previously
+     *       open elements.</li>
+     *   <li>Markup contains a <i>close element</i> that corresponds to a previously parsed
+     *       <i>unclosed standalone element</i>.</li>
+     * </ul>
+     * <p>
+     *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
+     *   should not be considered to be immutable, so reported structures should be copied if they need
+     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
+     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification). 
+     * </p>
+     * <p>
+     *   <b>Implementations of this handler should never modify the document buffer.</b> 
+     * </p>
+     * 
+     * @param buffer the document buffer (not copied)
+     * @param offset the offset (position in buffer) where the artifact starts.
+     * @param len the length (in chars) of the artifact, starting in offset.
+     * @param line the line in the original document where this artifact starts.
+     * @param col the column in the original document where this artifact starts.
+     * @throws AttoParseException
+     */
+    public void handleHtmlForcedCloseElementEnd(
+            final char[] buffer, 
+            final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException;
+    
 
 
     
