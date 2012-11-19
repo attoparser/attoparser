@@ -19,11 +19,30 @@
  */
 package org.attoparser.markup.html;
 
-import org.attoparser.AttoParseException;
 import org.attoparser.markup.AbstractDetailedMarkupAttoHandler;
-import org.attoparser.markup.html.elements.HtmlElements;
 import org.attoparser.markup.html.elements.IHtmlElement;
 
+
+
+/*
+ * TODO Organize HTML parsing
+ * --------------------------
+ * HTML Parsing Configuration
+ * --------------------------
+ * 
+ * - Require unique attributes
+ * - Require XML-well-formed attribute values
+ * - Require XML-well-formed elements (no forced close, unclosed standalone or unmatched close) 
+ * - Require well-positioned elements (e.g. "body before head", or "no head")
+ * - Allow fragments (combination of markup configuration parameters!)
+ * - Allow XML Declaration
+ * - Allow Processing Instructions
+ * - Allow DOCTYPEs: all, list (with predefined lists for HTML5, XHTML and HTML4)
+ * - Allow non-uppercase-DOCTYPE
+ * - Require well-formed prolog
+ * - Require no prolog
+ *  
+ */
 
 
 
