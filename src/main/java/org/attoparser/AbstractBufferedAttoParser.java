@@ -33,7 +33,9 @@ import java.io.Reader;
  *   Subclasses of this abstract class should only implement the abstract
  *   {@link #parseBuffer(char[], int, int, IAttoHandler, int, int)} method.
  * </p>
- * 
+ * <p>
+ *   This class closes the document {@link Reader} provided after parsing.  
+ * </p>
  * 
  * @author Daniel Fern&aacute;ndez
  * 
@@ -181,6 +183,12 @@ public abstract class AbstractBufferedAttoParser extends AbstractAttoParser {
             throw e;
         } catch (final Exception e) {
             throw new AttoParseException(e);
+        } finally {
+            try {
+                reader.close();
+            } catch (final Throwable t) {
+                // This exception can be safely ignored
+            }
         }
         
     }

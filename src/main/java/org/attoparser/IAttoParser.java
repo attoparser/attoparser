@@ -114,6 +114,10 @@ public interface IAttoParser {
      * <p>
      *   Parse a document using the specified {@link IAttoHandler}.
      * </p>
+     * <p>
+     *   Implementations of this interface must close the provided {@link Reader}
+     *   object after parsing.   
+     * </p>
      * 
      * @param reader a Reader on the document.
      * @param handler the handler to be used, an {@link IAttoHandler} implementation.
