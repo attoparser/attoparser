@@ -28,6 +28,8 @@ import junit.framework.TestCase;
 import org.attoparser.markup.MarkupAttoParser;
 import org.attoparser.markup.MarkupParsingConfiguration;
 import org.attoparser.markup.MarkupParsingConfiguration.ElementBalancing;
+import org.attoparser.markup.MarkupParsingConfiguration.PrologPresence;
+import org.attoparser.markup.MarkupParsingConfiguration.UniqueRootElementPresence;
 import org.attoparser.markup.duplicate.DuplicatingBasicMarkupAttoHandler;
 import org.attoparser.markup.duplicate.DuplicatingDetailedMarkupAttoHandler;
 import org.attoparser.markup.trace.TracingBasicMarkupAttoHandler;
@@ -57,15 +59,17 @@ public class AttoParserTest extends TestCase {
         noRestrictionsAutoClose.setElementBalancing(ElementBalancing.AUTO_CLOSE);
         
         final MarkupParsingConfiguration noUnbalacedClosed = MarkupParsingConfiguration.noRestrictions();
-        noUnbalacedClosed.setElementBalancing(ElementBalancing.AUTO_CLOSE);
-        noUnbalacedClosed.setRequireNoUnbalancedCloseElements(true);
+        noUnbalacedClosed.setElementBalancing(ElementBalancing.AUTO_CLOSE_REQUIRE_NO_UNMATCHED_CLOSE);
         
         final MarkupParsingConfiguration wellFormedXml = new MarkupParsingConfiguration();
         wellFormedXml.setElementBalancing(ElementBalancing.REQUIRE_BALANCED);
         wellFormedXml.setRequireUniqueAttributesInElement(true);
-        wellFormedXml.setRequireWellFormedAttributeValues(true);
-        wellFormedXml.setRequireWellFormedProlog(true);
-        wellFormedXml.setRequireUniqueRootElement(true);
+        wellFormedXml.setRequireXmlWellFormedAttributeValues(true);
+        wellFormedXml.getPrologParsingConfiguration().setValidateProlog(true);
+        wellFormedXml.getPrologParsingConfiguration().setPrologPresence(PrologPresence.ALLOWED);
+        wellFormedXml.getPrologParsingConfiguration().setXmlDeclarationPresence(PrologPresence.ALLOWED);
+        wellFormedXml.getPrologParsingConfiguration().setDoctypePresence(PrologPresence.ALLOWED);
+        wellFormedXml.setUniqueRootElementPresence(UniqueRootElementPresence.DEPENDS_ON_PROLOG_DOCTYPE);
         
         
         

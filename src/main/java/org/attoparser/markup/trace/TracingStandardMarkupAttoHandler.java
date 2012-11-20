@@ -155,12 +155,32 @@ public final class TracingStandardMarkupAttoHandler extends AbstractStandardMark
 
 
     @Override
-    public void handleBalancedCloseElement(final String elementName, final int line, final int col) 
+    public void handleAutoClosedElement(final String elementName, final int line, final int col) 
             throws AttoParseException {
         
         try {
             
-            this.writer.write("BCE");
+            this.writer.write("ACE");
+            this.writer.write('(');
+            this.writer.write(elementName);
+            this.writer.write(')');
+            writePosition(this.writer, line, col);
+            
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        }
+        
+    }
+
+
+
+    @Override
+    public void handleUnmatchedClosedElement(final String elementName, final int line, final int col) 
+            throws AttoParseException {
+        
+        try {
+            
+            this.writer.write("UCE");
             this.writer.write('(');
             this.writer.write(elementName);
             this.writer.write(')');

@@ -260,10 +260,60 @@ public abstract class AbstractStandardMarkupAttoHandler
 
         super.handleAutoCloseElementEnd(buffer, offset, len, line, col);
 
-        handleBalancedCloseElement(this.currentElementName, this.currentElementLine, this.currentElementCol);
+        handleAutoClosedElement(this.currentElementName, this.currentElementLine, this.currentElementCol);
         
     }
 
+
+    
+    
+    @Override
+    public void handleUnmatchedCloseElementStart(
+            final char[] buffer, 
+            final int offset, final int len, 
+            final int line, final int col) 
+            throws AttoParseException {
+
+        super.handleUnmatchedCloseElementStart(buffer, offset, len, line, col);
+        
+        this.currentElementName = null;
+        this.currentElementAttributes = null;
+        this.currentElementLine = line;
+        this.currentElementCol = col;
+        
+    }
+
+    
+    
+    @Override
+    public void handleUnmatchedCloseElementName(
+            final char[] buffer, 
+            final int offset, final int len, 
+            final int line, final int col) 
+            throws AttoParseException {
+
+        super.handleUnmatchedCloseElementName(buffer, offset, len, line, col);
+        
+        this.currentElementName = new String(buffer, offset, len);
+        
+    }
+
+    
+    
+    @Override
+    public void handleUnmatchedCloseElementEnd(
+            final char[] buffer, 
+            final int offset, final int len, 
+            final int line, final int col) 
+            throws AttoParseException {
+
+        super.handleUnmatchedCloseElementEnd(buffer, offset, len, line, col);
+
+        handleUnmatchedClosedElement(this.currentElementName, this.currentElementLine, this.currentElementCol);
+        
+    }
+
+    
     
     
     @Override
@@ -513,10 +563,10 @@ public abstract class AbstractStandardMarkupAttoHandler
     /**
      * <p>
      *   Called when a close element (a <i>close tag</i>) is needed in order
-     *   to correctly balance the markup.
+     *   to correctly balance the markup. This is called <i>autoclosing</i>.
      * </p>
      * <p>
-     *   Implementors might choose to ignore these balancing events.
+     *   Implementors might choose to ignore these autoclosing events.
      * </p>
      * 
      * @param elementName the element name (e.g. "&lt;/div&gt;" -> "div").
@@ -525,7 +575,29 @@ public abstract class AbstractStandardMarkupAttoHandler
      * @throws AttoParseException
      */
     @SuppressWarnings("unused")
-    public void handleBalancedCloseElement(
+    public void handleAutoClosedElement(
+            final String elementName, final int line, final int col)
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
+    }
+    
+
+    /**
+     * <p>
+     *   Called when a close element (a <i>close tag</i>) appears without
+     *   a corresponding <i>open element</i>.
+     * </p>
+     * <p>
+     *   Implementors might choose to ignore these events.
+     * </p>
+     * 
+     * @param elementName the element name (e.g. "&lt;/div&gt;" -> "div").
+     * @param line the line in the document where this elements appears.
+     * @param col the column in the document where this element appears.
+     * @throws AttoParseException
+     */
+    @SuppressWarnings("unused")
+    public void handleUnmatchedClosedElement(
             final String elementName, final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required

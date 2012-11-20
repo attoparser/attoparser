@@ -315,6 +315,36 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
+    public void handleUnmatchedCloseElementStart(final char[] buffer, final int offset, final int len, final int line,
+            final int col) throws AttoParseException {
+        // They were present at the original template, so simply output them.
+        handleCloseElementStart(buffer, offset, len, line, col);
+    }
+
+
+
+
+    @Override
+    public void handleUnmatchedCloseElementName(final char[] buffer, final int offset, final int len, final int line,
+            final int col) throws AttoParseException {
+        // They were present at the original template, so simply output them.
+        handleCloseElementName(buffer, offset, len, line, col);
+    }
+
+
+
+
+    @Override
+    public void handleUnmatchedCloseElementEnd(final char[] buffer, final int offset, final int len, final int line,
+            final int col) throws AttoParseException {
+        // They were present at the original template, so simply output them.
+        handleCloseElementEnd(buffer, offset, len, line, col);
+    }
+
+
+
+
+    @Override
     public void handleAttribute(final char[] buffer, final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol, final int operatorOffset, final int operatorLen,
             final int operatorLine, final int operatorCol, final int valueContentOffset,

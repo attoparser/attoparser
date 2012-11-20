@@ -21,6 +21,8 @@ package org.attoparser.markup;
 
 import org.attoparser.AttoParseException;
 import org.attoparser.markup.MarkupParsingConfiguration.ElementBalancing;
+import org.attoparser.markup.MarkupParsingConfiguration.PrologParsingConfiguration;
+import org.attoparser.markup.MarkupParsingConfiguration.UniqueRootElementPresence;
 
 
 
@@ -74,7 +76,9 @@ import org.attoparser.markup.MarkupParsingConfiguration.ElementBalancing;
  */
 public abstract class AbstractDetailedMarkupAttoHandler 
         extends AbstractBasicMarkupAttoHandler
-        implements IDetailedAutoCloseElementHandling, IDetailedDocTypeHandling {
+        implements IDetailedAutoCloseElementHandling,
+                   IDetailedUnmatchedCloseElementHandling,
+                   IDetailedDocTypeHandling {
 
     private static final MarkupParsingConfiguration NO_RESTRICTIONS = MarkupParsingConfiguration.noRestrictions(); 
     
@@ -203,12 +207,10 @@ public abstract class AbstractDetailedMarkupAttoHandler
         ElementMarkupParsingUtil.parseDetailedCloseElement(buffer, outerOffset, outerLen, line, col, this.wrapper);
 
     }
+    
+    
+    
 
-    
-    
-    
-    
-    
 
     /**
      * <p>
@@ -417,6 +419,34 @@ public abstract class AbstractDetailedMarkupAttoHandler
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
+    
+
+    
+    public void handleUnmatchedCloseElementStart(
+            final char[] buffer, 
+            final int offset, final int len, 
+            final int line, final int col)
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
+    }
+
+
+    public void handleUnmatchedCloseElementName(
+            final char[] buffer, 
+            final int offset, final int len, 
+            final int line, final int col)
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
+    }
+
+
+    public void handleUnmatchedCloseElementEnd(
+            final char[] buffer, 
+            final int offset, final int len, 
+            final int line, final int col)
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
+    }
 
 
     
@@ -489,24 +519,31 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
         private final boolean autoClose;
         private final boolean requireBalancedElements;
-        private final boolean requireNoUnbalancedCloseElements;
-        private final boolean requireWellFormedProlog;
-        private final boolean requireUniqueRootElement;
+        private final boolean requireNoUnmatchedCloseElements;
+        
+        private final PrologParsingConfiguration prologParsingConfiguration;
+        private final UniqueRootElementPresence uniqueRootElementPresence;
+        
         private final boolean requireWellFormedAttributeValues;
         private final boolean requireUniqueAttributesInElement;
-        
-        private final boolean requireNoProlog;
         
         private char[][] elementStack;
         private int elementStackSize;
         
-        private boolean xmlDeclarationRead = false;
-        private boolean docTypeRead = false;
+        private boolean validPrologXmlDeclarationRead = false;
+        private boolean validPrologDocTypeRead = false;
         private boolean elementRead = false;
         private char[] rootElementName = null;
         private char[][] currentElementAttributeNames = null;
         private int currentElementAttributeNamesSize = 0;
         
+        private final boolean validateProlog;
+        private final boolean prologPresenceForbidden;
+        private final boolean xmlDeclarationPresenceForbidden;
+        private final boolean doctypePresenceForbidden;
+        
+        
+        private boolean fireNextCloseElementEndEvent = true;
         
         
         StackAwareWrapper(final AbstractDetailedMarkupAttoHandler handler, final MarkupParsingConfiguration markupParsingConfiguration) {
@@ -520,17 +557,23 @@ public abstract class AbstractDetailedMarkupAttoHandler
                     ElementBalancing.AUTO_CLOSE.equals(markupParsingConfiguration.getElementBalancing());
             this.requireBalancedElements = 
                     ElementBalancing.REQUIRE_BALANCED.equals(markupParsingConfiguration.getElementBalancing());
-            this.requireNoUnbalancedCloseElements = 
-                    (this.requireBalancedElements || markupParsingConfiguration.getRequireNoUnbalancedCloseElements());
-            this.requireWellFormedProlog = markupParsingConfiguration.getRequireWellFormedProlog();
-            this.requireUniqueRootElement = markupParsingConfiguration.getRequireUniqueRootElement();
-            this.requireWellFormedAttributeValues = markupParsingConfiguration.getRequireWellFormedAttributeValues();
+            this.requireNoUnmatchedCloseElements = 
+                    (this.requireBalancedElements || 
+                     ElementBalancing.AUTO_CLOSE_REQUIRE_NO_UNMATCHED_CLOSE.equals(markupParsingConfiguration.getElementBalancing()) ||
+                     ElementBalancing.REQUIRE_NO_UNMATCHED_CLOSE.equals(markupParsingConfiguration.getElementBalancing()));
+            
+            this.prologParsingConfiguration = markupParsingConfiguration.getPrologParsingConfiguration();
+            this.uniqueRootElementPresence = markupParsingConfiguration.getUniqueRootElementPresence();
+            this.requireWellFormedAttributeValues = markupParsingConfiguration.getRequireXmlWellFormedAttributeValues();
             this.requireUniqueAttributesInElement = markupParsingConfiguration.getRequireUniqueAttributesInElement();
+            
+            this.validateProlog = this.prologParsingConfiguration.isValidateProlog();
+            this.prologPresenceForbidden = this.prologParsingConfiguration.getPrologPresence().isForbidden();
+            this.xmlDeclarationPresenceForbidden = this.prologParsingConfiguration.getXmlDeclarationPresence().isRequired();
+            this.doctypePresenceForbidden = this.prologParsingConfiguration.getDoctypePresence().isRequired();
             
             this.elementStack = new char[DEFAULT_STACK_SIZE][];
             this.elementStackSize = 0;
-            
-            this.requireNoProlog = markupParsingConfiguration.getRequireNoProlog();
             
         }
 
@@ -552,7 +595,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
                     " is never closed (no closing tag at the end of document)");
             }
             
-            if (this.requireUniqueRootElement && !this.elementRead) {
+            if (!this.elementRead && (this.validPrologDocTypeRead || this.uniqueRootElementPresence.isRequiredAlways())) {
                 throw new AttoParseException(
                         "Malformed markup: no root element present");
             }
@@ -578,20 +621,20 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int line, final int col) 
                 throws AttoParseException {
 
-            if (this.requireNoProlog) {
+            if (this.validateProlog && (this.prologPresenceForbidden || this.xmlDeclarationPresenceForbidden)) {
                 throw new AttoParseException(
-                        "No prolog is allowed by document restrictions, but an XML Declaration has been found",
+                        "An XML Declaration has been found, but it wasn't allowed",
                         line, col);
             }
-            
-            if (this.requireWellFormedProlog) {
+
+            if (this.validateProlog) {
                 
-                if (this.xmlDeclarationRead) {
+                if (this.validPrologXmlDeclarationRead) {
                     throw new AttoParseException(
                             "Malformed markup: Only one XML Declaration can appear in document",
                             line, col);
                 }
-                if (this.docTypeRead) {
+                if (this.validPrologDocTypeRead) {
                     throw new AttoParseException(
                             "Malformed markup: XML Declaration must appear before DOCTYPE",
                             line, col);
@@ -610,8 +653,10 @@ public abstract class AbstractDetailedMarkupAttoHandler
                     encodingOffset, encodingLen, encodingLine, encodingCol,
                     standaloneOffset, standaloneLen, standaloneLine, standaloneCol,
                     outerOffset, outerLen, line, col);
-            
-            this.xmlDeclarationRead = true;
+
+            if (this.validateProlog) {
+                this.validPrologXmlDeclarationRead = true;
+            }
             
         }
         
@@ -633,28 +678,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 throws AttoParseException {
             
             if (this.elementStackSize == 0) {
-                
-                if (this.requireUniqueRootElement && this.elementRead) {
-                    throw new AttoParseException(
-                            "Malformed markup: Only one root element is allowed",
-                            line, col);
-                }
-
-                if (this.requireWellFormedProlog && this.docTypeRead) {
-                    boolean matches = (this.rootElementName.length == len);
-                    for (int i = 0; matches && i < len; i++) {
-                        if (buffer[offset + i] != this.rootElementName[i]) {
-                            matches = false;
-                        }
-                    }
-                    if (!matches) {
-                        throw new AttoParseException(
-                            "Malformed markup: Root element should be \"" + new String(this.rootElementName) + "\", " +
-                            "but \"" + new String(buffer, offset, len) + "\" has been found",
-                            line, col);
-                    }
-                }
-                
+                checkValidRootElement(buffer, offset, len, line, col);
             }
 
             if (this.requireUniqueAttributesInElement) {
@@ -698,28 +722,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 throws AttoParseException {
             
             if (this.elementStackSize == 0) {
-                
-                if (this.requireUniqueRootElement && this.elementRead) {
-                    throw new AttoParseException(
-                            "Malformed markup: Only one root element is allowed",
-                            line, col);
-                }
-
-                if (this.requireWellFormedProlog && this.docTypeRead) {
-                    boolean matches = (this.rootElementName.length == len);
-                    for (int i = 0; matches && i < len; i++) {
-                        if (buffer[offset + i] != this.rootElementName[i]) {
-                            matches = false;
-                        }
-                    }
-                    if (!matches) {
-                        throw new AttoParseException(
-                            "Malformed markup: Root element should be \"" + new String(this.rootElementName) + "\", " +
-                            "but \"" + new String(buffer, offset, len) + "\" has been found",
-                            line, col);
-                    }
-                }
-                
+                checkValidRootElement(buffer, offset, len, line, col);
             }
 
             if (this.requireUniqueAttributesInElement) {
@@ -766,15 +769,18 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int line, final int col)
                 throws AttoParseException {
             
-            checkStackForElement(buffer, offset, len, line, col);
+            this.fireNextCloseElementEndEvent = 
+                    checkStackForElement(buffer, offset, len, line, col);
             
             if (this.requireUniqueAttributesInElement) {
                 this.currentElementAttributeNames = null;
                 this.currentElementAttributeNamesSize = 0;
             }
-            
-            this.handler.handleCloseElementStart(CLOSE_START, 0, CLOSE_START.length, line, col - 2);
-            this.handler.handleCloseElementName(buffer, offset, len, line, col);
+
+            if (this.fireNextCloseElementEndEvent) {
+                this.handler.handleCloseElementStart(CLOSE_START, 0, CLOSE_START.length, line, col - 2);
+                this.handler.handleCloseElementName(buffer, offset, len, line, col);
+            }
             
         }
 
@@ -784,7 +790,9 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int line, final int col)
                 throws AttoParseException {
             
-            this.handler.handleCloseElementEnd(buffer, offset, len, line, col);
+            if (this.fireNextCloseElementEndEvent) {
+                this.handler.handleCloseElementEnd(buffer, offset, len, line, col);
+            }
             
             this.elementRead = true;
             
@@ -900,23 +908,25 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int outerLine, final int outerCol) 
                 throws AttoParseException {
             
-            if (this.requireNoProlog) {
+            if (this.validateProlog && (this.prologPresenceForbidden || this.doctypePresenceForbidden)) {
                 throw new AttoParseException(
-                        "No prolog is allowed by document restrictions, but a DOCTYPE clause has been found",
+                        "A DOCTYPE clause has been found, but it wasn't allowed",
                         outerLine, outerCol);
             }
             
-            if (this.requireWellFormedProlog && this.docTypeRead) {
-                throw new AttoParseException(
-                        "Malformed markup: Only one DOCTYPE clause can appear in document",
-                        outerLine, outerCol);
-            }
-            
-            if (this.requireWellFormedProlog && this.elementRead) {
-                throw new AttoParseException(
-                        "Malformed markup: DOCTYPE must appear before any " +
-                        "elements in document",
-                        outerLine, outerCol);
+            if (this.validateProlog) {
+                if (this.validPrologDocTypeRead) {
+                    throw new AttoParseException(
+                            "Malformed markup: Only one DOCTYPE clause can appear in document",
+                            outerLine, outerCol);
+                }
+                
+                if (this.elementRead) {
+                    throw new AttoParseException(
+                            "Malformed markup: DOCTYPE must appear before any " +
+                            "elements in document",
+                            outerLine, outerCol);
+                }
             }
             
             this.rootElementName = new char[elementNameLen];
@@ -932,15 +942,68 @@ public abstract class AbstractDetailedMarkupAttoHandler
                     internalSubsetOffset, internalSubsetLen, internalSubsetLine, internalSubsetCol, 
                     outerOffset, outerLen, outerLine, outerCol);
             
-            this.docTypeRead = true;
+            if (this.validateProlog) {
+                this.validPrologDocTypeRead = true;
+            }
             
         }
 
         
+
+        
+        
+        private void checkValidRootElement(
+                final char[] buffer, final int offset, final int len, final int line, final int col) 
+                throws AttoParseException {
+            
+            if (!this.validateProlog) {
+                
+                if (this.elementRead && this.uniqueRootElementPresence.isRequiredAlways()) {
+                    // We are not validating the prolog, but anyway we required only one element root
+                    // and it seems there are several.
+                    throw new AttoParseException(
+                            "Malformed markup: Only one root element is allowed",
+                            line, col);
+                }
+
+                // Nothing else to check.
+                return;
+                
+            }
+            
+            // We don't need to check the possibility of having parsed forbidden XML Decl or DOCTYPE
+            // because this has already been checked when the corresponding events were triggered. 
+            
+            if (this.validPrologDocTypeRead) {
+                
+                if (this.elementRead) {
+                    // If we have a DOCTYPE, we will have a root element name and therefore we will
+                    // only allow one root element. But it seems there are several.
+                    throw new AttoParseException(
+                            "Malformed markup: Only one root element (with name \"" + new String(this.rootElementName) + "\" is allowed",
+                            line, col);
+                }
+                
+                boolean matches = (this.rootElementName.length == len);
+                for (int i = 0; matches && i < len; i++) {
+                    if (buffer[offset + i] != this.rootElementName[i]) {
+                        matches = false;
+                    }
+                }
+                if (!matches) {
+                    throw new AttoParseException(
+                        "Malformed markup: Root element should be \"" + new String(this.rootElementName) + "\", " +
+                        "but \"" + new String(buffer, offset, len) + "\" has been found",
+                        line, col);
+                }
+                
+            }
+            
+        }
         
         
         
-        private void checkStackForElement(
+        private boolean checkStackForElement(
                 final char[] buffer, final int offset, final int len, final int line, final int col) 
                 throws AttoParseException {
             
@@ -959,7 +1022,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
     
                 if (matches) {
                     // We found the corresponding opening element!
-                    return;
+                    return true;
                 }
                 
                 // does not match...
@@ -982,14 +1045,19 @@ public abstract class AbstractDetailedMarkupAttoHandler
             }
 
             // closing element at the root level
-            if (this.requireNoUnbalancedCloseElements) {
+            if (this.requireNoUnmatchedCloseElements) {
                 throw new AttoParseException(
                         "Malformed markup: closing element " +
                         "\"" + new String(buffer, offset, len) + "\"" +
                         " is never open", line, col - 2);
             }
             
-            // Nothing to check! just return.
+            this.handler.handleUnmatchedCloseElementStart(CLOSE_START, 0, CLOSE_START.length, line, col - 2);
+            this.handler.handleUnmatchedCloseElementName(buffer, offset, len, line, col - 2);
+            this.handler.handleUnmatchedCloseElementEnd(CLOSE_END, 0, CLOSE_END.length, line, col - 2);
+
+            // Return false so that the normal "close" event is not fired
+            return false;
             
         }
         

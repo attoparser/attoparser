@@ -43,40 +43,25 @@ import java.io.Serializable;
  *
  */
 public final class MarkupParsingConfiguration implements Serializable {
-
-    public static enum Presence { REQUIRED, ALLOWED, FORBIDDEN }
-    public static enum UniqueRootElement { REQUIRED, REQUIRED_IF_PROLOG_PRESENT, NOT_REQUIRED }
     
-    public static enum ElementBalancing { REQUIRE_BALANCED, AUTO_CLOSE, NO_BALANCING } 
+    public static enum ElementBalancing { 
+        REQUIRE_BALANCED, AUTO_CLOSE, AUTO_CLOSE_REQUIRE_NO_UNMATCHED_CLOSE, 
+        REQUIRE_NO_UNMATCHED_CLOSE, NO_BALANCING } 
+
     
     private static final long serialVersionUID = 5191449744126332916L;
     
     
     private ElementBalancing elementBalancing = ElementBalancing.NO_BALANCING;
-    private boolean requireNoUnbalancedCloseElements = false;
-    private boolean requireWellFormedProlog = false;
-    private boolean requireUniqueRootElement = false;
-    private boolean requireWellFormedAttributeValues = false;
+    
+    private boolean requireXmlWellFormedAttributeValues = false;
     private boolean requireUniqueAttributesInElement = false;
-    private boolean requireNoProlog = false;
  
     private PrologParsingConfiguration prologParsingConfiguration = new PrologParsingConfiguration();
+    private UniqueRootElementPresence uniqueRootElementPresence = UniqueRootElementPresence.DEPENDS_ON_PROLOG_DOCTYPE;
     
 
 
-    /*
-     * 
-     * PROLOG: VALIDATED, NOT VALIDATED
-     * PROLOG: REQUIRED, ALLOWED, DISALLOWED
-     *   XMLDECL : REQUIRED, ALLOWED, DISALLOWED
-     *   DOCTYPE : REQUIRED, ALLOWED, DISALLOWED
-     *   (RRR, RRA, RRD, RAR, RDR, ARR, ARA, ARD, AAR, AAA, AAD, ADR, ADA, DDD)
-     *   (RAA, RAD, RDA, RDD, ADD, DRR, DRA, DRD, DAR, DAA, DAD, DDR, DDA)
-     *   [IF (* = D__) -> RET (* = _DD); IF (* = _R_ OR * = __R) -> RET TRUE; IF (* = A__) -> RET (* != _DD); RET FALSE] 
-     *   
-     * UNIQUE ROOT ELEMENT: REQUIRED, REQUIRED_IF_PROLOG, NOT_REQUIRED
-     * 
-     */
 
     /**
      * <p>
@@ -86,13 +71,11 @@ public final class MarkupParsingConfiguration implements Serializable {
      *   This is the setup:
      * </p>
      * <ul>
-     *   <li><tt>elementBalancing = NO_BALANCING</tt></li>
-     *   <li><tt>requireNoUnbalancedCloseElements = false</tt></li>
-     *   <li><tt>requireWellFormedProlog = false</tt></li>
-     *   <li><tt>requireUniqueRootElement = false</tt></li>
-     *   <li><tt>requireWellFormedAttributeValues = false</tt></li>
-     *   <li><tt>requireUniqueAttributesInElement = false</tt></li>
-     *   <li><tt>requireNoProlog = false</tt></li>
+     *   <li><tt>{@link #getElementBalancing()} = {@link ElementBalancing#NO_BALANCING}</tt></li>
+     *   <li><tt>{@link #getRequireXmlWellFormedAttributeValues()} = false</tt></li>
+     *   <li><tt>{@link #getRequireUniqueAttributesInElement()} = false</tt></li>
+     *   <li><tt>{@link #getPrologParsingConfiguration()} = new {@link PrologParsingConfiguration}()</tt></li>
+     *   <li><tt>{@link #getUniqueRootElementPresence()} = {@link UniqueRootElementPresence#DEPENDS_ON_PROLOG_DOCTYPE}</tt></li>
      * </ul>
      * 
      * @return the new instance.
@@ -105,12 +88,59 @@ public final class MarkupParsingConfiguration implements Serializable {
 
     
     
+    /**
+     * <p>
+     *   Creates a {@link MarkupParsingConfiguration} instance with
+     *   a default configuration.
+     * </p>
+     * <p>
+     *   Default values are the same as created by {@link #noRestrictions()}:
+     * </p>
+     * <ul>
+     *   <li><tt>{@link #getElementBalancing()} = {@link ElementBalancing#NO_BALANCING}</tt></li>
+     *   <li><tt>{@link #getRequireXmlWellFormedAttributeValues()} = false</tt></li>
+     *   <li><tt>{@link #getRequireUniqueAttributesInElement()} = false</tt></li>
+     *   <li><tt>{@link #getPrologParsingConfiguration()} = new {@link PrologParsingConfiguration}()</tt></li>
+     *   <li><tt>{@link #getUniqueRootElementPresence()} = {@link UniqueRootElementPresence#DEPENDS_ON_PROLOG_DOCTYPE}</tt></li>
+     * </ul>
+     * 
+     * @return the new instance.
+     */
     public MarkupParsingConfiguration() {
         super();
     }
     
 
     
+    /**
+     * <p>
+     *   Determines the level of element balancing required at the document being parsed,
+     *   enabling auto-closing of elements if needed.
+     * </p>
+     * <p>
+     *   Possible values are:
+     * </p>
+     * <ul>
+     *   <li>{@link ElementBalancing#NO_BALANCING} (default): means no corrections and/or
+     *       validations of any kind will be performed. Artifacts will be reported by the
+     *       corresponding events without further interpretation.</li>
+     *   <li>{@link ElementBalancing#REQUIRE_BALANCED}: will require that all elements
+     *       are perfectly balanced, raising an exception if this does not happen.</li>
+     *   <li>{@link ElementBalancing#AUTO_CLOSE}: Parser will emit <i>autoclose</i> events
+     *       for those elements that are left unclosed, in order to provide a complete XML-style
+     *       tag balance.</li>
+     *   <li>{@link ElementBalancing#AUTO_CLOSE_REQUIRE_NO_UNMATCHED_CLOSE}: Same as 
+     *       {@link ElementBalancing#AUTO_CLOSE} but validating that there are no unmatched
+     *       <i>close element</i> artifacts (without a corresponding <i>open element</i> artifact),
+     *       raising an exception if any are found.</li>
+     *   <li>{@link ElementBalancing#REQUIRE_NO_UNMATCHED_CLOSE}: Will not require complete
+     *       balancing nor perform <i>autoclose</i>, but will require that there are no unmatched
+     *       <i>close element</i> artifacts (without a corresponding <i>open element</i> artifact),
+     *       raising an exception if any are found.</li>
+     * </ul>
+     * 
+     * @return the level of element balancing.
+     */
     public ElementBalancing getElementBalancing() {
         return this.elementBalancing;
     }
@@ -119,39 +149,51 @@ public final class MarkupParsingConfiguration implements Serializable {
     public void setElementBalancing(final ElementBalancing elementBalancing) {
         this.elementBalancing = elementBalancing;
     }
-    
-    
-    public boolean getRequireNoUnbalancedCloseElements() {
-        return this.requireNoUnbalancedCloseElements;
+
+
+    /**
+     * <p>
+     *   A {@link PrologParsingConfiguration} object determining the way
+     *   in which prolog (XML Declaration, DOCTYPE) will be dealt with during parsing.
+     * </p>
+     * 
+     * @return the configuration object.
+     */
+    public PrologParsingConfiguration getPrologParsingConfiguration() {
+        return this.prologParsingConfiguration;
     }
 
 
-    public void setRequireNoUnbalancedCloseElements(final boolean requireNoUnbalancedCloseElements) {
-        this.requireNoUnbalancedCloseElements = requireNoUnbalancedCloseElements;
+    /**
+     * <p>
+     *   Determine whether element attributes will be required to be well-formed from the XML
+     *   standpoint. This means:
+     * </p>
+     * <ul>
+     *   <li>Attributes should always have a value.</li>
+     *   <li>Attribute values should be surrounded by double-quotes.</li>
+     * </ul>
+     * 
+     * @return whether attributes should be XML-well-formed or not.
+     */
+    public boolean getRequireXmlWellFormedAttributeValues() {
+        return this.requireXmlWellFormedAttributeValues;
     }
 
 
-    public boolean getRequireWellFormedProlog() {
-        return this.requireWellFormedProlog;
+    public void setRequireXmlWellFormedAttributeValues(
+            final boolean requireXmlWellFormedAttributeValues) {
+        this.requireXmlWellFormedAttributeValues = requireXmlWellFormedAttributeValues;
     }
 
 
-    public void setRequireWellFormedProlog(final boolean requireWellFormedProlog) {
-        this.requireWellFormedProlog = requireWellFormedProlog;
-    }
-
-
-    public boolean getRequireWellFormedAttributeValues() {
-        return this.requireWellFormedAttributeValues;
-    }
-
-
-    public void setRequireWellFormedAttributeValues(
-            final boolean requireWellFormedAttributeValues) {
-        this.requireWellFormedAttributeValues = requireWellFormedAttributeValues;
-    }
-
-
+    /**
+     * <p>
+     *   Determines whether attributes should never appear duplicated in elements.
+     * </p>
+     * 
+     * @return whether attributes should never appear duplicated in elements.
+     */
     public boolean getRequireUniqueAttributesInElement() {
         return this.requireUniqueAttributesInElement;
     }
@@ -162,42 +204,201 @@ public final class MarkupParsingConfiguration implements Serializable {
     }
 
 
-    public boolean getRequireUniqueRootElement() {
-        return this.requireUniqueRootElement;
+    /**
+     * <p>
+     *   This value determines whether it will be required that the document has a unique
+     *   root element.
+     * </p>
+     * <p>
+     *   If set to {@link UniqueRootElementPresence#REQUIRED_ALWAYS}, then a document with
+     *   more than one elements at the root level will never be considered valid. And if
+     *   {@link PrologParsingConfiguration#isValidateProlog()} is true and there is a DOCTYPE
+     *   clause, it will be checked that the root name established at the DOCTYPE clause
+     *   is the same as the document's element root.
+     * </p>
+     * <p>
+     *   If set to {@link UniqueRootElementPresence#DEPENDS_ON_PROLOG_DOCTYPE}, then:
+     * </p>
+     * <ul>
+     *   <li>If {@link PrologParsingConfiguration#isValidateProlog()} is false, multiple
+     *       document root elements will be allowed.</li>
+     *   <li>If {@link PrologParsingConfiguration#isValidateProlog()} is true:
+     *       <ul>
+     *         <li>If there is a DOCTYPE clause, a unique element root will be required,
+     *             and its name will be checked against the name specified at the DOCTYPE
+     *             clause.</li>
+     *         <li>If there is no DOCTYPE clause (even if it is forbidden), multiple 
+     *             document root elements will be allowed.</li>
+     *       </ul>
+     *   </li>
+     * </ul>
+     * <p>
+     *   Default value is <b>{@link UniqueRootElementPresence#DEPENDS_ON_PROLOG_DOCTYPE}</b>.
+     * </p>
+     * 
+     * @return the configuration value for validating the presence of a unique root element.
+     */
+    public UniqueRootElementPresence getUniqueRootElementPresence() {
+        return this.uniqueRootElementPresence;
     }
 
 
-    public void setRequireUniqueRootElement(final boolean requireUniqueRootElement) {
-        this.requireUniqueRootElement = requireUniqueRootElement;
-    }
-
-
-    public boolean getRequireNoProlog() {
-        return this.requireNoProlog;
-    }
-
-
-    public void setRequireNoProlog(final boolean requireNoProlog) {
-        this.requireNoProlog = requireNoProlog;
+    public void setUniqueRootElementPresence(final UniqueRootElementPresence uniqueRootElementPresence) {
+        validateNotNull(uniqueRootElementPresence, "The \"unique root element presence\" configuration value cannot be null");
+        this.uniqueRootElementPresence = uniqueRootElementPresence;
     }
     
     
+
+    
+    public static enum PrologPresence {
+        
+        REQUIRED(true, false, false), 
+        ALLOWED(false, true, false), 
+        FORBIDDEN(false, false, true); 
+        
+        private final boolean required;
+        private final boolean allowed;
+        private final boolean forbidden;
+    
+        private PrologPresence(
+                final boolean required, final boolean allowed, final boolean forbidden) {
+            this.required = required;
+            this.allowed = allowed;
+            this.forbidden = forbidden;
+        }
+
+        public boolean isRequired() {
+            return this.required;
+        }
+
+        public boolean isAllowed() {
+            return this.allowed;
+        }
+
+        public boolean isForbidden() {
+            return this.forbidden;
+        }
+    
+    }
+    
+    
+    
+    
+    public static enum UniqueRootElementPresence { 
+        
+        REQUIRED_ALWAYS(true, false), 
+        DEPENDS_ON_PROLOG_DOCTYPE(false, true);
+        
+        private final boolean requiredAlways;
+        private final boolean dependsOnPrologDoctype;
+    
+        private UniqueRootElementPresence(
+                final boolean requiredAlways, final boolean dependsOnPrologDoctype) {
+            this.requiredAlways = requiredAlways;
+            this.dependsOnPrologDoctype = dependsOnPrologDoctype;
+        }
+
+        public boolean isRequiredAlways() {
+            return this.requiredAlways;
+        }
+
+        public boolean isDependsOnPrologDoctype() {
+            return this.dependsOnPrologDoctype;
+        }
+    
+    }
     
     
     
     
     
+
+    /**
+     * <p>
+     *   Class encapsulating the configuration parameters used for parsing
+     *   and validating the "prolog" section of a markup document. The prolog
+     *   is the section of an XML/HTML document containing the XML declaration
+     *   and the DOCTYPE clause (if these exist).
+     * </p>
+     * <p>
+     *   If <tt>validateProlog</tt> is set to false, all other parameters
+     *   should be ignored.
+     * </p>
+     * <p>
+     *   If <tt>validateProlog</tt> is true, then the rest of the parameters
+     *   will be considered.
+     * </p>
+     * <p>
+     *   Not all combinations of values of the tt>{@link #getPrologPresence()}</tt>, 
+     *   <tt>{@link #getXmlDeclarationPresence()}</tt> and <tt>{@link #getDoctypePresence()}</tt> 
+     *   are considered valid. See {@link #validateConfiguration()} for details.
+     * </p>
+     * 
+     * @author Daniel Fern&aacute;ndez
+     *  
+     * @since 1.1
+     */
     public static class PrologParsingConfiguration implements Serializable {
         
-        private boolean validateProlog = false;
-        private Presence prologPresence = Presence.ALLOWED;
-        private Presence xmlDeclarationPresence = Presence.ALLOWED;
-        private Presence doctypePresence = Presence.ALLOWED;
+        private static final long serialVersionUID = -4291053503740751549L;
         
-        public PrologParsingConfiguration() {
+        
+        private boolean validateProlog = false;
+        private PrologPresence prologPresence = PrologPresence.ALLOWED;
+        private PrologPresence xmlDeclarationPresence = PrologPresence.ALLOWED;
+        private PrologPresence doctypePresence = PrologPresence.ALLOWED;
+        
+        
+        /**
+         * <p>
+         *   Creates a {@link PrologParsingConfiguration} instance with
+         *   a default configuration.
+         * </p>
+         * <p>
+         *   Default values are:
+         * </p>
+         * <ul>
+         *   <li><tt>{@link #isValidateProlog()} = false</tt></li>
+         *   <li><tt>{@link #getPrologPresence()} = {@link PrologPresence#ALLOWED}</tt></li>
+         *   <li><tt>{@link #getXmlDeclarationPresence()} = {@link PrologPresence#ALLOWED}</tt></li>
+         *   <li><tt>{@link #getDoctypePresence()} = {@link PrologPresence#ALLOWED}</tt></li>
+         * </ul>
+         * 
+         * @return the new instance.
+         */
+        protected PrologParsingConfiguration() {
             super();
         }
 
+        /**
+         * <p>
+         *   This flag indicates whether the document's prolog should be validated
+         *   at all or not. 
+         * </p>
+         * <p>
+         *   If not validated, prolog-specific structures (XML Declaration
+         *   and DOCTYPE) will be allowed to appear anywhere in the document.
+         *   All other configuration paramters in this object will be ignored.
+         * </p>
+         * <p>
+         *   If validated, prolog-specific structures will only be allowed to
+         *   appear (under the conditions established in this object) at the
+         *   beginning of the document, before the element root. Or if 
+         *   {@link #getPrologPresence()} is set to {@link PrologPresence#FORBIDDEN},
+         *   it will be validated that such structures do not appear at all.
+         * </p>
+         * <p>
+         *   Also, if validated and a DOCTYPE is present, it will be checked
+         *   that there is only one root element in the document and its name
+         *   matches the root element name in the DOCTYPE clause.
+         * </p>
+         * <p>
+         *   Default value is <b>false</b>.
+         * </p>
+         * 
+         * @return whether prolog is to be validated or not.
+         */
         public boolean isValidateProlog() {
             return this.validateProlog;
         }
@@ -206,31 +407,138 @@ public final class MarkupParsingConfiguration implements Serializable {
             this.validateProlog = validateProlog;
         }
 
-        public Presence getPrologPresence() {
+        /**
+         * <p>
+         *  This flag indicates the level of presence desired for the prolog
+         *  in the document, in case {@link #isValidateProlog()} has been set
+         *  to true.
+         * </p>
+         * 
+         * @return the level of presence desired for the prolog.
+         */
+        public PrologPresence getPrologPresence() {
             return this.prologPresence;
         }
 
-        public void setPrologPresence(final Presence prologPresence) {
+        public void setPrologPresence(final PrologPresence prologPresence) {
+            validateNotNull(this.prologPresence, "Prolog presence cannot be null");
             this.prologPresence = prologPresence;
         }
 
-        public Presence getXmlDeclarationPresence() {
+        /**
+         * <p>
+         *  This flag indicates the level of presence desired for the XML Declaration
+         *  (a part of the prolog) in the document, in case {@link #isValidateProlog()} 
+         *  has been set to true.
+         * </p>
+         * 
+         * @return the level of presence desired for the XML Declaration.
+         */
+        public PrologPresence getXmlDeclarationPresence() {
             return this.xmlDeclarationPresence;
         }
 
-        public void setXmlDeclarationPresence(final Presence xmlDeclarationPresence) {
+        public void setXmlDeclarationPresence(final PrologPresence xmlDeclarationPresence) {
+            validateNotNull(this.prologPresence, "XML Declaration presence cannot be null");
             this.xmlDeclarationPresence = xmlDeclarationPresence;
         }
 
-        public Presence getDoctypePresence() {
+        /**
+         * <p>
+         *  This flag indicates the level of presence desired for the DOCTYPE clause
+         *  (a part of the prolog) in the document, in case {@link #isValidateProlog()} 
+         *  has been set to true.
+         * </p>
+         * 
+         * @return the level of presence desired for the DOCTYPE clause.
+         */
+        public PrologPresence getDoctypePresence() {
             return this.doctypePresence;
         }
 
-        public void setDoctypePresence(final Presence doctypePresence) {
+        public void setDoctypePresence(final PrologPresence doctypePresence) {
+            validateNotNull(this.prologPresence, "DOCTYPE presence cannot be null");
             this.doctypePresence = doctypePresence;
         }
+
+
         
+        /**
+         * <p>
+         *   Checks that the combination of values in the <tt>{@link #getPrologPresence()}</tt>, 
+         *   <tt>{@link #getXmlDeclarationPresence()}</tt> and <tt>{@link #getDoctypePresence()}</tt> 
+         *   parameters makes sense.
+         * </p>
+         * <ol>
+         *   <li>If {@link #getPrologPresence()} is {@link PrologPresence#FORBIDDEN}, then
+         *       {@link #getXmlDeclarationPresence()} and {@link #getDoctypePresence()} must
+         *       be {@link PrologPresence#FORBIDDEN} too.</li>
+         *   <li>Else if at least one of {@link #getXmlDeclarationPresence()} or
+         *       {@link #getDoctypePresence()} is {@link PrologPresence#REQUIRED}, the
+         *       configuration is considered valid.</li>
+         *   <li>Else if {@link #getPrologPresence()} is {@link PrologPresence#ALLOWED}, 
+         *       the configuration is considered valid as long as not both
+         *       {@link #getXmlDeclarationPresence()} and {@link #getDoctypePresence()}
+         *       are {@link PrologPresence#FORBIDDEN}.</li>
+         * </ol>
+         * 
+         * @throws IllegalArgumentException if the combination of values is not correct.
+         */
+        public void validateConfiguration() {
+
+            /*
+             * 
+             *   1. PROLOG: REQUIRED, ALLOWED, FORBIDDEN
+             *   2. XMLDECL : REQUIRED, ALLOWED, FORBIDDEN
+             *   3. DOCTYPE : REQUIRED, ALLOWED, FORBIDDEN
+             *   
+             *   VALID: (RRR, RRA, RRF, RAR, RFR, ARR, ARA, ARF, AAR, AAA, AAF, AFR, AFA, FFF)
+             *   NOT VALID: (RAA, RAF, RFA, RFF, AFF, FRR, FRA, FRF, FAR, FAA, FAF, FFR, FFA)
+             *   
+             *   FORMULA:
+             *   [IF (* = F__) -> RET (* = _FF); IF (* = _R_ OR * = __R) -> RET TRUE; IF (* = A__) -> RET (* != _FF); RET FALSE] 
+             * 
+             */
+            
+            if (!this.validateProlog) {
+                // There's nothing to check here!
+                return;
+            }
+            
+            if (PrologPresence.FORBIDDEN.equals(this.prologPresence)) {
+                if (PrologPresence.FORBIDDEN.equals(this.xmlDeclarationPresence) && 
+                        PrologPresence.FORBIDDEN.equals(this.doctypePresence)) {
+                    return;
+                }
+            } else {
+                if (PrologPresence.REQUIRED.equals(this.xmlDeclarationPresence) ||
+                        PrologPresence.REQUIRED.equals(this.doctypePresence)) {
+                    return;
+                }
+                if (PrologPresence.ALLOWED.equals(this.prologPresence)) {
+                    if (!(PrologPresence.FORBIDDEN.equals(this.xmlDeclarationPresence) && 
+                            PrologPresence.FORBIDDEN.equals(this.doctypePresence))) {
+                        return;
+                    }
+                }
+            }
+            
+            throw new IllegalArgumentException(
+                    "Prolog parsing configuration is not valid: " +
+                    "Prolog presence: " + this.prologPresence + ", " +
+                    "XML Declaration presence: " + this.xmlDeclarationPresence + ", " +
+                    "DOCTYPE presence: " + this.doctypePresence);
+            
+        }
         
+    }
+
+    
+    
+    protected static void validateNotNull(final Object obj, final String message) {
+        if (obj == null) {
+            throw new IllegalArgumentException(message);
+        }
     }
     
         

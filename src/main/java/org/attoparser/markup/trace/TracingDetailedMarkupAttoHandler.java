@@ -316,7 +316,7 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
         
         try {
             
-            this.writer.write('B');
+            this.writer.write('A');
             this.writer.write('C');
             this.writer.write('E');
             this.writer.write('S');
@@ -340,7 +340,7 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
         
         try {
             
-            this.writer.write('B');
+            this.writer.write('A');
             this.writer.write('C');
             this.writer.write('E');
             this.writer.write('N');
@@ -367,7 +367,85 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
         
         try {
             
-            this.writer.write('B');
+            this.writer.write('A');
+            this.writer.write('C');
+            this.writer.write('E');
+            this.writer.write('E');
+            this.writer.write('(');
+            this.writer.write(buffer, offset, len);
+            this.writer.write(')');
+            writePosition(this.writer, line, col);
+            
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        }
+        
+    }
+    
+    
+
+    
+    @Override
+    public void handleUnmatchedCloseElementStart(
+            final char[] buffer, 
+            final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException {
+        
+        try {
+            
+            this.writer.write('U');
+            this.writer.write('C');
+            this.writer.write('E');
+            this.writer.write('S');
+            this.writer.write('(');
+            this.writer.write(buffer, offset, len);
+            this.writer.write(')');
+            writePosition(this.writer, line, col);
+            
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        }
+        
+    }
+
+
+    
+    @Override
+    public void handleUnmatchedCloseElementName(final char[] buffer, final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException {
+        
+        try {
+            
+            this.writer.write('U');
+            this.writer.write('C');
+            this.writer.write('E');
+            this.writer.write('N');
+            this.writer.write('(');
+            this.writer.write(buffer, offset, len);
+            this.writer.write(')');
+            writePosition(this.writer, line, col);
+            
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        }
+        
+    }
+    
+    
+
+    
+    @Override
+    public void handleUnmatchedCloseElementEnd(
+            final char[] buffer, 
+            final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException {
+        
+        try {
+            
+            this.writer.write('U');
             this.writer.write('C');
             this.writer.write('E');
             this.writer.write('E');

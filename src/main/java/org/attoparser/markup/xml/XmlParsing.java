@@ -21,6 +21,8 @@ package org.attoparser.markup.xml;
 
 import org.attoparser.markup.MarkupParsingConfiguration;
 import org.attoparser.markup.MarkupParsingConfiguration.ElementBalancing;
+import org.attoparser.markup.MarkupParsingConfiguration.PrologPresence;
+import org.attoparser.markup.MarkupParsingConfiguration.UniqueRootElementPresence;
 
 
 
@@ -44,8 +46,12 @@ public class XmlParsing {
         XML_PARSING_CONFIGURATION = new MarkupParsingConfiguration();
         XML_PARSING_CONFIGURATION.setElementBalancing(ElementBalancing.REQUIRE_BALANCED);
         XML_PARSING_CONFIGURATION.setRequireUniqueAttributesInElement(true);
-        XML_PARSING_CONFIGURATION.setRequireWellFormedAttributeValues(true);
-        XML_PARSING_CONFIGURATION.setRequireWellFormedProlog(true);
+        XML_PARSING_CONFIGURATION.setRequireXmlWellFormedAttributeValues(true);
+        XML_PARSING_CONFIGURATION.getPrologParsingConfiguration().setValidateProlog(true);
+        XML_PARSING_CONFIGURATION.getPrologParsingConfiguration().setPrologPresence(PrologPresence.ALLOWED);
+        XML_PARSING_CONFIGURATION.getPrologParsingConfiguration().setXmlDeclarationPresence(PrologPresence.ALLOWED);
+        XML_PARSING_CONFIGURATION.getPrologParsingConfiguration().setDoctypePresence(PrologPresence.ALLOWED);
+        XML_PARSING_CONFIGURATION.setUniqueRootElementPresence(UniqueRootElementPresence.DEPENDS_ON_PROLOG_DOCTYPE);
     }
 
 
