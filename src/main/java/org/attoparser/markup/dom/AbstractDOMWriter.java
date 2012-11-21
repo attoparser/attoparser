@@ -35,7 +35,7 @@ import java.io.Writer;
  * @since 1.1
  *
  */
-public abstract class AbstractDOMWriter {
+public abstract class AbstractDOMWriter implements IDOMWriter {
 
     
     public void write(final INode node, final Writer writer) throws IOException {
