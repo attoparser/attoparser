@@ -568,6 +568,9 @@ public abstract class AbstractDetailedMarkupAttoHandler
                      ElementBalancing.REQUIRE_NO_UNMATCHED_CLOSE.equals(markupParsingConfiguration.getElementBalancing()));
             
             this.prologParsingConfiguration = markupParsingConfiguration.getPrologParsingConfiguration();
+            
+            this.prologParsingConfiguration.validateConfiguration();
+            
             this.uniqueRootElementPresence = markupParsingConfiguration.getUniqueRootElementPresence();
             this.requireWellFormedAttributeValues = markupParsingConfiguration.getRequireXmlWellFormedAttributeValues();
             this.requireUniqueAttributesInElement = markupParsingConfiguration.getRequireUniqueAttributesInElement();
@@ -926,13 +929,14 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int outerLine, final int outerCol) 
                 throws AttoParseException {
             
-            if (this.validateProlog && (this.prologPresenceForbidden || this.doctypePresenceForbidden)) {
-                throw new AttoParseException(
-                        "A DOCTYPE clause has been found, but it wasn't allowed",
-                        outerLine, outerCol);
-            }
-            
             if (this.validateProlog) {
+                
+                if (this.prologPresenceForbidden || this.doctypePresenceForbidden) {
+                    throw new AttoParseException(
+                            "A DOCTYPE clause has been found, but it wasn't allowed",
+                            outerLine, outerCol);
+                }
+                
                 if (this.validPrologDocTypeRead) {
                     throw new AttoParseException(
                             "Malformed markup: Only one DOCTYPE clause can appear in document",
@@ -945,6 +949,35 @@ public abstract class AbstractDetailedMarkupAttoHandler
                             "elements in document",
                             outerLine, outerCol);
                 }
+
+                if (this.prologParsingConfiguration.isRequireDoctypeKeywordsUpperCase()) {
+                    
+                    if (keywordLen > 0) {
+                        final int maxi = keywordOffset + keywordLen;
+                        for (int i = keywordOffset; i < maxi; i++) {
+                            if (Character.isLowerCase(buffer[i])) {
+                                throw new AttoParseException(
+                                        "Malformed markup: DOCTYPE requires upper-case " +
+                                        "keywords (\"" + new String(buffer, keywordOffset, keywordLen) + "\" was found)",
+                                        outerLine, outerCol);
+                            }
+                        }
+                    }
+                    
+                    if (typeLen > 0) {
+                        final int maxi = typeOffset + typeLen;
+                        for (int i = typeOffset; i < maxi; i++) {
+                            if (Character.isLowerCase(buffer[i])) {
+                                throw new AttoParseException(
+                                        "Malformed markup: DOCTYPE requires upper-case " +
+                                        "keywords (\"" + new String(buffer, typeOffset, typeLen) + "\" was found)",
+                                        outerLine, outerCol);
+                            }
+                        }
+                    }
+                    
+                }
+                
             }
             
             this.rootElementName = new char[elementNameLen];

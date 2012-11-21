@@ -55,6 +55,10 @@ public class AttoParserTest extends TestCase {
         
         final MarkupParsingConfiguration noRestrictions = MarkupParsingConfiguration.noRestrictions();
         
+        final MarkupParsingConfiguration noRestrictionsUpperCaseDocType = noRestrictions.clone();
+        noRestrictionsUpperCaseDocType.getPrologParsingConfiguration().setValidateProlog(true);
+        noRestrictionsUpperCaseDocType.getPrologParsingConfiguration().setRequireDoctypeKeywordsUpperCase(true);
+        
         final MarkupParsingConfiguration noRestrictionsAutoClose = MarkupParsingConfiguration.noRestrictions();
         noRestrictionsAutoClose.setElementBalancing(ElementBalancing.AUTO_CLOSE);
         
@@ -653,6 +657,14 @@ public class AttoParserTest extends TestCase {
             "[DT(doctype){1,3}(){1,10}(){1,10}(){1,10}(){1,10}(){1,10}]",
             "[DT()()()(){1,1}]", 
             noRestrictionsAutoClose);
+        testDocError( 
+            "<!doctype>",
+            null, null, 1, 1,
+            noRestrictionsUpperCaseDocType);
+        testDocError( 
+            "<!DOCTYPE html system \"lala\">",
+            null, null, 1, 1,
+            noRestrictionsUpperCaseDocType);
         testDoc( 
             "<!DOCTYPE  >",
             "[DT(DOCTYPE){1,3}(){1,10}(){1,10}(){1,10}(){1,10}(){1,10}]",

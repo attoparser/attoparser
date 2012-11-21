@@ -73,6 +73,7 @@ public final class MarkupParsingConfiguration implements Serializable {
      *   This is the setup:
      * </p>
      * <ul>
+     *   <li><tt>{@link #isCaseSensitive()} = true</tt></li>
      *   <li><tt>{@link #getElementBalancing()} = {@link ElementBalancing#NO_BALANCING}</tt></li>
      *   <li><tt>{@link #getRequireXmlWellFormedAttributeValues()} = false</tt></li>
      *   <li><tt>{@link #getRequireUniqueAttributesInElement()} = false</tt></li>
@@ -99,6 +100,7 @@ public final class MarkupParsingConfiguration implements Serializable {
      *   Default values are the same as created by {@link #noRestrictions()}:
      * </p>
      * <ul>
+     *   <li><tt>{@link #isCaseSensitive()} = true</tt></li>
      *   <li><tt>{@link #getElementBalancing()} = {@link ElementBalancing#NO_BALANCING}</tt></li>
      *   <li><tt>{@link #getRequireXmlWellFormedAttributeValues()} = false</tt></li>
      *   <li><tt>{@link #getRequireUniqueAttributesInElement()} = false</tt></li>
@@ -394,6 +396,7 @@ public final class MarkupParsingConfiguration implements Serializable {
         private PrologPresence prologPresence = PrologPresence.ALLOWED;
         private PrologPresence xmlDeclarationPresence = PrologPresence.ALLOWED;
         private PrologPresence doctypePresence = PrologPresence.ALLOWED;
+        private boolean requireDoctypeKeywordsUpperCase = true;
         
         
         /**
@@ -409,6 +412,7 @@ public final class MarkupParsingConfiguration implements Serializable {
          *   <li><tt>{@link #getPrologPresence()} = {@link PrologPresence#ALLOWED}</tt></li>
          *   <li><tt>{@link #getXmlDeclarationPresence()} = {@link PrologPresence#ALLOWED}</tt></li>
          *   <li><tt>{@link #getDoctypePresence()} = {@link PrologPresence#ALLOWED}</tt></li>
+         *   <li><tt>{@link #isRequireDoctypeKeywordsUpperCase()} = true</tt></li>
          * </ul>
          * 
          * @return the new instance.
@@ -507,6 +511,28 @@ public final class MarkupParsingConfiguration implements Serializable {
             this.doctypePresence = doctypePresence;
         }
 
+        /**
+         * <p>
+         *   This configuration parameter allows to check that all keywords in
+         *   a DOCTYPE clause ('DOCTYPE', 'SYSTEM', 'PUBLIC') are in upper-case as
+         *   required by the XML specification (and not by the HTML5 one, for example).
+         * </p>
+         * <p>
+         *   Default value is <b>true</b>, but it will apply only if
+         *   {@link #isValidateProlog()} is true.
+         * </p>
+         * 
+         * @return whether keywords in the DOCTYPE clause will be forced to be
+         *         in upper-case.
+         */
+        public boolean isRequireDoctypeKeywordsUpperCase() {
+            return this.requireDoctypeKeywordsUpperCase;
+        }
+
+        public void setRequireDoctypeKeywordsUpperCase(final boolean requireDoctypeKeywordsUpperCase) {
+            this.requireDoctypeKeywordsUpperCase = requireDoctypeKeywordsUpperCase;
+        }
+
 
         
         /**
@@ -586,6 +612,7 @@ public final class MarkupParsingConfiguration implements Serializable {
             conf.prologPresence = this.prologPresence;
             conf.doctypePresence = this.doctypePresence;
             conf.xmlDeclarationPresence = this.xmlDeclarationPresence;
+            conf.requireDoctypeKeywordsUpperCase = this.requireDoctypeKeywordsUpperCase;
             return conf;
         }
         
