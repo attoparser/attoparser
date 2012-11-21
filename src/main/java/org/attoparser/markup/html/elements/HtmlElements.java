@@ -258,16 +258,12 @@ public final class HtmlElements {
 
 
         private int getSegmentByChar(final char c) {
-            
-            if (c >= 'a' && c <= 'z') {
-                return (c - 'a');
-            } else if (c >= 'A' && c <= 'Z') {
-                return ((char)(c + CASE_DIFF) - 'a');
-            } else {
-                // Non-alphabetic will go after position 'z'
-                return ('z' + 1);
+            if (c >= 'A' && c <= 'Z') {
+                // We want lower- and upper-case to be together in the same segment in order
+                // to implement case-insensitivity
+                return c + CASE_DIFF;
             }
-            
+            return c;
         }
         
         public boolean matchesByKey(final IHtmlElement value, final String key) {

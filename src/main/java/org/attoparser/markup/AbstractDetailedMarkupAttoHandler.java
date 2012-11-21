@@ -19,10 +19,14 @@
  */
 package org.attoparser.markup;
 
+import java.util.Arrays;
+
 import org.attoparser.AttoParseException;
 import org.attoparser.markup.MarkupParsingConfiguration.ElementBalancing;
 import org.attoparser.markup.MarkupParsingConfiguration.PrologParsingConfiguration;
 import org.attoparser.markup.MarkupParsingConfiguration.UniqueRootElementPresence;
+import org.attoparser.util.SegmentedArray;
+import org.attoparser.util.SegmentedArray.IValueHandler;
 
 
 
@@ -506,7 +510,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
     
     static final class StackAwareWrapper
             implements IDetailedElementHandling, IDetailedDocTypeHandling {
-        
+
         private static final int DEFAULT_STACK_SIZE = 15;
         private static final int DEFAULT_ATTRIBUTE_NAMES_SIZE = 5;
 
@@ -533,6 +537,10 @@ public abstract class AbstractDetailedMarkupAttoHandler
         private final boolean prologPresenceForbidden;
         private final boolean xmlDeclarationPresenceForbidden;
         private final boolean doctypePresenceForbidden;
+
+        // Will be used as an element name cache in order to avoid creating a new
+        // char[] object each time an element is pushed into the stack
+        private final SegmentedArray<char[], char[]> elementNames;
         
         private char[][] elementStack;
         private int elementStackSize;
@@ -582,6 +590,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
             
             this.elementStack = new char[DEFAULT_STACK_SIZE][];
             this.elementStackSize = 0;
+
+            this.elementNames = new SegmentedArray<char[],char[]>(char[].class, new ElementNameValueHandler(), 10, 10);
             
         }
 
@@ -611,7 +621,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
             cleanStack(line, col);
             
             this.handler.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col, this.markupParsingConfiguration);
-            
+
         }
 
         
@@ -1164,8 +1174,16 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 growStack();
             }
             
-            this.elementStack[this.elementStackSize] = new char[len];
-            System.arraycopy(buffer, offset, this.elementStack[this.elementStackSize], 0, len);
+            final char[] cachedElementName = 
+                    this.elementNames.searchByText(buffer, offset, len);
+            
+            if (cachedElementName == null) {
+                this.elementStack[this.elementStackSize] = new char[len];
+                System.arraycopy(buffer, offset, this.elementStack[this.elementStackSize], 0, len);
+                this.elementNames.registerValue(this.elementStack[this.elementStackSize]);
+            } else {
+                this.elementStack[this.elementStackSize] = cachedElementName;
+            }
             
             this.elementStackSize++;
             
@@ -1194,6 +1212,66 @@ public abstract class AbstractDetailedMarkupAttoHandler
             final char[][] newStack = new char[newStackSize][];
             System.arraycopy(this.elementStack, 0, newStack, 0, this.elementStack.length);
             this.elementStack = newStack;
+            
+        }
+        
+        
+        private static final class ElementNameValueHandler implements IValueHandler<char[], char[]> {
+            
+            /*
+             * Class is private, only used here. No need to validate arguments.
+             */
+            
+            ElementNameValueHandler() {
+                super();
+            }
+            
+            
+            public char[] getKey(final char[] value) {
+                return value;
+            }
+
+
+            public int getSegment(final char[] value) {
+                return getSegmentByKey(getKey(value));
+            }
+
+            public int getSegmentByKey(final char[] key) {
+                return key[0];
+            }
+
+            public int getSegmentByText(final String text) {
+                throw new UnsupportedOperationException();
+            }
+
+            public int getSegmentByText(final char[] textBuffer, final int textOffset, final int textLen) {
+                return textBuffer[textOffset];
+            }
+            
+            public boolean matchesByKey(final char[] value, final char[] key) {
+                return Arrays.equals(value, key);
+            }
+
+            public boolean matchesByText(final char[] value, final String text) {
+                throw new UnsupportedOperationException();
+            }
+
+            public boolean matchesByText(final char[] value, final char[] textBuffer,
+                    final int textOffset, final int textLen) {
+                
+                final int valueLen = value.length;
+                if (valueLen != textLen) {
+                    return false;
+                }
+                for (int i = 0; i < valueLen; i++) {
+                    if (value[i] != textBuffer[i + textOffset]) {
+                        return false;
+                    }
+                }
+                
+                return true;
+                
+            }
             
         }
         
