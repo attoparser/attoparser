@@ -103,8 +103,8 @@ public class AttoParserTest extends TestCase {
         
         testDoc( 
             "<h1>Hello</ h1>",
-            "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}T(Hello</ h1>){1,5}BCES(</){1,16}BCEN(h1){1,16}BCEE(>){1,16}]",
-            "[OE(h1){1,1}T(Hello</ h1>){1,5}BCE(h1){1,16}]", 
+            "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}T(Hello</ h1>){1,5}ACES(</){1,16}ACEN(h1){1,16}ACEE(>){1,16}]",
+            "[OE(h1){1,1}T(Hello</ h1>){1,5}ACE(h1){1,16}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "<h1>Hello</ h1>",
@@ -113,8 +113,8 @@ public class AttoParserTest extends TestCase {
             noRestrictions);
         testDoc( 
             "<p><h1>Hello</ h1></p>",
-            "[OES(<){1,1}OEN(p){1,2}OEE(>){1,3}OES(<){1,4}OEN(h1){1,5}OEE(>){1,7}T(Hello</ h1>){1,8}BCES(</){1,19}BCEN(h1){1,19}BCEE(>){1,19}CES(</){1,19}CEN(p){1,21}CEE(>){1,22}]",
-            "[OE(p){1,1}OE(h1){1,4}T(Hello</ h1>){1,8}BCE(h1){1,19}CE(p){1,19}]", 
+            "[OES(<){1,1}OEN(p){1,2}OEE(>){1,3}OES(<){1,4}OEN(h1){1,5}OEE(>){1,7}T(Hello</ h1>){1,8}ACES(</){1,19}ACEN(h1){1,19}ACEE(>){1,19}CES(</){1,19}CEN(p){1,21}CEE(>){1,22}]",
+            "[OE(p){1,1}OE(h1){1,4}T(Hello</ h1>){1,8}ACE(h1){1,19}CE(p){1,19}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "<p><h1>Hello</ h1></p>",
@@ -153,18 +153,18 @@ public class AttoParserTest extends TestCase {
             noRestrictionsAutoClose);
         testDoc( 
             "<\np  >Hello</p>",
-            "[T(<\np  >Hello){1,1}CES(</){2,10}CEN(p){2,12}CEE(>){2,13}]",
-            "[T(<\np  >Hello){1,1}CE(p){2,10}]", 
+            "[T(<\np  >Hello){1,1}UCES(</){2,10}UCEN(p){2,12}UCEE(>){2,13}]",
+            "[T(<\np  >Hello){1,1}UCE(p){2,10}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "< h1  >Hello</h1>",
-            "[T(< h1  >Hello){1,1}CES(</){1,13}CEN(h1){1,15}CEE(>){1,17}]",
-            "[T(< h1  >Hello){1,1}CE(h1){1,13}]", 
+            "[T(< h1  >Hello){1,1}UCES(</){1,13}UCEN(h1){1,15}UCEE(>){1,17}]",
+            "[T(< h1  >Hello){1,1}UCE(h1){1,13}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "<h1>Hello</ h1>",
-            "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}T(Hello</ h1>){1,5}BCES(</){1,16}BCEN(h1){1,16}BCEE(>){1,16}]",
-            "[OE(h1){1,1}T(Hello</ h1>){1,5}BCE(h1){1,16}]", 
+            "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}T(Hello</ h1>){1,5}ACES(</){1,16}ACEN(h1){1,16}ACEE(>){1,16}]",
+            "[OE(h1){1,1}T(Hello</ h1>){1,5}ACE(h1){1,16}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "< h1>Hello</ h1>",
@@ -200,8 +200,8 @@ public class AttoParserTest extends TestCase {
             noRestrictionsAutoClose);
         testDoc( 
             "Hello, <p>lala</p>",
-            "[T(o, ){1,1}OES(<){1,4}OEN(p){1,5}OEE(>){1,6}T(l){1,7}BCES(</){1,8}BCEN(p){1,8}BCEE(>){1,8}]",
-            "[T(o, ){1,1}OE(p){1,4}T(l){1,7}BCE(p){1,8}]",
+            "[T(o, ){1,1}OES(<){1,4}OEN(p){1,5}OEE(>){1,6}T(l){1,7}ACES(</){1,8}ACEN(p){1,8}ACEE(>){1,8}]",
+            "[T(o, ){1,1}OE(p){1,4}T(l){1,7}ACE(p){1,8}]",
             4, 7, 
             noRestrictionsAutoClose);
         testDoc( 
@@ -620,22 +620,22 @@ public class AttoParserTest extends TestCase {
         
         testDoc( 
             "<div class = \"lala\">",
-            "[OES(<){1,1}OEN(div){1,2}AS( ){1,5}A(class){1,6}( = ){1,11}(\"lala\"){1,14}OEE(>){1,20}BCES(</){1,21}BCEN(div){1,21}BCEE(>){1,21}]",
+            "[OES(<){1,1}OEN(div){1,2}AS( ){1,5}A(class){1,6}( = ){1,11}(\"lala\"){1,14}OEE(>){1,20}ACES(</){1,21}ACEN(div){1,21}ACEE(>){1,21}]",
             null, 
             noRestrictionsAutoClose);
         testDoc( 
             "<div class \n\n= \nlala li=\nlla>",
-            "[OES(<){1,1}OEN(div){1,2}AS( ){1,5}A(class){1,6}( \n\n= \n){1,11}(lala){4,1}AS( ){4,5}A(li){4,6}(=\n){4,8}(lla){5,1}OEE(>){5,4}BCES(</){5,5}BCEN(div){5,5}BCEE(>){5,5}]",
+            "[OES(<){1,1}OEN(div){1,2}AS( ){1,5}A(class){1,6}( \n\n= \n){1,11}(lala){4,1}AS( ){4,5}A(li){4,6}(=\n){4,8}(lla){5,1}OEE(>){5,4}ACES(</){5,5}ACEN(div){5,5}ACEE(>){5,5}]",
             null, 
             noRestrictionsAutoClose);
         testDoc( 
             "<div class \n\n= \n\"lala\"li=\nlla>",
-            "[OES(<){1,1}OEN(div){1,2}AS( ){1,5}A(class){1,6}( \n\n= \n){1,11}(\"lala\"){4,1}A(li){4,7}(=\n){4,9}(lla){5,1}OEE(>){5,4}BCES(</){5,5}BCEN(div){5,5}BCEE(>){5,5}]",
+            "[OES(<){1,1}OEN(div){1,2}AS( ){1,5}A(class){1,6}( \n\n= \n){1,11}(\"lala\"){4,1}A(li){4,7}(=\n){4,9}(lla){5,1}OEE(>){5,4}ACES(</){5,5}ACEN(div){5,5}ACEE(>){5,5}]",
             null, 
             noRestrictionsAutoClose);
         testDoc( 
             "<div class \n\n= \n'lala'li=\nlla>",
-            "[OES(<){1,1}OEN(div){1,2}AS( ){1,5}A(class){1,6}( \n\n= \n){1,11}('lala'){4,1}A(li){4,7}(=\n){4,9}(lla){5,1}OEE(>){5,4}BCES(</){5,5}BCEN(div){5,5}BCEE(>){5,5}]",
+            "[OES(<){1,1}OEN(div){1,2}AS( ){1,5}A(class){1,6}( \n\n= \n){1,11}('lala'){4,1}A(li){4,7}(=\n){4,9}(lla){5,1}OEE(>){5,4}ACES(</){5,5}ACEN(div){5,5}ACEE(>){5,5}]",
             null, 
             noRestrictionsAutoClose);
         
@@ -916,13 +916,13 @@ public class AttoParserTest extends TestCase {
                 
         testDoc( 
             "\n <!ELEMENT sgml ANY>",
-            "[T(\n ){1,1}OES(<){2,2}OEN(!ELEMENT){2,3}AS( ){2,11}A(sgml){2,12}(){2,16}(){2,16}AS( ){2,16}A(ANY){2,17}(){2,20}(){2,20}OEE(>){2,20}BCES(</){2,21}BCEN(!ELEMENT){2,21}BCEE(>){2,21}]",
-            "[T(\n ){1,1}OE(!ELEMENT[sgml='',ANY='']){2,2}BCE(!ELEMENT){2,21}]", 
+            "[T(\n ){1,1}OES(<){2,2}OEN(!ELEMENT){2,3}AS( ){2,11}A(sgml){2,12}(){2,16}(){2,16}AS( ){2,16}A(ANY){2,17}(){2,20}(){2,20}OEE(>){2,20}ACES(</){2,21}ACEN(!ELEMENT){2,21}ACEE(>){2,21}]",
+            "[T(\n ){1,1}OE(!ELEMENT[sgml='',ANY='']){2,2}ACE(!ELEMENT){2,21}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "\n <!ELEMENT sgml ANY>\n <!-- this is a comment inside --> <!ENTITY % std       \"standard SGML\">\n",
-            "[T(\n ){1,1}OES(<){2,2}OEN(!ELEMENT){2,3}AS( ){2,11}A(sgml){2,12}(){2,16}(){2,16}AS( ){2,16}A(ANY){2,17}(){2,20}(){2,20}OEE(>){2,20}T(\n ){2,21}C( this is a comment inside ){3,2}T( ){3,35}OES(<){3,36}OEN(!ENTITY){3,37}AS( ){3,44}A(%){3,45}(){3,46}(){3,46}AS( ){3,46}A(std){3,47}(){3,50}(){3,50}AS(       ){3,50}A(\"standard){3,57}(){3,66}(){3,66}AS( ){3,66}A(SGML\"){3,67}(){3,72}(){3,72}OEE(>){3,72}T(\n){3,73}BCES(</){4,1}BCEN(!ENTITY){4,1}BCEE(>){4,1}BCES(</){4,1}BCEN(!ELEMENT){4,1}BCEE(>){4,1}]",
-            "[T(\n ){1,1}OE(!ELEMENT[sgml='',ANY='']){2,2}T(\n ){2,21}C( this is a comment inside ){3,2}T( ){3,35}OE(!ENTITY[%='',std='',\"standard='',SGML\"='']){3,36}T(\n){3,73}BCE(!ENTITY){4,1}BCE(!ELEMENT){4,1}]", 
+            "[T(\n ){1,1}OES(<){2,2}OEN(!ELEMENT){2,3}AS( ){2,11}A(sgml){2,12}(){2,16}(){2,16}AS( ){2,16}A(ANY){2,17}(){2,20}(){2,20}OEE(>){2,20}T(\n ){2,21}C( this is a comment inside ){3,2}T( ){3,35}OES(<){3,36}OEN(!ENTITY){3,37}AS( ){3,44}A(%){3,45}(){3,46}(){3,46}AS( ){3,46}A(std){3,47}(){3,50}(){3,50}AS(       ){3,50}A(\"standard){3,57}(){3,66}(){3,66}AS( ){3,66}A(SGML\"){3,67}(){3,72}(){3,72}OEE(>){3,72}T(\n){3,73}ACES(</){4,1}ACEN(!ENTITY){4,1}ACEE(>){4,1}ACES(</){4,1}ACEN(!ELEMENT){4,1}ACEE(>){4,1}]",
+            "[T(\n ){1,1}OE(!ELEMENT[sgml='',ANY='']){2,2}T(\n ){2,21}C( this is a comment inside ){3,2}T( ){3,35}OE(!ENTITY[%='',std='',\"standard='',SGML\"='']){3,36}T(\n){3,73}ACE(!ENTITY){4,1}ACE(!ELEMENT){4,1}]", 
             noRestrictionsAutoClose);
 
         
@@ -953,13 +953,13 @@ public class AttoParserTest extends TestCase {
             noRestrictionsAutoClose);
         testDoc( 
             "<p><!--a-->",
-            "[OES(<){1,1}OEN(p){1,2}OEE(>){1,3}C(a){1,4}BCES(</){1,12}BCEN(p){1,12}BCEE(>){1,12}]",
-            "[OE(p){1,1}C(a){1,4}BCE(p){1,12}]", 
+            "[OES(<){1,1}OEN(p){1,2}OEE(>){1,3}C(a){1,4}ACES(</){1,12}ACEN(p){1,12}ACEE(>){1,12}]",
+            "[OE(p){1,1}C(a){1,4}ACE(p){1,12}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "<p><?xsl-stylesheet a=\"1\" a b > uas23 ?>",
-            "[OES(<){1,1}OEN(p){1,2}OEE(>){1,3}P(xsl-stylesheet){1,6}(a=\"1\" a b > uas23 ){1,21}BCES(</){1,41}BCEN(p){1,41}BCEE(>){1,41}]",
-            "[OE(p){1,1}P(xsl-stylesheet)(a=\"1\" a b > uas23 ){1,4}BCE(p){1,41}]", 
+            "[OES(<){1,1}OEN(p){1,2}OEE(>){1,3}P(xsl-stylesheet){1,6}(a=\"1\" a b > uas23 ){1,21}ACES(</){1,41}ACEN(p){1,41}ACEE(>){1,41}]",
+            "[OE(p){1,1}P(xsl-stylesheet)(a=\"1\" a b > uas23 ){1,4}ACE(p){1,41}]", 
             noRestrictionsAutoClose);
         
         testDoc( 
@@ -1078,21 +1078,26 @@ public class AttoParserTest extends TestCase {
             "Hello, <br th:text/>",
             null, null, 1, 19,
             wellFormedXml);
-        testDocError( 
+        testDoc( 
             "<html></html><html></html>",
-            null, null, 1, 15, 
+            "[OES(<){1,1}OEN(html){1,2}OEE(>){1,6}CES(</){1,7}CEN(html){1,9}CEE(>){1,13}OES(<){1,14}OEN(html){1,15}OEE(>){1,19}CES(</){1,20}CEN(html){1,22}CEE(>){1,26}]", 
+            "[OE(html){1,1}CE(html){1,7}OE(html){1,14}CE(html){1,20}]", 
+            wellFormedXml);
+        testDocError( 
+            "<!DOCTYPE html><html></html><html></html>",
+            null, null, 1, 29, 
             wellFormedXml);
         testDocError( 
             "<!DOCTYPE html><htmla></htmla>",
-            null, null, 1, 17,
+            null, null, 1, 16,
             wellFormedXml);
         testDocError( 
             "<!DOCTYPE html><htma></htma>",
-            null, null, 1, 17,
+            null, null, 1, 16,
             wellFormedXml);
         testDocError( 
             "<!DOCTYPE html><htma/>",
-            null, null, 1, 17,
+            null, null, 1, 16,
             wellFormedXml);
         testDoc( 
             "Hello, <br th:text=\"ll\" th:text=\"la\"/>",
@@ -1121,8 +1126,8 @@ public class AttoParserTest extends TestCase {
                 noUnbalacedClosed);
         testDoc( 
                 "<h1>Hello",
-                "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}T(Hello){1,5}BCES(</){1,10}BCEN(h1){1,10}BCEE(>){1,10}]",
-                "[OE(h1){1,1}T(Hello){1,5}BCE(h1){1,10}]", 
+                "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}T(Hello){1,5}ACES(</){1,10}ACEN(h1){1,10}ACEE(>){1,10}]",
+                "[OE(h1){1,1}T(Hello){1,5}ACE(h1){1,10}]", 
                 noRestrictionsAutoClose);
         testDocError( 
                 "<h2>Hello</h1>",
@@ -1132,8 +1137,8 @@ public class AttoParserTest extends TestCase {
                 noUnbalacedClosed);
         testDoc( 
                 "<h1><h2>Hello</h1>",
-                "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}OES(<){1,5}OEN(h2){1,6}OEE(>){1,8}T(Hello){1,9}BCES(</){1,14}BCEN(h2){1,14}BCEE(>){1,14}CES(</){1,14}CEN(h1){1,16}CEE(>){1,18}]",
-                "[OE(h1){1,1}OE(h2){1,5}T(Hello){1,9}BCE(h2){1,14}CE(h1){1,14}]", 
+                "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}OES(<){1,5}OEN(h2){1,6}OEE(>){1,8}T(Hello){1,9}ACES(</){1,14}ACEN(h2){1,14}ACEE(>){1,14}CES(</){1,14}CEN(h1){1,16}CEE(>){1,18}]",
+                "[OE(h1){1,1}OE(h2){1,5}T(Hello){1,9}ACE(h2){1,14}CE(h1){1,14}]", 
                 noUnbalacedClosed);
         testDocError( 
                 "Hello</h1>",
@@ -1143,13 +1148,13 @@ public class AttoParserTest extends TestCase {
                 noUnbalacedClosed);
         testDoc( 
                 "<h1><h2>Hello</h2>",
-                "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}OES(<){1,5}OEN(h2){1,6}OEE(>){1,8}T(Hello){1,9}CES(</){1,14}CEN(h2){1,16}CEE(>){1,18}BCES(</){1,19}BCEN(h1){1,19}BCEE(>){1,19}]",
-                "[OE(h1){1,1}OE(h2){1,5}T(Hello){1,9}CE(h2){1,14}BCE(h1){1,19}]", 
+                "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}OES(<){1,5}OEN(h2){1,6}OEE(>){1,8}T(Hello){1,9}CES(</){1,14}CEN(h2){1,16}CEE(>){1,18}ACES(</){1,19}ACEN(h1){1,19}ACEE(>){1,19}]",
+                "[OE(h1){1,1}OE(h2){1,5}T(Hello){1,9}CE(h2){1,14}ACE(h1){1,19}]", 
                 noUnbalacedClosed);
         testDoc( 
                 "<h1><h2>Hello<!--a--></h1>",
-                "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}OES(<){1,5}OEN(h2){1,6}OEE(>){1,8}T(Hello){1,9}C(a){1,14}BCES(</){1,22}BCEN(h2){1,22}BCEE(>){1,22}CES(</){1,22}CEN(h1){1,24}CEE(>){1,26}]",
-                "[OE(h1){1,1}OE(h2){1,5}T(Hello){1,9}C(a){1,14}BCE(h2){1,22}CE(h1){1,22}]", 
+                "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}OES(<){1,5}OEN(h2){1,6}OEE(>){1,8}T(Hello){1,9}C(a){1,14}ACES(</){1,22}ACEN(h2){1,22}ACEE(>){1,22}CES(</){1,22}CEN(h1){1,24}CEE(>){1,26}]",
+                "[OE(h1){1,1}OE(h2){1,5}T(Hello){1,9}C(a){1,14}ACE(h2){1,22}CE(h1){1,22}]", 
                 noUnbalacedClosed);
         
         System.out.println("TOTAL Test executions: " + totalTestExecutions);

@@ -305,7 +305,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
             final int encodingOffset, final int encodingLen, 
             final int encodingLine, final int encodingCol, 
             final int standaloneOffset, final int standaloneLen,
-            final int standaloneLine, final int standaloneCol, 
+            final int standaloneLine, final int standaloneCol,
             final int outerOffset, final int outerLen, 
             final int line, final int col) 
             throws AttoParseException {
@@ -543,7 +543,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
         private final boolean doctypePresenceForbidden;
         
         
-        private boolean fireNextCloseElementEndEvent = true;
+        private boolean closeElementIsMatched = true;
         
         
         StackAwareWrapper(final AbstractDetailedMarkupAttoHandler handler, final MarkupParsingConfiguration markupParsingConfiguration) {
@@ -554,7 +554,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
             this.markupParsingConfiguration = markupParsingConfiguration;
 
             this.autoClose =
-                    ElementBalancing.AUTO_CLOSE.equals(markupParsingConfiguration.getElementBalancing());
+                    (ElementBalancing.AUTO_CLOSE.equals(markupParsingConfiguration.getElementBalancing()) ||
+                     ElementBalancing.AUTO_CLOSE_REQUIRE_NO_UNMATCHED_CLOSE.equals(markupParsingConfiguration.getElementBalancing()));
             this.requireBalancedElements = 
                     ElementBalancing.REQUIRE_BALANCED.equals(markupParsingConfiguration.getElementBalancing());
             this.requireNoUnmatchedCloseElements = 
@@ -769,7 +770,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int line, final int col)
                 throws AttoParseException {
             
-            this.fireNextCloseElementEndEvent = 
+            this.closeElementIsMatched = 
                     checkStackForElement(buffer, offset, len, line, col);
             
             if (this.requireUniqueAttributesInElement) {
@@ -777,9 +778,12 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 this.currentElementAttributeNamesSize = 0;
             }
 
-            if (this.fireNextCloseElementEndEvent) {
+            if (this.closeElementIsMatched) {
                 this.handler.handleCloseElementStart(CLOSE_START, 0, CLOSE_START.length, line, col - 2);
                 this.handler.handleCloseElementName(buffer, offset, len, line, col);
+            } else {
+                this.handler.handleUnmatchedCloseElementStart(CLOSE_START, 0, CLOSE_START.length, line, col - 2);
+                this.handler.handleUnmatchedCloseElementName(buffer, offset, len, line, col);
             }
             
         }
@@ -790,8 +794,10 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int line, final int col)
                 throws AttoParseException {
             
-            if (this.fireNextCloseElementEndEvent) {
+            if (this.closeElementIsMatched) {
                 this.handler.handleCloseElementEnd(buffer, offset, len, line, col);
+            } else {
+                this.handler.handleUnmatchedCloseElementEnd(buffer, offset, len, line, col);
             }
             
             this.elementRead = true;
@@ -963,7 +969,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
                     // and it seems there are several.
                     throw new AttoParseException(
                             "Malformed markup: Only one root element is allowed",
-                            line, col);
+                            line, col - 1);
                 }
 
                 // Nothing else to check.
@@ -981,7 +987,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
                     // only allow one root element. But it seems there are several.
                     throw new AttoParseException(
                             "Malformed markup: Only one root element (with name \"" + new String(this.rootElementName) + "\" is allowed",
-                            line, col);
+                            line, col - 1);
                 }
                 
                 boolean matches = (this.rootElementName.length == len);
@@ -994,7 +1000,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
                     throw new AttoParseException(
                         "Malformed markup: Root element should be \"" + new String(this.rootElementName) + "\", " +
                         "but \"" + new String(buffer, offset, len) + "\" has been found",
-                        line, col);
+                        line, col - 1);
                 }
                 
             }
@@ -1021,7 +1027,9 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 }
     
                 if (matches) {
-                    // We found the corresponding opening element!
+                    // We found the corresponding opening element, so
+                    // we return true (meaning the close element has a matching
+                    // open element).
                     return true;
                 }
                 
@@ -1051,12 +1059,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
                         "\"" + new String(buffer, offset, len) + "\"" +
                         " is never open", line, col - 2);
             }
-            
-            this.handler.handleUnmatchedCloseElementStart(CLOSE_START, 0, CLOSE_START.length, line, col - 2);
-            this.handler.handleUnmatchedCloseElementName(buffer, offset, len, line, col - 2);
-            this.handler.handleUnmatchedCloseElementEnd(CLOSE_END, 0, CLOSE_END.length, line, col - 2);
 
-            // Return false so that the normal "close" event is not fired
+            // Return false because the close element has no matching open element
             return false;
             
         }
