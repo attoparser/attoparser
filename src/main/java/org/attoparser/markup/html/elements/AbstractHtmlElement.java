@@ -36,8 +36,9 @@ package org.attoparser.markup.html.elements;
 public abstract class AbstractHtmlElement implements IHtmlElement {
 
     
-    final int nameLen;
-    final char[] name;
+    private final int nameLen;
+    private final String name;
+    private final char[] normalizedName;
     
 
 
@@ -52,24 +53,32 @@ public abstract class AbstractHtmlElement implements IHtmlElement {
             throw new IllegalArgumentException("Name cannot be null");
         }
         
-        this.name = name.toCharArray();
-        this.nameLen = this.name.length;
-        
+        this.name = name;
+        this.normalizedName = name.toCharArray();
+        this.nameLen = this.normalizedName.length;
+
+        // Normalizing: set to lower-case
         for (int i = 0; i < this.nameLen; i++) {
-            final char c = this.name[i]; 
+            final char c = this.normalizedName[i]; 
             if (c >= 'A' && c <= 'Z') {
-                this.name[i] = (char)(c + HtmlElements.CASE_DIFF);
+                this.normalizedName[i] = (char)(c + HtmlElements.CASE_DIFF);
             }
         }
 
-        HtmlElements.registerElement(this, this.name);
+        HtmlElements.registerElement(this);
         
     }
 
     
     
+    public final String getName() {
+        return this.name;
+    }
     
-    public boolean matches(final String elementName) {
+    
+    
+    
+    public final boolean matches(final String elementName) {
 
         if (elementName == null) {
             throw new IllegalArgumentException("Element name cannot be null");
@@ -83,7 +92,7 @@ public abstract class AbstractHtmlElement implements IHtmlElement {
             if (c >= 'A' && c <= 'Z') {
                 c = (char)(c + HtmlElements.CASE_DIFF);
             }
-            if (c != this.name[i]) {
+            if (c != this.normalizedName[i]) {
                 return false;
             }
         }
@@ -92,7 +101,7 @@ public abstract class AbstractHtmlElement implements IHtmlElement {
     }
 
     
-    public boolean matches(final char[] elementName) {
+    public final boolean matches(final char[] elementName) {
         if (elementName == null) {
             throw new IllegalArgumentException("Element name cannot be null");
         }
@@ -100,7 +109,7 @@ public abstract class AbstractHtmlElement implements IHtmlElement {
     }
 
     
-    public boolean matches(final char[] elementNameBuffer, final int offset, final int len) {
+    public final boolean matches(final char[] elementNameBuffer, final int offset, final int len) {
         
         if (elementNameBuffer == null) {
             throw new IllegalArgumentException("Buffer cannot be null");
@@ -115,7 +124,7 @@ public abstract class AbstractHtmlElement implements IHtmlElement {
             if (c >= 'A' && c <= 'Z') {
                 c = (char)(c + HtmlElements.CASE_DIFF);
             }
-            if (c != this.name[i - offset]) {
+            if (c != this.normalizedName[i - offset]) {
                 return false;
             }
         }

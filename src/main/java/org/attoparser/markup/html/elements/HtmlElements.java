@@ -19,6 +19,9 @@
  */
 package org.attoparser.markup.html.elements;
 
+import org.attoparser.util.SegmentedArray;
+import org.attoparser.util.SegmentedArray.IValueHandler;
+
 
 
 
@@ -34,10 +37,12 @@ package org.attoparser.markup.html.elements;
  */
 public final class HtmlElements {
 
-    
     static final int CASE_DIFF = ('a' - 'A');
-    static final IHtmlElement[][] ELEMENTS = new IHtmlElement[('z' - 'a') + 2][];
-    private static final int NON_ALPHABETIC_INDEX = ELEMENTS.length - 1; 
+
+    private static final int ELEMENTS_SEGMENT_SIZE = (('z' - 'a') + 1);
+    private static final SegmentedArray<IHtmlElement, String> ELEMENTS =
+            new SegmentedArray<IHtmlElement, String>(IHtmlElement.class, new ElementValueHandler(), ELEMENTS_SEGMENT_SIZE);
+            
     
 
 
@@ -179,33 +184,10 @@ public final class HtmlElements {
     
     
     public static IHtmlElement lookFor(final String elementName) {
-
         if (elementName == null) {
             throw new IllegalArgumentException("Element name cannot be null");
         }
-        
-        final char firstChar = elementName.charAt(0);
-        final int segmentIndex =
-                (firstChar >= 'a' && firstChar <= 'z'? 
-                        (firstChar - 'a') : 
-                        (firstChar >= 'A' && firstChar <= 'Z' ? 
-                                (firstChar + CASE_DIFF - 'a') :
-                                NON_ALPHABETIC_INDEX));
-        
-        final IHtmlElement[] elements = ELEMENTS[segmentIndex];
-        
-        if (elements == null) {
-            return null;
-        }
-        
-        final int elementsLen = elements.length;
-        for (int i = 0; i < elementsLen; i++) {
-            if (elements[i].matches(elementName)) {
-                return elements[i];
-            }
-        }
-        return null;
-        
+        return ELEMENTS.searchByText(elementName);
     }
     
     
@@ -218,57 +200,93 @@ public final class HtmlElements {
     
     
     public static IHtmlElement lookFor(final char[] elementNameBuffer, final int offset, final int len) {
-
         if (elementNameBuffer == null) {
             throw new IllegalArgumentException("Buffer cannot be null");
         }
-
-        final char firstChar = elementNameBuffer[offset];
-        final int segmentIndex =
-                (firstChar >= 'a' && firstChar <= 'z'? 
-                        (firstChar - 'a') : 
-                        (firstChar >= 'A' && firstChar <= 'Z' ? 
-                                (firstChar + CASE_DIFF - 'a') :
-                                NON_ALPHABETIC_INDEX));
-        
-        final IHtmlElement[] elements = ELEMENTS[segmentIndex];
-        
-        if (elements == null) {
-            return null;
-        }
-        
-        final int elementsLen = elements.length;
-        for (int i = 0; i < elementsLen; i++) {
-            if (elements[i].matches(elementNameBuffer, offset, len)) {
-                return elements[i];
-            }
-        }
-        return null;
-        
+        return ELEMENTS.searchByText(elementNameBuffer, offset, len);
     }
     
     
+    
+    static void registerElement(final IHtmlElement element) {
+        ELEMENTS.registerValue(element);
+    }
 
     
-    static void registerElement(final IHtmlElement element, final char[] elementName) {
-        
-        final IHtmlElement[] elements = ELEMENTS[elementName[0] - 'a'];
-        final int newSize = (elements == null? 1 : elements.length + 1);
-        final IHtmlElement[] newElements = new IHtmlElement[newSize];
-        if (newSize > 1) {
-            System.arraycopy(elements, 0, newElements, 0, (newSize - 1));
-        }
-        newElements[newSize - 1] = element;
-        ELEMENTS[elementName[0] - 'a'] = newElements;
-        
-    }
     
+
     
     
     private HtmlElements() {
         super();
     }
     
+    
+
+    
+    private static final class ElementValueHandler implements IValueHandler<IHtmlElement, String> {
+        
+        /*
+         * Class is private, only used here. No need to validate arguments.
+         */
+        
+        ElementValueHandler() {
+            super();
+        }
+        
+        
+        public String getKey(final IHtmlElement value) {
+            return value.getName();
+        }
+
+
+        public int getSegment(final IHtmlElement value) {
+            return getSegmentByKey(getKey(value));
+        }
+
+        public int getSegmentByKey(final String key) {
+            return getSegmentByText(key);
+        }
+
+        public int getSegmentByText(final String text) {
+            return getSegmentByChar(text.charAt(0));
+        }
+
+        public int getSegmentByText(final char[] textBuffer, final int textOffset, final int textLen) {
+            return getSegmentByChar(textBuffer[textOffset]);
+        }
+
+
+        private int getSegmentByChar(final char c) {
+            
+            if (c >= 'a' && c <= 'z') {
+                return (c - 'a');
+            } else if (c >= 'A' && c <= 'Z') {
+                return ((char)(c + CASE_DIFF) - 'a');
+            } else {
+                // Non-alphabetic will go after position 'z'
+                return ('z' + 1);
+            }
+            
+        }
+        
+        public boolean matchesByKey(final IHtmlElement value, final String key) {
+            return matchesByText(value, key);
+        }
+
+        public boolean matchesByText(final IHtmlElement value, final String text) {
+            return value.matches(text);
+        }
+
+        public boolean matchesByText(final IHtmlElement value, final char[] textBuffer,
+                final int textOffset, final int textLen) {
+            return value.matches(textBuffer, textOffset, textLen);
+        }
+        
+    }
+    
+    
+
     
     
 
@@ -278,19 +296,23 @@ public final class HtmlElements {
         System.out.println(lookFor("A"));
         System.out.println(lookFor("link"));
         System.out.println(lookFor("html"));
-        System.out.println(lookFor("meta"));
+        System.out.println(lookFor("META"));
 
-        for (int i = 0; i < ELEMENTS.length; i++) {
-            System.out.print("[" + ((char)(i + 'a')) + "] ");
-            if (ELEMENTS[i] != null) {
-                System.out.print(ELEMENTS[i][0]);
-                for (int j = 1; j < ELEMENTS[i].length; j++) {
-                    System.out.print(",");
-                    System.out.print(ELEMENTS[i][j]);
-                }
-            }
-            System.out.println();
+        System.out.println(ELEMENTS.toString());
+        
+        
+        final long start = System.currentTimeMillis();
+        
+        for (int i = 0; i < 10000000; i++) {
+            IHtmlElement e1 = lookFor("A");
+            IHtmlElement e2 = lookFor("link");
+            IHtmlElement e3 = lookFor("html");
+            IHtmlElement e4 = lookFor("META");
         }
+        
+        final long end = System.currentTimeMillis();
+
+        System.out.println("Time: " + (end - start) + "ms");
         
     }
     

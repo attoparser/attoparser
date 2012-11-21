@@ -36,6 +36,8 @@ import org.attoparser.markup.html.IDetailedHtmlElementHandling;
  */
 public interface IHtmlElement {
     
+    public String getName();
+    
     public boolean matches(final String elementName);
     public boolean matches(final char[] elementName);
     public boolean matches(final char[] elementNameBuffer, final int offset, final int len);
