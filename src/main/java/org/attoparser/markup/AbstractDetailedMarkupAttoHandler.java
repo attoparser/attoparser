@@ -523,9 +523,16 @@ public abstract class AbstractDetailedMarkupAttoHandler
         
         private final PrologParsingConfiguration prologParsingConfiguration;
         private final UniqueRootElementPresence uniqueRootElementPresence;
+
+        private final boolean caseSensitive;
         
         private final boolean requireWellFormedAttributeValues;
         private final boolean requireUniqueAttributesInElement;
+        
+        private final boolean validateProlog;
+        private final boolean prologPresenceForbidden;
+        private final boolean xmlDeclarationPresenceForbidden;
+        private final boolean doctypePresenceForbidden;
         
         private char[][] elementStack;
         private int elementStackSize;
@@ -536,11 +543,6 @@ public abstract class AbstractDetailedMarkupAttoHandler
         private char[] rootElementName = null;
         private char[][] currentElementAttributeNames = null;
         private int currentElementAttributeNamesSize = 0;
-        
-        private final boolean validateProlog;
-        private final boolean prologPresenceForbidden;
-        private final boolean xmlDeclarationPresenceForbidden;
-        private final boolean doctypePresenceForbidden;
         
         
         private boolean closeElementIsMatched = true;
@@ -553,6 +555,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
             this.handler = handler;
             this.markupParsingConfiguration = markupParsingConfiguration;
 
+            this.caseSensitive = markupParsingConfiguration.isCaseSensitive();
+            
             this.autoClose =
                     (ElementBalancing.AUTO_CLOSE.equals(markupParsingConfiguration.getElementBalancing()) ||
                      ElementBalancing.AUTO_CLOSE_REQUIRE_NO_UNMATCHED_CLOSE.equals(markupParsingConfiguration.getElementBalancing()));
@@ -828,9 +832,17 @@ public abstract class AbstractDetailedMarkupAttoHandler
                         continue;
                     }
                     int j;
-                    for (j = 0; j < nameLen; j++) {
-                        if (this.currentElementAttributeNames[i][j] != buffer[nameOffset + j]) {
-                            break;
+                    if (this.caseSensitive) {
+                        for (j = 0; j < nameLen; j++) {
+                            if (this.currentElementAttributeNames[i][j] != buffer[nameOffset + j]) {
+                                break;
+                            }
+                        }
+                    } else {
+                        for (j = 0; j < nameLen; j++) {
+                            if (Character.toLowerCase(this.currentElementAttributeNames[i][j]) != Character.toLowerCase(buffer[nameOffset + j])) {
+                                break;
+                            }
                         }
                     }
                     if (j == nameLen) {
@@ -991,9 +1003,17 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 }
                 
                 boolean matches = (this.rootElementName.length == len);
-                for (int i = 0; matches && i < len; i++) {
-                    if (buffer[offset + i] != this.rootElementName[i]) {
-                        matches = false;
+                if (this.caseSensitive) {
+                    for (int i = 0; matches && i < len; i++) {
+                        if (buffer[offset + i] != this.rootElementName[i]) {
+                            matches = false;
+                        }
+                    }
+                } else {
+                    for (int i = 0; matches && i < len; i++) {
+                        if (Character.toLowerCase(buffer[offset + i]) != Character.toLowerCase(this.rootElementName[i])) {
+                            matches = false;
+                        }
                     }
                 }
                 if (!matches) {
@@ -1020,9 +1040,17 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 boolean matches = (len == popped.length);
             
                 final int maxi = offset + len;
-                for (int i = offset; matches && i < maxi; i++) {
-                    if (buffer[i] != popped[i - offset]) {
-                        matches = false;
+                if (this.caseSensitive) {
+                    for (int i = offset; matches && i < maxi; i++) {
+                        if (buffer[i] != popped[i - offset]) {
+                            matches = false;
+                        }
+                    }
+                } else {
+                    for (int i = offset; matches && i < maxi; i++) {
+                        if (Character.toLowerCase(buffer[i]) != Character.toLowerCase(popped[i - offset])) {
+                            matches = false;
+                        }
                     }
                 }
     

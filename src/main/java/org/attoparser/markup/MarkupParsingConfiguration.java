@@ -52,6 +52,8 @@ public final class MarkupParsingConfiguration implements Serializable {
     private static final long serialVersionUID = 5191449744126332916L;
     
     
+    private boolean caseSensitive = true;
+    
     private ElementBalancing elementBalancing = ElementBalancing.NO_BALANCING;
     
     private boolean requireXmlWellFormedAttributeValues = false;
@@ -111,7 +113,32 @@ public final class MarkupParsingConfiguration implements Serializable {
     }
     
 
+
+    /**
+     * <p>
+     *   Determines whether validations performed on the parsed document should be
+     *   case sensitive or not (e.g. attribute names, document root element name, element
+     *   open vs close elements, etc.)
+     * </p>
+     * <p>
+     *   Default is <b>true</b>.
+     * </p>
+     * 
+     * @return whether validations should be case sensitive or not. 
+     */
+    public boolean isCaseSensitive() {
+        return this.caseSensitive;
+    }
+
     
+    public void setCaseSensitive(final boolean caseSensitive) {
+        this.caseSensitive = caseSensitive;
+    }
+
+
+
+
+
     /**
      * <p>
      *   Determines the level of element balancing required at the document being parsed,
@@ -249,8 +276,27 @@ public final class MarkupParsingConfiguration implements Serializable {
     }
     
     
-
     
+    
+    @Override
+    public MarkupParsingConfiguration clone() throws CloneNotSupportedException {
+        final MarkupParsingConfiguration conf = new MarkupParsingConfiguration();
+        conf.caseSensitive = this.caseSensitive;
+        conf.elementBalancing = this.elementBalancing;
+        conf.requireUniqueAttributesInElement = this.requireUniqueAttributesInElement;
+        conf.requireXmlWellFormedAttributeValues = this.requireXmlWellFormedAttributeValues;
+        conf.uniqueRootElementPresence = this.uniqueRootElementPresence;
+        conf.prologParsingConfiguration = this.prologParsingConfiguration.clone();
+        return conf;
+    }
+
+
+
+
+
+
+
+
     public static enum PrologPresence {
         
         REQUIRED(true, false, false), 
@@ -530,6 +576,19 @@ public final class MarkupParsingConfiguration implements Serializable {
                     "DOCTYPE presence: " + this.doctypePresence);
             
         }
+
+        
+        
+        @Override
+        public PrologParsingConfiguration clone() throws CloneNotSupportedException {
+            final PrologParsingConfiguration conf = new PrologParsingConfiguration();
+            conf.validateProlog = this.validateProlog;
+            conf.prologPresence = this.prologPresence;
+            conf.doctypePresence = this.doctypePresence;
+            conf.xmlDeclarationPresence = this.xmlDeclarationPresence;
+            return conf;
+        }
+        
         
     }
 

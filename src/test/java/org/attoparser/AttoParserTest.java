@@ -71,6 +71,9 @@ public class AttoParserTest extends TestCase {
         wellFormedXml.getPrologParsingConfiguration().setDoctypePresence(PrologPresence.ALLOWED);
         wellFormedXml.setUniqueRootElementPresence(UniqueRootElementPresence.DEPENDS_ON_PROLOG_DOCTYPE);
         
+        final MarkupParsingConfiguration wellFormedXmlCaseInsensitive = wellFormedXml.clone();
+        wellFormedXmlCaseInsensitive.setCaseSensitive(false);
+        
         
         
         final String dt1 = "<!DOCTYPE>"; 
@@ -1156,6 +1159,33 @@ public class AttoParserTest extends TestCase {
                 "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}OES(<){1,5}OEN(h2){1,6}OEE(>){1,8}T(Hello){1,9}C(a){1,14}ACES(</){1,22}ACEN(h2){1,22}ACEE(>){1,22}CES(</){1,22}CEN(h1){1,24}CEE(>){1,26}]",
                 "[OE(h1){1,1}OE(h2){1,5}T(Hello){1,9}C(a){1,14}ACE(h2){1,22}CE(h1){1,22}]", 
                 noUnbalacedClosed);
+        testDoc( 
+                "<h1></H1>",
+                "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}CES(</){1,5}CEN(H1){1,7}CEE(>){1,9}]",
+                "[OE(h1){1,1}CE(H1){1,5}]", 
+                wellFormedXmlCaseInsensitive);
+        testDocError( 
+                "<h1></H1>",
+                null, null, 1, 5, 
+                wellFormedXml);
+        testDoc( 
+                "<!DOCTYPE h1><H1></H1>",
+                "[DT(DOCTYPE){1,3}(h1){1,11}(){1,13}(){1,13}(){1,13}(){1,13}OES(<){1,14}OEN(H1){1,15}OEE(>){1,17}CES(</){1,18}CEN(H1){1,20}CEE(>){1,22}]",
+                "[DT(h1)()()(){1,1}OE(H1){1,14}CE(H1){1,18}]", 
+                wellFormedXmlCaseInsensitive);
+        testDocError( 
+                "<!DOCTYPE h1><H1></H1>",
+                null, null, 1, 14, 
+                wellFormedXml);
+        testDocError( 
+                "<a b=\"2\" B=\"3\"/>",
+                null, null, 1, 10, 
+                wellFormedXmlCaseInsensitive);
+        testDoc( 
+                "<a b=\"2\" B=\"3\"/>",
+                "[SES(<){1,1}SEN(a){1,2}AS( ){1,3}A(b){1,4}(=){1,5}(\"2\"){1,6}AS( ){1,9}A(B){1,10}(=){1,11}(\"3\"){1,12}SEE(/>){1,15}]", 
+                "[SE(a[b='2',B='3']){1,1}]", 
+                wellFormedXml);
         
         System.out.println("TOTAL Test executions: " + totalTestExecutions);
         
