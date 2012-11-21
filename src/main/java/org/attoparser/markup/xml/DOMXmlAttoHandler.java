@@ -83,7 +83,7 @@ public final class DOMXmlAttoHandler extends AbstractStandardMarkupAttoHandler {
      */
     public DOMXmlAttoHandler(final String documentName) {
         // Must be well-formed in order to create an adequate DOM tree
-        super(XmlParsing.XML_PARSING_CONFIGURATION);
+        super(XmlParsing.xmlParsingConfiguration());
         this.documentName = 
                 (documentName == null? 
                         String.valueOf(System.identityHashCode(this)) : documentName);

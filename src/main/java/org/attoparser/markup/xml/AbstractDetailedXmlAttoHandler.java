@@ -43,7 +43,7 @@ public abstract class AbstractDetailedXmlAttoHandler
     
     
     public AbstractDetailedXmlAttoHandler() {
-        super(XmlParsing.XML_PARSING_CONFIGURATION);
+        super(XmlParsing.xmlParsingConfiguration());
     }
     
     

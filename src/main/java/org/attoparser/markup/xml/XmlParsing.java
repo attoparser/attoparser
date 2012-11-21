@@ -38,8 +38,8 @@ import org.attoparser.markup.MarkupParsingConfiguration.UniqueRootElementPresenc
  */
 public class XmlParsing {
 
-
-    public static final MarkupParsingConfiguration XML_PARSING_CONFIGURATION;
+    // Cannot make public because it's mutable
+    private static final MarkupParsingConfiguration XML_PARSING_CONFIGURATION;
     
 
     static {
@@ -54,7 +54,17 @@ public class XmlParsing {
         XML_PARSING_CONFIGURATION.setUniqueRootElementPresence(UniqueRootElementPresence.DEPENDS_ON_PROLOG_DOCTYPE);
     }
 
+    
 
+    public static MarkupParsingConfiguration xmlParsingConfiguration() {
+        try {
+            return XML_PARSING_CONFIGURATION.clone();
+        } catch (final CloneNotSupportedException e) {
+            // Will never be thrown
+            throw new IllegalStateException(e);
+        }
+    }
+    
     
     private XmlParsing() {
         super();
