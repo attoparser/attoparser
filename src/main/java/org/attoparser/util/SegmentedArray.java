@@ -188,6 +188,10 @@ public final class SegmentedArray<T,K> {
     @SuppressWarnings("unchecked")
     public boolean registerValue(final T value) {
 
+        /*
+         * TODO Should not have to create a new array each time a value is added!
+         */
+        
         final int segment = this.valueHandler.getSegment(value);
         final int index = segment % this.numSegments;
         
@@ -224,10 +228,18 @@ public final class SegmentedArray<T,K> {
             strBuilder.append("[" + i + "] ");
             if (this.segments[i] != null) {
                 final T[] segment = this.segments[i];
-                strBuilder.append(segment[0]);
+                if (segment[0] instanceof char[]) {
+                    strBuilder.append((char[])segment[0]);
+                } else {
+                    strBuilder.append(segment[0]);
+                }
                 for (int j = 1; j < segment.length; j++) {
                     strBuilder.append(",");
-                    strBuilder.append(segment[j]);
+                    if (segment[j] instanceof char[]) {
+                        strBuilder.append((char[])segment[j]);
+                    } else {
+                        strBuilder.append(segment[j]);
+                    }
                 }
             }
             strBuilder.append('\n');

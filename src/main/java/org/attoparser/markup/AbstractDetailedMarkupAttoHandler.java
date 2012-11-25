@@ -539,8 +539,11 @@ public abstract class AbstractDetailedMarkupAttoHandler
         private final boolean doctypePresenceForbidden;
 
         // Will be used as an element name cache in order to avoid creating a new
-        // char[] object each time an element is pushed into the stack
-        private final SegmentedArray<char[], char[]> elementNames;
+        // char[] object each time an element is pushed into the stack or an attribute
+        // is processed to check its uniqueness.
+        private final SegmentedArray<char[], char[]> elementAttributeNames;
+        private static final int ELEMENT_ATTRIBUTE_NAMES_NUM_SEGMENTS = 15;
+        private static final int ELEMENT_ATTRIBUTE_NAMES_MAX_SEGMENT_SIZE = 20;
         
         private char[][] elementStack;
         private int elementStackSize;
@@ -591,7 +594,12 @@ public abstract class AbstractDetailedMarkupAttoHandler
             this.elementStack = new char[DEFAULT_STACK_SIZE][];
             this.elementStackSize = 0;
 
-            this.elementNames = new SegmentedArray<char[],char[]>(char[].class, new ElementNameValueHandler(), 10, 10);
+            this.elementAttributeNames = 
+                    new SegmentedArray<char[],char[]>(
+                            char[].class, 
+                            new ElementNameValueHandler(), 
+                            ELEMENT_ATTRIBUTE_NAMES_NUM_SEGMENTS, 
+                            ELEMENT_ATTRIBUTE_NAMES_MAX_SEGMENT_SIZE);
             
         }
 
@@ -871,8 +879,18 @@ public abstract class AbstractDetailedMarkupAttoHandler
                     System.arraycopy(this.currentElementAttributeNames, 0, newCurrentElementAttributeNames, 0, this.currentElementAttributeNames.length);
                     this.currentElementAttributeNames = newCurrentElementAttributeNames;
                 }
-                this.currentElementAttributeNames[this.currentElementAttributeNamesSize] = new char[nameLen];
-                System.arraycopy(buffer, nameOffset, this.currentElementAttributeNames[this.currentElementAttributeNamesSize], 0, nameLen);
+
+                final char[] cachedAttributeName =
+                        this.elementAttributeNames.searchByText(buffer, nameOffset, nameLen);
+                
+                if (cachedAttributeName == null) {
+                    this.currentElementAttributeNames[this.currentElementAttributeNamesSize] = new char[nameLen];
+                    System.arraycopy(buffer, nameOffset, this.currentElementAttributeNames[this.currentElementAttributeNamesSize], 0, nameLen);
+                    this.elementAttributeNames.registerValue(this.currentElementAttributeNames[this.currentElementAttributeNamesSize]);
+                } else {
+                    this.currentElementAttributeNames[this.currentElementAttributeNamesSize] = cachedAttributeName; 
+                }
+                    
                 this.currentElementAttributeNamesSize++;
                 
             }
@@ -990,8 +1008,16 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 
             }
             
-            this.rootElementName = new char[elementNameLen];
-            System.arraycopy(buffer, elementNameOffset, this.rootElementName, 0, elementNameLen);
+            final char[] cachedElementName = 
+                    this.elementAttributeNames.searchByText(buffer, elementNameOffset, elementNameLen);
+            
+            if (cachedElementName == null) {
+                this.rootElementName = new char[elementNameLen];
+                System.arraycopy(buffer, elementNameOffset, this.rootElementName, 0, elementNameLen);
+                this.elementAttributeNames.registerValue(this.rootElementName);
+            } else {
+                this.rootElementName = cachedElementName;
+            }
             
             this.handler.handleDocType(
                     buffer, 
@@ -1175,12 +1201,12 @@ public abstract class AbstractDetailedMarkupAttoHandler
             }
             
             final char[] cachedElementName = 
-                    this.elementNames.searchByText(buffer, offset, len);
+                    this.elementAttributeNames.searchByText(buffer, offset, len);
             
             if (cachedElementName == null) {
                 this.elementStack[this.elementStackSize] = new char[len];
                 System.arraycopy(buffer, offset, this.elementStack[this.elementStackSize], 0, len);
-                this.elementNames.registerValue(this.elementStack[this.elementStackSize]);
+                this.elementAttributeNames.registerValue(this.elementStack[this.elementStackSize]);
             } else {
                 this.elementStack[this.elementStackSize] = cachedElementName;
             }
@@ -1237,7 +1263,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
             }
 
             public int getSegmentByKey(final char[] key) {
-                return key[0];
+                return key[0] + key[key.length - 1];
             }
 
             public int getSegmentByText(final String text) {
@@ -1245,7 +1271,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
             }
 
             public int getSegmentByText(final char[] textBuffer, final int textOffset, final int textLen) {
-                return textBuffer[textOffset];
+                return textBuffer[textOffset] + textBuffer[textOffset + (textLen - 1)];
             }
             
             public boolean matchesByKey(final char[] value, final char[] key) {
