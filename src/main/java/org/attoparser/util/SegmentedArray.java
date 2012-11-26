@@ -20,6 +20,7 @@
 package org.attoparser.util;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 
 
 
@@ -43,13 +44,14 @@ import java.lang.reflect.Array;
  */
 public final class SegmentedArray<T,K> {
 
+    public static final int DEFAULT_SEGMENT_SIZE = 5;
     
     private final Class<T> componentType;
     private final IValueHandler<? super T,K> valueHandler;
     private final int numSegments;
-    private final int maxSegmentSize;
-    
     private final T[][] segments;
+    private final int[] segmentSizes;
+    private final int maxSegmentSize;
     
 
 
@@ -89,6 +91,8 @@ public final class SegmentedArray<T,K> {
         
         final Class<T[]> arrayClass = (Class<T[]>) Array.newInstance(componentType, 0).getClass();
         this.segments = (T[][]) Array.newInstance(arrayClass, this.numSegments);
+        this.segmentSizes = new int[this.numSegments];
+        Arrays.fill(this.segmentSizes, 0);
         
     }
     
@@ -112,8 +116,8 @@ public final class SegmentedArray<T,K> {
             return null;
         }
         
-        final int valuesLen = values.length;
-        for (int i = 0; i < valuesLen; i++) {
+        final int valuesSize = this.segmentSizes[index];
+        for (int i = 0; i < valuesSize; i++) {
             if (this.valueHandler.matchesByKey(values[i], key)) {
                 return values[i];
             }
@@ -138,8 +142,8 @@ public final class SegmentedArray<T,K> {
             return null;
         }
         
-        final int valuesLen = values.length;
-        for (int i = 0; i < valuesLen; i++) {
+        final int valuesSize = this.segmentSizes[index];
+        for (int i = 0; i < valuesSize; i++) {
             if (this.valueHandler.matchesByText(values[i], text)) {
                 return values[i];
             }
@@ -172,8 +176,8 @@ public final class SegmentedArray<T,K> {
             return null;
         }
         
-        final int valuesLen = values.length;
-        for (int i = 0; i < valuesLen; i++) {
+        final int valuesSize = this.segmentSizes[index];
+        for (int i = 0; i < valuesSize; i++) {
             if (this.valueHandler.matchesByText(values[i], textBuffer, textOffset, textLen)) {
                 return values[i];
             }
@@ -188,29 +192,47 @@ public final class SegmentedArray<T,K> {
     @SuppressWarnings("unchecked")
     public boolean registerValue(final T value) {
 
-        /*
-         * TODO Should not have to create a new array each time a value is added!
-         */
-        
         final int segment = this.valueHandler.getSegment(value);
         final int index = segment % this.numSegments;
         
-        final T[] values = this.segments[index];
-        final int valuesLen = (values == null? 0 : values.length);
+        final int valuesSize = this.segmentSizes[index];
 
-        if (this.maxSegmentSize != -1 && valuesLen >= this.maxSegmentSize) {
+        if (this.maxSegmentSize != -1 && valuesSize >= this.maxSegmentSize) {
             // We've reached the maximum size for this segment!
             return false;
         }
-        
-        final int newSize = valuesLen + 1;
-        final T[] newValues = (T[]) Array.newInstance(this.componentType, newSize);
-        if (newSize > 1) {
-            System.arraycopy(values, 0, newValues, 0, valuesLen);
+
+        if (valuesSize == 0) {
+            // No values until now: create segment
+            
+            final int initialSegmentSize = Math.min(DEFAULT_SEGMENT_SIZE, this.maxSegmentSize);
+            this.segments[index] = (T[]) Array.newInstance(this.componentType, initialSegmentSize);
+            this.segments[index][0] = value;
+            this.segmentSizes[index]++;
+            
+            return true;
+            
         }
-        newValues[valuesLen] = value;
         
+        final int valuesArrayLen = this.segments[index].length;
+        if (valuesSize < valuesArrayLen) {
+            // There's still room at the array for our new value
+            
+            this.segments[index][valuesSize] = value;
+            this.segmentSizes[index]++;
+            
+            return true;
+            
+        }
+        
+        // Value does not fit. We need to resize array
+        
+        final int newSize = Math.min((valuesArrayLen * 2), this.maxSegmentSize);
+        final T[] newValues = (T[]) Array.newInstance(this.componentType, newSize);
+        System.arraycopy(this.segments[index], 0, newValues, 0, valuesSize);
+        newValues[valuesSize] = value;
         this.segments[index] = newValues;
+        this.segmentSizes[index]++;
         
         return true;
         
@@ -224,16 +246,17 @@ public final class SegmentedArray<T,K> {
     @Override
     public String toString() {
         final StringBuilder strBuilder = new StringBuilder();
-        for (int i = 0; i < this.segments.length; i++) {
+        for (int i = 0; i < this.numSegments; i++) {
             strBuilder.append("[" + i + "] ");
             if (this.segments[i] != null) {
                 final T[] segment = this.segments[i];
+                final int segmentSize = this.segmentSizes[i];
                 if (segment[0] instanceof char[]) {
                     strBuilder.append((char[])segment[0]);
                 } else {
                     strBuilder.append(segment[0]);
                 }
-                for (int j = 1; j < segment.length; j++) {
+                for (int j = 1; j < segmentSize; j++) {
                     strBuilder.append(",");
                     if (segment[j] instanceof char[]) {
                         strBuilder.append((char[])segment[j]);
