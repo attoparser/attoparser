@@ -233,7 +233,7 @@ public final class ElementMarkupParsingUtil {
         
         final int maxi = contentOffset + contentLen;
         
-        final MarkupParsingLocator locator = new MarkupParsingLocator(line, col + 1);
+        final int[] locator = new int[] {line, col + 1};
         
         /*
          * Extract the element name first 
@@ -251,14 +251,14 @@ public final class ElementMarkupParsingUtil {
                         line, col + 1);
                 handler.handleStandaloneElementEnd(
                         buffer, (outerOffset + outerLen - 2), 2, 
-                        locator.line, locator.col);
+                        locator[0], locator[1]);
             } else {
                 handler.handleOpenElementName(
                         buffer, contentOffset, contentLen, 
                         line, col + 1);
                 handler.handleOpenElementEnd(
                         buffer, (outerOffset + outerLen - 1), 1, 
-                        locator.line, locator.col);
+                        locator[0], locator[1]);
             }
             
             return;
@@ -285,11 +285,11 @@ public final class ElementMarkupParsingUtil {
         if (isStandalone) {
             handler.handleStandaloneElementEnd(
                     buffer, (outerOffset + outerLen - 2), 2, 
-                    locator.line, locator.col);
+                    locator[0], locator[1]);
         } else {
             handler.handleOpenElementEnd(
                     buffer, (outerOffset + outerLen - 1), 1, 
-                    locator.line, locator.col);
+                    locator[0], locator[1]);
         }
         
         return;
@@ -311,7 +311,7 @@ public final class ElementMarkupParsingUtil {
         
         final int maxi = contentOffset + contentLen;
         
-        final MarkupParsingLocator locator = new MarkupParsingLocator(line, col + 2);
+        final int[] locator = new int[] {line, col + 2};
         
         /*
          * Extract the element name first 
@@ -328,7 +328,7 @@ public final class ElementMarkupParsingUtil {
                     line, col + 2);
             handler.handleCloseElementEnd(
                     buffer, (outerOffset + outerLen - 1), 1, 
-                    locator.line, locator.col);
+                    locator[0], locator[1]);
             
             return;
             
@@ -343,8 +343,8 @@ public final class ElementMarkupParsingUtil {
         int i = elementNameEnd;
         int current = i;
 
-        int currentArtifactLine = locator.line;
-        int currentArtifactCol = locator.col;
+        int currentArtifactLine = locator[0];
+        int currentArtifactCol = locator[1];
         
         final int wsEnd = 
             MarkupParsingUtil.findNextNonWhitespaceCharWildcard(buffer, i, maxi, locator);
@@ -365,7 +365,7 @@ public final class ElementMarkupParsingUtil {
         
         handler.handleCloseElementEnd(
                 buffer, (outerOffset + outerLen - 1), 1, 
-                locator.line, locator.col);
+                locator[0], locator[1]);
         
     }
     

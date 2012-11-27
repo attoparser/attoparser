@@ -101,7 +101,7 @@ public final class ProcessingInstructionMarkupParsingUtil {
 
         final int maxi = internalOffset + internalLen;
         
-        final MarkupParsingLocator locator = new MarkupParsingLocator(line, col + 2);
+        final int[] locator = new int[] {line, col + 2};
         
         int i = internalOffset;
         
@@ -120,7 +120,7 @@ public final class ProcessingInstructionMarkupParsingUtil {
                     i, maxi - i,                                      // target
                     line, col + 2,                                    // target
                     0, 0,                                             // content
-                    locator.line, locator.col,                        // content
+                    locator[0], locator[1],                        // content
                     outerOffset, outerLen,                            // outer 
                     line, col);                                       // outer
             
@@ -151,7 +151,7 @@ public final class ProcessingInstructionMarkupParsingUtil {
                     targetOffset, targetLen,                          // target
                     line, col + 2,                                    // target
                     0, 0,                                             // content
-                    locator.line, locator.col,                        // content
+                    locator[0], locator[1],                        // content
                     outerOffset, outerLen,                            // outer 
                     line, col);                                       // outer
             
@@ -165,7 +165,7 @@ public final class ProcessingInstructionMarkupParsingUtil {
                 targetOffset, targetLen,                          // target
                 line, col + 2,                                    // target
                 contentStart, maxi - contentStart,                // content
-                locator.line, locator.col,                        // content
+                locator[0], locator[1],                        // content
                 outerOffset, outerLen,                            // outer 
                 line, col);                                       // outer
         

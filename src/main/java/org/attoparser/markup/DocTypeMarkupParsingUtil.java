@@ -165,7 +165,7 @@ public final class DocTypeMarkupParsingUtil {
 
         final int maxi = internalOffset + internalLen;
         
-        final MarkupParsingLocator locator = new MarkupParsingLocator(line, col + 2);
+        final int[] locator = new int[] {line, col + 2};
         
         int i = internalOffset;
         
@@ -185,7 +185,7 @@ public final class DocTypeMarkupParsingUtil {
         doParseDetailedDocTypeWithInternalSubset(
                 buffer, internalOffset, (internalSubsetStart - internalOffset), offset, len, line, col, 
                 internalSubsetStart + 1, (internalSubsetLastChar - internalSubsetStart) - 1, 
-                locator.line, locator.col, 
+                locator[0], locator[1], 
                 handler);
         
         
@@ -208,7 +208,7 @@ public final class DocTypeMarkupParsingUtil {
 
         final int maxi = contentOffset + contentLen;
         
-        final MarkupParsingLocator locator = new MarkupParsingLocator(line, col + 2);
+        final int[] locator = new int[] {line, col + 2};
         
         int i = contentOffset;
         
@@ -227,16 +227,16 @@ public final class DocTypeMarkupParsingUtil {
                     i, maxi - i,                                                // keyword 
                     line, col + 2,                                              // keyword
                     0, 0,                                                       // element name 
-                    locator.line, locator.col,  // element name
+                    locator[0], locator[1],  // element name
                     0, 0,                                                       // type
-                    locator.line, locator.col,  // type
+                    locator[0], locator[1],  // type
                     0, 0,                                                       // publicId
-                    locator.line, locator.col,  // publicId
+                    locator[0], locator[1],  // publicId
                     0, 0,                                                       // systemId
-                    locator.line, locator.col,  // systemId
+                    locator[0], locator[1],  // systemId
                     internalSubsetOffset, internalSubsetLen,                    // internalSubset
-                    Math.max(locator.line, internalSubsetLine), // internalSubset
-                    Math.max(locator.col, internalSubsetCol),   // internalSubset
+                    Math.max(locator[0], internalSubsetLine), // internalSubset
+                    Math.max(locator[1], internalSubsetCol),   // internalSubset
                     outerOffset, outerLen,                                      // outer 
                     line, col);                                                 // outer
             
@@ -258,8 +258,8 @@ public final class DocTypeMarkupParsingUtil {
          * Fast-forward to the element name
          */
         
-        int currentDocTypeLine = locator.line;
-        int currentDocTypeCol = locator.col;
+        int currentDocTypeLine = locator[0];
+        int currentDocTypeCol = locator[1];
         
         final int elementNameStart = 
                 MarkupParsingUtil.findNextNonWhitespaceCharWildcard(buffer, i, maxi, locator);
@@ -298,8 +298,8 @@ public final class DocTypeMarkupParsingUtil {
          * Search the element name end
          */
         
-        currentDocTypeLine = locator.line;
-        currentDocTypeCol = locator.col;
+        currentDocTypeLine = locator[0];
+        currentDocTypeCol = locator[1];
         
         final int elementNameEnd = 
                 MarkupParsingUtil.findNextWhitespaceCharWildcard(buffer, i, maxi, false, locator);
@@ -314,14 +314,14 @@ public final class DocTypeMarkupParsingUtil {
                     i, maxi - i,                                                // element name 
                     currentDocTypeLine, currentDocTypeCol,                      // element name
                     0, 0,                                                       // type
-                    locator.line, locator.col,  // type
+                    locator[0], locator[1],  // type
                     0, 0,                                                       // publicId
-                    locator.line, locator.col,  // publicId
+                    locator[0], locator[1],  // publicId
                     0, 0,                                                       // systemId
-                    locator.line, locator.col,  // systemId
+                    locator[0], locator[1],  // systemId
                     internalSubsetOffset, internalSubsetLen,                    // internalSubset
-                    Math.max(locator.line, internalSubsetLine), // internalSubset
-                    Math.max(locator.col, internalSubsetCol),   // internalSubset
+                    Math.max(locator[0], internalSubsetLine), // internalSubset
+                    Math.max(locator[1], internalSubsetCol),   // internalSubset
                     outerOffset, outerLen,                                      // outer 
                     line, col);                                                 // outer
             
@@ -343,8 +343,8 @@ public final class DocTypeMarkupParsingUtil {
          * Fast-forward to the type
          */
         
-        currentDocTypeLine = locator.line;
-        currentDocTypeCol = locator.col;
+        currentDocTypeLine = locator[0];
+        currentDocTypeCol = locator[1];
         
         final int typeStart = 
                 MarkupParsingUtil.findNextNonWhitespaceCharWildcard(buffer, i, maxi, locator);
@@ -359,14 +359,14 @@ public final class DocTypeMarkupParsingUtil {
                     elementNameOffset, elementNameLen,                          // element name 
                     elementNameLine, elementNameCol,                            // element name
                     0, 0,                                                       // type
-                    locator.line, locator.col,  // type
+                    locator[0], locator[1],  // type
                     0, 0,                                                       // publicId
-                    locator.line, locator.col,  // publicId
+                    locator[0], locator[1],  // publicId
                     0, 0,                                                       // systemId
-                    locator.line, locator.col,  // systemId
+                    locator[0], locator[1],  // systemId
                     internalSubsetOffset, internalSubsetLen,                    // internalSubset
-                    Math.max(locator.line, internalSubsetLine), // internalSubset
-                    Math.max(locator.col, internalSubsetCol),   // internalSubset
+                    Math.max(locator[0], internalSubsetLine), // internalSubset
+                    Math.max(locator[1], internalSubsetCol),   // internalSubset
                     outerOffset, outerLen,                                      // outer 
                     line, col);                                                 // outer
             
@@ -383,8 +383,8 @@ public final class DocTypeMarkupParsingUtil {
          * Search the type end
          */
         
-        currentDocTypeLine = locator.line;
-        currentDocTypeCol = locator.col;
+        currentDocTypeLine = locator[0];
+        currentDocTypeCol = locator[1];
         
         final int typeEnd = 
                 MarkupParsingUtil.findNextWhitespaceCharWildcard(buffer, i, maxi, true, locator);
@@ -436,8 +436,8 @@ public final class DocTypeMarkupParsingUtil {
          * Fast-forward to the spec1 (publicId or systemId, depending on type)
          */
         
-        currentDocTypeLine = locator.line;
-        currentDocTypeCol = locator.col;
+        currentDocTypeLine = locator[0];
+        currentDocTypeCol = locator[1];
         
         final int spec1Start = 
                 MarkupParsingUtil.findNextNonWhitespaceCharWildcard(buffer, i, maxi, locator);
@@ -463,8 +463,8 @@ public final class DocTypeMarkupParsingUtil {
          * Search the spec1 end
          */
         
-        currentDocTypeLine = locator.line;
-        currentDocTypeCol = locator.col;
+        currentDocTypeLine = locator[0];
+        currentDocTypeCol = locator[1];
         
         final int spec1End = 
                 MarkupParsingUtil.findNextWhitespaceCharWildcard(buffer, i, maxi, true, locator);
@@ -497,10 +497,10 @@ public final class DocTypeMarkupParsingUtil {
                         i + 1, maxi - (i + 2),                                      // publicId
                         currentDocTypeLine, currentDocTypeCol,                      // publicId
                         0, 0,                                                       // systemId 
-                        locator.line, locator.col,  // systemId
+                        locator[0], locator[1],  // systemId
                         internalSubsetOffset, internalSubsetLen,                    // internalSubset
-                        Math.max(locator.line, internalSubsetLine), // internalSubset
-                        Math.max(locator.col, internalSubsetCol),   // internalSubset
+                        Math.max(locator[0], internalSubsetLine), // internalSubset
+                        Math.max(locator[1], internalSubsetCol),   // internalSubset
                         outerOffset, outerLen,                                      // outer 
                         line, col);                                                 // outer
                 
@@ -521,8 +521,8 @@ public final class DocTypeMarkupParsingUtil {
                     i + 1, maxi - (i + 2),                                      // systemId
                     currentDocTypeLine, currentDocTypeCol,                      // systemId
                     internalSubsetOffset, internalSubsetLen,                    // internalSubset
-                    Math.max(locator.line, internalSubsetLine), // internalSubset
-                    Math.max(locator.col, internalSubsetCol),   // internalSubset
+                    Math.max(locator[0], internalSubsetLine), // internalSubset
+                    Math.max(locator[1], internalSubsetCol),   // internalSubset
                     outerOffset, outerLen,                                      // outer 
                     line, col);                                                 // outer
             
@@ -556,8 +556,8 @@ public final class DocTypeMarkupParsingUtil {
          * Fast-forward to the spec2 (systemId, only if type is PUBLIC)
          */
         
-        currentDocTypeLine = locator.line;
-        currentDocTypeCol = locator.col;
+        currentDocTypeLine = locator[0];
+        currentDocTypeCol = locator[1];
         
         final int spec2Start = 
                 MarkupParsingUtil.findNextNonWhitespaceCharWildcard(buffer, i, maxi, locator);
@@ -579,10 +579,10 @@ public final class DocTypeMarkupParsingUtil {
                         spec1Offset + 1, spec1Len - 2,                              // publicId 
                         spec1Line, spec1Col,                                        // publicId
                         0, 0,                                                       // systemId
-                        locator.line, locator.col,  // systemId
+                        locator[0], locator[1],  // systemId
                         internalSubsetOffset, internalSubsetLen,                    // internalSubset
-                        Math.max(locator.line, internalSubsetLine), // internalSubset
-                        Math.max(locator.col, internalSubsetCol),   // internalSubset
+                        Math.max(locator[0], internalSubsetLine), // internalSubset
+                        Math.max(locator[1], internalSubsetCol),   // internalSubset
                         outerOffset, outerLen,                                      // outer 
                         line, col);                                                 // outer
                 
@@ -603,8 +603,8 @@ public final class DocTypeMarkupParsingUtil {
                     spec1Offset + 1, spec1Len - 2,                              // systemId
                     spec1Line, spec1Col,                                        // systemId
                     internalSubsetOffset, internalSubsetLen,                    // internalSubset
-                    Math.max(locator.line, internalSubsetLine), // internalSubset
-                    Math.max(locator.col, internalSubsetCol),   // internalSubset
+                    Math.max(locator[0], internalSubsetLine), // internalSubset
+                    Math.max(locator[1], internalSubsetCol),   // internalSubset
                     outerOffset, outerLen,                                      // outer 
                     line, col);                                                 // outer
             
@@ -621,8 +621,8 @@ public final class DocTypeMarkupParsingUtil {
          * Search the spec2 end
          */
         
-        currentDocTypeLine = locator.line;
-        currentDocTypeCol = locator.col;
+        currentDocTypeLine = locator[0];
+        currentDocTypeCol = locator[1];
         
         final int spec2End = 
                 MarkupParsingUtil.findNextWhitespaceCharWildcard(buffer, i, maxi, true, locator);
@@ -667,8 +667,8 @@ public final class DocTypeMarkupParsingUtil {
                     i + 1, maxi - (i + 2),                                      // systemId
                     currentDocTypeLine, currentDocTypeCol,                      // systemId
                     internalSubsetOffset, internalSubsetLen,                    // internalSubset
-                    Math.max(locator.line, internalSubsetLine), // internalSubset
-                    Math.max(locator.col, internalSubsetCol),   // internalSubset
+                    Math.max(locator[0], internalSubsetLine), // internalSubset
+                    Math.max(locator[1], internalSubsetCol),   // internalSubset
                     outerOffset, outerLen,                                      // outer 
                     line, col);                                                 // outer
             
@@ -714,8 +714,8 @@ public final class DocTypeMarkupParsingUtil {
          * Fast-forward to the end of the DOCTYPE clause
          */
         
-        currentDocTypeLine = locator.line;
-        currentDocTypeCol = locator.col;
+        currentDocTypeLine = locator[0];
+        currentDocTypeCol = locator[1];
         
         final int clauseEndStart = 
                 MarkupParsingUtil.findNextNonWhitespaceCharWildcard(buffer, i, maxi, locator);
@@ -748,8 +748,8 @@ public final class DocTypeMarkupParsingUtil {
                 spec2Offset + 1, spec2Len - 2,                              // systemId
                 spec2Line, spec2Col,                                        // systemId
                 internalSubsetOffset, internalSubsetLen,                    // internalSubset
-                Math.max(locator.line, internalSubsetLine), // internalSubset
-                Math.max(locator.col, internalSubsetCol),   // internalSubset
+                Math.max(locator[0], internalSubsetLine), // internalSubset
+                Math.max(locator[1], internalSubsetCol),   // internalSubset
                 outerOffset, outerLen,                                      // outer 
                 line, col);                                                 // outer
         
@@ -849,7 +849,7 @@ public final class DocTypeMarkupParsingUtil {
 
     
     private static int findInternalSubsetStartCharWildcard(
-            final char[] text, final int offset, final int maxi, final MarkupParsingLocator locator) {
+            final char[] text, final int offset, final int maxi, final int[] locator) {
         
         boolean inQuotes = false;
         boolean inApos = false;
@@ -866,7 +866,7 @@ public final class DocTypeMarkupParsingUtil {
                 return i;
             }
 
-            MarkupParsingLocator.countChar(locator, c);
+            LocatorUtils.countChar(locator, c);
             
         }
             
@@ -878,7 +878,7 @@ public final class DocTypeMarkupParsingUtil {
     
     
     static int findNextDocTypeStructureEnd(
-            final char[] text, final int offset, final int maxi, final MarkupParsingLocator locator) {
+            final char[] text, final int offset, final int maxi, final int[] locator) {
         
         boolean inQuotes = false;
         boolean inApos = false;
@@ -900,7 +900,7 @@ public final class DocTypeMarkupParsingUtil {
                 return i;
             }
 
-            MarkupParsingLocator.countChar(locator, c);
+            LocatorUtils.countChar(locator, c);
             
         }
         

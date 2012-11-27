@@ -105,10 +105,10 @@ public final class XmlDeclarationMarkupParsingUtil {
 
         final int maxi = internalOffset + internalLen;
         
-        final MarkupParsingLocator locator = new MarkupParsingLocator(line, col + 2);
+        final int[] locator = new int[] {line, col + 2};
         
-        final int keywordLine = locator.line;
-        final int keywordCol = locator.col;
+        final int keywordLine = locator[0];
+        final int keywordCol = locator[1];
         
         int i = internalOffset;
         
@@ -348,7 +348,7 @@ public final class XmlDeclarationMarkupParsingUtil {
 
         
         
-        public void finalChecks(final MarkupParsingLocator locator, final char[] buffer) throws AttoParseException {
+        public void finalChecks(final int[] locator, final char[] buffer) throws AttoParseException {
             if (!this.versionPresent) {
                 throw new AttoParseException(
                         "Attribute \"version\" is required in XML Declaration: " +
@@ -356,13 +356,13 @@ public final class XmlDeclarationMarkupParsingUtil {
                         this.outerLine, this.outerLine);
             }
             if (!this.standalonePresent) {
-                this.standaloneLine = locator.line;
-                this.standaloneCol = locator.col;
+                this.standaloneLine = locator[0];
+                this.standaloneCol = locator[1];
             }
             if (!this.encodingPresent) {
                 if (!this.standalonePresent) {
-                    this.encodingLine = locator.line;
-                    this.encodingCol = locator.col;
+                    this.encodingLine = locator[0];
+                    this.encodingCol = locator[1];
                 } else {
                     this.encodingLine = this.standaloneLine;
                     this.encodingCol = this.standaloneCol;

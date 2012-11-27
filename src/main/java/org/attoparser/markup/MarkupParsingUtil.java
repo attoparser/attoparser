@@ -55,7 +55,7 @@ public final class MarkupParsingUtil {
     
     static int findNextStructureEndAvoidQuotes(
             final char[] text, final int offset, final int maxi, 
-            final MarkupParsingLocator locator) {
+            final int[] locator) {
         
         boolean inQuotes = false;
         boolean inApos = false;
@@ -67,20 +67,20 @@ public final class MarkupParsingUtil {
 
             if (c == '\n') {
                 colIndex = i;
-                locator.col = 0;
-                locator.line++;
+                locator[1] = 0;
+                locator[0]++;
             } else if (c == '"' && !inApos) {
                 inQuotes = !inQuotes;
             } else if (c == '\'' && !inQuotes) {
                 inApos = !inApos;
             } else if (c == '>' && !inQuotes && !inApos) {
-                locator.col += (i - colIndex);
+                locator[1] += (i - colIndex);
                 return i;
             }
             
         }
             
-        locator.col += (maxi - colIndex);
+        locator[1] += (maxi - colIndex);
         return -1;
         
     }
@@ -88,7 +88,7 @@ public final class MarkupParsingUtil {
     
     static int findNextStructureEndDontAvoidQuotes(
             final char[] text, final int offset, final int maxi, 
-            final MarkupParsingLocator locator) {
+            final int[] locator) {
         
         int colIndex = offset;
         for (int i = offset; i < maxi; i++) {
@@ -97,16 +97,16 @@ public final class MarkupParsingUtil {
             
             if (c == '\n') {
                 colIndex = i;
-                locator.col = 0;
-                locator.line++;
+                locator[1] = 0;
+                locator[0]++;
             } else if (c == '>') {
-                locator.col += (i - colIndex);
+                locator[1] += (i - colIndex);
                 return i;
             }
             
         }
             
-        locator.col += (maxi - colIndex);
+        locator[1] += (maxi - colIndex);
         return -1;
         
     }
@@ -114,7 +114,7 @@ public final class MarkupParsingUtil {
     
     static int findNextStructureStart(
             final char[] text, final int offset, final int maxi, 
-            final MarkupParsingLocator locator) {
+            final int[] locator) {
 
         int colIndex = offset;
         for (int i = offset; i < maxi; i++) {
@@ -123,16 +123,16 @@ public final class MarkupParsingUtil {
             
             if (c == '\n') {
                 colIndex = i;
-                locator.col = 0;
-                locator.line++;
+                locator[1] = 0;
+                locator[0]++;
             } else if (c == '<') {
-                locator.col += (i - colIndex);
+                locator[1] += (i - colIndex);
                 return i;
             }
             
         }
             
-        locator.col += (maxi - colIndex);
+        locator[1] += (maxi - colIndex);
         return -1;
         
     }
@@ -140,7 +140,7 @@ public final class MarkupParsingUtil {
     
     static int findNextWhitespaceCharWildcard(
             final char[] text, final int offset, final int maxi, 
-            final boolean avoidQuotes, final MarkupParsingLocator locator) {
+            final boolean avoidQuotes, final int[] locator) {
         
         boolean inQuotes = false;
         boolean inApos = false;
@@ -157,7 +157,7 @@ public final class MarkupParsingUtil {
                 return i;
             }
 
-            MarkupParsingLocator.countChar(locator, c);
+            LocatorUtils.countChar(locator, c);
             
         }
             
@@ -168,7 +168,7 @@ public final class MarkupParsingUtil {
     
     static int findNextNonWhitespaceCharWildcard(
             final char[] text, final int offset, final int maxi, 
-            final MarkupParsingLocator locator) {
+            final int[] locator) {
         
         for (int i = offset; i < maxi; i++) {
             
@@ -179,7 +179,7 @@ public final class MarkupParsingUtil {
                 return i;
             }
 
-            MarkupParsingLocator.countChar(locator, c);
+            LocatorUtils.countChar(locator, c);
             
         }
             
@@ -190,7 +190,7 @@ public final class MarkupParsingUtil {
     
     static int findNextOperatorCharWildcard(
             final char[] text, final int offset, final int maxi,  
-            final MarkupParsingLocator locator) {
+            final int[] locator) {
         
         for (int i = offset; i < maxi; i++) {
             
@@ -200,7 +200,7 @@ public final class MarkupParsingUtil {
                 return i;
             }
 
-            MarkupParsingLocator.countChar(locator, c);
+            LocatorUtils.countChar(locator, c);
             
         }
             
@@ -211,7 +211,7 @@ public final class MarkupParsingUtil {
     
     static int findNextNonOperatorCharWildcard(
             final char[] text, final int offset, final int maxi, 
-            final MarkupParsingLocator locator) {
+            final int[] locator) {
         
         for (int i = offset; i < maxi; i++) {
             
@@ -221,7 +221,7 @@ public final class MarkupParsingUtil {
                 return i;
             }
 
-            MarkupParsingLocator.countChar(locator, c);
+            LocatorUtils.countChar(locator, c);
             
         }
             
@@ -232,7 +232,7 @@ public final class MarkupParsingUtil {
     
     static int findNextAnyCharAvoidQuotesWildcard(
             final char[] text, final int offset, final int maxi,  
-            final MarkupParsingLocator locator) {
+            final int[] locator) {
         
         boolean inQuotes = false;
         boolean inApos = false;
@@ -249,7 +249,7 @@ public final class MarkupParsingUtil {
                 return i;
             }
 
-            MarkupParsingLocator.countChar(locator, c);
+            LocatorUtils.countChar(locator, c);
             
         }
             

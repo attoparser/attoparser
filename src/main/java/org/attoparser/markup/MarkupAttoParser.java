@@ -77,10 +77,10 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
             throws AttoParseException {
 
 
-        final MarkupParsingLocator locator = new MarkupParsingLocator(line, col);
+        final int[] locator = new int[] {line, col};
         
-        int currentLine = locator.line;
-        int currentCol = locator.col;
+        int currentLine = locator[0];
+        int currentCol = locator[1];
         
         final int maxi = offset + len;
         int i = offset;
@@ -101,8 +101,8 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
         
         while (i < maxi) {
             
-            currentLine = locator.line;
-            currentCol = locator.col;
+            currentLine = locator[0];
+            currentCol = locator[1];
             
             inStructure =
                     (inOpenElement || inCloseElement || inComment || inCdata || inDocType || inXmlDeclaration || inProcessingInstruction);
@@ -143,7 +143,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                     // We found a '<', but it cannot be considered a tag because it is not
                     // the beginning of any known structure
                     
-                    MarkupParsingLocator.countChar(locator, buffer[tagStart]);
+                    LocatorUtils.countChar(locator, buffer[tagStart]);
                     tagStart = MarkupParsingUtil.findNextStructureStart(buffer, tagStart + 1, maxi, locator);
                     
                     if (tagStart == -1) {
@@ -226,7 +226,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                     while (tagEnd - current < 7 || buffer[tagEnd - 1] != '-' || buffer[tagEnd - 2] != '-') {
                         // the '>' we chose is not the comment-closing one. Let's find again
                         
-                        MarkupParsingLocator.countChar(locator, buffer[tagEnd]);
+                        LocatorUtils.countChar(locator, buffer[tagEnd]);
                         tagEnd = MarkupParsingUtil.findNextStructureEndDontAvoidQuotes(buffer, tagEnd + 1, maxi, locator);
                         
                         if (tagEnd == -1) {
@@ -244,7 +244,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                     while (tagEnd - current < 12 || buffer[tagEnd - 1] != ']' || buffer[tagEnd - 2] != ']') {
                         // the '>' we chose is not the comment-closing one. Let's find again
                         
-                        MarkupParsingLocator.countChar(locator, buffer[tagEnd]);
+                        LocatorUtils.countChar(locator, buffer[tagEnd]);
                         tagEnd = MarkupParsingUtil.findNextStructureEndDontAvoidQuotes(buffer, tagEnd + 1, maxi, locator);
                         
                         if (tagEnd == -1) {
@@ -274,7 +274,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                     while (tagEnd - current < 5 || buffer[tagEnd - 1] != '?') {
                         // the '>' we chose is not the PI-closing one. Let's find again
 
-                        MarkupParsingLocator.countChar(locator, buffer[tagEnd]);
+                        LocatorUtils.countChar(locator, buffer[tagEnd]);
                         tagEnd = MarkupParsingUtil.findNextStructureEndDontAvoidQuotes(buffer, tagEnd + 1, maxi, locator);
                         
                         if (tagEnd == -1) {
@@ -295,7 +295,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                 }
                 
                 // The '>' char will be considered as processed too
-                MarkupParsingLocator.countChar(locator, buffer[tagEnd]);
+                LocatorUtils.countChar(locator, buffer[tagEnd]);
                 
                 current = tagEnd + 1;
                 i = current;
@@ -304,7 +304,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
             
         }
         
-        return new BufferParseResult(current, locator.line, locator.col, false);
+        return new BufferParseResult(current, locator[0], locator[1], false);
         
     }
     

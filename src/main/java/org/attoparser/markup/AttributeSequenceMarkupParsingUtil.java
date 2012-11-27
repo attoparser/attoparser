@@ -68,12 +68,12 @@ public final class AttributeSequenceMarkupParsingUtil {
     static void parseAttributeSequence(
             final char[] buffer, 
             final int offset, final int len, 
-            final MarkupParsingLocator locator, 
+            final int[] locator, 
             final IAttributeSequenceHandling handler)
             throws AttoParseException {
         
-        final int line = locator.line;
-        final int col = locator.col;
+        final int line = locator[0];
+        final int col = locator[1];
         if (!tryParseAttributeSequence(buffer, offset, len, locator, handler)) {
             throw new AttoParseException(
                     "Could not parse as attribute sequence: \"" + new String(buffer, offset, len) + "\"", line, col);
@@ -93,7 +93,7 @@ public final class AttributeSequenceMarkupParsingUtil {
             final IAttributeSequenceHandling handler)
             throws AttoParseException {
         
-        return tryParseAttributeSequence(buffer, offset, len, new MarkupParsingLocator(line, col), handler);
+        return tryParseAttributeSequence(buffer, offset, len, new int[] {line, col}, handler);
                 
     }
     
@@ -102,7 +102,7 @@ public final class AttributeSequenceMarkupParsingUtil {
     static boolean tryParseAttributeSequence(
             final char[] buffer,
             final int offset, final int len, 
-            final MarkupParsingLocator locator, 
+            final int[] locator, 
             final IAttributeSequenceHandling handler)
             throws AttoParseException {
 
@@ -116,8 +116,8 @@ public final class AttributeSequenceMarkupParsingUtil {
         int i = offset;
         int current = i;
 
-        int currentArtifactLine = locator.line;
-        int currentArtifactCol = locator.col;
+        int currentArtifactLine = locator[0];
+        int currentArtifactCol = locator[1];
         
         while (i < maxi) {
 
@@ -125,8 +125,8 @@ public final class AttributeSequenceMarkupParsingUtil {
              * STEP ONE: Look for whitespaces between attributes
              */
 
-            currentArtifactLine = locator.line;
-            currentArtifactCol = locator.col;
+            currentArtifactLine = locator[0];
+            currentArtifactCol = locator[1];
             
             final int wsEnd = 
                     MarkupParsingUtil.findNextNonWhitespaceCharWildcard(buffer, i, maxi, locator);
@@ -158,8 +158,8 @@ public final class AttributeSequenceMarkupParsingUtil {
              */
 
             
-            currentArtifactLine = locator.line;
-            currentArtifactCol = locator.col;
+            currentArtifactLine = locator[0];
+            currentArtifactCol = locator[1];
             
             final int attributeNameEnd = 
                     MarkupParsingUtil.findNextOperatorCharWildcard(buffer, i, maxi, locator);
@@ -174,9 +174,9 @@ public final class AttributeSequenceMarkupParsingUtil {
                         attributeNameOffset, attributeNameLen,                                // name
                         currentArtifactLine, currentArtifactCol,                              // name
                         0, 0,                                                                 // operator
-                        locator.line, locator.col,                                            // operator
+                        locator[0], locator[1],                                            // operator
                         0, 0, 0, 0,                                                           // value
-                        locator.line, locator.col);                                           // value
+                        locator[0], locator[1]);                                           // value
                 i = maxi;
                 continue;
                 
@@ -204,8 +204,8 @@ public final class AttributeSequenceMarkupParsingUtil {
              */
 
             
-            currentArtifactLine = locator.line;
-            currentArtifactCol = locator.col;
+            currentArtifactLine = locator[0];
+            currentArtifactCol = locator[1];
 
             final int operatorEnd = 
                     MarkupParsingUtil.findNextNonOperatorCharWildcard(buffer, i, maxi, locator);
@@ -237,7 +237,7 @@ public final class AttributeSequenceMarkupParsingUtil {
                             operatorOffset, operatorLen,                                           // operator 
                             currentArtifactLine, currentArtifactCol,                               // operator
                             0, 0, 0, 0,                                                            // value
-                            locator.line, locator.col);                                            // value
+                            locator[0], locator[1]);                                            // value
                     
                 } else {
                     // There is no "=", so we will first output the attribute with no
@@ -313,8 +313,8 @@ public final class AttributeSequenceMarkupParsingUtil {
              */
 
             
-            currentArtifactLine = locator.line;
-            currentArtifactCol = locator.col;
+            currentArtifactLine = locator[0];
+            currentArtifactCol = locator[1];
 
             final boolean attributeEndsWithQuotes = (i < maxi && (buffer[current] == '"' || buffer[current] == '\''));
             final int valueEnd =
