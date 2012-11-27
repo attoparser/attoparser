@@ -35,12 +35,15 @@ import org.attoparser.markup.html.elements.IHtmlElement;
 public final class HtmlElementStack {
 
     private static final int DEFAULT_STACK_SIZE = 20;
+    private static final int ROOT_PARENT = -1;
     
     
     public IHtmlElement[] elements;
     public int[] parents;
     public int size = 0;
 
+
+    
     
     public HtmlElementStack() {
         
@@ -58,22 +61,27 @@ public final class HtmlElementStack {
     
     
     
-    
-    
-    
-    
 
-
-    
-    
-
-    private void cleanStack(final int from) {
-        
+    public void cleanStack(final int from) {
         for (int i = from; i < this.elements.length; i++) {
             this.elements[i] = null;
-            this.parents[i] = -1;
+            this.parents[i] = ROOT_PARENT;
         }
-        
+    }
+    
+    
+    
+    public void addParent(final IHtmlElement element) {
+        this.elements[this.size] = element;
+        this.parents[this.size] = (this.size == 0? ROOT_PARENT : (this.size - 1));
+        this.size++;
+    }
+    
+    
+    public void addSibling(final IHtmlElement element) {
+        this.elements[this.size] = element;
+        this.parents[this.size] = (this.size == 0? ROOT_PARENT : this.parents[this.size - 1]);
+        this.size++;
     }
     
     
