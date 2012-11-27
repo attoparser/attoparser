@@ -282,35 +282,6 @@ public final class HtmlElements {
     }
     
     
-
-    
-    
-
-    public static void main(String[] args) {
-
-        
-        System.out.println(lookFor("A"));
-        System.out.println(lookFor("link"));
-        System.out.println(lookFor("html"));
-        System.out.println(lookFor("META"));
-
-        System.out.println(ELEMENTS.toString());
-        
-        
-        final long start = System.currentTimeMillis();
-        
-        for (int i = 0; i < 10000000; i++) {
-            IHtmlElement e1 = lookFor("A");
-            IHtmlElement e2 = lookFor("link");
-            IHtmlElement e3 = lookFor("html");
-            IHtmlElement e4 = lookFor("META");
-        }
-        
-        final long end = System.currentTimeMillis();
-
-        System.out.println("Time: " + (end - start) + "ms");
-        
-    }
     
     
 }

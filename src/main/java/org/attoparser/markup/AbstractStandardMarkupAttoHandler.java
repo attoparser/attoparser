@@ -36,7 +36,7 @@ import org.attoparser.AttoParseException;
  *   handling interface similar to that of the standard SAX {@link org.xml.sax.ContentHandler}.
  * </p>
  * <p>
- *   Handlers extending from this class can make use of a {@link MarkupParsingConfiguration} instance
+ *   Handlers extending from this class can make use of a {@link HtmlParsingConfiguration} instance
  *   specifying a markup parsing configuration to be applied during document parsing (for example, 
  *   for ensuring that a document is well-formed from an XML/XHTML standpoint).
  * </p>

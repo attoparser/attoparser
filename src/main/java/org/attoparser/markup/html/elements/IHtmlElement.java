@@ -19,7 +19,10 @@
  */
 package org.attoparser.markup.html.elements;
 
+import org.attoparser.AttoParseException;
+import org.attoparser.markup.html.HtmlElementStack;
 import org.attoparser.markup.html.IDetailedHtmlElementHandling;
+
 
 
 
@@ -42,13 +45,80 @@ public interface IHtmlElement {
     public boolean matches(final char[] elementName);
     public boolean matches(final char[] elementNameBuffer, final int offset, final int len);
     
-    public boolean canBeChildOf(final IHtmlElement parent);
-    public void fixBeingChildOf(final IHtmlElement parent, final IHtmlElement[] stack, final IDetailedHtmlElementHandling handler);
 
-    public boolean canBeSiblingOf(final IHtmlElement parent, final IHtmlElement[] siblings);
-    public void fixBeingSiblingOf(final IHtmlElement parent, final IHtmlElement[] siblings, final IHtmlElement[] stack, final IDetailedHtmlElementHandling handler);
     
-    public Boolean isEmptyElement();
+    public void handleStandaloneElementStartAndName(
+            final char[] buffer, final int offset, final int len, final int line, final int col, 
+            final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
+            throws AttoParseException;
     
+    public void handleStandaloneElementEnd(
+            final char[] buffer, final int offset, final int len, final int line, final int col, 
+            final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
+            throws AttoParseException;
+
+    
+    
+    public void handleOpenElementStartAndName(
+            final char[] buffer, final int offset, final int len, final int line, final int col, 
+            final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
+            throws AttoParseException;
+
+    public void handleOpenElementEnd(
+            final char[] buffer, final int offset, final int len, final int line, final int col, 
+            final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
+            throws AttoParseException;
+
+    
+    
+    public void handleCloseElementStartAndName(
+            final char[] buffer, final int offset, final int len, final int line, final int col, 
+            final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
+            throws AttoParseException;
+
+    public void handleCloseElementEnd(
+            final char[] buffer, final int offset, final int len, final int line, final int col,
+            final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
+            throws AttoParseException;
+
+    
+    
+    public void handleAutoCloseElementStartAndName(
+            final char[] buffer, final int offset, final int len, final int line, final int col, 
+            final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
+            throws AttoParseException;
+
+    public void handleAutoCloseElementEnd(
+            final char[] buffer, final int offset, final int len, final int line, final int col, 
+            final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
+            throws AttoParseException;
+    
+
+    
+    public void handleUnmatchedCloseElementStartAndName(
+            final char[] buffer, final int offset, final int len, final int line, final int col, 
+            final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
+            throws AttoParseException;
+
+    public void handleUnmatchedCloseElementEnd(
+            final char[] buffer, final int offset, final int len,final int line, final int col,
+            final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
+            throws AttoParseException;
+    
+    
+    
+    public void handleAttribute(
+            final char[] buffer, 
+            final int nameOffset, final int nameLen, final int nameLine, final int nameCol, 
+            final int operatorOffset, final int operatorLen, final int operatorLine, final int operatorCol, 
+            final int valueContentOffset, final int valueContentLen, final int valueOuterOffset, final int valueOuterLen,
+            final int valueLine, final int valueCol,
+            final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
+            throws AttoParseException;
+
+    public void handleAttributeSeparator(
+            final char[] buffer, final int offset, final int len, final int line, final int col,
+            final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
+            throws AttoParseException;
     
 }

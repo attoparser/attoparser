@@ -67,7 +67,7 @@ public final class MarkupParsingConfiguration implements Serializable {
 
     /**
      * <p>
-     *   Creates a {@link MarkupParsingConfiguration} instance enforcing no restrictions at all.
+     *   Creates a {@link HtmlParsingConfiguration} instance enforcing no restrictions at all.
      * </p>
      * <p>
      *   This is the setup:
@@ -93,7 +93,7 @@ public final class MarkupParsingConfiguration implements Serializable {
     
     /**
      * <p>
-     *   Creates a {@link MarkupParsingConfiguration} instance with
+     *   Creates a {@link HtmlParsingConfiguration} instance with
      *   a default configuration.
      * </p>
      * <p>

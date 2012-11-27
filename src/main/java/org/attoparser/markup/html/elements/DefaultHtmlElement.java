@@ -19,6 +19,8 @@
  */
 package org.attoparser.markup.html.elements;
 
+import org.attoparser.AttoParseException;
+import org.attoparser.markup.html.HtmlElementStack;
 import org.attoparser.markup.html.IDetailedHtmlElementHandling;
 
 
@@ -37,39 +39,105 @@ import org.attoparser.markup.html.IDetailedHtmlElementHandling;
 public final class DefaultHtmlElement extends AbstractHtmlElement {
 
     
-    DefaultHtmlElement(final String name) {
+    public DefaultHtmlElement(final String name) {
         super(name);
+    }
+
+    public void handleStandaloneElementStartAndName(char[] buffer, int offset,
+            int len, int line, int col, HtmlElementStack stack,
+            IDetailedHtmlElementHandling handler) throws AttoParseException {
+        // TODO Auto-generated method stub
+System.out.print("[" + System.identityHashCode(this) + "] ");
+handler.handleHtmlClosedStandaloneElementName(buffer, offset, len, line, col);
+    }
+
+    public void handleStandaloneElementEnd(char[] buffer, int offset, int len,
+            int line, int col, HtmlElementStack stack,
+            IDetailedHtmlElementHandling handler) throws AttoParseException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void handleOpenElementStartAndName(char[] buffer, int offset,
+            int len, int line, int col, HtmlElementStack stack,
+            IDetailedHtmlElementHandling handler) throws AttoParseException {
+        // TODO Auto-generated method stub
+System.out.print("[" + System.identityHashCode(this) + "] ");
+handler.handleHtmlOpenElementName(buffer, offset, len, line, col);
+    }
+
+    public void handleOpenElementEnd(char[] buffer, int offset, int len,
+            int line, int col, HtmlElementStack stack,
+            IDetailedHtmlElementHandling handler) throws AttoParseException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void handleCloseElementStartAndName(char[] buffer, int offset,
+            int len, int line, int col, HtmlElementStack stack,
+            IDetailedHtmlElementHandling handler) throws AttoParseException {
+        // TODO Auto-generated method stub
+System.out.print("[" + System.identityHashCode(this) + "] ");
+handler.handleHtmlCloseElementName(buffer, offset, len, line, col);
+    }
+
+    public void handleCloseElementEnd(char[] buffer, int offset, int len,
+            int line, int col, HtmlElementStack stack,
+            IDetailedHtmlElementHandling handler) throws AttoParseException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void handleAutoCloseElementStartAndName(char[] buffer, int offset,
+            int len, int line, int col, HtmlElementStack stack,
+            IDetailedHtmlElementHandling handler) throws AttoParseException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void handleAutoCloseElementEnd(char[] buffer, int offset, int len,
+            int line, int col, HtmlElementStack stack,
+            IDetailedHtmlElementHandling handler) throws AttoParseException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void handleUnmatchedCloseElementStartAndName(char[] buffer,
+            int offset, int len, int line, int col, HtmlElementStack stack,
+            IDetailedHtmlElementHandling handler) throws AttoParseException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void handleUnmatchedCloseElementEnd(char[] buffer, int offset,
+            int len, int line, int col, HtmlElementStack stack,
+            IDetailedHtmlElementHandling handler) throws AttoParseException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void handleAttribute(char[] buffer, int nameOffset, int nameLen,
+            int nameLine, int nameCol, int operatorOffset, int operatorLen,
+            int operatorLine, int operatorCol, int valueContentOffset,
+            int valueContentLen, int valueOuterOffset, int valueOuterLen,
+            int valueLine, int valueCol, HtmlElementStack stack,
+            IDetailedHtmlElementHandling handler) throws AttoParseException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void handleAttributeSeparator(char[] buffer, int offset, int len,
+            int line, int col, HtmlElementStack stack,
+            IDetailedHtmlElementHandling handler) throws AttoParseException {
+        // TODO Auto-generated method stub
+        
     }
 
 
     
-    public boolean canBeChildOf(final IHtmlElement parent) {
-        return true;
-    }
-
-
-    public void fixBeingChildOf(final IHtmlElement parent, final IHtmlElement[] stack,
-            final IDetailedHtmlElementHandling handler) {
-        // Nothing to do here
-    }
-
-
-    public boolean canBeSiblingOf(final IHtmlElement parent, final IHtmlElement[] siblings) {
-        return false;
-    }
-
-
-    public void fixBeingSiblingOf(final IHtmlElement parent, final IHtmlElement[] siblings,
-            final IHtmlElement[] stack, final IDetailedHtmlElementHandling handler) {
-        // Nothing to do here
-    }
-
-
-    public Boolean isEmptyElement() {
-        // If we don't have specific information about an
-        // element having or not a body, we should declare this
-        // as 'unknown' by simply returning null.
-        return null;
-    }
+    
+    
+    
+    
     
 }

@@ -44,7 +44,7 @@ import java.util.Arrays;
  */
 public final class SegmentedArray<T,K> {
 
-    public static final int DEFAULT_SEGMENT_SIZE = 5;
+    public static final int DEFAULT_SEGMENT_SIZE = 15;
     
     private final Class<T> componentType;
     private final IValueHandler<? super T,K> valueHandler;
@@ -205,7 +205,8 @@ public final class SegmentedArray<T,K> {
         if (valuesSize == 0) {
             // No values until now: create segment
             
-            final int initialSegmentSize = Math.min(DEFAULT_SEGMENT_SIZE, this.maxSegmentSize);
+            final int initialSegmentSize =
+                    (this.maxSegmentSize < 0? DEFAULT_SEGMENT_SIZE : Math.min(DEFAULT_SEGMENT_SIZE, this.maxSegmentSize));
             this.segments[index] = (T[]) Array.newInstance(this.componentType, initialSegmentSize);
             this.segments[index][0] = value;
             this.segmentSizes[index]++;
@@ -227,7 +228,8 @@ public final class SegmentedArray<T,K> {
         
         // Value does not fit. We need to resize array
         
-        final int newSize = Math.min((valuesArrayLen * 2), this.maxSegmentSize);
+        final int newSize =
+                (this.maxSegmentSize < 0? (valuesArrayLen * 2) : Math.min((valuesArrayLen * 2), this.maxSegmentSize));
         final T[] newValues = (T[]) Array.newInstance(this.componentType, newSize);
         System.arraycopy(this.segments[index], 0, newValues, 0, valuesSize);
         newValues[valuesSize] = value;

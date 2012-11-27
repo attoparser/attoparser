@@ -41,7 +41,7 @@ import org.attoparser.util.SegmentedArray.IValueHandler;
  *   different events for them.
  * </p>
  * <p>
- *   Handlers extending from this class can make use of a {@link MarkupParsingConfiguration} instance
+ *   Handlers extending from this class can make use of a {@link HtmlParsingConfiguration} instance
  *   specifying a set of restrictions to be applied during document parsing (for example, 
  *   for ensuring that a document is well-formed from an XML/XHTML standpoint).
  * </p>
@@ -511,7 +511,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
     static final class StackAwareWrapper
             implements IDetailedElementHandling, IDetailedDocTypeHandling {
 
-        private static final int DEFAULT_STACK_SIZE = 15;
+        private static final int DEFAULT_STACK_SIZE = 20;
         private static final int DEFAULT_ATTRIBUTE_NAMES_SIZE = 5;
 
         private static final char[] CLOSE_START = "</".toCharArray();
@@ -542,7 +542,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
         // char[] object each time an element is pushed into the stack or an attribute
         // is processed to check its uniqueness.
         private final SegmentedArray<char[], char[]> elementAttributeNames;
-        private static final int ELEMENT_ATTRIBUTE_NAMES_NUM_SEGMENTS = 15;
+        private static final int ELEMENT_ATTRIBUTE_NAMES_NUM_SEGMENTS = 20;
         private static final int ELEMENT_ATTRIBUTE_NAMES_MAX_SEGMENT_SIZE = 20;
         
         private char[][] elementStack;
@@ -1263,7 +1263,11 @@ public abstract class AbstractDetailedMarkupAttoHandler
             }
 
             public int getSegmentByKey(final char[] key) {
-                return key[0] + key[key.length - 1];
+                final int keyLen = key.length;
+                if (keyLen == 0) {
+                    return 0;
+                }
+                return key[0] + key[keyLen - 1];
             }
 
             public int getSegmentByText(final String text) {
@@ -1271,6 +1275,9 @@ public abstract class AbstractDetailedMarkupAttoHandler
             }
 
             public int getSegmentByText(final char[] textBuffer, final int textOffset, final int textLen) {
+                if (textLen == 0) {
+                    return 0;
+                }
                 return textBuffer[textOffset] + textBuffer[textOffset + (textLen - 1)];
             }
             

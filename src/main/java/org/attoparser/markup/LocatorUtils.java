@@ -25,19 +25,18 @@ package org.attoparser.markup;
  * 
  * @author Daniel Fern&aacute;ndez
  * 
- * @since 1.0
+ * @since 1.1
  *
  */
 final class LocatorUtils {
-    
 
     public static void countChar(final int[] locator, final char c) {
         if (c == '\n') {
             locator[0]++;
             locator[1] = 1;
-        } else {
-            locator[1]++;
+            return;
         }
+        locator[1]++;
     }
 
     
