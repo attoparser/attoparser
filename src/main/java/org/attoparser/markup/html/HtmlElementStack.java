@@ -19,6 +19,8 @@
  */
 package org.attoparser.markup.html;
 
+import java.util.Arrays;
+
 import org.attoparser.markup.html.elements.IHtmlElement;
 
 
@@ -35,12 +37,13 @@ import org.attoparser.markup.html.elements.IHtmlElement;
 public final class HtmlElementStack {
 
     private static final int DEFAULT_STACK_SIZE = 20;
-    private static final int ROOT_PARENT = -1;
+    private static final int NO_PARENT = -1;
     
     
     public IHtmlElement[] elements;
     public int[] parents;
     public int size = 0;
+    public int openIndex = -1;
 
 
     
@@ -50,10 +53,13 @@ public final class HtmlElementStack {
         super();
         
         this.elements = new IHtmlElement[DEFAULT_STACK_SIZE];
+        Arrays.fill(this.elements, (IHtmlElement)null);
+        
         this.parents = new int[DEFAULT_STACK_SIZE];
+        Arrays.fill(this.parents, NO_PARENT);
+
         this.size = 0;
-        
-        cleanStack(0);
+        this.openIndex = NO_PARENT;
         
     }
 
@@ -61,107 +67,92 @@ public final class HtmlElementStack {
     
     
     
-
-    public void cleanStack(final int from) {
-        for (int i = from; i < this.elements.length; i++) {
-            this.elements[i] = null;
-            this.parents[i] = ROOT_PARENT;
+    
+    public void openElement(final IHtmlElement element) {
+        // A new element is added to the stack, and every new element
+        // added after this will be considered its child.
+        if (this.size == this.elements.length) {
+            growStack();
         }
-    }
-    
-    
-    
-    public void addParent(final IHtmlElement element) {
         this.elements[this.size] = element;
-        this.parents[this.size] = (this.size == 0? ROOT_PARENT : (this.size - 1));
+        this.parents[this.size] = this.openIndex;
+        this.openIndex = this.size;
         this.size++;
     }
+
     
-    
-    public void addSibling(final IHtmlElement element) {
-        this.elements[this.size] = element;
-        this.parents[this.size] = (this.size == 0? ROOT_PARENT : this.parents[this.size - 1]);
-        this.size++;
+    public void closeElement() {
+        // We will close the element currently considered "open", and
+        // remove all of its children from the stack.
+        // New "open" element will be the old open one's parent.
+        
+        if (this.size == 0 || this.openIndex == NO_PARENT) {
+            throw new IllegalStateException("Cannot close element: no element is currently open!");
+        }
+        
+        int i = this.size - 1;
+        while (i > this.openIndex) {
+            this.elements[i] = null;
+            this.parents[i] = NO_PARENT;
+            i--;
+        }
+        
+        // Now "i" must be equal to openIndex
+        if (i != this.openIndex) {
+            throw new IllegalStateException("Malformed stack");
+        }
+        
+        this.size = this.openIndex + 1;
+        this.openIndex = this.parents[this.openIndex];
+        
     }
     
     
+
     
-//    private void addToElementStack(final IHtmlElement element) {
-//        
-//        if (this.elementStackSize == this.elementStack.length) {
-//            this.elementStack = growStack(this.elementStack);
-//            this.siblingStack = growStack(this.siblingStack);
-//            this.siblingStackSizes = growStack(this.siblingStackSizes);
-//        }
-//        
-//        this.elementStack[this.elementStackSize] = element;
-//        this.elementStackSize++;
-//        
-//        t
-//        
-//    }
-//
-//    
-//    private IHtmlElement peekFromStack() {
-//        
-//        if (this.elementStackSize == 0) {
-//            return null;
-//        }
-//        
-//        return this.elementStack[this.elementStackSize - 1];
-//        
-//    }
-//
-//    
-//    private IHtmlElement popFromElementStack() {
-//        
-//        if (this.elementStackSize == 0) {
-//            return null;
-//        }
-//        
-//        this.elementStackSize--;
-//        
-//        final IHtmlElement popped = this.elementStack[this.elementStackSize];
-//        this.elementStack[this.elementStackSize] = null;
-//
-//        return popped;
-//        
-//    }
-//    
-//
-//    
-//    private void growElementStack() {
-//        if (this.elementStack == null) {
-//            this.elementStack = new IHtmlElement[DEFAULT_STACK_SIZE];
-//            return;
-//        }
-//        final int newStackSize = stack.length * 2;
-//        final IHtmlElement[] newStack = new IHtmlElement[newStackSize];
-//        System.arraycopy(stack, 0, newStack, 0, stack.length);
-//        return newStack;
-//    }
-//    
-//    private IHtmlElement[] growStack(final IHtmlElement[] stack) {
-//        if (stack == null) {
-//            return new IHtmlElement[DEFAULT_STACK_SIZE];
-//        }
-//        final int newStackSize = stack.length * 2;
-//        final IHtmlElement[] newStack = new IHtmlElement[newStackSize];
-//        System.arraycopy(stack, 0, newStack, 0, stack.length);
-//        return newStack;
-//    }
-//    
-//    private IHtmlElement[] growStack(final IHtmlElement[] stack) {
-//        if (stack == null) {
-//            return new IHtmlElement[DEFAULT_STACK_SIZE];
-//        }
-//        final int newStackSize = stack.length * 2;
-//        final IHtmlElement[] newStack = new IHtmlElement[newStackSize];
-//        System.arraycopy(stack, 0, newStack, 0, stack.length);
-//        return newStack;
-//    }
-//    
+    private void growStack() {
+        
+        final int newStackSize = this.elements.length + DEFAULT_STACK_SIZE;
+        
+        final IHtmlElement[] newElements = new IHtmlElement[newStackSize];
+        System.arraycopy(this.elements, 0, newElements, 0, this.elements.length);
+        
+        final int[] newParents = new int[newStackSize];
+        System.arraycopy(this.parents, 0, newParents, 0, this.parents.length);
+        
+        this.elements = newElements;
+        this.parents = newParents;
+        
+    }
     
+    
+
+    
+    
+    @Override
+    public String toString() {
+        final StringBuilder strBuilder = new StringBuilder();
+        strBuilder.append("[ ");
+        if (this.size > 0) {
+            strBuilder.append(0);
+            strBuilder.append('^');
+            strBuilder.append(this.parents[0]);
+            strBuilder.append(':');
+            strBuilder.append(this.elements[0]);
+            for (int i = 1; i < this.size; i++) {
+                strBuilder.append(" | ");
+                strBuilder.append(i);
+                strBuilder.append('^');
+                strBuilder.append(this.parents[i]);
+                strBuilder.append(':');
+                strBuilder.append(this.elements[i]);
+            }
+        }
+        strBuilder.append(" ] {^");
+        strBuilder.append(this.openIndex);
+        strBuilder.append('}');
+        return strBuilder.toString();
+    }
 
     
     

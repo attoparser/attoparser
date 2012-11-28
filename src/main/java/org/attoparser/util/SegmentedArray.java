@@ -229,7 +229,9 @@ public final class SegmentedArray<T,K> {
         // Value does not fit. We need to resize array
         
         final int newSize =
-                (this.maxSegmentSize < 0? (valuesArrayLen * 2) : Math.min((valuesArrayLen * 2), this.maxSegmentSize));
+                (this.maxSegmentSize < 0? 
+                        (valuesArrayLen + DEFAULT_SEGMENT_SIZE) : 
+                        Math.min((valuesArrayLen + DEFAULT_SEGMENT_SIZE), this.maxSegmentSize));
         final T[] newValues = (T[]) Array.newInstance(this.componentType, newSize);
         System.arraycopy(this.segments[index], 0, newValues, 0, valuesSize);
         newValues[valuesSize] = value;

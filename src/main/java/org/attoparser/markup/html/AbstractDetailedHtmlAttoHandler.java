@@ -21,7 +21,7 @@ package org.attoparser.markup.html;
 
 import org.attoparser.AttoParseException;
 import org.attoparser.markup.AbstractDetailedMarkupAttoHandler;
-import org.attoparser.markup.html.elements.DefaultHtmlElement;
+import org.attoparser.markup.html.elements.BasicHtmlElement;
 import org.attoparser.markup.html.elements.HtmlElements;
 import org.attoparser.markup.html.elements.IHtmlElement;
 
@@ -58,7 +58,7 @@ public abstract class AbstractDetailedHtmlAttoHandler
     private static IHtmlElement getElementByName(final char[] buffer, final int offset, final int len) {
         final IHtmlElement element = HtmlElements.lookFor(buffer, offset, len);
         if (element == null) {
-            return new DefaultHtmlElement(new String(buffer, offset, len));
+            return new BasicHtmlElement(new String(buffer, offset, len));
         }
         return element;
     }
@@ -91,7 +91,7 @@ public abstract class AbstractDetailedHtmlAttoHandler
         
         this.currentElement = getElementByName(buffer, offset, len);
         this.currentElement.handleStandaloneElementStartAndName(buffer, offset, len, line, col, this.stack, this);
-        
+
     }
 
     @Override
@@ -109,7 +109,7 @@ public abstract class AbstractDetailedHtmlAttoHandler
 
         this.currentElement.handleStandaloneElementEnd(buffer, offset, len, line, col, this.stack, this);
         this.currentElement = null;
-        
+
     }
 
 
@@ -138,7 +138,7 @@ public abstract class AbstractDetailedHtmlAttoHandler
         
         this.currentElement = getElementByName(buffer, offset, len);
         this.currentElement.handleOpenElementStartAndName(buffer, offset, len, line, col, this.stack, this);
-        
+
     }
 
     @Override
@@ -203,7 +203,7 @@ public abstract class AbstractDetailedHtmlAttoHandler
 
         this.currentElement.handleCloseElementEnd(buffer, offset, len, line, col, this.stack, this);
         this.currentElement = null;
-        
+
     }
 
     

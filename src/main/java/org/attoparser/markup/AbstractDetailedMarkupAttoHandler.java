@@ -875,7 +875,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 }
                 if (this.currentElementAttributeNamesSize == this.currentElementAttributeNames.length) {
                     // we need to grow the array!
-                    final char[][] newCurrentElementAttributeNames = new char[this.currentElementAttributeNames.length * 2][];
+                    final char[][] newCurrentElementAttributeNames = new char[this.currentElementAttributeNames.length + DEFAULT_ATTRIBUTE_NAMES_SIZE][];
                     System.arraycopy(this.currentElementAttributeNames, 0, newCurrentElementAttributeNames, 0, this.currentElementAttributeNames.length);
                     this.currentElementAttributeNames = newCurrentElementAttributeNames;
                 }
@@ -1234,7 +1234,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
         
         private void growStack() {
             
-            final int newStackSize = this.elementStack.length * 2;
+            final int newStackSize = this.elementStack.length + DEFAULT_STACK_SIZE;
             final char[][] newStack = new char[newStackSize][];
             System.arraycopy(this.elementStack, 0, newStack, 0, this.elementStack.length);
             this.elementStack = newStack;

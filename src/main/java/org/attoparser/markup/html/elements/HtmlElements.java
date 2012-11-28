@@ -47,135 +47,135 @@ public final class HtmlElements {
 
 
     // Root
-    public static final IHtmlElement HTML = new DefaultHtmlElement("html");
+    public static final IHtmlElement HTML = new BasicHtmlElement("html");
     
     // Document metadata
-    public static final IHtmlElement HEAD = new DefaultHtmlElement("head");
-    public static final IHtmlElement TITLE = new DefaultHtmlElement("title");
-    public static final IHtmlElement BASE = new DefaultHtmlElement("base");
-    public static final IHtmlElement LINK = new DefaultHtmlElement("link");
-    public static final IHtmlElement META = new DefaultHtmlElement("meta");
-    public static final IHtmlElement STYLE = new DefaultHtmlElement("style");
+    public static final IHtmlElement HEAD = new BasicHtmlElement("head");
+    public static final IHtmlElement TITLE = new BasicHtmlElement("title");
+    public static final IHtmlElement BASE = new BasicHtmlElement("base");
+    public static final IHtmlElement LINK = new BasicHtmlElement("link");
+    public static final IHtmlElement META = new BasicHtmlElement("meta");
+    public static final IHtmlElement STYLE = new BasicHtmlElement("style");
     
     // Scripting
-    public static final IHtmlElement SCRIPT = new DefaultHtmlElement("script");
-    public static final IHtmlElement NOSCRIPT = new DefaultHtmlElement("noscript");
+    public static final IHtmlElement SCRIPT = new BasicHtmlElement("script");
+    public static final IHtmlElement NOSCRIPT = new BasicHtmlElement("noscript");
     
     // Sections
-    public static final IHtmlElement BODY = new DefaultHtmlElement("body");
-    public static final IHtmlElement ARTICLE = new DefaultHtmlElement("article");
-    public static final IHtmlElement SECTION = new DefaultHtmlElement("section");
-    public static final IHtmlElement NAV = new DefaultHtmlElement("nav");
-    public static final IHtmlElement ASIDE = new DefaultHtmlElement("aside");
-    public static final IHtmlElement H1 = new DefaultHtmlElement("h1");
-    public static final IHtmlElement H2 = new DefaultHtmlElement("h2");
-    public static final IHtmlElement H3 = new DefaultHtmlElement("h3");
-    public static final IHtmlElement H4 = new DefaultHtmlElement("h4");
-    public static final IHtmlElement H5 = new DefaultHtmlElement("h5");
-    public static final IHtmlElement H6 = new DefaultHtmlElement("h6");
-    public static final IHtmlElement HGROUP = new DefaultHtmlElement("hgroup");
-    public static final IHtmlElement HEADER = new DefaultHtmlElement("header");
-    public static final IHtmlElement FOOTER = new DefaultHtmlElement("footer");
-    public static final IHtmlElement ADDRESS = new DefaultHtmlElement("address");
+    public static final IHtmlElement BODY = new BasicHtmlElement("body");
+    public static final IHtmlElement ARTICLE = new BasicHtmlElement("article");
+    public static final IHtmlElement SECTION = new BasicHtmlElement("section");
+    public static final IHtmlElement NAV = new BasicHtmlElement("nav");
+    public static final IHtmlElement ASIDE = new BasicHtmlElement("aside");
+    public static final IHtmlElement H1 = new BasicHtmlElement("h1");
+    public static final IHtmlElement H2 = new BasicHtmlElement("h2");
+    public static final IHtmlElement H3 = new BasicHtmlElement("h3");
+    public static final IHtmlElement H4 = new BasicHtmlElement("h4");
+    public static final IHtmlElement H5 = new BasicHtmlElement("h5");
+    public static final IHtmlElement H6 = new BasicHtmlElement("h6");
+    public static final IHtmlElement HGROUP = new BasicHtmlElement("hgroup");
+    public static final IHtmlElement HEADER = new BasicHtmlElement("header");
+    public static final IHtmlElement FOOTER = new BasicHtmlElement("footer");
+    public static final IHtmlElement ADDRESS = new BasicHtmlElement("address");
     
     // Grouping content
-    public static final IHtmlElement P = new DefaultHtmlElement("p");
-    public static final IHtmlElement HR = new DefaultHtmlElement("hr");
-    public static final IHtmlElement PRE = new DefaultHtmlElement("pre");
-    public static final IHtmlElement BLOCKQUOTE = new DefaultHtmlElement("blockquote");
-    public static final IHtmlElement OL = new DefaultHtmlElement("ol");
-    public static final IHtmlElement UL = new DefaultHtmlElement("ul");
-    public static final IHtmlElement LI = new DefaultHtmlElement("li");
-    public static final IHtmlElement DL = new DefaultHtmlElement("dl");
-    public static final IHtmlElement DT = new DefaultHtmlElement("dt");
-    public static final IHtmlElement DD = new DefaultHtmlElement("dd");
-    public static final IHtmlElement FIGURE = new DefaultHtmlElement("figure");
-    public static final IHtmlElement FIGCAPTION = new DefaultHtmlElement("figcaption");
-    public static final IHtmlElement DIV = new DefaultHtmlElement("div");
+    public static final IHtmlElement P = new BasicHtmlElement("p");
+    public static final IHtmlElement HR = new BasicHtmlElement("hr");
+    public static final IHtmlElement PRE = new BasicHtmlElement("pre");
+    public static final IHtmlElement BLOCKQUOTE = new BasicHtmlElement("blockquote");
+    public static final IHtmlElement OL = new BasicHtmlElement("ol");
+    public static final IHtmlElement UL = new BasicHtmlElement("ul");
+    public static final IHtmlElement LI = new BasicHtmlElement("li");
+    public static final IHtmlElement DL = new BasicHtmlElement("dl");
+    public static final IHtmlElement DT = new BasicHtmlElement("dt");
+    public static final IHtmlElement DD = new BasicHtmlElement("dd");
+    public static final IHtmlElement FIGURE = new BasicHtmlElement("figure");
+    public static final IHtmlElement FIGCAPTION = new BasicHtmlElement("figcaption");
+    public static final IHtmlElement DIV = new BasicHtmlElement("div");
     
     // Text-level semantics
-    public static final IHtmlElement A = new DefaultHtmlElement("a");
-    public static final IHtmlElement EM = new DefaultHtmlElement("em");
-    public static final IHtmlElement STRONG = new DefaultHtmlElement("strong");
-    public static final IHtmlElement SMALL = new DefaultHtmlElement("small");
-    public static final IHtmlElement S = new DefaultHtmlElement("s");
-    public static final IHtmlElement CITE = new DefaultHtmlElement("cite");
-    public static final IHtmlElement G = new DefaultHtmlElement("g");
-    public static final IHtmlElement DFN = new DefaultHtmlElement("dfn");
-    public static final IHtmlElement ABBR = new DefaultHtmlElement("abbr");
-    public static final IHtmlElement TIME = new DefaultHtmlElement("time");
-    public static final IHtmlElement CODE = new DefaultHtmlElement("code");
-    public static final IHtmlElement VAR = new DefaultHtmlElement("var");
-    public static final IHtmlElement SAMP = new DefaultHtmlElement("samp");
-    public static final IHtmlElement KBD = new DefaultHtmlElement("kbd");
-    public static final IHtmlElement SUB = new DefaultHtmlElement("sub");
-    public static final IHtmlElement SUP = new DefaultHtmlElement("sup");
-    public static final IHtmlElement I = new DefaultHtmlElement("i");
-    public static final IHtmlElement B = new DefaultHtmlElement("b");
-    public static final IHtmlElement U = new DefaultHtmlElement("u");
-    public static final IHtmlElement MARK = new DefaultHtmlElement("mark");
-    public static final IHtmlElement RUBY = new DefaultHtmlElement("ruby");
-    public static final IHtmlElement RT = new DefaultHtmlElement("rt");
-    public static final IHtmlElement RP = new DefaultHtmlElement("rp");
-    public static final IHtmlElement BDI = new DefaultHtmlElement("bdi");
-    public static final IHtmlElement BDO = new DefaultHtmlElement("bdo");
-    public static final IHtmlElement SPAN = new DefaultHtmlElement("span");
-    public static final IHtmlElement BR = new DefaultHtmlElement("br");
-    public static final IHtmlElement WBR = new DefaultHtmlElement("wbr");
+    public static final IHtmlElement A = new BasicHtmlElement("a");
+    public static final IHtmlElement EM = new BasicHtmlElement("em");
+    public static final IHtmlElement STRONG = new BasicHtmlElement("strong");
+    public static final IHtmlElement SMALL = new BasicHtmlElement("small");
+    public static final IHtmlElement S = new BasicHtmlElement("s");
+    public static final IHtmlElement CITE = new BasicHtmlElement("cite");
+    public static final IHtmlElement G = new BasicHtmlElement("g");
+    public static final IHtmlElement DFN = new BasicHtmlElement("dfn");
+    public static final IHtmlElement ABBR = new BasicHtmlElement("abbr");
+    public static final IHtmlElement TIME = new BasicHtmlElement("time");
+    public static final IHtmlElement CODE = new BasicHtmlElement("code");
+    public static final IHtmlElement VAR = new BasicHtmlElement("var");
+    public static final IHtmlElement SAMP = new BasicHtmlElement("samp");
+    public static final IHtmlElement KBD = new BasicHtmlElement("kbd");
+    public static final IHtmlElement SUB = new BasicHtmlElement("sub");
+    public static final IHtmlElement SUP = new BasicHtmlElement("sup");
+    public static final IHtmlElement I = new BasicHtmlElement("i");
+    public static final IHtmlElement B = new BasicHtmlElement("b");
+    public static final IHtmlElement U = new BasicHtmlElement("u");
+    public static final IHtmlElement MARK = new BasicHtmlElement("mark");
+    public static final IHtmlElement RUBY = new BasicHtmlElement("ruby");
+    public static final IHtmlElement RT = new BasicHtmlElement("rt");
+    public static final IHtmlElement RP = new BasicHtmlElement("rp");
+    public static final IHtmlElement BDI = new BasicHtmlElement("bdi");
+    public static final IHtmlElement BDO = new BasicHtmlElement("bdo");
+    public static final IHtmlElement SPAN = new BasicHtmlElement("span");
+    public static final IHtmlElement BR = new BasicHtmlElement("br");
+    public static final IHtmlElement WBR = new BasicHtmlElement("wbr");
     
     // Edits
-    public static final IHtmlElement INS = new DefaultHtmlElement("ins");
-    public static final IHtmlElement DEL = new DefaultHtmlElement("del");
+    public static final IHtmlElement INS = new BasicHtmlElement("ins");
+    public static final IHtmlElement DEL = new BasicHtmlElement("del");
     
     // Embedded content
-    public static final IHtmlElement IMG = new DefaultHtmlElement("img");
-    public static final IHtmlElement IFRAME = new DefaultHtmlElement("iframe");
-    public static final IHtmlElement EMBED = new DefaultHtmlElement("embed");
-    public static final IHtmlElement OBJECT = new DefaultHtmlElement("object");
-    public static final IHtmlElement PARAM = new DefaultHtmlElement("param");
-    public static final IHtmlElement VIDEO = new DefaultHtmlElement("video");
-    public static final IHtmlElement AUDIO = new DefaultHtmlElement("audio");
-    public static final IHtmlElement SOURCE = new DefaultHtmlElement("source");
-    public static final IHtmlElement TRACK = new DefaultHtmlElement("track");
-    public static final IHtmlElement CANVAS = new DefaultHtmlElement("canvas");
-    public static final IHtmlElement MAP = new DefaultHtmlElement("map");
-    public static final IHtmlElement AREA = new DefaultHtmlElement("area");
+    public static final IHtmlElement IMG = new BasicHtmlElement("img");
+    public static final IHtmlElement IFRAME = new BasicHtmlElement("iframe");
+    public static final IHtmlElement EMBED = new BasicHtmlElement("embed");
+    public static final IHtmlElement OBJECT = new BasicHtmlElement("object");
+    public static final IHtmlElement PARAM = new BasicHtmlElement("param");
+    public static final IHtmlElement VIDEO = new BasicHtmlElement("video");
+    public static final IHtmlElement AUDIO = new BasicHtmlElement("audio");
+    public static final IHtmlElement SOURCE = new BasicHtmlElement("source");
+    public static final IHtmlElement TRACK = new BasicHtmlElement("track");
+    public static final IHtmlElement CANVAS = new BasicHtmlElement("canvas");
+    public static final IHtmlElement MAP = new BasicHtmlElement("map");
+    public static final IHtmlElement AREA = new BasicHtmlElement("area");
     
     // Tabular data
-    public static final IHtmlElement TABLE = new DefaultHtmlElement("table");
-    public static final IHtmlElement CAPTION = new DefaultHtmlElement("caption");
-    public static final IHtmlElement COLGROUP = new DefaultHtmlElement("colgroup");
-    public static final IHtmlElement COL = new DefaultHtmlElement("col");
-    public static final IHtmlElement TBODY = new DefaultHtmlElement("tbody");
-    public static final IHtmlElement THEAD = new DefaultHtmlElement("thead");
-    public static final IHtmlElement TFOOT = new DefaultHtmlElement("tfoot");
-    public static final IHtmlElement TR = new DefaultHtmlElement("tr");
-    public static final IHtmlElement TD = new DefaultHtmlElement("td");
-    public static final IHtmlElement TH = new DefaultHtmlElement("th");
+    public static final IHtmlElement TABLE = new BasicHtmlElement("table");
+    public static final IHtmlElement CAPTION = new BasicHtmlElement("caption");
+    public static final IHtmlElement COLGROUP = new BasicHtmlElement("colgroup");
+    public static final IHtmlElement COL = new BasicHtmlElement("col");
+    public static final IHtmlElement TBODY = new BasicHtmlElement("tbody");
+    public static final IHtmlElement THEAD = new BasicHtmlElement("thead");
+    public static final IHtmlElement TFOOT = new BasicHtmlElement("tfoot");
+    public static final IHtmlElement TR = new BasicHtmlElement("tr");
+    public static final IHtmlElement TD = new BasicHtmlElement("td");
+    public static final IHtmlElement TH = new BasicHtmlElement("th");
     
     // Forms
-    public static final IHtmlElement FORM = new DefaultHtmlElement("form");
-    public static final IHtmlElement FIELDSET = new DefaultHtmlElement("fieldset");
-    public static final IHtmlElement LEGEND = new DefaultHtmlElement("legend");
-    public static final IHtmlElement LABEL = new DefaultHtmlElement("label");
-    public static final IHtmlElement INPUT = new DefaultHtmlElement("input");
-    public static final IHtmlElement BUTTON = new DefaultHtmlElement("button");
-    public static final IHtmlElement SELECT = new DefaultHtmlElement("select");
-    public static final IHtmlElement DATALIST = new DefaultHtmlElement("datalist");
-    public static final IHtmlElement OPTGROUP = new DefaultHtmlElement("optgroup");
-    public static final IHtmlElement OPTION = new DefaultHtmlElement("option");
-    public static final IHtmlElement TEXTAREA = new DefaultHtmlElement("textarea");
-    public static final IHtmlElement KEYGEN = new DefaultHtmlElement("keygen");
-    public static final IHtmlElement OUTPUT = new DefaultHtmlElement("output");
-    public static final IHtmlElement PROGRESS = new DefaultHtmlElement("progress");
-    public static final IHtmlElement METER = new DefaultHtmlElement("meter");
+    public static final IHtmlElement FORM = new BasicHtmlElement("form");
+    public static final IHtmlElement FIELDSET = new BasicHtmlElement("fieldset");
+    public static final IHtmlElement LEGEND = new BasicHtmlElement("legend");
+    public static final IHtmlElement LABEL = new BasicHtmlElement("label");
+    public static final IHtmlElement INPUT = new BasicHtmlElement("input");
+    public static final IHtmlElement BUTTON = new BasicHtmlElement("button");
+    public static final IHtmlElement SELECT = new BasicHtmlElement("select");
+    public static final IHtmlElement DATALIST = new BasicHtmlElement("datalist");
+    public static final IHtmlElement OPTGROUP = new BasicHtmlElement("optgroup");
+    public static final IHtmlElement OPTION = new BasicHtmlElement("option");
+    public static final IHtmlElement TEXTAREA = new BasicHtmlElement("textarea");
+    public static final IHtmlElement KEYGEN = new BasicHtmlElement("keygen");
+    public static final IHtmlElement OUTPUT = new BasicHtmlElement("output");
+    public static final IHtmlElement PROGRESS = new BasicHtmlElement("progress");
+    public static final IHtmlElement METER = new BasicHtmlElement("meter");
     
     // Interactive elements
-    public static final IHtmlElement DETAILS = new DefaultHtmlElement("details");
-    public static final IHtmlElement SUMMARY = new DefaultHtmlElement("summary");
-    public static final IHtmlElement COMMAND = new DefaultHtmlElement("command");
-    public static final IHtmlElement MENU = new DefaultHtmlElement("menu");
-    public static final IHtmlElement DIALOG = new DefaultHtmlElement("dialog");
+    public static final IHtmlElement DETAILS = new BasicHtmlElement("details");
+    public static final IHtmlElement SUMMARY = new BasicHtmlElement("summary");
+    public static final IHtmlElement COMMAND = new BasicHtmlElement("command");
+    public static final IHtmlElement MENU = new BasicHtmlElement("menu");
+    public static final IHtmlElement DIALOG = new BasicHtmlElement("dialog");
     
     
     
