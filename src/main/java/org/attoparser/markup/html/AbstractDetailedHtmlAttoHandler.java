@@ -21,6 +21,7 @@ package org.attoparser.markup.html;
 
 import org.attoparser.AttoParseException;
 import org.attoparser.markup.AbstractDetailedMarkupAttoHandler;
+import org.attoparser.markup.MarkupParsingConfiguration;
 import org.attoparser.markup.html.elements.BasicHtmlElement;
 import org.attoparser.markup.html.elements.HtmlElements;
 import org.attoparser.markup.html.elements.IHtmlElement;
@@ -41,7 +42,8 @@ public abstract class AbstractDetailedHtmlAttoHandler
         implements IDetailedHtmlElementHandling {
 
 
-    
+
+    private final HtmlParsingConfiguration configuration;
     private final HtmlElementStack stack;
     private IHtmlElement currentElement = null;
 
@@ -50,6 +52,7 @@ public abstract class AbstractDetailedHtmlAttoHandler
     protected AbstractDetailedHtmlAttoHandler(final HtmlParsingConfiguration configuration) {
         super(HtmlParsing.markupParsingConfiguration(configuration));
         this.stack = new HtmlElementStack();
+        this.configuration = configuration;
     }
 
     
@@ -61,6 +64,31 @@ public abstract class AbstractDetailedHtmlAttoHandler
             return new BasicHtmlElement(new String(buffer, offset, len));
         }
         return element;
+    }
+    
+    
+    
+    
+
+    
+    
+    
+    @Override
+    public final void handleDocumentStart(final long startTimeNanos, 
+            final int line, final int col,
+            final MarkupParsingConfiguration markupParsingConfiguration)
+            throws AttoParseException {
+        handleDocumentStart(startTimeNanos, line, col, this.configuration);
+    }
+
+    
+    
+    @Override
+    public final void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, 
+            final int line, final int col, 
+            final MarkupParsingConfiguration markupParsingConfiguration)
+            throws AttoParseException {
+        handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col, this.configuration);
     }
     
     
@@ -353,6 +381,36 @@ public abstract class AbstractDetailedHtmlAttoHandler
 
     
     
+    
+    
+    
+    /*
+     * *********************
+     * *                   *
+     * * DOCUMENT HANDLING *
+     * *                   *
+     * *********************
+     */
+
+
+    @SuppressWarnings("unused")
+    public void handleDocumentStart(
+            final long startTimeNanos, 
+            final int line, final int col,
+            final HtmlParsingConfiguration configuration)
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
+    }
+
+    
+    @SuppressWarnings("unused")
+    public void handleDocumentEnd(
+            final long endTimeNanos, final long totalTimeNanos, 
+            final int line, final int col, 
+            final HtmlParsingConfiguration configuration)
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
+    }
     
 
     
