@@ -17,7 +17,7 @@
  * 
  * =============================================================================
  */
-package org.attoparser.markup;
+package org.attoparser.markup.html;
 
 import org.attoparser.AttoParseException;
 
@@ -25,15 +25,15 @@ import org.attoparser.AttoParseException;
 /**
  * <p>
  *   Handler feature interface to be implemented by {@link org.attoparser.IAttoHandler} implementations
- *   that offer detailed reporting of markup attributes.
+ *   that offer detailed reporting of HTML attributes.
  * </p>
  * 
  * @author Daniel Fern&aacute;ndez
  * 
- * @since 1.0
+ * @since 1.1
  *
  */
-public interface IAttributeSequenceHandling {
+public interface IHtmlAttributeSequenceHandling {
 
     
     
@@ -78,7 +78,7 @@ public interface IAttributeSequenceHandling {
      * @param valueCol the column in the original document where the <i>value</i> (outer) partition starts.
      * @throws AttoParseException
      */
-    public void handleAttribute(
+    public void handleHtmlAttribute(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol,
@@ -119,7 +119,7 @@ public interface IAttributeSequenceHandling {
      * @param col the column in the original document where the artifact starts.
      * @throws AttoParseException
      */
-    public void handleAttributeSeparator(
+    public void handleHtmlAttributeSeparator(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)

@@ -39,24 +39,137 @@ import org.attoparser.markup.html.HtmlParsingConfiguration;
  * @since 1.1
  *
  */
-public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHandler {
+public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler {
 
+    private static final String OPEN_TAG_START = "&lt;";
+    private static final String OPEN_TAG_END = "&gt;";
+    private static final String CLOSE_TAG_START = "&lt;/";
+    private static final String CLOSE_TAG_END = "&gt;";
+    private static final String MINIMIZED_TAG_END = "/&gt;";
+    
+    
+    private static final String STYLES = "\n" +
+            "body {\n" +
+            "    font-family: Courier, 'Courier New', monospace;\n" +
+            "    font-size: 12px;\n" +
+            "}\n" +
+            ".attr-name {\n" +
+            "    font-weight: normal;\n" + 
+            "    color: red;\n" + 
+            "}\n" +
+            ".attr-value {\n" +
+            "    font-weight: normal;\n" + 
+            "    color: blue;\n" + 
+            "}\n" +
+            ".closed-standalone {\n" +
+            "    font-weight: bold;\n" + 
+            "    color: black;\n" + 
+            "}\n" +
+            ".unclosed-standalone {\n" +
+            "    font-weight: bold;\n" + 
+            "    color: black;\n" + 
+            "    background: wheat;\n" + 
+            "}\n" +
+            ".open, .close {\n" +
+            "    font-weight: bold;\n" + 
+            "    color: black;\n" + 
+            "}\n" +
+            ".forced-close {\n" +
+            "    font-weight: bold;\n" + 
+            "    color: ghostwhite;\n" + 
+            "    background: orangered;\n" + 
+            "}\n" +
+            ".unmatched-close {\n" +
+            "    font-weight: bold;\n" + 
+            "    color: ghostwhite;\n" + 
+            "    background: indigo;\n" + 
+            "}\n" +
+            ".doctype {\n" +
+            "    font-weight: bold;\n" + 
+            "    font-style: italics;\n" + 
+            "    color: #888;\n" + 
+            "}\n" +
+            ".comment {\n" +
+            "    font-style: italic;\n" + 
+            "    color: black;\n" + 
+            "    background: palegreen;\n" + 
+            "}\n" +
+            ".xml-declaration {\n" +
+            "    font-weight: bold;\n" + 
+            "    color: olivedrab;\n" + 
+            "}\n" +
+            ".processing-instruction {\n" +
+            "    color: white;\n" + 
+            "    background: black;\n" + 
+            "}\n" +
+            ".text {\n" +
+            "    color: #444;\n" + 
+            "    background: white;\n" + 
+            "}\n" +
+            "\n";
+    
+    
+    private static final String STYLE_DOCTYPE = "doctype";
+    private static final String STYLE_COMMENT = "comment";
+    private static final String STYLE_CDATA = "cdata";
+    private static final String STYLE_XML_DECLARATION = "xml-declaration";
+    private static final String STYLE_PROCESSING_INSTRUCTION = "processing-instruction";
+    private static final String STYLE_CLOSED_STANDALONE = "closed-standalone";
+    private static final String STYLE_UNCLOSED_STANDALONE = "unclosed-standalone";
+    private static final String STYLE_OPEN = "open";
+    private static final String STYLE_CLOSE = "close";
+    private static final String STYLE_FORCED_CLOSE = "forced-close";
+    private static final String STYLE_UNMATCHED_CLOSE = "unmatched-close";
+    private static final String STYLE_ATTR_NAME = "attr-name";
+    private static final String STYLE_ATTR_VALUE = "attr-value";
+    private static final String STYLE_TEXT = "text";
+    
+    private static final String TAG_FORMAT_START = "<span class=\"%1$s\">";
+    private static final String TAG_FORMAT_END = "</span>";
     
     private final Writer writer;
     
     
-    public TracingDetailedHtmlAttoHandler(final Writer writer) {
+    public HtmlCodeDisplayAttoHandler(final Writer writer) {
         super(new HtmlParsingConfiguration());
         this.writer = writer;
     }
 
     
-    public TracingDetailedHtmlAttoHandler(final Writer writer, final HtmlParsingConfiguration configuration) {
+    public HtmlCodeDisplayAttoHandler(final Writer writer, final HtmlParsingConfiguration configuration) {
         super(configuration);
         this.writer = writer;
     }
     
     
+    
+    
+    private void writeEscaped(final char[] buffer, final int offset, final int len) throws IOException {
+        
+
+        final int maxi = offset + len;
+        for (int i = offset; i < maxi; i++) {
+            final char c = buffer[i];
+            if (c == '\n') {
+                this.writer.write("<br />");
+            } else if (c == ' ') {
+                this.writer.write("&nbsp;");
+            } else {
+                this.writer.write(c);
+            }
+        }
+
+    }
+    
+    
+    
+    private void openStyle(final String style) throws IOException {
+        this.writer.write(String.format(TAG_FORMAT_START, style));
+    }
+    
+    private void closeStyle() throws IOException {
+        this.writer.write(TAG_FORMAT_END);
+    }
     
     
     
@@ -66,11 +179,16 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
             final int line, final int col,
             final HtmlParsingConfiguration configuration)
             throws AttoParseException {
+        
         try {
-            this.writer.write('[');
+            
+            this.writer.write("<!DOCTYPE html>\n");
+            this.writer.write("<html>\n<head>\n<style>\n" + STYLES + "\n</style>\n</head>\n<body>");
+            
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
+        
     }
 
     
@@ -80,11 +198,15 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
             final int line, final int col, 
             final HtmlParsingConfiguration configuration)
             throws AttoParseException {
+        
         try {
-            this.writer.write(']');
+            
+            this.writer.write("</body></html>");
+            
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
+        
     }
     
     
@@ -99,14 +221,8 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         
         try {
             
-            this.writer.write('C');
-            this.writer.write('S');
-            this.writer.write('E');
-            this.writer.write('S');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
+            openStyle(STYLE_CLOSED_STANDALONE);
+            this.writer.write(OPEN_TAG_START);
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -124,14 +240,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         
         try {
             
-            this.writer.write('C');
-            this.writer.write('S');
-            this.writer.write('E');
-            this.writer.write('N');
-            this.writer.write('(');
             this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -149,14 +258,8 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         
         try {
             
-            this.writer.write('C');
-            this.writer.write('S');
-            this.writer.write('E');
-            this.writer.write('E');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
+            this.writer.write(MINIMIZED_TAG_END);
+            closeStyle();
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -176,14 +279,8 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         
         try {
             
-            this.writer.write('U');
-            this.writer.write('S');
-            this.writer.write('E');
-            this.writer.write('S');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
+            openStyle(STYLE_UNCLOSED_STANDALONE);
+            this.writer.write(OPEN_TAG_START);
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -201,14 +298,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         
         try {
             
-            this.writer.write('U');
-            this.writer.write('S');
-            this.writer.write('E');
-            this.writer.write('N');
-            this.writer.write('(');
             this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -226,14 +316,8 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         
         try {
             
-            this.writer.write('U');
-            this.writer.write('S');
-            this.writer.write('E');
-            this.writer.write('S');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
+            this.writer.write(OPEN_TAG_END);
+            closeStyle();
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -252,13 +336,8 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         
         try {
             
-            this.writer.write('O');
-            this.writer.write('E');
-            this.writer.write('S');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
+            openStyle(STYLE_OPEN);
+            this.writer.write(OPEN_TAG_START);
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -276,13 +355,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         
         try {
             
-            this.writer.write('O');
-            this.writer.write('E');
-            this.writer.write('N');
-            this.writer.write('(');
             this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -300,13 +373,8 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         
         try {
             
-            this.writer.write('O');
-            this.writer.write('E');
-            this.writer.write('E');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
+            this.writer.write(OPEN_TAG_END);
+            closeStyle();
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -326,13 +394,8 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         
         try {
             
-            this.writer.write('C');
-            this.writer.write('E');
-            this.writer.write('S');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
+            openStyle(STYLE_CLOSE);
+            this.writer.write(CLOSE_TAG_START);
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -350,13 +413,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         
         try {
             
-            this.writer.write('C');
-            this.writer.write('E');
-            this.writer.write('N');
-            this.writer.write('(');
             this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -374,13 +431,8 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         
         try {
             
-            this.writer.write('C');
-            this.writer.write('E');
-            this.writer.write('E');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
+            this.writer.write(CLOSE_TAG_END);
+            closeStyle();
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -400,14 +452,8 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         
         try {
             
-            this.writer.write('F');
-            this.writer.write('C');
-            this.writer.write('E');
-            this.writer.write('S');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
+            openStyle(STYLE_FORCED_CLOSE);
+            this.writer.write(CLOSE_TAG_START);
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -425,14 +471,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         
         try {
             
-            this.writer.write('F');
-            this.writer.write('C');
-            this.writer.write('E');
-            this.writer.write('N');
-            this.writer.write('(');
             this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -450,14 +489,8 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         
         try {
             
-            this.writer.write('F');
-            this.writer.write('C');
-            this.writer.write('E');
-            this.writer.write('E');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
+            this.writer.write(CLOSE_TAG_END);
+            closeStyle();
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -477,14 +510,8 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         
         try {
             
-            this.writer.write('U');
-            this.writer.write('C');
-            this.writer.write('E');
-            this.writer.write('S');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
+            openStyle(STYLE_UNMATCHED_CLOSE);
+            this.writer.write(CLOSE_TAG_START);
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -502,14 +529,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         
         try {
             
-            this.writer.write('U');
-            this.writer.write('C');
-            this.writer.write('E');
-            this.writer.write('N');
-            this.writer.write('(');
             this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -527,14 +547,8 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         
         try {
             
-            this.writer.write('F');
-            this.writer.write('C');
-            this.writer.write('E');
-            this.writer.write('E');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
+            this.writer.write(CLOSE_TAG_END);
+            closeStyle();
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -559,19 +573,15 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         
         try {
             
-            this.writer.write('A');
-            this.writer.write('(');
+            openStyle(STYLE_ATTR_NAME);
             this.writer.write(buffer, nameOffset, nameLen);
-            this.writer.write(')');
-            writePosition(this.writer, nameLine, nameCol);
-            this.writer.write('(');
+            closeStyle();
+            
             this.writer.write(buffer, operatorOffset, operatorLen);
-            this.writer.write(')');
-            writePosition(this.writer, operatorLine, operatorCol);
-            this.writer.write('(');
+            
+            openStyle(STYLE_ATTR_VALUE);
             this.writer.write(buffer, valueOuterOffset, valueOuterLen);
-            this.writer.write(')');
-            writePosition(this.writer, valueLine, valueCol);
+            closeStyle();
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -589,12 +599,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         
         try {
             
-            this.writer.write('A');
-            this.writer.write('S');
-            this.writer.write('(');
             this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -614,11 +619,9 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         
         try {
             
-            this.writer.write('T');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
+            openStyle(STYLE_TEXT);
+            writeEscaped(buffer, offset, len);
+            closeStyle();
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -637,12 +640,12 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
             throws AttoParseException {
         
         try {
-            
-            this.writer.write('C');
-            this.writer.write('(');
+
+            openStyle(STYLE_COMMENT);
+            this.writer.write("&lt;!--");
             this.writer.write(buffer, contentOffset, contentLen);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
+            this.writer.write("--&gt;");
+            closeStyle();
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -661,11 +664,11 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         
         try {
             
-            this.writer.write('D');
-            this.writer.write('(');
+            openStyle(STYLE_CDATA);
+            this.writer.write("&lt;![CDATA[");
             this.writer.write(buffer, contentOffset, contentLen);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
+            this.writer.write("]]&gt;");
+            closeStyle();
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -692,28 +695,61 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
             throws AttoParseException {
         
         try {
+
+            final int outerContentEnd = (outerOffset  + outerLen) - 2;
             
-            this.writer.write("X");
-            this.writer.write('(');
-            this.writer.write(buffer, versionOffset, versionLen);
-            this.writer.write(')');
-            writePosition(this.writer, versionLine, versionCol);
-            this.writer.write('(');
-            if (encodingOffset != 0) {
-                this.writer.write(buffer, encodingOffset, encodingLen);
-            } else {
-                this.writer.write("null");
+            openStyle(STYLE_XML_DECLARATION);
+            this.writer.write("&lt;");
+            this.writer.write('?');
+            this.writer.write(buffer, keywordOffset, keywordLen);
+
+            /*
+             * VERSION (required) 
+             */
+            int lastStructureEnd = keywordOffset + keywordLen;
+            int thisStructureOffset = versionOffset;
+            int thisStructureLen = versionLen;
+            int thisStructureEnd = thisStructureOffset + thisStructureLen;
+            
+            this.writer.write(buffer, lastStructureEnd, thisStructureOffset - lastStructureEnd);
+            this.writer.write(buffer, thisStructureOffset, thisStructureLen);
+
+            /*
+             * ENCODING (optional)
+             */
+            if (encodingLen > 0)  {
+                
+                lastStructureEnd = thisStructureEnd;
+                thisStructureOffset = encodingOffset;
+                thisStructureLen = encodingLen;
+                thisStructureEnd = thisStructureOffset + thisStructureLen;
+            
+                this.writer.write(buffer, lastStructureEnd, thisStructureOffset - lastStructureEnd);
+                this.writer.write(buffer, thisStructureOffset, thisStructureLen);
+
             }
-            this.writer.write(')');
-            writePosition(this.writer, encodingLine, encodingCol);
-            this.writer.write('(');
-            if (standaloneOffset != 0) {
-                this.writer.write(buffer, standaloneOffset, standaloneLen);
-            } else {
-                this.writer.write("null");
+
+            /*
+             * STANDALONE (optional)
+             */
+            
+            if (standaloneLen > 0) {
+                
+                lastStructureEnd = thisStructureEnd;
+                thisStructureOffset = standaloneOffset;
+                thisStructureLen = standaloneLen;
+                thisStructureEnd = thisStructureOffset + thisStructureLen;
+            
+                this.writer.write(buffer, lastStructureEnd, thisStructureOffset - lastStructureEnd);
+                this.writer.write(buffer, thisStructureOffset, thisStructureLen);
+                
             }
-            this.writer.write(')');
-            writePosition(this.writer, standaloneLine, standaloneCol);
+            
+            this.writer.write(buffer, thisStructureEnd, (outerContentEnd - thisStructureEnd));
+            
+            this.writer.write('?');
+            this.writer.write("&gt;");
+            closeStyle();
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -746,32 +782,11 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         
         try {
             
-            this.writer.write('D');
-            this.writer.write('T');
-            this.writer.write('(');
-            this.writer.write(buffer, keywordOffset, keywordLen);
-            this.writer.write(')');
-            writePosition(this.writer, keywordLine, keywordCol);
-            this.writer.write('(');
-            this.writer.write(buffer, elementNameOffset, elementNameLen);
-            this.writer.write(')');
-            writePosition(this.writer, elementNameLine, elementNameCol);
-            this.writer.write('(');
-            this.writer.write(buffer, typeOffset, typeLen);
-            this.writer.write(')');
-            writePosition(this.writer, typeLine, typeCol);
-            this.writer.write('(');
-            this.writer.write(buffer, publicIdOffset, publicIdLen);
-            this.writer.write(')');
-            writePosition(this.writer, publicIdLine, publicIdCol);
-            this.writer.write('(');
-            this.writer.write(buffer, systemIdOffset, systemIdLen);
-            this.writer.write(')');
-            writePosition(this.writer, systemIdLine, systemIdCol);
-            this.writer.write('(');
-            this.writer.write(buffer, internalSubsetOffset, internalSubsetLen);
-            this.writer.write(')');
-            writePosition(this.writer, internalSubsetLine, internalSubsetCol);
+            openStyle(STYLE_DOCTYPE);
+            this.writer.write("&lt;");
+            this.writer.write(buffer, outerOffset + 1, outerLen - 2);
+            this.writer.write("&gt;");
+            closeStyle();
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -795,20 +810,20 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
             throws AttoParseException {
         
         try {
-            
-            this.writer.write("P");
-            this.writer.write('(');
+
+            openStyle(STYLE_PROCESSING_INSTRUCTION);
+            this.writer.write("&lt;");
+            this.writer.write('?');
             this.writer.write(buffer, targetOffset, targetLen);
-            this.writer.write(')');
-            writePosition(this.writer, targetLine, targetCol);
-            this.writer.write('(');
-            if (contentOffset != 0) {
+            if (contentLen > 0)  {
+                this.writer.write(buffer, (targetOffset + targetLen), contentOffset - (targetOffset + targetLen));
                 this.writer.write(buffer, contentOffset, contentLen);
             } else {
-                this.writer.write("null");
+                this.writer.write(buffer, (targetOffset + targetLen), ((outerOffset  + outerLen) - 2) - (targetOffset + targetLen));
             }
-            this.writer.write(')');
-            writePosition(this.writer, contentLine, contentCol);
+            this.writer.write('?');
+            this.writer.write("&gt;");
+            closeStyle();
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -819,23 +834,6 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
     
     
     
-    
-    
-    
-    
-    
-    
-    private static void writePosition(final Writer writer, final int line, final int col) throws IOException {
-        writer.write('{');
-        writer.write(String.valueOf(line));
-        writer.write(',');
-        writer.write(String.valueOf(col));
-        writer.write('}');
-    }
-
-
-
-
     
     
 }

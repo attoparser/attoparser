@@ -20,7 +20,6 @@
 package org.attoparser.markup.html;
 
 import org.attoparser.AttoParseException;
-import org.attoparser.markup.IAttributeSequenceHandling;
 
 
 /**
@@ -30,7 +29,7 @@ import org.attoparser.markup.IAttributeSequenceHandling;
  * @since 1.1
  *
  */
-public interface IDetailedHtmlElementHandling extends IAttributeSequenceHandling {
+public interface IDetailedHtmlElementHandling extends IHtmlAttributeSequenceHandling {
 
     
 

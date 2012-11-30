@@ -397,7 +397,7 @@ public abstract class AbstractDetailedHtmlAttoHandler
     public void handleDocumentStart(
             final long startTimeNanos, 
             final int line, final int col,
-            final HtmlParsingConfiguration configuration)
+            final HtmlParsingConfiguration parsingConfiguration)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
@@ -407,7 +407,7 @@ public abstract class AbstractDetailedHtmlAttoHandler
     public void handleDocumentEnd(
             final long endTimeNanos, final long totalTimeNanos, 
             final int line, final int col, 
-            final HtmlParsingConfiguration configuration)
+            final HtmlParsingConfiguration parsingConfiguration)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
@@ -604,6 +604,33 @@ public abstract class AbstractDetailedHtmlAttoHandler
     }
 
     public void handleHtmlUnmatchedCloseElementEnd(
+            final char[] buffer, 
+            final int offset, final int len, 
+            final int line, final int col) 
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
+    }
+
+
+
+
+    public void handleHtmlAttribute(
+            final char[] buffer, 
+            final int nameOffset, final int nameLen,
+            final int nameLine, final int nameCol, 
+            final int operatorOffset, final int operatorLen,
+            final int operatorLine, final int operatorCol, 
+            final int valueContentOffset, final int valueContentLen, 
+            final int valueOuterOffset, final int valueOuterLen,
+            final int valueLine, final int valueCol)
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
+    }
+
+
+
+
+    public void handleHtmlAttributeSeparator(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col) 

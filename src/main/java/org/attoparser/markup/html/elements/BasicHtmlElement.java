@@ -94,8 +94,8 @@ public class BasicHtmlElement extends AbstractHtmlElement {
         
         stack.openElement(this);
         
-        handler.handleHtmlClosedStandaloneElementStart(OPEN_ELEMENT_START, 0, OPEN_ELEMENT_START.length, line, col - 1);
-        handler.handleHtmlClosedStandaloneElementName(buffer, offset, len, line, col);
+        handler.handleHtmlOpenElementStart(OPEN_ELEMENT_START, 0, OPEN_ELEMENT_START.length, line, col - 1);
+        handler.handleHtmlOpenElementName(buffer, offset, len, line, col);
 
     }
 
@@ -107,7 +107,7 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException {
         
-        handler.handleHtmlClosedStandaloneElementEnd(OPEN_ELEMENT_END, 0, OPEN_ELEMENT_END.length, line, col);
+        handler.handleHtmlOpenElementEnd(OPEN_ELEMENT_END, 0, OPEN_ELEMENT_END.length, line, col);
         
     }
 
@@ -121,8 +121,8 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException {
         
-        handler.handleHtmlClosedStandaloneElementStart(CLOSE_ELEMENT_START, 0, CLOSE_ELEMENT_START.length, line, col - 2);
-        handler.handleHtmlClosedStandaloneElementName(buffer, offset, len, line, col);
+        handler.handleHtmlCloseElementStart(CLOSE_ELEMENT_START, 0, CLOSE_ELEMENT_START.length, line, col - 2);
+        handler.handleHtmlCloseElementName(buffer, offset, len, line, col);
 
     }
 
@@ -134,7 +134,7 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException {
         
-        handler.handleHtmlClosedStandaloneElementEnd(CLOSE_ELEMENT_END, 0, CLOSE_ELEMENT_END.length, line, col);
+        handler.handleHtmlCloseElementEnd(CLOSE_ELEMENT_END, 0, CLOSE_ELEMENT_END.length, line, col);
 
         stack.closeElement();
         
@@ -213,7 +213,7 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             throws AttoParseException {
         
         // Stack should not be affected by this, simply delegate the event
-        handler.handleAttribute(buffer, nameOffset, nameLen, nameLine, nameCol, operatorOffset, operatorLen, operatorLine, operatorCol, valueContentOffset, valueContentLen, valueOuterOffset, valueOuterLen, valueLine, valueCol);
+        handler.handleHtmlAttribute(buffer, nameOffset, nameLen, nameLine, nameCol, operatorOffset, operatorLen, operatorLine, operatorCol, valueContentOffset, valueContentLen, valueOuterOffset, valueOuterLen, valueLine, valueCol);
         
     }
 
@@ -226,7 +226,7 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             throws AttoParseException {
         
         // Stack should not be affected by this, simply delegate the event
-        handler.handleAttributeSeparator(buffer, offset, len, line, col);
+        handler.handleHtmlAttributeSeparator(buffer, offset, len, line, col);
         
     }
     
