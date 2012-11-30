@@ -1101,7 +1101,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
         private boolean checkStackForElement(
                 final char[] buffer, final int offset, final int len, final int line, final int col) 
                 throws AttoParseException {
-            
+
+            final int initialStackSize = this.elementStackSize;
             char[] popped = popFromStack();
 
             while (popped != null) {
@@ -1127,6 +1128,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
                     // We found the corresponding opening element, so
                     // we return true (meaning the close element has a matching
                     // open element).
+                    commitPopFromStack(initialStackSize);
                     return true;
                 }
                 
@@ -1158,6 +1160,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
             }
 
             // Return false because the close element has no matching open element
+            rollbackPopFromStack(initialStackSize);
             return false;
             
         }
@@ -1217,18 +1220,21 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
         
         private char[] popFromStack() {
-            
             if (this.elementStackSize == 0) {
                 return null;
             }
-            
             this.elementStackSize--;
-            
-            final char[] popped = this.elementStack[this.elementStackSize];
-            this.elementStack[this.elementStackSize] = null;
-
-            return popped;
-            
+            return this.elementStack[this.elementStackSize];
+        }
+        
+        private void commitPopFromStack(final int initialSize) {
+            for (int i = this.elementStackSize; i < initialSize; i++) {
+                this.elementStack[i] = null;
+            }
+        }
+        
+        private void rollbackPopFromStack(final int initialSize) {
+            this.elementStackSize = initialSize;
         }
         
         
