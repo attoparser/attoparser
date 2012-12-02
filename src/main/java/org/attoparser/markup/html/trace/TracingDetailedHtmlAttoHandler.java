@@ -91,15 +91,16 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
 
     
     @Override
-    public void handleHtmlClosedStandaloneElementStart(
+    public void handleHtmlStandaloneElementStart(
             final char[] buffer,
             final int offset, final int len, 
-            final int line, final int col) 
+            final int line, final int col,
+            final boolean minimized) 
             throws AttoParseException {
         
         try {
             
-            this.writer.write('C');
+            this.writer.write((minimized? 'C' : 'U'));  // Closed vs. Unclosed
             this.writer.write('S');
             this.writer.write('E');
             this.writer.write('S');
@@ -116,15 +117,16 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
 
     
     @Override
-    public void handleHtmlClosedStandaloneElementName(
+    public void handleHtmlStandaloneElementName(
             final char[] buffer,
             final int offset, final int len, 
-            final int line, final int col)
+            final int line, final int col,
+            final boolean minimized)
             throws AttoParseException {
         
         try {
             
-            this.writer.write('C');
+            this.writer.write((minimized? 'C' : 'U'));  // Closed vs. Unclosed
             this.writer.write('S');
             this.writer.write('E');
             this.writer.write('N');
@@ -141,95 +143,19 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
 
     
     @Override
-    public void handleHtmlClosedStandaloneElementEnd(
+    public void handleHtmlStandaloneElementEnd(
             final char[] buffer, 
             final int offset, final int len, 
-            final int line, final int col)
+            final int line, final int col,
+            final boolean minimized)
             throws AttoParseException {
         
         try {
             
-            this.writer.write('C');
+            this.writer.write((minimized? 'C' : 'U'));  // Closed vs. Unclosed
             this.writer.write('S');
             this.writer.write('E');
             this.writer.write('E');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
-    }
-
-    
-    
-    
-    @Override
-    public void handleHtmlUnclosedStandaloneElementStart(
-            final char[] buffer,
-            final int offset, final int len, 
-            final int line, final int col) 
-            throws AttoParseException {
-        
-        try {
-            
-            this.writer.write('U');
-            this.writer.write('S');
-            this.writer.write('E');
-            this.writer.write('S');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
-    }
-
-    
-    @Override
-    public void handleHtmlUnclosedStandaloneElementName(
-            final char[] buffer,
-            final int offset, final int len, 
-            final int line, final int col) 
-            throws AttoParseException {
-        
-        try {
-            
-            this.writer.write('U');
-            this.writer.write('S');
-            this.writer.write('E');
-            this.writer.write('N');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
-    }
-
-    
-    @Override
-    public void handleHtmlUnclosedStandaloneElementEnd(
-            final char[] buffer,
-            final int offset, final int len, 
-            final int line, final int col) 
-            throws AttoParseException {
-        
-        try {
-            
-            this.writer.write('U');
-            this.writer.write('S');
-            this.writer.write('E');
-            this.writer.write('S');
             this.writer.write('(');
             this.writer.write(buffer, offset, len);
             this.writer.write(')');
@@ -392,7 +318,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
     
     
     @Override
-    public void handleHtmlForcedCloseElementStart(
+    public void handleHtmlSyntheticCloseElementStart(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col) 
@@ -400,7 +326,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         
         try {
             
-            this.writer.write('F');
+            this.writer.write('S');
             this.writer.write('C');
             this.writer.write('E');
             this.writer.write('S');
@@ -417,7 +343,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
 
     
     @Override
-    public void handleHtmlForcedCloseElementName(
+    public void handleHtmlSyntheticCloseElementName(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col) 
@@ -425,7 +351,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         
         try {
             
-            this.writer.write('F');
+            this.writer.write('S');
             this.writer.write('C');
             this.writer.write('E');
             this.writer.write('N');
@@ -442,7 +368,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
 
     
     @Override
-    public void handleHtmlForcedCloseElementEnd(
+    public void handleHtmlSyntheticCloseElementEnd(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col) 
@@ -450,7 +376,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         
         try {
             
-            this.writer.write('F');
+            this.writer.write('S');
             this.writer.write('C');
             this.writer.write('E');
             this.writer.write('E');
@@ -469,7 +395,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
     
     
     @Override
-    public void handleHtmlUnmatchedCloseElementStart(
+    public void handleHtmlIgnorableCloseElementStart(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col) 
@@ -477,7 +403,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         
         try {
             
-            this.writer.write('U');
+            this.writer.write('I');
             this.writer.write('C');
             this.writer.write('E');
             this.writer.write('S');
@@ -494,7 +420,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
 
     
     @Override
-    public void handleHtmlUnmatchedCloseElementName(
+    public void handleHtmlIgnorableCloseElementName(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col) 
@@ -502,7 +428,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         
         try {
             
-            this.writer.write('U');
+            this.writer.write('I');
             this.writer.write('C');
             this.writer.write('E');
             this.writer.write('N');
@@ -519,7 +445,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
 
     
     @Override
-    public void handleHtmlUnmatchedCloseElementEnd(
+    public void handleHtmlIgnorableCloseElementEnd(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col) 
@@ -527,7 +453,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         
         try {
             
-            this.writer.write('F');
+            this.writer.write('I');
             this.writer.write('C');
             this.writer.write('E');
             this.writer.write('E');

@@ -425,62 +425,34 @@ public abstract class AbstractDetailedHtmlAttoHandler
     
 
     /*
-     * ---------------------------------------
-     * CLOSED STANDALONE ELEMENTS: <img ... />
-     * ---------------------------------------
+     * -------------------------------------------
+     * STANDALONE ELEMENTS: <img ... />, <img ...> 
+     * -------------------------------------------
      */
 
-    public void handleHtmlClosedStandaloneElementStart(
+    public void handleHtmlStandaloneElementStart(
             final char[] buffer, 
             final int offset, final int len, 
-            final int line, final int col) 
+            final int line, final int col,
+            final boolean minimized) 
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
 
-    public void handleHtmlClosedStandaloneElementName(
+    public void handleHtmlStandaloneElementName(
             final char[] buffer, 
             final int offset, final int len, 
-            final int line, final int col)
+            final int line, final int col,
+            final boolean minimized)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
 
-    public void handleHtmlClosedStandaloneElementEnd(
+    public void handleHtmlStandaloneElementEnd(
             final char[] buffer, 
             final int offset, final int len, 
-            final int line, final int col)
-            throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
-    }
-
-    
-    /*
-     * ----------------------------------------
-     * UNCLOSED STANDALONE ELEMENTS: <img ... >
-     * ----------------------------------------
-     */
-    
-    public void handleHtmlUnclosedStandaloneElementStart(
-            final char[] buffer,
-            final int offset, final int len, 
-            final int line, final int col)
-            throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
-    }
-
-    public void handleHtmlUnclosedStandaloneElementName(
-            final char[] buffer,
-            final int offset, final int len, 
-            final int line, final int col)
-            throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
-    }
-
-    public void handleHtmlUnclosedStandaloneElementEnd(
-            final char[] buffer,
-            final int offset, final int len, 
-            final int line, final int col) 
+            final int line, final int col,
+            final boolean minimized)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
@@ -555,7 +527,7 @@ public abstract class AbstractDetailedHtmlAttoHandler
      * ------------------------------------------------------------------------------
      */
     
-    public void handleHtmlForcedCloseElementStart(
+    public void handleHtmlSyntheticCloseElementStart(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col)
@@ -563,7 +535,7 @@ public abstract class AbstractDetailedHtmlAttoHandler
         // Nothing to be done here, meant to be overridden if required
     }
 
-    public void handleHtmlForcedCloseElementName(
+    public void handleHtmlSyntheticCloseElementName(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col)
@@ -571,7 +543,7 @@ public abstract class AbstractDetailedHtmlAttoHandler
         // Nothing to be done here, meant to be overridden if required
     }
 
-    public void handleHtmlForcedCloseElementEnd(
+    public void handleHtmlSyntheticCloseElementEnd(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col) 
@@ -587,7 +559,7 @@ public abstract class AbstractDetailedHtmlAttoHandler
      * -----------------------------------------------------------------------
      */
     
-    public void handleHtmlUnmatchedCloseElementStart(
+    public void handleHtmlIgnorableCloseElementStart(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col) 
@@ -595,7 +567,7 @@ public abstract class AbstractDetailedHtmlAttoHandler
         // Nothing to be done here, meant to be overridden if required
     }
 
-    public void handleHtmlUnmatchedCloseElementName(
+    public void handleHtmlIgnorableCloseElementName(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col) 
@@ -603,7 +575,7 @@ public abstract class AbstractDetailedHtmlAttoHandler
         // Nothing to be done here, meant to be overridden if required
     }
 
-    public void handleHtmlUnmatchedCloseElementEnd(
+    public void handleHtmlIgnorableCloseElementEnd(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col) 

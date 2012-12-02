@@ -59,8 +59,8 @@ public class StandaloneHtmlElement extends BasicHtmlElement {
         
         stack.openElement(this);
         
-        handler.handleHtmlUnclosedStandaloneElementStart(OPEN_ELEMENT_START, 0, OPEN_ELEMENT_START.length, line, col - 1);
-        handler.handleHtmlUnclosedStandaloneElementName(buffer, offset, len, line, col);
+        handler.handleHtmlStandaloneElementStart(OPEN_ELEMENT_START, 0, OPEN_ELEMENT_START.length, line, col - 1, false);
+        handler.handleHtmlStandaloneElementName(buffer, offset, len, line, col, false);
 
     }
 
@@ -73,7 +73,7 @@ public class StandaloneHtmlElement extends BasicHtmlElement {
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException {
         
-        handler.handleHtmlUnclosedStandaloneElementEnd(OPEN_ELEMENT_END, 0, OPEN_ELEMENT_END.length, line, col);
+        handler.handleHtmlStandaloneElementEnd(OPEN_ELEMENT_END, 0, OPEN_ELEMENT_END.length, line, col, false);
         
     }
 
@@ -88,8 +88,8 @@ public class StandaloneHtmlElement extends BasicHtmlElement {
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException {
         
-        handler.handleHtmlUnmatchedCloseElementStart(CLOSE_ELEMENT_START, 0, CLOSE_ELEMENT_START.length, line, col - 2);
-        handler.handleHtmlUnmatchedCloseElementName(buffer, offset, len, line, col);
+        handler.handleHtmlIgnorableCloseElementStart(CLOSE_ELEMENT_START, 0, CLOSE_ELEMENT_START.length, line, col - 2);
+        handler.handleHtmlIgnorableCloseElementName(buffer, offset, len, line, col);
 
     }
 
@@ -102,7 +102,7 @@ public class StandaloneHtmlElement extends BasicHtmlElement {
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException {
         
-        handler.handleHtmlUnmatchedCloseElementEnd(CLOSE_ELEMENT_END, 0, CLOSE_ELEMENT_END.length, line, col);
+        handler.handleHtmlIgnorableCloseElementEnd(CLOSE_ELEMENT_END, 0, CLOSE_ELEMENT_END.length, line, col);
 
         stack.closeElement();
         

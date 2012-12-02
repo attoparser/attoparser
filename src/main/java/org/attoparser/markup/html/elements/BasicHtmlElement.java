@@ -63,8 +63,8 @@ public class BasicHtmlElement extends AbstractHtmlElement {
 
         stack.openElement(this);
         
-        handler.handleHtmlClosedStandaloneElementStart(OPEN_ELEMENT_START, 0, OPEN_ELEMENT_START.length, line, col - 1);
-        handler.handleHtmlClosedStandaloneElementName(buffer, offset, len, line, col);
+        handler.handleHtmlStandaloneElementStart(OPEN_ELEMENT_START, 0, OPEN_ELEMENT_START.length, line, col - 1, true);
+        handler.handleHtmlStandaloneElementName(buffer, offset, len, line, col, true);
         
     }
 
@@ -76,7 +76,7 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException {
         
-        handler.handleHtmlClosedStandaloneElementEnd(MINIMIZED_ELEMENT_END, 0, MINIMIZED_ELEMENT_END.length, line, col);
+        handler.handleHtmlStandaloneElementEnd(MINIMIZED_ELEMENT_END, 0, MINIMIZED_ELEMENT_END.length, line, col, true);
 
         stack.closeElement();
         
@@ -179,8 +179,8 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             throws AttoParseException {
         
         // Stack should not be affected by this, simply delegate the event
-        handler.handleHtmlUnmatchedCloseElementStart(CLOSE_ELEMENT_START, 0, CLOSE_ELEMENT_START.length, line, col - 2);
-        handler.handleHtmlUnmatchedCloseElementName(buffer, offset, len, line, col);
+        handler.handleHtmlIgnorableCloseElementStart(CLOSE_ELEMENT_START, 0, CLOSE_ELEMENT_START.length, line, col - 2);
+        handler.handleHtmlIgnorableCloseElementName(buffer, offset, len, line, col);
         
     }
 
@@ -193,7 +193,7 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             throws AttoParseException {
         
         // Stack should not be affected by this, simply delegate the event
-        handler.handleHtmlUnmatchedCloseElementEnd(CLOSE_ELEMENT_END, 0, CLOSE_ELEMENT_END.length, line, col);
+        handler.handleHtmlIgnorableCloseElementEnd(CLOSE_ELEMENT_END, 0, CLOSE_ELEMENT_END.length, line, col);
         
     }
 
