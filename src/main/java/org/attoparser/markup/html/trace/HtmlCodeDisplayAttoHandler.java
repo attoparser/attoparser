@@ -61,11 +61,11 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
             "    font-weight: normal;\n" + 
             "    color: blue;\n" + 
             "}\n" +
-            ".closed-standalone {\n" +
+            ".minimized-standalone {\n" +
             "    font-weight: bold;\n" + 
             "    color: black;\n" + 
             "}\n" +
-            ".unclosed-standalone {\n" +
+            ".non-minimized-standalone {\n" +
             "    font-weight: bold;\n" + 
             "    color: black;\n" + 
             "    background: wheat;\n" + 
@@ -74,7 +74,7 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
             "    font-weight: bold;\n" + 
             "    color: black;\n" + 
             "}\n" +
-            ".synthetic-close {\n" +
+            ".synthetic-open, .synthetic-close {\n" +
             "    font-weight: bold;\n" + 
             "    color: ghostwhite;\n" + 
             "    background: orangered;\n" + 
@@ -114,10 +114,11 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
     private static final String STYLE_CDATA = "cdata";
     private static final String STYLE_XML_DECLARATION = "xml-declaration";
     private static final String STYLE_PROCESSING_INSTRUCTION = "processing-instruction";
-    private static final String STYLE_CLOSED_STANDALONE = "closed-standalone";
-    private static final String STYLE_UNCLOSED_STANDALONE = "unclosed-standalone";
+    private static final String STYLE_MINIMIZED_STANDALONE = "minimized-standalone";
+    private static final String STYLE_NON_MINIMIZED_STANDALONE = "non-minimized-standalone";
     private static final String STYLE_OPEN = "open";
     private static final String STYLE_CLOSE = "close";
+    private static final String STYLE_SYNTHETIC_OPEN = "synthetic-open";
     private static final String STYLE_SYNTHETIC_CLOSE = "synthetic-close";
     private static final String STYLE_IGNORABLE_CLOSE = "ignorable-close";
     private static final String STYLE_ATTR_NAME = "attr-name";
@@ -213,16 +214,15 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
 
     
     @Override
-    public void handleHtmlStandaloneElementStart(
+    public void handleHtmlMinimizedStandaloneElementStart(
             final char[] buffer,
             final int offset, final int len, 
-            final int line, final int col,
-            final boolean minimized) 
+            final int line, final int col) 
             throws AttoParseException {
         
         try {
             
-            openStyle((minimized? STYLE_CLOSED_STANDALONE : STYLE_UNCLOSED_STANDALONE));
+            openStyle(STYLE_MINIMIZED_STANDALONE);
             this.writer.write(OPEN_TAG_START);
             
         } catch (final Exception e) {
@@ -233,11 +233,10 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
 
     
     @Override
-    public void handleHtmlStandaloneElementName(
+    public void handleHtmlMinimizedStandaloneElementName(
             final char[] buffer,
             final int offset, final int len, 
-            final int line, final int col,
-            final boolean minimized)
+            final int line, final int col)
             throws AttoParseException {
         
         try {
@@ -252,20 +251,73 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
 
     
     @Override
-    public void handleHtmlStandaloneElementEnd(
+    public void handleHtmlMinimizedStandaloneElementEnd(
             final char[] buffer, 
             final int offset, final int len, 
-            final int line, final int col,
-            final boolean minimized)
+            final int line, final int col)
             throws AttoParseException {
         
         try {
             
-            if (minimized) {
-                this.writer.write(MINIMIZED_TAG_END);
-            } else {
-                this.writer.write(OPEN_TAG_END);
-            }
+            this.writer.write(MINIMIZED_TAG_END);
+            closeStyle();
+            
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        }
+        
+    }
+
+    
+    
+    
+    @Override
+    public void handleHtmlNonMinimizedStandaloneElementStart(
+            final char[] buffer,
+            final int offset, final int len, 
+            final int line, final int col) 
+            throws AttoParseException {
+        
+        try {
+            
+            openStyle(STYLE_NON_MINIMIZED_STANDALONE);
+            this.writer.write(OPEN_TAG_START);
+            
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        }
+        
+    }
+
+    
+    @Override
+    public void handleHtmlNonMinimizedStandaloneElementName(
+            final char[] buffer,
+            final int offset, final int len, 
+            final int line, final int col)
+            throws AttoParseException {
+        
+        try {
+            
+            this.writer.write(buffer, offset, len);
+            
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        }
+        
+    }
+
+    
+    @Override
+    public void handleHtmlNonMinimizedStandaloneElementEnd(
+            final char[] buffer, 
+            final int offset, final int len, 
+            final int line, final int col)
+            throws AttoParseException {
+        
+        try {
+            
+            this.writer.write(OPEN_TAG_END);
             closeStyle();
             
         } catch (final Exception e) {
@@ -381,6 +433,64 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
         try {
             
             this.writer.write(CLOSE_TAG_END);
+            closeStyle();
+            
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        }
+        
+    }
+
+    
+    
+    
+    @Override
+    public void handleHtmlSyntheticOpenElementStart(
+            final char[] buffer, 
+            final int offset, final int len, 
+            final int line, final int col) 
+            throws AttoParseException {
+        
+        try {
+            
+            openStyle(STYLE_SYNTHETIC_OPEN);
+            this.writer.write(OPEN_TAG_START);
+            
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        }
+        
+    }
+
+    
+    @Override
+    public void handleHtmlSyntheticOpenElementName(
+            final char[] buffer, 
+            final int offset, final int len, 
+            final int line, final int col) 
+            throws AttoParseException {
+        
+        try {
+            
+            this.writer.write(buffer, offset, len);
+            
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        }
+        
+    }
+
+    
+    @Override
+    public void handleHtmlSyntheticOpenElementEnd(
+            final char[] buffer, 
+            final int offset, final int len, 
+            final int line, final int col) 
+            throws AttoParseException {
+        
+        try {
+            
+            this.writer.write(OPEN_TAG_END);
             closeStyle();
             
         } catch (final Exception e) {

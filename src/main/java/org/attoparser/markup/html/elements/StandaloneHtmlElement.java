@@ -59,8 +59,8 @@ public class StandaloneHtmlElement extends BasicHtmlElement {
         
         stack.openElement(this);
         
-        handler.handleHtmlStandaloneElementStart(OPEN_ELEMENT_START, 0, OPEN_ELEMENT_START.length, line, col - 1, false);
-        handler.handleHtmlStandaloneElementName(buffer, offset, len, line, col, false);
+        handler.handleHtmlNonMinimizedStandaloneElementStart(OPEN_ELEMENT_START, 0, OPEN_ELEMENT_START.length, line, col - 1);
+        handler.handleHtmlNonMinimizedStandaloneElementName(buffer, offset, len, line, col);
 
     }
 
@@ -73,7 +73,7 @@ public class StandaloneHtmlElement extends BasicHtmlElement {
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException {
         
-        handler.handleHtmlStandaloneElementEnd(OPEN_ELEMENT_END, 0, OPEN_ELEMENT_END.length, line, col, false);
+        handler.handleHtmlNonMinimizedStandaloneElementEnd(OPEN_ELEMENT_END, 0, OPEN_ELEMENT_END.length, line, col);
         
     }
 

@@ -63,8 +63,8 @@ public class BasicHtmlElement extends AbstractHtmlElement {
 
         stack.openElement(this);
         
-        handler.handleHtmlStandaloneElementStart(OPEN_ELEMENT_START, 0, OPEN_ELEMENT_START.length, line, col - 1, true);
-        handler.handleHtmlStandaloneElementName(buffer, offset, len, line, col, true);
+        handler.handleHtmlMinimizedStandaloneElementStart(OPEN_ELEMENT_START, 0, OPEN_ELEMENT_START.length, line, col - 1);
+        handler.handleHtmlMinimizedStandaloneElementName(buffer, offset, len, line, col);
         
     }
 
@@ -76,7 +76,7 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException {
         
-        handler.handleHtmlStandaloneElementEnd(MINIMIZED_ELEMENT_END, 0, MINIMIZED_ELEMENT_END.length, line, col, true);
+        handler.handleHtmlMinimizedStandaloneElementEnd(MINIMIZED_ELEMENT_END, 0, MINIMIZED_ELEMENT_END.length, line, col);
 
         stack.closeElement();
         
