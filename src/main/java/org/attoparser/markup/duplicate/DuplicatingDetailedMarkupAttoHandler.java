@@ -140,6 +140,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
         
         try {
             
+            this.writer.write('<');
             this.writer.write(buffer, offset, len);
             
         } catch (final Exception e) {
@@ -152,29 +153,12 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public void handleStandaloneElementName(final char[] buffer, final int offset, final int len,
+    public void handleStandaloneElementEnd(
             final int line, final int col) throws AttoParseException {
         
         try {
             
-            this.writer.write(buffer, offset, len);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
-    }
-
-
-
-
-    @Override
-    public void handleStandaloneElementEnd(final char[] buffer, final int offset, final int len,
-            final int line, final int col) throws AttoParseException {
-        
-        try {
-            
-            this.writer.write(buffer, offset, len);
+            this.writer.write("/>");
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -191,6 +175,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
         
         try {
             
+            this.writer.write('<');
             this.writer.write(buffer, offset, len);
             
         } catch (final Exception e) {
@@ -203,29 +188,12 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public void handleOpenElementName(final char[] buffer, final int offset, final int len, final int line,
-            final int col) throws AttoParseException {
+    public void handleOpenElementEnd(
+            final int line, final int col) throws AttoParseException {
         
         try {
             
-            this.writer.write(buffer, offset, len);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
-    }
-
-
-
-
-    @Override
-    public void handleOpenElementEnd(final char[] buffer, final int offset, final int len, final int line,
-            final int col) throws AttoParseException {
-        
-        try {
-            
-            this.writer.write(buffer, offset, len);
+            this.writer.write('>');
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -242,6 +210,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
         
         try {
             
+            this.writer.write("</");
             this.writer.write(buffer, offset, len);
             
         } catch (final Exception e) {
@@ -254,29 +223,12 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public void handleCloseElementName(final char[] buffer, final int offset, final int len, final int line,
-            final int col) throws AttoParseException {
+    public void handleCloseElementEnd(
+            final int line, final int col) throws AttoParseException {
         
         try {
             
-            this.writer.write(buffer, offset, len);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
-    }
-
-
-
-
-    @Override
-    public void handleCloseElementEnd(final char[] buffer, final int offset, final int len, final int line,
-            final int col) throws AttoParseException {
-        
-        try {
-            
-            this.writer.write(buffer, offset, len);
+            this.writer.write('>');
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -297,8 +249,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public void handleAutoCloseElementName(final char[] buffer, final int offset, final int len, final int line,
-            final int col) throws AttoParseException {
+    public void handleAutoCloseElementEnd(final int line, final int col) throws AttoParseException {
         // Nothing to be done... balanced elements were not present at the original template!
     }
 
@@ -306,17 +257,8 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public void handleAutoCloseElementEnd(final char[] buffer, final int offset, final int len, final int line,
-            final int col) throws AttoParseException {
-        // Nothing to be done... balanced elements were not present at the original template!
-    }
-
-
-
-
-    @Override
-    public void handleUnmatchedCloseElementStart(final char[] buffer, final int offset, final int len, final int line,
-            final int col) throws AttoParseException {
+    public void handleUnmatchedCloseElementStart(final char[] buffer, final int offset, final int len, 
+            final int line, final int col) throws AttoParseException {
         // They were present at the original template, so simply output them.
         handleCloseElementStart(buffer, offset, len, line, col);
     }
@@ -325,20 +267,9 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public void handleUnmatchedCloseElementName(final char[] buffer, final int offset, final int len, final int line,
-            final int col) throws AttoParseException {
+    public void handleUnmatchedCloseElementEnd(final int line, final int col) throws AttoParseException {
         // They were present at the original template, so simply output them.
-        handleCloseElementName(buffer, offset, len, line, col);
-    }
-
-
-
-
-    @Override
-    public void handleUnmatchedCloseElementEnd(final char[] buffer, final int offset, final int len, final int line,
-            final int col) throws AttoParseException {
-        // They were present at the original template, so simply output them.
-        handleCloseElementEnd(buffer, offset, len, line, col);
+        handleCloseElementEnd(line, col);
     }
 
 
@@ -367,7 +298,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public void handleAttributeSeparator(
+    public void handleInnerWhiteSpace(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col)

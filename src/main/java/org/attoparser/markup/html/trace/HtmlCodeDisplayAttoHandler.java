@@ -224,23 +224,6 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
             
             openStyle(STYLE_MINIMIZED_STANDALONE);
             this.writer.write(OPEN_TAG_START);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
-    }
-
-    
-    @Override
-    public void handleHtmlMinimizedStandaloneElementName(
-            final char[] buffer,
-            final int offset, final int len, 
-            final int line, final int col)
-            throws AttoParseException {
-        
-        try {
-            
             this.writer.write(buffer, offset, len);
             
         } catch (final Exception e) {
@@ -252,8 +235,6 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
     
     @Override
     public void handleHtmlMinimizedStandaloneElementEnd(
-            final char[] buffer, 
-            final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
         
@@ -282,23 +263,6 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
             
             openStyle(STYLE_NON_MINIMIZED_STANDALONE);
             this.writer.write(OPEN_TAG_START);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
-    }
-
-    
-    @Override
-    public void handleHtmlNonMinimizedStandaloneElementName(
-            final char[] buffer,
-            final int offset, final int len, 
-            final int line, final int col)
-            throws AttoParseException {
-        
-        try {
-            
             this.writer.write(buffer, offset, len);
             
         } catch (final Exception e) {
@@ -310,8 +274,6 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
     
     @Override
     public void handleHtmlNonMinimizedStandaloneElementEnd(
-            final char[] buffer, 
-            final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
         
@@ -339,23 +301,6 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
             
             openStyle(STYLE_OPEN);
             this.writer.write(OPEN_TAG_START);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
-    }
-
-    
-    @Override
-    public void handleHtmlOpenElementName(
-            final char[] buffer, 
-            final int offset, final int len,
-            final int line, final int col) 
-            throws AttoParseException {
-        
-        try {
-            
             this.writer.write(buffer, offset, len);
             
         } catch (final Exception e) {
@@ -367,8 +312,6 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
     
     @Override
     public void handleHtmlOpenElementEnd(
-            final char[] buffer, 
-            final int offset, final int len,
             final int line, final int col) 
             throws AttoParseException {
         
@@ -397,23 +340,6 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
             
             openStyle(STYLE_CLOSE);
             this.writer.write(CLOSE_TAG_START);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
-    }
-
-    
-    @Override
-    public void handleHtmlCloseElementName(
-            final char[] buffer, 
-            final int offset, final int len,
-            final int line, final int col) 
-            throws AttoParseException {
-        
-        try {
-            
             this.writer.write(buffer, offset, len);
             
         } catch (final Exception e) {
@@ -425,8 +351,6 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
     
     @Override
     public void handleHtmlCloseElementEnd(
-            final char[] buffer, 
-            final int offset, final int len,
             final int line, final int col) 
             throws AttoParseException {
         
@@ -455,23 +379,6 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
             
             openStyle(STYLE_SYNTHETIC_OPEN);
             this.writer.write(OPEN_TAG_START);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
-    }
-
-    
-    @Override
-    public void handleHtmlSyntheticOpenElementName(
-            final char[] buffer, 
-            final int offset, final int len, 
-            final int line, final int col) 
-            throws AttoParseException {
-        
-        try {
-            
             this.writer.write(buffer, offset, len);
             
         } catch (final Exception e) {
@@ -483,8 +390,6 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
     
     @Override
     public void handleHtmlSyntheticOpenElementEnd(
-            final char[] buffer, 
-            final int offset, final int len, 
             final int line, final int col) 
             throws AttoParseException {
         
@@ -513,23 +418,6 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
             
             openStyle(STYLE_SYNTHETIC_CLOSE);
             this.writer.write(CLOSE_TAG_START);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
-    }
-
-    
-    @Override
-    public void handleHtmlSyntheticCloseElementName(
-            final char[] buffer, 
-            final int offset, final int len, 
-            final int line, final int col) 
-            throws AttoParseException {
-        
-        try {
-            
             this.writer.write(buffer, offset, len);
             
         } catch (final Exception e) {
@@ -541,8 +429,6 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
     
     @Override
     public void handleHtmlSyntheticCloseElementEnd(
-            final char[] buffer, 
-            final int offset, final int len, 
             final int line, final int col) 
             throws AttoParseException {
         
@@ -571,23 +457,6 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
             
             openStyle(STYLE_IGNORABLE_CLOSE);
             this.writer.write(CLOSE_TAG_START);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
-    }
-
-    
-    @Override
-    public void handleHtmlIgnorableCloseElementName(
-            final char[] buffer, 
-            final int offset, final int len, 
-            final int line, final int col) 
-            throws AttoParseException {
-        
-        try {
-            
             this.writer.write(buffer, offset, len);
             
         } catch (final Exception e) {
@@ -599,8 +468,6 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
     
     @Override
     public void handleHtmlIgnorableCloseElementEnd(
-            final char[] buffer, 
-            final int offset, final int len, 
             final int line, final int col) 
             throws AttoParseException {
         
@@ -650,7 +517,7 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
 
 
     @Override
-    public void handleHtmlAttributeSeparator(
+    public void handleHtmlInnerWhiteSpace(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col)

@@ -105,36 +105,10 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
         
     }
 
-    
-    
-    @Override
-    public void handleStandaloneElementName(
-            final char[] buffer, 
-            final int offset, final int len,
-            final int line, final int col)
-            throws AttoParseException {
-        
-        try {
-            
-            this.writer.write('S');
-            this.writer.write('E');
-            this.writer.write('N');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
-    }
-
 
 
     @Override
     public void handleStandaloneElementEnd(
-            final char[] buffer, final int offset, final int len,
             final int line, final int col) 
             throws AttoParseException {
         
@@ -143,9 +117,6 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
             this.writer.write('S');
             this.writer.write('E');
             this.writer.write('E');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
             writePosition(this.writer, line, col);
             
         } catch (final Exception e) {
@@ -179,37 +150,12 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
         }
         
     }
-
-    
-    
-    @Override
-    public void handleOpenElementName(final char[] buffer, final int offset, final int len,
-            final int line, final int col)
-            throws AttoParseException {
-        
-        try {
-            
-            this.writer.write('O');
-            this.writer.write('E');
-            this.writer.write('N');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
-    }
     
     
 
     
     @Override
     public void handleOpenElementEnd(
-            final char[] buffer, 
-            final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         
@@ -218,9 +164,6 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
             this.writer.write('O');
             this.writer.write('E');
             this.writer.write('E');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
             writePosition(this.writer, line, col);
             
         } catch (final Exception e) {
@@ -254,37 +197,12 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
         }
         
     }
-
-
-    
-    @Override
-    public void handleCloseElementName(final char[] buffer, final int offset, final int len,
-            final int line, final int col)
-            throws AttoParseException {
-        
-        try {
-            
-            this.writer.write('C');
-            this.writer.write('E');
-            this.writer.write('N');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
-    }
     
     
 
     
     @Override
     public void handleCloseElementEnd(
-            final char[] buffer, 
-            final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         
@@ -293,9 +211,6 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
             this.writer.write('C');
             this.writer.write('E');
             this.writer.write('E');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
             writePosition(this.writer, line, col);
             
         } catch (final Exception e) {
@@ -330,38 +245,12 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
         }
         
     }
-
-
-    
-    @Override
-    public void handleAutoCloseElementName(final char[] buffer, final int offset, final int len,
-            final int line, final int col)
-            throws AttoParseException {
-        
-        try {
-            
-            this.writer.write('A');
-            this.writer.write('C');
-            this.writer.write('E');
-            this.writer.write('N');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
-    }
     
     
 
     
     @Override
     public void handleAutoCloseElementEnd(
-            final char[] buffer, 
-            final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         
@@ -371,9 +260,6 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
             this.writer.write('C');
             this.writer.write('E');
             this.writer.write('E');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
             writePosition(this.writer, line, col);
             
         } catch (final Exception e) {
@@ -408,38 +294,12 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
         }
         
     }
-
-
-    
-    @Override
-    public void handleUnmatchedCloseElementName(final char[] buffer, final int offset, final int len,
-            final int line, final int col)
-            throws AttoParseException {
-        
-        try {
-            
-            this.writer.write('U');
-            this.writer.write('C');
-            this.writer.write('E');
-            this.writer.write('N');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
-    }
     
     
 
     
     @Override
     public void handleUnmatchedCloseElementEnd(
-            final char[] buffer, 
-            final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         
@@ -449,9 +309,6 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
             this.writer.write('C');
             this.writer.write('E');
             this.writer.write('E');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
             writePosition(this.writer, line, col);
             
         } catch (final Exception e) {
@@ -622,7 +479,7 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
 
 
     @Override
-    public void handleAttributeSeparator(
+    public void handleInnerWhiteSpace(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col)
@@ -630,7 +487,8 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
         
         try {
             
-            this.writer.write('A');
+            this.writer.write('I');
+            this.writer.write('W');
             this.writer.write('S');
             this.writer.write('(');
             this.writer.write(buffer, offset, len);

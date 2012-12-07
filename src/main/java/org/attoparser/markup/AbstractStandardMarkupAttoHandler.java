@@ -76,31 +76,16 @@ public abstract class AbstractStandardMarkupAttoHandler
     @Override
     public final void handleStandaloneElementStart(
             final char[] buffer, 
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col) 
             throws AttoParseException {
         
-        super.handleStandaloneElementStart(buffer, offset, len, line, col);
+        super.handleStandaloneElementStart(buffer, nameOffset, nameLen, line, col);
         
-        this.currentElementName = null;
+        this.currentElementName = new String(buffer, nameOffset, nameLen);
         this.currentElementAttributes = null;
         this.currentElementLine = line;
         this.currentElementCol = col;
-        
-    }
-    
-    
-
-    @Override
-    public final void handleStandaloneElementName(
-            final char[] buffer, 
-            final int offset, final int len,
-            final int line, final int col) 
-            throws AttoParseException {
-
-        super.handleStandaloneElementName(buffer, offset, len, line, col);
-        
-        this.currentElementName = new String(buffer, offset, len);
         
     }
 
@@ -108,12 +93,10 @@ public abstract class AbstractStandardMarkupAttoHandler
     
     @Override
     public final void handleStandaloneElementEnd(
-            final char[] buffer, 
-            final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         
-        super.handleStandaloneElementEnd(buffer, offset, len, line, col);
+        super.handleStandaloneElementEnd(line, col);
         
         handleStandaloneElement(this.currentElementName, this.currentElementAttributes, this.currentElementLine, this.currentElementCol);
         
@@ -124,31 +107,16 @@ public abstract class AbstractStandardMarkupAttoHandler
     @Override
     public final void handleOpenElementStart(
             final char[] buffer, 
-            final int offset, final int len, 
+            final int nameOffset, final int nameLen, 
             final int line, final int col) 
             throws AttoParseException {
 
-        super.handleOpenElementStart(buffer, offset, len, line, col);
+        super.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
 
-        this.currentElementName = null;
+        this.currentElementName = new String(buffer, nameOffset, nameLen);
         this.currentElementAttributes = null;
         this.currentElementLine = line;
         this.currentElementCol = col;
-        
-    }
-    
-    
-
-    @Override
-    public final void handleOpenElementName(
-            final char[] buffer, 
-            final int offset, final int len, 
-            final int line, final int col)
-            throws AttoParseException {
-
-        super.handleOpenElementName(buffer, offset, len, line, col);
-        
-        this.currentElementName = new String(buffer, offset, len);
         
     }
 
@@ -156,12 +124,10 @@ public abstract class AbstractStandardMarkupAttoHandler
     
     @Override
     public final void handleOpenElementEnd(
-            final char[] buffer, 
-            final int offset, final int len, 
             final int line, final int col) 
             throws AttoParseException {
 
-        super.handleOpenElementEnd(buffer, offset, len, line, col);
+        super.handleOpenElementEnd(line, col);
         
         handleOpenElement(this.currentElementName, this.currentElementAttributes, this.currentElementLine, this.currentElementCol);
         
@@ -172,31 +138,16 @@ public abstract class AbstractStandardMarkupAttoHandler
     @Override
     public final void handleCloseElementStart(
             final char[] buffer, 
-            final int offset, final int len, 
+            final int nameOffset, final int nameLen, 
             final int line, final int col) 
             throws AttoParseException {
 
-        super.handleCloseElementStart(buffer, offset, len, line, col);
+        super.handleCloseElementStart(buffer, nameOffset, nameLen, line, col);
         
-        this.currentElementName = null;
+        this.currentElementName = new String(buffer, nameOffset, nameLen);
         this.currentElementAttributes = null;
         this.currentElementLine = line;
         this.currentElementCol = col;
-        
-    }
-    
-    
-
-    @Override
-    public final void handleCloseElementName(
-            final char[] buffer, 
-            final int offset, final int len, 
-            final int line, final int col)
-            throws AttoParseException {
-
-        super.handleCloseElementName(buffer, offset, len, line, col);
-        
-        this.currentElementName = new String(buffer, offset, len);
         
     }
 
@@ -204,12 +155,10 @@ public abstract class AbstractStandardMarkupAttoHandler
     
     @Override
     public final void handleCloseElementEnd(
-            final char[] buffer, 
-            final int offset, final int len,
             final int line, final int col) 
             throws AttoParseException {
 
-        super.handleCloseElementEnd(buffer, offset, len, line, col);
+        super.handleCloseElementEnd(line, col);
 
         handleCloseElement(this.currentElementName, this.currentElementLine, this.currentElementCol);
         
@@ -221,31 +170,16 @@ public abstract class AbstractStandardMarkupAttoHandler
     @Override
     public final void handleAutoCloseElementStart(
             final char[] buffer, 
-            final int offset, final int len, 
+            final int nameOffset, final int nameLen, 
             final int line, final int col) 
             throws AttoParseException {
 
-        super.handleAutoCloseElementStart(buffer, offset, len, line, col);
+        super.handleAutoCloseElementStart(buffer, nameOffset, nameLen, line, col);
         
-        this.currentElementName = null;
+        this.currentElementName = new String(buffer, nameOffset, nameLen);
         this.currentElementAttributes = null;
         this.currentElementLine = line;
         this.currentElementCol = col;
-        
-    }
-    
-    
-
-    @Override
-    public final void handleAutoCloseElementName(
-            final char[] buffer, 
-            final int offset, final int len, 
-            final int line, final int col)
-            throws AttoParseException {
-
-        super.handleAutoCloseElementName(buffer, offset, len, line, col);
-        
-        this.currentElementName = new String(buffer, offset, len);
         
     }
 
@@ -253,12 +187,10 @@ public abstract class AbstractStandardMarkupAttoHandler
     
     @Override
     public final void handleAutoCloseElementEnd(
-            final char[] buffer, 
-            final int offset, final int len,
             final int line, final int col) 
             throws AttoParseException {
 
-        super.handleAutoCloseElementEnd(buffer, offset, len, line, col);
+        super.handleAutoCloseElementEnd(line, col);
 
         handleAutoClosedElement(this.currentElementName, this.currentElementLine, this.currentElementCol);
         
@@ -268,15 +200,15 @@ public abstract class AbstractStandardMarkupAttoHandler
     
     
     @Override
-    public void handleUnmatchedCloseElementStart(
+    public final void handleUnmatchedCloseElementStart(
             final char[] buffer, 
-            final int offset, final int len, 
+            final int nameOffset, final int nameLen, 
             final int line, final int col) 
             throws AttoParseException {
 
-        super.handleUnmatchedCloseElementStart(buffer, offset, len, line, col);
+        super.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col);
         
-        this.currentElementName = null;
+        this.currentElementName = new String(buffer, nameOffset, nameLen);
         this.currentElementAttributes = null;
         this.currentElementLine = line;
         this.currentElementCol = col;
@@ -286,28 +218,11 @@ public abstract class AbstractStandardMarkupAttoHandler
     
     
     @Override
-    public void handleUnmatchedCloseElementName(
-            final char[] buffer, 
-            final int offset, final int len, 
+    public final void handleUnmatchedCloseElementEnd(
             final int line, final int col) 
             throws AttoParseException {
 
-        super.handleUnmatchedCloseElementName(buffer, offset, len, line, col);
-        
-        this.currentElementName = new String(buffer, offset, len);
-        
-    }
-
-    
-    
-    @Override
-    public void handleUnmatchedCloseElementEnd(
-            final char[] buffer, 
-            final int offset, final int len, 
-            final int line, final int col) 
-            throws AttoParseException {
-
-        super.handleUnmatchedCloseElementEnd(buffer, offset, len, line, col);
+        super.handleUnmatchedCloseElementEnd(line, col);
 
         handleUnmatchedClosedElement(this.currentElementName, this.currentElementLine, this.currentElementCol);
         
@@ -348,13 +263,13 @@ public abstract class AbstractStandardMarkupAttoHandler
     
     
     @Override
-    public final void handleAttributeSeparator(
+    public final void handleInnerWhiteSpace(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col) 
             throws AttoParseException {
 
-        super.handleAttributeSeparator(buffer, offset, len, line, col);
+        super.handleInnerWhiteSpace(buffer, offset, len, line, col);
         
     }
 

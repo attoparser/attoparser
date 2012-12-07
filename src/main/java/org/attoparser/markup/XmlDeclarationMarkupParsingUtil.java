@@ -338,7 +338,7 @@ public final class XmlDeclarationMarkupParsingUtil {
         }
         
 
-        public void handleAttributeSeparator(
+        public void handleInnerWhiteSpace(
                 final char[] buffer, 
                 final int offset, final int len,
                 final int line, final int col)

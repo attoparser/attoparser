@@ -110,22 +110,22 @@ public class AttoParserTest extends TestCase {
         
         testDoc( 
             "<h1>Hello</ h1>",
-            "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}T(Hello</ h1>){1,5}ACES(</){1,16}ACEN(h1){1,16}ACEE(>){1,16}]",
+            "[OES(h1){1,1}OEE{1,4}T(Hello</ h1>){1,5}ACES(h1){1,16}ACEE{1,16}]",
             "[OE(h1){1,1}T(Hello</ h1>){1,5}ACE(h1){1,16}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "<h1>Hello</ h1>",
-            "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}T(Hello</ h1>){1,5}]",
+            "[OES(h1){1,1}OEE{1,4}T(Hello</ h1>){1,5}]",
             "[OE(h1){1,1}T(Hello</ h1>){1,5}]", 
             noRestrictions);
         testDoc( 
             "<p><h1>Hello</ h1></p>",
-            "[OES(<){1,1}OEN(p){1,2}OEE(>){1,3}OES(<){1,4}OEN(h1){1,5}OEE(>){1,7}T(Hello</ h1>){1,8}ACES(</){1,19}ACEN(h1){1,19}ACEE(>){1,19}CES(</){1,19}CEN(p){1,21}CEE(>){1,22}]",
+            "[OES(p){1,1}OEE{1,3}OES(h1){1,4}OEE{1,7}T(Hello</ h1>){1,8}ACES(h1){1,19}ACEE{1,19}CES(p){1,19}CEE{1,22}]",
             "[OE(p){1,1}OE(h1){1,4}T(Hello</ h1>){1,8}ACE(h1){1,19}CE(p){1,19}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "<p><h1>Hello</ h1></p>",
-            "[OES(<){1,1}OEN(p){1,2}OEE(>){1,3}OES(<){1,4}OEN(h1){1,5}OEE(>){1,7}T(Hello</ h1>){1,8}CES(</){1,19}CEN(p){1,21}CEE(>){1,22}]",
+            "[OES(p){1,1}OEE{1,3}OES(h1){1,4}OEE{1,7}T(Hello</ h1>){1,8}CES(p){1,19}CEE{1,22}]",
             "[OE(p){1,1}OE(h1){1,4}T(Hello</ h1>){1,8}CE(p){1,19}]", 
             noRestrictions);
         testDoc( 
@@ -140,37 +140,37 @@ public class AttoParserTest extends TestCase {
             noRestrictionsAutoClose);
         testDoc( 
             "<p>Hello</p>",
-            "[OES(<){1,1}OEN(p){1,2}OEE(>){1,3}T(Hello){1,4}CES(</){1,9}CEN(p){1,11}CEE(>){1,12}]",
+            "[OES(p){1,1}OEE{1,3}T(Hello){1,4}CES(p){1,9}CEE{1,12}]",
             "[OE(p){1,1}T(Hello){1,4}CE(p){1,9}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "<h1>Hello</h1>",
-            "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}T(Hello){1,5}CES(</){1,10}CEN(h1){1,12}CEE(>){1,14}]",
+            "[OES(h1){1,1}OEE{1,4}T(Hello){1,5}CES(h1){1,10}CEE{1,14}]",
             "[OE(h1){1,1}T(Hello){1,5}CE(h1){1,10}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "<h1>Hello</h1 >",
-            "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}T(Hello){1,5}CES(</){1,10}CEN(h1){1,12}AS( ){1,14}CEE(>){1,15}]",
+            "[OES(h1){1,1}OEE{1,4}T(Hello){1,5}CES(h1){1,10}IWS( ){1,14}CEE{1,15}]",
             "[OE(h1){1,1}T(Hello){1,5}CE(h1){1,10}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "<h1>Hello</h1 \n\n>",
-            "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}T(Hello){1,5}CES(</){1,10}CEN(h1){1,12}AS( \n\n){1,14}CEE(>){3,1}]",
+            "[OES(h1){1,1}OEE{1,4}T(Hello){1,5}CES(h1){1,10}IWS( \n\n){1,14}CEE{3,1}]",
             "[OE(h1){1,1}T(Hello){1,5}CE(h1){1,10}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "<\np  >Hello</p>",
-            "[T(<\np  >Hello){1,1}UCES(</){2,10}UCEN(p){2,12}UCEE(>){2,13}]",
+            "[T(<\np  >Hello){1,1}UCES(p){2,10}UCEE{2,13}]",
             "[T(<\np  >Hello){1,1}UCE(p){2,10}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "< h1  >Hello</h1>",
-            "[T(< h1  >Hello){1,1}UCES(</){1,13}UCEN(h1){1,15}UCEE(>){1,17}]",
+            "[T(< h1  >Hello){1,1}UCES(h1){1,13}UCEE{1,17}]",
             "[T(< h1  >Hello){1,1}UCE(h1){1,13}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "<h1>Hello</ h1>",
-            "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}T(Hello</ h1>){1,5}ACES(</){1,16}ACEN(h1){1,16}ACEE(>){1,16}]",
+            "[OES(h1){1,1}OEE{1,4}T(Hello</ h1>){1,5}ACES(h1){1,16}ACEE{1,16}]",
             "[OE(h1){1,1}T(Hello</ h1>){1,5}ACE(h1){1,16}]", 
             noRestrictionsAutoClose);
         testDoc( 
@@ -192,196 +192,196 @@ public class AttoParserTest extends TestCase {
             noRestrictionsAutoClose);
         testDoc( 
             "Hello, <p>lala</p>",
-            "[T(Hello, ){1,1}OES(<){1,8}OEN(p){1,9}OEE(>){1,10}T(lala){1,11}CES(</){1,15}CEN(p){1,17}CEE(>){1,18}]",
+            "[T(Hello, ){1,1}OES(p){1,8}OEE{1,10}T(lala){1,11}CES(p){1,15}CEE{1,18}]",
             "[T(Hello, ){1,1}OE(p){1,8}T(lala){1,11}CE(p){1,15}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello, <p>lal'a</p>",
-            "[T(Hello, ){1,1}OES(<){1,8}OEN(p){1,9}OEE(>){1,10}T(lal'a){1,11}CES(</){1,16}CEN(p){1,18}CEE(>){1,19}]",
+            "[T(Hello, ){1,1}OES(p){1,8}OEE{1,10}T(lal'a){1,11}CES(p){1,16}CEE{1,19}]",
             "[T(Hello, ){1,1}OE(p){1,8}T(lal'a){1,11}CE(p){1,16}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello, <p>l'al'a</p>",
-            "[T(Hello, ){1,1}OES(<){1,8}OEN(p){1,9}OEE(>){1,10}T(l'al'a){1,11}CES(</){1,17}CEN(p){1,19}CEE(>){1,20}]",
+            "[T(Hello, ){1,1}OES(p){1,8}OEE{1,10}T(l'al'a){1,11}CES(p){1,17}CEE{1,20}]",
             "[T(Hello, ){1,1}OE(p){1,8}T(l'al'a){1,11}CE(p){1,17}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello, <p>lala</p>",
-            "[T(o, ){1,1}OES(<){1,4}OEN(p){1,5}OEE(>){1,6}T(l){1,7}ACES(</){1,8}ACEN(p){1,8}ACEE(>){1,8}]",
+            "[T(o, ){1,1}OES(p){1,4}OEE{1,6}T(l){1,7}ACES(p){1,8}ACEE{1,8}]",
             "[T(o, ){1,1}OE(p){1,4}T(l){1,7}ACE(p){1,8}]",
             4, 7, 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello, <br/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}SEE(/>){1,11}]",
+            "[T(Hello, ){1,1}SES(br){1,8}SEE{1,11}]",
             "[T(Hello, ){1,1}SE(br){1,8}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello, <br th:text=\"ll\"/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}(=){1,19}(\"ll\"){1,20}SEE(/>){1,24}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}(=){1,19}(\"ll\"){1,20}SEE{1,24}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello, <br th:text='ll'/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}(=){1,19}('ll'){1,20}SEE(/>){1,24}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}(=){1,19}('ll'){1,20}SEE{1,24}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello, <br th:text =\"ll\"/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( =){1,19}(\"ll\"){1,21}SEE(/>){1,25}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =){1,19}(\"ll\"){1,21}SEE{1,25}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello, <br th:text =   \"ll\"/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( =   ){1,19}(\"ll\"){1,24}SEE(/>){1,28}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}(\"ll\"){1,24}SEE{1,28}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello, <br th:text =   ll/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( =   ){1,19}(ll){1,24}SEE(/>){1,26}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}(ll){1,24}SEE{1,26}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello, <br th:text =   \"ll\"a=2/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( =   ){1,19}(\"ll\"){1,24}A(a){1,28}(=){1,29}(2){1,30}SEE(/>){1,31}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}(\"ll\"){1,24}A(a){1,28}(=){1,29}(2){1,30}SEE{1,31}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll',a='2']){1,8}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello, <br th:text =   'll'a=2/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( =   ){1,19}('ll'){1,24}A(a){1,28}(=){1,29}(2){1,30}SEE(/>){1,31}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}('ll'){1,24}A(a){1,28}(=){1,29}(2){1,30}SEE{1,31}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll',a='2']){1,8}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello, <br th:text =   \"ll\"a= \n 2/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( =   ){1,19}(\"ll\"){1,24}A(a){1,28}(= \n ){1,29}(2){2,2}SEE(/>){2,3}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}(\"ll\"){1,24}A(a){1,28}(= \n ){1,29}(2){2,2}SEE{2,3}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll',a='2']){1,8}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello, <br th:text =   ll a= \n 2/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( =   ){1,19}(ll){1,24}AS( ){1,26}A(a){1,27}(= \n ){1,28}(2){2,2}SEE(/>){2,3}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}(ll){1,24}IWS( ){1,26}A(a){1,27}(= \n ){1,28}(2){2,2}SEE{2,3}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll',a='2']){1,8}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello, <br th:text =   ll a/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( =   ){1,19}(ll){1,24}AS( ){1,26}A(a){1,27}(){1,28}(){1,28}SEE(/>){1,28}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}(ll){1,24}IWS( ){1,26}A(a){1,27}(){1,28}(){1,28}SEE{1,28}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll',a='']){1,8}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello, <br th:text =   ll a=/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( =   ){1,19}(ll){1,24}AS( ){1,26}A(a){1,27}(=){1,28}(){1,29}SEE(/>){1,29}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}(ll){1,24}IWS( ){1,26}A(a){1,27}(=){1,28}(){1,29}SEE{1,29}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll',a='']){1,8}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello, <br th:text = a=/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( = ){1,19}(a=){1,22}SEE(/>){1,24}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( = ){1,19}(a=){1,22}SEE{1,24}]",
             "[T(Hello, ){1,1}SE(br[th:text='a=']){1,8}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello, <br th:text = a= b/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( = ){1,19}(a=){1,22}AS( ){1,24}A(b){1,25}(){1,26}(){1,26}SEE(/>){1,26}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( = ){1,19}(a=){1,22}IWS( ){1,24}A(b){1,25}(){1,26}(){1,26}SEE{1,26}]",
             "[T(Hello, ){1,1}SE(br[th:text='a=',b='']){1,8}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello, <br th:text = a=b/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( = ){1,19}(a=b){1,22}SEE(/>){1,25}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( = ){1,19}(a=b){1,22}SEE{1,25}]",
             "[T(Hello, ){1,1}SE(br[th:text='a=b']){1,8}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello, <br th:text = \"a=b\"/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( = ){1,19}(\"a=b\"){1,22}SEE(/>){1,27}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( = ){1,19}(\"a=b\"){1,22}SEE{1,27}]",
             "[T(Hello, ){1,1}SE(br[th:text='a=b']){1,8}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello, <br th:text = \"a= b\"/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( = ){1,19}(\"a= b\"){1,22}SEE(/>){1,28}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( = ){1,19}(\"a= b\"){1,22}SEE{1,28}]",
             "[T(Hello, ){1,1}SE(br[th:text='a= b']){1,8}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello, <br th:text = 'a= b'/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( = ){1,19}('a= b'){1,22}SEE(/>){1,28}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( = ){1,19}('a= b'){1,22}SEE{1,28}]",
             "[T(Hello, ){1,1}SE(br[th:text='a= b']){1,8}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello, <br th:text = \"a= b\"\n/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}( = ){1,19}(\"a= b\"){1,22}AS(\n){1,28}SEE(/>){2,1}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( = ){1,19}(\"a= b\"){1,22}IWS(\n){1,28}SEE{2,1}]",
             "[T(Hello, ){1,1}SE(br[th:text='a= b']){1,8}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello, <br  th:text=\"ll\"/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS(  ){1,11}A(th:text){1,13}(=){1,20}(\"ll\"){1,21}SEE(/>){1,25}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS(  ){1,11}A(th:text){1,13}(=){1,20}(\"ll\"){1,21}SEE{1,25}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello, <br \nth:text=\"ll\"/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( \n){1,11}A(th:text){2,1}(=){2,8}(\"ll\"){2,9}SEE(/>){2,13}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( \n){1,11}A(th:text){2,1}(=){2,8}(\"ll\"){2,9}SEE{2,13}]",
             null, 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello, World! <br/>\n<div\n l\n     a=\"12 3\" zas    o=\"\"  b=\"lelo\n  = s\">lala</div> <p th=\"lala\" >liool</p>",
-            "[T(Hello, World! ){1,1}SES(<){1,15}SEN(br){1,16}SEE(/>){1,18}T(\n){1,20}" +
-              "OES(<){2,1}OEN(div){2,2}AS(\n ){2,5}A(l){3,2}(){3,3}(){3,3}AS(\n     ){3,3}" +
-              "A(a){4,6}(=){4,7}(\"12 3\"){4,8}AS( ){4,14}A(zas){4,15}(){4,18}(){4,18}AS(    ){4,18}" +
-              "A(o){4,22}(=){4,23}(\"\"){4,24}AS(  ){4,26}A(b){4,28}(=){4,29}(\"lelo\n  = s\"){4,30}" +
-              "OEE(>){5,7}T(lala){5,8}CES(</){5,12}CEN(div){5,14}CEE(>){5,17}T( ){5,18}" +
-              "OES(<){5,19}OEN(p){5,20}AS( ){5,21}A(th){5,22}(=){5,24}(\"lala\"){5,25}AS( ){5,31}OEE(>){5,32}" +
-              "T(liool){5,33}CES(</){5,38}CEN(p){5,40}CEE(>){5,41}]",
+            "[T(Hello, World! ){1,1}SES(br){1,15}SEE{1,18}T(\n){1,20}" +
+              "OES(div){2,1}IWS(\n ){2,5}A(l){3,2}(){3,3}(){3,3}IWS(\n     ){3,3}" +
+              "A(a){4,6}(=){4,7}(\"12 3\"){4,8}IWS( ){4,14}A(zas){4,15}(){4,18}(){4,18}IWS(    ){4,18}" +
+              "A(o){4,22}(=){4,23}(\"\"){4,24}IWS(  ){4,26}A(b){4,28}(=){4,29}(\"lelo\n  = s\"){4,30}" +
+              "OEE{5,7}T(lala){5,8}CES(div){5,12}CEE{5,17}T( ){5,18}" +
+              "OES(p){5,19}IWS( ){5,21}A(th){5,22}(=){5,24}(\"lala\"){5,25}IWS( ){5,31}OEE{5,32}" +
+              "T(liool){5,33}CES(p){5,38}CEE{5,41}]",
               null, 
               noRestrictionsAutoClose);
 
         testDoc( 
             "Hello<!--hi!-->, <br/>",
-            "[T(Hello){1,1}C(hi!){1,6}T(, ){1,16}SES(<){1,18}SEN(br){1,19}SEE(/>){1,21}]",
+            "[T(Hello){1,1}C(hi!){1,6}T(, ){1,16}SES(br){1,18}SEE{1,21}]",
             null, 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello<!--hi\"!-->, <br/>",
-            "[T(Hello){1,1}C(hi\"!){1,6}T(, ){1,17}SES(<){1,19}SEN(br){1,20}SEE(/>){1,22}]",
+            "[T(Hello){1,1}C(hi\"!){1,6}T(, ){1,17}SES(br){1,19}SEE{1,22}]",
             null, 
             noRestrictionsAutoClose);
 
         testDoc( 
             "Hello<!-- 4 > 3 -->, <br/>",
-            "[T(Hello){1,1}C( 4 > 3 ){1,6}T(, ){1,20}SES(<){1,22}SEN(br){1,23}SEE(/>){1,25}]",
+            "[T(Hello){1,1}C( 4 > 3 ){1,6}T(, ){1,20}SES(br){1,22}SEE{1,25}]",
             null, 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello<!-- 4 > 3 > 10 -->, <br/>",
-            "[T(Hello){1,1}C( 4 > 3 > 10 ){1,6}T(, ){1,25}SES(<){1,27}SEN(br){1,28}SEE(/>){1,30}]",
+            "[T(Hello){1,1}C( 4 > 3 > 10 ){1,6}T(, ){1,25}SES(br){1,27}SEE{1,30}]",
             "[T(Hello){1,1}C( 4 > 3 > 10 ){1,6}T(, ){1,25}SE(br){1,27}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello<!-- 4 > 3\n > 10 -->, <br/>",
-            "[T(Hello){1,1}C( 4 > 3\n > 10 ){1,6}T(, ){2,10}SES(<){2,12}SEN(br){2,13}SEE(/>){2,15}]",
+            "[T(Hello){1,1}C( 4 > 3\n > 10 ){1,6}T(, ){2,10}SES(br){2,12}SEE{2,15}]",
             null, 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello<![CDATA[ 4 > 3\n > 10 ]]>, <br/>",
-            "[T(Hello){1,1}D( 4 > 3\n > 10 ){1,6}T(, ){2,10}SES(<){2,12}SEN(br){2,13}SEE(/>){2,15}]",
+            "[T(Hello){1,1}D( 4 > 3\n > 10 ){1,6}T(, ){2,10}SES(br){2,12}SEE{2,15}]",
             null, 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello<![CDATA[ 4 > 3\n \"> 10 ]]>, <br/>",
-            "[T(Hello){1,1}D( 4 > 3\n \"> 10 ){1,6}T(, ){2,11}SES(<){2,13}SEN(br){2,14}SEE(/>){2,16}]",
+            "[T(Hello){1,1}D( 4 > 3\n \"> 10 ){1,6}T(, ){2,11}SES(br){2,13}SEE{2,16}]",
             "[T(Hello){1,1}D( 4 > 3\n \"> 10 ){1,6}T(, ){2,11}SE(br){2,13}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello<![CDATA[ 4 > 3\n '> 10 ]]>, <br/>",
-            "[T(Hello){1,1}D( 4 > 3\n '> 10 ){1,6}T(, ){2,11}SES(<){2,13}SEN(br){2,14}SEE(/>){2,16}]",
+            "[T(Hello){1,1}D( 4 > 3\n '> 10 ){1,6}T(, ){2,11}SES(br){2,13}SEE{2,16}]",
             "[T(Hello){1,1}D( 4 > 3\n '> 10 ){1,6}T(, ){2,11}SE(br){2,13}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello<![CDATA[ 4 > 3 > 10 ]]>, <br/>",
-            "[T(Hello){1,1}D( 4 > 3 > 10 ){1,6}T(, ){1,30}SES(<){1,32}SEN(br){1,33}SEE(/>){1,35}]",
+            "[T(Hello){1,1}D( 4 > 3 > 10 ){1,6}T(, ){1,30}SES(br){1,32}SEE{1,35}]",
             null, 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello<![CDATA[ 4 > 3\n\n\n\n > 10 ]]>, <br/>",
-            "[T(Hello){1,1}D( 4 > 3\n\n\n\n > 10 ){1,6}T(, ){5,10}SES(<){5,12}SEN(br){5,13}SEE(/>){5,15}]",
+            "[T(Hello){1,1}D( 4 > 3\n\n\n\n > 10 ){1,6}T(, ){5,10}SES(br){5,12}SEE{5,15}]",
             null, 
             noRestrictionsAutoClose);
         testDoc( 
             "Hello<![CDATA[ 4 > 3\n\n  \n   \n   \t> 10 ]]>, <br/>",
-            "[T(Hello){1,1}D( 4 > 3\n\n  \n   \n   \t> 10 ){1,6}T(, ){5,13}SES(<){5,15}SEN(br){5,16}SEE(/>){5,18}]",
+            "[T(Hello){1,1}D( 4 > 3\n\n  \n   \n   \t> 10 ){1,6}T(, ){5,13}SES(br){5,15}SEE{5,18}]",
             null, 
             noRestrictionsAutoClose);
         testDoc( 
@@ -390,11 +390,11 @@ public class AttoParserTest extends TestCase {
             "Hello<![CDATA[ 4 > 3\n\n  \n   \n   \t> 10 ]]>, <br/>\n" +
             "Hello<![CDATA[ 4 > 3\n\n  \n   \n   \t> 10 ]]>, <br/>\n" +
             "Hello<![CDATA[ 4 > 3\n\n  \n   \n   \t> 10 ]]>, <br/>",
-            "[T(Hello){1,1}D( 4 > 3\n\n  \n   \n   \t> 10 ){1,6}T(, ){5,13}SES(<){5,15}SEN(br){5,16}SEE(/>){5,18}" +
-            "T(\nHello){5,20}D( 4 > 3\n\n  \n   \n   \t> 10 ){6,6}T(, ){10,13}SES(<){10,15}SEN(br){10,16}SEE(/>){10,18}" +
-            "T(\nHello){10,20}D( 4 > 3\n\n  \n   \n   \t> 10 ){11,6}T(, ){15,13}SES(<){15,15}SEN(br){15,16}SEE(/>){15,18}" +
-            "T(\nHello){15,20}D( 4 > 3\n\n  \n   \n   \t> 10 ){16,6}T(, ){20,13}SES(<){20,15}SEN(br){20,16}SEE(/>){20,18}" +
-            "T(\nHello){20,20}D( 4 > 3\n\n  \n   \n   \t> 10 ){21,6}T(, ){25,13}SES(<){25,15}SEN(br){25,16}SEE(/>){25,18}]",
+            "[T(Hello){1,1}D( 4 > 3\n\n  \n   \n   \t> 10 ){1,6}T(, ){5,13}SES(br){5,15}SEE{5,18}" +
+            "T(\nHello){5,20}D( 4 > 3\n\n  \n   \n   \t> 10 ){6,6}T(, ){10,13}SES(br){10,15}SEE{10,18}" +
+            "T(\nHello){10,20}D( 4 > 3\n\n  \n   \n   \t> 10 ){11,6}T(, ){15,13}SES(br){15,15}SEE{15,18}" +
+            "T(\nHello){15,20}D( 4 > 3\n\n  \n   \n   \t> 10 ){16,6}T(, ){20,13}SES(br){20,15}SEE{20,18}" +
+            "T(\nHello){20,20}D( 4 > 3\n\n  \n   \n   \t> 10 ){21,6}T(, ){25,13}SES(br){25,15}SEE{25,18}]",
             null, 
             noRestrictionsAutoClose);
         testDoc( 
@@ -550,13 +550,13 @@ public class AttoParserTest extends TestCase {
             "la \n&aacute; lasd &amp; aiass da & asdll . asi ua&$\" khj askjh 1 kh ak hhjh" +
             "kljasdl kjaslkj asjqq9k fiuh 23kj hdfkjh assdflkjh lkjh fdfa\nsdfkjlh dfs" +
             "llkd8u u \nhkkj asyu 4lk vl jhksajhd889p3rk sl a, alkj a9))sad l\nkjsalkja aslk" +
-            "la &aacute;\n lasd &amp;){1,1}OES(<){11,12}OEN(p){11,13}OEE(>){11,14}T( aiass da & asdll . asi ua&$\" khj askjh 1 kh ak hh\njh" +
+            "la &aacute;\n lasd &amp;){1,1}OES(p){11,12}OEE{11,14}T( aiass da & asdll . asi ua&$\" khj askjh 1 kh ak hh\njh" +
             "kl\njasdl kjaslkj asjqq9\nk fiuh 23kj hdfkjh assd\nflkjh lkjh fdfasdfkjlh dfs" +
             "llk\nd8u u hkkj asyu 4lk vl jhksajhd889p3rk sl a, alkj a9\n))sad lkjsalkja aslk" +
             "la \n&aacute; lasd &amp; aiass da & asdll . asi ua&$\" khj askjh 1 kh ak hhjh" +
             "kljasdl kjaslkj asjqq9k fiuh 23kj hdfkjh assdflkjh lkjh fdfa\nsdfkjlh dfs" +
             "llkd8u u \nhkkj asyu 4lk vl jhksajhd889p3rk sl a, alkj a9))sad l\nkjsalkja aslk" +
-            "la &aacute;\n lasd &amp; aiass da & asdll . asi ua&$\"){11,15}CES(</){22,41}CEN(p){22,43}CEE(>){22,44}T( khj askjh 1 kh ak hh\njh" +
+            "la &aacute;\n lasd &amp; aiass da & asdll . asi ua&$\"){11,15}CES(p){22,41}CEE{22,44}T( khj askjh 1 kh ak hh\njh" +
             "kl\njasdl kjaslkj asjqq9\nk fiuh 23kj hdfkjh assd\nflkjh lkjh fdfasdfkjlh dfs" +
             "llk\nd8u u hkkj asyu 4lk vl jhksajhd889p3rk sl a, alkj a9\n))sad lkjsalkja aslk" +
             "la \n&aacute; lasd &amp; aiass da & asdll . asi ua&$\" khj askjh 1 kh ak hhjh" +
@@ -627,22 +627,22 @@ public class AttoParserTest extends TestCase {
         
         testDoc( 
             "<div class = \"lala\">",
-            "[OES(<){1,1}OEN(div){1,2}AS( ){1,5}A(class){1,6}( = ){1,11}(\"lala\"){1,14}OEE(>){1,20}ACES(</){1,21}ACEN(div){1,21}ACEE(>){1,21}]",
+            "[OES(div){1,1}IWS( ){1,5}A(class){1,6}( = ){1,11}(\"lala\"){1,14}OEE{1,20}ACES(div){1,21}ACEE{1,21}]",
             null, 
             noRestrictionsAutoClose);
         testDoc( 
             "<div class \n\n= \nlala li=\nlla>",
-            "[OES(<){1,1}OEN(div){1,2}AS( ){1,5}A(class){1,6}( \n\n= \n){1,11}(lala){4,1}AS( ){4,5}A(li){4,6}(=\n){4,8}(lla){5,1}OEE(>){5,4}ACES(</){5,5}ACEN(div){5,5}ACEE(>){5,5}]",
+            "[OES(div){1,1}IWS( ){1,5}A(class){1,6}( \n\n= \n){1,11}(lala){4,1}IWS( ){4,5}A(li){4,6}(=\n){4,8}(lla){5,1}OEE{5,4}ACES(div){5,5}ACEE{5,5}]",
             null, 
             noRestrictionsAutoClose);
         testDoc( 
             "<div class \n\n= \n\"lala\"li=\nlla>",
-            "[OES(<){1,1}OEN(div){1,2}AS( ){1,5}A(class){1,6}( \n\n= \n){1,11}(\"lala\"){4,1}A(li){4,7}(=\n){4,9}(lla){5,1}OEE(>){5,4}ACES(</){5,5}ACEN(div){5,5}ACEE(>){5,5}]",
+            "[OES(div){1,1}IWS( ){1,5}A(class){1,6}( \n\n= \n){1,11}(\"lala\"){4,1}A(li){4,7}(=\n){4,9}(lla){5,1}OEE{5,4}ACES(div){5,5}ACEE{5,5}]",
             null, 
             noRestrictionsAutoClose);
         testDoc( 
             "<div class \n\n= \n'lala'li=\nlla>",
-            "[OES(<){1,1}OEN(div){1,2}AS( ){1,5}A(class){1,6}( \n\n= \n){1,11}('lala'){4,1}A(li){4,7}(=\n){4,9}(lla){5,1}OEE(>){5,4}ACES(</){5,5}ACEN(div){5,5}ACEE(>){5,5}]",
+            "[OES(div){1,1}IWS( ){1,5}A(class){1,6}( \n\n= \n){1,11}('lala'){4,1}A(li){4,7}(=\n){4,9}(lla){5,1}OEE{5,4}ACES(div){5,5}ACEE{5,5}]",
             null, 
             noRestrictionsAutoClose);
         
@@ -931,12 +931,12 @@ public class AttoParserTest extends TestCase {
                 
         testDoc( 
             "\n <!ELEMENT sgml ANY>",
-            "[T(\n ){1,1}OES(<){2,2}OEN(!ELEMENT){2,3}AS( ){2,11}A(sgml){2,12}(){2,16}(){2,16}AS( ){2,16}A(ANY){2,17}(){2,20}(){2,20}OEE(>){2,20}ACES(</){2,21}ACEN(!ELEMENT){2,21}ACEE(>){2,21}]",
+            "[T(\n ){1,1}OES(!ELEMENT){2,2}IWS( ){2,11}A(sgml){2,12}(){2,16}(){2,16}IWS( ){2,16}A(ANY){2,17}(){2,20}(){2,20}OEE{2,20}ACES(!ELEMENT){2,21}ACEE{2,21}]",
             "[T(\n ){1,1}OE(!ELEMENT[sgml='',ANY='']){2,2}ACE(!ELEMENT){2,21}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "\n <!ELEMENT sgml ANY>\n <!-- this is a comment inside --> <!ENTITY % std       \"standard SGML\">\n",
-            "[T(\n ){1,1}OES(<){2,2}OEN(!ELEMENT){2,3}AS( ){2,11}A(sgml){2,12}(){2,16}(){2,16}AS( ){2,16}A(ANY){2,17}(){2,20}(){2,20}OEE(>){2,20}T(\n ){2,21}C( this is a comment inside ){3,2}T( ){3,35}OES(<){3,36}OEN(!ENTITY){3,37}AS( ){3,44}A(%){3,45}(){3,46}(){3,46}AS( ){3,46}A(std){3,47}(){3,50}(){3,50}AS(       ){3,50}A(\"standard){3,57}(){3,66}(){3,66}AS( ){3,66}A(SGML\"){3,67}(){3,72}(){3,72}OEE(>){3,72}T(\n){3,73}ACES(</){4,1}ACEN(!ENTITY){4,1}ACEE(>){4,1}ACES(</){4,1}ACEN(!ELEMENT){4,1}ACEE(>){4,1}]",
+            "[T(\n ){1,1}OES(!ELEMENT){2,2}IWS( ){2,11}A(sgml){2,12}(){2,16}(){2,16}IWS( ){2,16}A(ANY){2,17}(){2,20}(){2,20}OEE{2,20}T(\n ){2,21}C( this is a comment inside ){3,2}T( ){3,35}OES(!ENTITY){3,36}IWS( ){3,44}A(%){3,45}(){3,46}(){3,46}IWS( ){3,46}A(std){3,47}(){3,50}(){3,50}IWS(       ){3,50}A(\"standard){3,57}(){3,66}(){3,66}IWS( ){3,66}A(SGML\"){3,67}(){3,72}(){3,72}OEE{3,72}T(\n){3,73}ACES(!ENTITY){4,1}ACEE{4,1}ACES(!ELEMENT){4,1}ACEE{4,1}]",
             "[T(\n ){1,1}OE(!ELEMENT[sgml='',ANY='']){2,2}T(\n ){2,21}C( this is a comment inside ){3,2}T( ){3,35}OE(!ENTITY[%='',std='',\"standard='',SGML\"='']){3,36}T(\n){3,73}ACE(!ENTITY){4,1}ACE(!ELEMENT){4,1}]", 
             noRestrictionsAutoClose);
 
@@ -963,28 +963,28 @@ public class AttoParserTest extends TestCase {
             noRestrictionsAutoClose);
         testDoc( 
             "<p><!--a--></p>",
-            "[OES(<){1,1}OEN(p){1,2}OEE(>){1,3}C(a){1,4}CES(</){1,12}CEN(p){1,14}CEE(>){1,15}]",
+            "[OES(p){1,1}OEE{1,3}C(a){1,4}CES(p){1,12}CEE{1,15}]",
             "[OE(p){1,1}C(a){1,4}CE(p){1,12}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "<p><!--a-->",
-            "[OES(<){1,1}OEN(p){1,2}OEE(>){1,3}C(a){1,4}ACES(</){1,12}ACEN(p){1,12}ACEE(>){1,12}]",
+            "[OES(p){1,1}OEE{1,3}C(a){1,4}ACES(p){1,12}ACEE{1,12}]",
             "[OE(p){1,1}C(a){1,4}ACE(p){1,12}]", 
             noRestrictionsAutoClose);
         testDoc( 
             "<p><?xsl-stylesheet a=\"1\" a b > uas23 ?>",
-            "[OES(<){1,1}OEN(p){1,2}OEE(>){1,3}P(xsl-stylesheet){1,6}(a=\"1\" a b > uas23 ){1,21}ACES(</){1,41}ACEN(p){1,41}ACEE(>){1,41}]",
+            "[OES(p){1,1}OEE{1,3}P(xsl-stylesheet){1,6}(a=\"1\" a b > uas23 ){1,21}ACES(p){1,41}ACEE{1,41}]",
             "[OE(p){1,1}P(xsl-stylesheet)(a=\"1\" a b > uas23 ){1,4}ACE(p){1,41}]", 
             noRestrictionsAutoClose);
         
         testDoc( 
             "<p>Hello</p>",
-            "[OES(<){1,1}OEN(p){1,2}OEE(>){1,3}T(Hello){1,4}CES(</){1,9}CEN(p){1,11}CEE(>){1,12}]",
+            "[OES(p){1,1}OEE{1,3}T(Hello){1,4}CES(p){1,9}CEE{1,12}]",
             "[OE(p){1,1}T(Hello){1,4}CE(p){1,9}]", 
             wellFormedXml);
         testDoc( 
             "<h1>Hello</h1>",
-            "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}T(Hello){1,5}CES(</){1,10}CEN(h1){1,12}CEE(>){1,14}]",
+            "[OES(h1){1,1}OEE{1,4}T(Hello){1,5}CES(h1){1,10}CEE{1,14}]",
             "[OE(h1){1,1}T(Hello){1,5}CE(h1){1,10}]", 
             wellFormedXml);
         testDocError( 
@@ -1001,48 +1001,48 @@ public class AttoParserTest extends TestCase {
             wellFormedXml);
         testDoc( 
             "<h1>Hello</h1 >",
-            "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}T(Hello){1,5}CES(</){1,10}CEN(h1){1,12}AS( ){1,14}CEE(>){1,15}]",
+            "[OES(h1){1,1}OEE{1,4}T(Hello){1,5}CES(h1){1,10}IWS( ){1,14}CEE{1,15}]",
             "[OE(h1){1,1}T(Hello){1,5}CE(h1){1,10}]", 
             wellFormedXml);
         
         testDoc( 
             "<?xml version=\"1.0\"?>\n<!DOCTYPE html>\n<html></html>",
-            "[X(1.0){1,15}(null){1,20}(null){1,20}T(\n){1,22}DT(DOCTYPE){2,3}(html){2,11}(){2,15}(){2,15}(){2,15}(){2,15}T(\n){2,16}OES(<){3,1}OEN(html){3,2}OEE(>){3,6}CES(</){3,7}CEN(html){3,9}CEE(>){3,13}]",
+            "[X(1.0){1,15}(null){1,20}(null){1,20}T(\n){1,22}DT(DOCTYPE){2,3}(html){2,11}(){2,15}(){2,15}(){2,15}(){2,15}T(\n){2,16}OES(html){3,1}OEE{3,6}CES(html){3,7}CEE{3,13}]",
             "[X(1.0)(null)(null){1,1}T(\n){1,22}DT(html)()()(){2,1}T(\n){2,16}OE(html){3,1}CE(html){3,7}]", 
             wellFormedXml);
         testDoc( 
             "<?xml version=\"1.0\"?>\n<html></html>",
-            "[X(1.0){1,15}(null){1,20}(null){1,20}T(\n){1,22}OES(<){2,1}OEN(html){2,2}OEE(>){2,6}CES(</){2,7}CEN(html){2,9}CEE(>){2,13}]",
+            "[X(1.0){1,15}(null){1,20}(null){1,20}T(\n){1,22}OES(html){2,1}OEE{2,6}CES(html){2,7}CEE{2,13}]",
             "[X(1.0)(null)(null){1,1}T(\n){1,22}OE(html){2,1}CE(html){2,7}]", 
             wellFormedXml);
         testDoc( 
             "<!DOCTYPE html>\n<html></html>",
-            "[DT(DOCTYPE){1,3}(html){1,11}(){1,15}(){1,15}(){1,15}(){1,15}T(\n){1,16}OES(<){2,1}OEN(html){2,2}OEE(>){2,6}CES(</){2,7}CEN(html){2,9}CEE(>){2,13}]",
+            "[DT(DOCTYPE){1,3}(html){1,11}(){1,15}(){1,15}(){1,15}(){1,15}T(\n){1,16}OES(html){2,1}OEE{2,6}CES(html){2,7}CEE{2,13}]",
             "[DT(html)()()(){1,1}T(\n){1,16}OE(html){2,1}CE(html){2,7}]", 
             wellFormedXml);
         testDoc( 
             "\n<!DOCTYPE html>\n<html></html>",
-            "[T(\n){1,1}DT(DOCTYPE){2,3}(html){2,11}(){2,15}(){2,15}(){2,15}(){2,15}T(\n){2,16}OES(<){3,1}OEN(html){3,2}OEE(>){3,6}CES(</){3,7}CEN(html){3,9}CEE(>){3,13}]",
+            "[T(\n){1,1}DT(DOCTYPE){2,3}(html){2,11}(){2,15}(){2,15}(){2,15}(){2,15}T(\n){2,16}OES(html){3,1}OEE{3,6}CES(html){3,7}CEE{3,13}]",
             "[T(\n){1,1}DT(html)()()(){2,1}T(\n){2,16}OE(html){3,1}CE(html){3,7}]", 
             wellFormedXml);
         testDoc( 
             "\n<?xml version=\"1.0\"?>\n<!DOCTYPE html>\n<html></html>",
-            "[T(\n){1,1}X(1.0){2,15}(null){2,20}(null){2,20}T(\n){2,22}DT(DOCTYPE){3,3}(html){3,11}(){3,15}(){3,15}(){3,15}(){3,15}T(\n){3,16}OES(<){4,1}OEN(html){4,2}OEE(>){4,6}CES(</){4,7}CEN(html){4,9}CEE(>){4,13}]",
+            "[T(\n){1,1}X(1.0){2,15}(null){2,20}(null){2,20}T(\n){2,22}DT(DOCTYPE){3,3}(html){3,11}(){3,15}(){3,15}(){3,15}(){3,15}T(\n){3,16}OES(html){4,1}OEE{4,6}CES(html){4,7}CEE{4,13}]",
             "[T(\n){1,1}X(1.0)(null)(null){2,1}T(\n){2,22}DT(html)()()(){3,1}T(\n){3,16}OE(html){4,1}CE(html){4,7}]", 
             wellFormedXml);
         testDoc( 
             "<?xml version=\"1.0\"?>\n<!-- a comment -->\n<!DOCTYPE html>\n<html></html>",
-            "[X(1.0){1,15}(null){1,20}(null){1,20}T(\n){1,22}C( a comment ){2,1}T(\n){2,19}DT(DOCTYPE){3,3}(html){3,11}(){3,15}(){3,15}(){3,15}(){3,15}T(\n){3,16}OES(<){4,1}OEN(html){4,2}OEE(>){4,6}CES(</){4,7}CEN(html){4,9}CEE(>){4,13}]",
+            "[X(1.0){1,15}(null){1,20}(null){1,20}T(\n){1,22}C( a comment ){2,1}T(\n){2,19}DT(DOCTYPE){3,3}(html){3,11}(){3,15}(){3,15}(){3,15}(){3,15}T(\n){3,16}OES(html){4,1}OEE{4,6}CES(html){4,7}CEE{4,13}]",
             "[X(1.0)(null)(null){1,1}T(\n){1,22}C( a comment ){2,1}T(\n){2,19}DT(html)()()(){3,1}T(\n){3,16}OE(html){4,1}CE(html){4,7}]", 
             wellFormedXml);
         testDoc( 
             "<!-- a comment -->\n<?xml version=\"1.0\"?>\n<!DOCTYPE html>\n<html></html>",
-            "[C( a comment ){1,1}T(\n){1,19}X(1.0){2,15}(null){2,20}(null){2,20}T(\n){2,22}DT(DOCTYPE){3,3}(html){3,11}(){3,15}(){3,15}(){3,15}(){3,15}T(\n){3,16}OES(<){4,1}OEN(html){4,2}OEE(>){4,6}CES(</){4,7}CEN(html){4,9}CEE(>){4,13}]",
+            "[C( a comment ){1,1}T(\n){1,19}X(1.0){2,15}(null){2,20}(null){2,20}T(\n){2,22}DT(DOCTYPE){3,3}(html){3,11}(){3,15}(){3,15}(){3,15}(){3,15}T(\n){3,16}OES(html){4,1}OEE{4,6}CES(html){4,7}CEE{4,13}]",
             "[C( a comment ){1,1}T(\n){1,19}X(1.0)(null)(null){2,1}T(\n){2,22}DT(html)()()(){3,1}T(\n){3,16}OE(html){4,1}CE(html){4,7}]", 
             wellFormedXml);
         testDoc( 
             "<!DOCTYPE html>\n<html><?xml version=\"1.0\"?>\n</html>",
-            "[DT(DOCTYPE){1,3}(html){1,11}(){1,15}(){1,15}(){1,15}(){1,15}T(\n){1,16}OES(<){2,1}OEN(html){2,2}OEE(>){2,6}X(1.0){2,21}(null){2,26}(null){2,26}T(\n){2,28}CES(</){3,1}CEN(html){3,3}CEE(>){3,7}]", 
+            "[DT(DOCTYPE){1,3}(html){1,11}(){1,15}(){1,15}(){1,15}(){1,15}T(\n){1,16}OES(html){2,1}OEE{2,6}X(1.0){2,21}(null){2,26}(null){2,26}T(\n){2,28}CES(html){3,1}CEE{3,7}]", 
             "[DT(html)()()(){1,1}T(\n){1,16}OE(html){2,1}X(1.0)(null)(null){2,7}T(\n){2,28}CE(html){3,1}]",
             noRestrictionsAutoClose);
         testDocError( 
@@ -1073,12 +1073,12 @@ public class AttoParserTest extends TestCase {
         
         testDoc( 
             "Hello, <br th:text=\"ll\"/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}(=){1,19}(\"ll\"){1,20}SEE(/>){1,24}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}(=){1,19}(\"ll\"){1,20}SEE{1,24}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]", 
             wellFormedXml);
         testDoc( 
             "Hello, <br th:text='ll'/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}(=){1,19}('ll'){1,20}SEE(/>){1,24}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}(=){1,19}('ll'){1,20}SEE{1,24}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]", 
             wellFormedXml);
         testDocError( 
@@ -1095,7 +1095,7 @@ public class AttoParserTest extends TestCase {
             wellFormedXml);
         testDoc( 
             "<html></html><html></html>",
-            "[OES(<){1,1}OEN(html){1,2}OEE(>){1,6}CES(</){1,7}CEN(html){1,9}CEE(>){1,13}OES(<){1,14}OEN(html){1,15}OEE(>){1,19}CES(</){1,20}CEN(html){1,22}CEE(>){1,26}]", 
+            "[OES(html){1,1}OEE{1,6}CES(html){1,7}CEE{1,13}OES(html){1,14}OEE{1,19}CES(html){1,20}CEE{1,26}]", 
             "[OE(html){1,1}CE(html){1,7}OE(html){1,14}CE(html){1,20}]", 
             wellFormedXml);
         testDocError( 
@@ -1116,7 +1116,7 @@ public class AttoParserTest extends TestCase {
             wellFormedXml);
         testDoc( 
             "Hello, <br th:text=\"ll\" th:text=\"la\"/>",
-            "[T(Hello, ){1,1}SES(<){1,8}SEN(br){1,9}AS( ){1,11}A(th:text){1,12}(=){1,19}(\"ll\"){1,20}AS( ){1,24}A(th:text){1,25}(=){1,32}(\"la\"){1,33}SEE(/>){1,37}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}(=){1,19}(\"ll\"){1,20}IWS( ){1,24}A(th:text){1,25}(=){1,32}(\"la\"){1,33}SEE{1,37}]",
             "[T(Hello, ){1,1}SE(br[th:text='la']){1,8}]", 
             noRestrictionsAutoClose);
         testDocError( 
@@ -1130,7 +1130,7 @@ public class AttoParserTest extends TestCase {
         
         testDoc( 
                 "<h1>Hello</h1>",
-                "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}T(Hello){1,5}CES(</){1,10}CEN(h1){1,12}CEE(>){1,14}]",
+                "[OES(h1){1,1}OEE{1,4}T(Hello){1,5}CES(h1){1,10}CEE{1,14}]",
                 "[OE(h1){1,1}T(Hello){1,5}CE(h1){1,10}]", 
                 noUnbalacedClosed);
         testDocError( 
@@ -1141,7 +1141,7 @@ public class AttoParserTest extends TestCase {
                 noUnbalacedClosed);
         testDoc( 
                 "<h1>Hello",
-                "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}T(Hello){1,5}ACES(</){1,10}ACEN(h1){1,10}ACEE(>){1,10}]",
+                "[OES(h1){1,1}OEE{1,4}T(Hello){1,5}ACES(h1){1,10}ACEE{1,10}]",
                 "[OE(h1){1,1}T(Hello){1,5}ACE(h1){1,10}]", 
                 noRestrictionsAutoClose);
         testDocError( 
@@ -1152,7 +1152,7 @@ public class AttoParserTest extends TestCase {
                 noUnbalacedClosed);
         testDoc( 
                 "<h1><h2>Hello</h1>",
-                "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}OES(<){1,5}OEN(h2){1,6}OEE(>){1,8}T(Hello){1,9}ACES(</){1,14}ACEN(h2){1,14}ACEE(>){1,14}CES(</){1,14}CEN(h1){1,16}CEE(>){1,18}]",
+                "[OES(h1){1,1}OEE{1,4}OES(h2){1,5}OEE{1,8}T(Hello){1,9}ACES(h2){1,14}ACEE{1,14}CES(h1){1,14}CEE{1,18}]",
                 "[OE(h1){1,1}OE(h2){1,5}T(Hello){1,9}ACE(h2){1,14}CE(h1){1,14}]", 
                 noUnbalacedClosed);
         testDocError( 
@@ -1163,17 +1163,17 @@ public class AttoParserTest extends TestCase {
                 noUnbalacedClosed);
         testDoc( 
                 "<h1><h2>Hello</h2>",
-                "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}OES(<){1,5}OEN(h2){1,6}OEE(>){1,8}T(Hello){1,9}CES(</){1,14}CEN(h2){1,16}CEE(>){1,18}ACES(</){1,19}ACEN(h1){1,19}ACEE(>){1,19}]",
+                "[OES(h1){1,1}OEE{1,4}OES(h2){1,5}OEE{1,8}T(Hello){1,9}CES(h2){1,14}CEE{1,18}ACES(h1){1,19}ACEE{1,19}]",
                 "[OE(h1){1,1}OE(h2){1,5}T(Hello){1,9}CE(h2){1,14}ACE(h1){1,19}]", 
                 noUnbalacedClosed);
         testDoc( 
                 "<h1><h2>Hello<!--a--></h1>",
-                "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}OES(<){1,5}OEN(h2){1,6}OEE(>){1,8}T(Hello){1,9}C(a){1,14}ACES(</){1,22}ACEN(h2){1,22}ACEE(>){1,22}CES(</){1,22}CEN(h1){1,24}CEE(>){1,26}]",
+                "[OES(h1){1,1}OEE{1,4}OES(h2){1,5}OEE{1,8}T(Hello){1,9}C(a){1,14}ACES(h2){1,22}ACEE{1,22}CES(h1){1,22}CEE{1,26}]",
                 "[OE(h1){1,1}OE(h2){1,5}T(Hello){1,9}C(a){1,14}ACE(h2){1,22}CE(h1){1,22}]", 
                 noUnbalacedClosed);
         testDoc( 
                 "<h1></H1>",
-                "[OES(<){1,1}OEN(h1){1,2}OEE(>){1,4}CES(</){1,5}CEN(H1){1,7}CEE(>){1,9}]",
+                "[OES(h1){1,1}OEE{1,4}CES(H1){1,5}CEE{1,9}]",
                 "[OE(h1){1,1}CE(H1){1,5}]", 
                 wellFormedXmlCaseInsensitive);
         testDocError( 
@@ -1182,7 +1182,7 @@ public class AttoParserTest extends TestCase {
                 wellFormedXml);
         testDoc( 
                 "<!DOCTYPE h1><H1></H1>",
-                "[DT(DOCTYPE){1,3}(h1){1,11}(){1,13}(){1,13}(){1,13}(){1,13}OES(<){1,14}OEN(H1){1,15}OEE(>){1,17}CES(</){1,18}CEN(H1){1,20}CEE(>){1,22}]",
+                "[DT(DOCTYPE){1,3}(h1){1,11}(){1,13}(){1,13}(){1,13}(){1,13}OES(H1){1,14}OEE{1,17}CES(H1){1,18}CEE{1,22}]",
                 "[DT(h1)()()(){1,1}OE(H1){1,14}CE(H1){1,18}]", 
                 wellFormedXmlCaseInsensitive);
         testDocError( 
@@ -1195,8 +1195,13 @@ public class AttoParserTest extends TestCase {
                 wellFormedXmlCaseInsensitive);
         testDoc( 
                 "<a b=\"2\" B=\"3\"/>",
-                "[SES(<){1,1}SEN(a){1,2}AS( ){1,3}A(b){1,4}(=){1,5}(\"2\"){1,6}AS( ){1,9}A(B){1,10}(=){1,11}(\"3\"){1,12}SEE(/>){1,15}]", 
+                "[SES(a){1,1}IWS( ){1,3}A(b){1,4}(=){1,5}(\"2\"){1,6}IWS( ){1,9}A(B){1,10}(=){1,11}(\"3\"){1,12}SEE{1,15}]", 
                 "[SE(a[b='2',B='3']){1,1}]", 
+                wellFormedXml);
+        testDoc( 
+                "<a />",
+                "[SES(a){1,1}IWS( ){1,3}SEE{1,4}]", 
+                "[SE(a){1,1}]", 
                 wellFormedXml);
         
         System.out.println("TOTAL Test executions: " + totalTestExecutions);

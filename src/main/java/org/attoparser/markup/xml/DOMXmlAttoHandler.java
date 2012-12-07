@@ -22,8 +22,6 @@ package org.attoparser.markup.xml;
 import java.util.Map;
 
 import org.attoparser.AttoParseException;
-import org.attoparser.markup.AbstractStandardMarkupAttoHandler;
-import org.attoparser.markup.MarkupParsingConfiguration;
 import org.attoparser.markup.dom.INestableNode;
 import org.attoparser.markup.dom.impl.CDATASection;
 import org.attoparser.markup.dom.impl.Comment;
@@ -53,7 +51,7 @@ import org.attoparser.markup.dom.impl.XmlDeclaration;
  * @since 1.1
  *
  */
-public final class DOMXmlAttoHandler extends AbstractStandardMarkupAttoHandler {
+public final class DOMXmlAttoHandler extends AbstractStandardXmlAttoHandler {
     
     private final String documentName;
     
@@ -82,8 +80,7 @@ public final class DOMXmlAttoHandler extends AbstractStandardMarkupAttoHandler {
      * </p> 
      */
     public DOMXmlAttoHandler(final String documentName) {
-        // Must be well-formed in order to create an adequate DOM tree
-        super(XmlParsing.xmlParsingConfiguration());
+        super();
         this.documentName = 
                 (documentName == null? 
                         String.valueOf(System.identityHashCode(this)) : documentName);
@@ -153,13 +150,12 @@ public final class DOMXmlAttoHandler extends AbstractStandardMarkupAttoHandler {
     
 
     @Override
-    public void handleDocumentStart(
+    public void handleXmlDocumentStart(
             final long startTimeNanos, 
-            final int line, final int col,
-            final MarkupParsingConfiguration markupParsingConfiguration) 
+            final int line, final int col) 
             throws AttoParseException {
         
-        super.handleDocumentStart(startTimeNanos, line, col, markupParsingConfiguration);
+        super.handleXmlDocumentStart(startTimeNanos, line, col);
         
         this.document = new Document(this.documentName);
         this.parsingStartTimeNanos = startTimeNanos;
@@ -169,13 +165,12 @@ public final class DOMXmlAttoHandler extends AbstractStandardMarkupAttoHandler {
     
     
     @Override
-    public void handleDocumentEnd(
+    public void handleXmlDocumentEnd(
             final long endTimeNanos, final long totalTimeNanos, 
-            final int line, final int col, 
-            final MarkupParsingConfiguration markupParsingConfiguration)
+            final int line, final int col)
             throws AttoParseException {
 
-        super.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col, markupParsingConfiguration);
+        super.handleXmlDocumentEnd(endTimeNanos, totalTimeNanos, line, col);
         
         this.parsingEndTimeNanos = endTimeNanos;
         this.parsingTotalTimeNanos = totalTimeNanos;
@@ -237,12 +232,12 @@ public final class DOMXmlAttoHandler extends AbstractStandardMarkupAttoHandler {
     
     
     @Override
-    public void handleStandaloneElement(
+    public void handleXmlStandaloneElement(
             final String elementName, final Map<String, String> attributes, 
             final int line, final int col)
             throws AttoParseException {
 
-        super.handleStandaloneElement(elementName, attributes, line, col);
+        super.handleXmlStandaloneElement(elementName, attributes, line, col);
 
         final Element element = new Element(elementName);
         element.addAttributes(attributes);
@@ -260,12 +255,12 @@ public final class DOMXmlAttoHandler extends AbstractStandardMarkupAttoHandler {
     
     
     @Override
-    public void handleOpenElement(
+    public void handleXmlOpenElement(
             final String elementName, final Map<String, String> attributes, 
             final int line, final int col)
             throws AttoParseException {
 
-        super.handleOpenElement(elementName, attributes, line, col);
+        super.handleXmlOpenElement(elementName, attributes, line, col);
 
         final Element element = new Element(elementName);
         element.addAttributes(attributes);
@@ -284,12 +279,12 @@ public final class DOMXmlAttoHandler extends AbstractStandardMarkupAttoHandler {
 
     
     @Override
-    public void handleCloseElement(
+    public void handleXmlCloseElement(
             final String elementName, 
             final int line, final int col)
             throws AttoParseException {
 
-        super.handleCloseElement(elementName, line, col);
+        super.handleXmlCloseElement(elementName, line, col);
 
         this.currentParent = this.currentParent.getParent();
         

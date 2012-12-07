@@ -92,7 +92,7 @@ public interface IHtmlAttributeSequenceHandling {
     
     /**
      * <p>
-     *   Called when a separation between attributes is found.
+     *   Called when an amount of white space is found inside an element.
      * </p>
      * <p>
      *   This attribute separators can contain any amount of whitespace, including
@@ -119,7 +119,7 @@ public interface IHtmlAttributeSequenceHandling {
      * @param col the column in the original document where the artifact starts.
      * @throws AttoParseException
      */
-    public void handleHtmlAttributeSeparator(
+    public void handleHtmlInnerWhiteSpace(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)

@@ -50,30 +50,27 @@ public class StandaloneHtmlElement extends BasicHtmlElement {
     
     
     @Override
-    public void handleOpenElementStartAndName(
+    public void handleOpenElementStart(
             final char[] buffer, 
-            final int offset, final int len, 
+            final int nameOffset, final int nameLen, 
             final int line, final int col, 
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException {
         
         stack.openElement(this);
         
-        handler.handleHtmlNonMinimizedStandaloneElementStart(OPEN_ELEMENT_START, 0, OPEN_ELEMENT_START.length, line, col - 1);
-        handler.handleHtmlNonMinimizedStandaloneElementName(buffer, offset, len, line, col);
+        handler.handleHtmlNonMinimizedStandaloneElementStart(buffer, nameOffset, nameLen, line, col);
 
     }
 
     
     @Override
     public void handleOpenElementEnd(
-            final char[] buffer, 
-            final int offset, final int len,
             final int line, final int col, 
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException {
         
-        handler.handleHtmlNonMinimizedStandaloneElementEnd(OPEN_ELEMENT_END, 0, OPEN_ELEMENT_END.length, line, col);
+        handler.handleHtmlNonMinimizedStandaloneElementEnd(line, col);
         
     }
 
@@ -81,28 +78,25 @@ public class StandaloneHtmlElement extends BasicHtmlElement {
     
     
     @Override
-    public void handleCloseElementStartAndName(
+    public void handleCloseElementStart(
             final char[] buffer, 
-            final int offset, final int len, 
+            final int nameOffset, final int nameLen, 
             final int line, final int col, 
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException {
         
-        handler.handleHtmlIgnorableCloseElementStart(CLOSE_ELEMENT_START, 0, CLOSE_ELEMENT_START.length, line, col - 2);
-        handler.handleHtmlIgnorableCloseElementName(buffer, offset, len, line, col);
+        handler.handleHtmlIgnorableCloseElementStart(buffer, nameOffset, nameLen, line, col);
 
     }
 
     
     @Override
     public void handleCloseElementEnd(
-            final char[] buffer, 
-            final int offset, final int len,
             final int line, final int col, 
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException {
         
-        handler.handleHtmlIgnorableCloseElementEnd(CLOSE_ELEMENT_END, 0, CLOSE_ELEMENT_END.length, line, col);
+        handler.handleHtmlIgnorableCloseElementEnd(line, col);
 
         stack.closeElement();
         

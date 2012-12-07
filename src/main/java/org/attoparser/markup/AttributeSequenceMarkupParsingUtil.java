@@ -136,7 +136,7 @@ public final class AttributeSequenceMarkupParsingUtil {
                 
                 final int wsOffset = current;
                 final int wsLen = maxi - current;
-                handler.handleAttributeSeparator(buffer, wsOffset, wsLen, currentArtifactLine, currentArtifactCol);
+                handler.handleInnerWhiteSpace(buffer, wsOffset, wsLen, currentArtifactLine, currentArtifactCol);
                 i = maxi;
                 continue;
                 
@@ -146,7 +146,7 @@ public final class AttributeSequenceMarkupParsingUtil {
                 // We avoid empty whitespace fragments
                 final int wsOffset = current;
                 final int wsLen = wsEnd - current;
-                handler.handleAttributeSeparator(buffer, wsOffset, wsLen, currentArtifactLine, currentArtifactCol);
+                handler.handleInnerWhiteSpace(buffer, wsOffset, wsLen, currentArtifactLine, currentArtifactCol);
                 i = wsEnd;
                 current = i;
             }
@@ -252,7 +252,7 @@ public final class AttributeSequenceMarkupParsingUtil {
                             0, 0, 0, 0,                                                            // value
                             currentArtifactLine, currentArtifactCol);                              // value
                     
-                    handler.handleAttributeSeparator(
+                    handler.handleInnerWhiteSpace(
                             buffer, 
                             operatorOffset, operatorLen, 
                             currentArtifactLine, currentArtifactCol);
@@ -287,7 +287,7 @@ public final class AttributeSequenceMarkupParsingUtil {
                         0, 0, 0, 0,                                                            // value
                         currentArtifactLine, currentArtifactCol);                              // value
                 
-                handler.handleAttributeSeparator(
+                handler.handleInnerWhiteSpace(
                         buffer, 
                         current, (operatorEnd - current), 
                         currentArtifactLine, currentArtifactCol);

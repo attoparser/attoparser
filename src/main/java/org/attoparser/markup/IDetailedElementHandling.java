@@ -39,8 +39,8 @@ public interface IDetailedElementHandling extends IAttributeSequenceHandling {
 
     /**
      * <p>
-     *   Called when the start of a standalone element (a <i>minimized tag</i>) is found. This
-     *   "start" is considered to be the "<tt>&lt;</tt>" symbol the element starts with.
+     *   Called when a standalone element (a <i>minimized tag</i>) is found. The name of
+     *   the element is also reported.
      * </p>
      * <p>
      *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
@@ -53,72 +53,28 @@ public interface IDetailedElementHandling extends IAttributeSequenceHandling {
      * </p>
      * 
      * @param buffer the document buffer (not copied)
-     * @param offset the offset (position in buffer) where the artifact starts.
-     * @param len the length (in chars) of the artifact, starting in offset.
+     * @param nameOffset the offset (position in buffer) where the element name appears.
+     * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
      * @throws AttoParseException
      */
     public void handleStandaloneElementStart(
             final char[] buffer, 
-            final int offset, final int len,
-            final int line, final int col)
-            throws AttoParseException;
-
-    /**
-     * <p>
-     *   Called when the name of a standalone element (a <i>minimized tag</i>) is found. E.g., the
-     *   "element name" of an element like <tt>&lt;img src="images/logo.png" /&gt;</tt> would be 
-     *   "<tt>img</tt>".
-     * </p>
-     * <p>
-     *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
-     *   should not be considered to be immutable, so reported structures should be copied if they need
-     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
-     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification). 
-     * </p>
-     * <p>
-     *   <b>Implementations of this handler should never modify the document buffer.</b> 
-     * </p>
-     * 
-     * @param buffer the document buffer (not copied)
-     * @param offset the offset (position in buffer) where the artifact starts.
-     * @param len the length (in chars) of the artifact, starting in offset.
-     * @param line the line in the original document where this artifact starts.
-     * @param col the column in the original document where this artifact starts.
-     * @throws AttoParseException
-     */
-    public void handleStandaloneElementName(
-            final char[] buffer, 
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException;
     
     /**
      * <p>
-     *   Called when the end of a standalone element (a <i>minimized tag</i>) is found. This
-     *   "end" is considered to be the "<tt>/&gt;</tt>" sequence the element ends with.
-     * </p>
-     * <p>
-     *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
-     *   should not be considered to be immutable, so reported structures should be copied if they need
-     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
-     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification). 
-     * </p>
-     * <p>
-     *   <b>Implementations of this handler should never modify the document buffer.</b> 
+     *   Called when the end of a standalone element (a <i>minimized tag</i>) is found
      * </p>
      * 
-     * @param buffer the document buffer (not copied)
-     * @param offset the offset (position in buffer) where the artifact starts.
-     * @param len the length (in chars) of the artifact, starting in offset.
-     * @param line the line in the original document where this artifact starts.
-     * @param col the column in the original document where this artifact starts.
+     * @param line the line in the original document where the element ending structure appears.
+     * @param col the column in the original document where the element ending structure appears.
      * @throws AttoParseException
      */
     public void handleStandaloneElementEnd(
-            final char[] buffer, 
-            final int offset, final int len,
             final int line, final int col)
             throws AttoParseException;
 
@@ -128,8 +84,8 @@ public interface IDetailedElementHandling extends IAttributeSequenceHandling {
     
     /**
      * <p>
-     *   Called when the start of an open element (an <i>open tag</i>) is found. This
-     *   "start" is considered to be the "<tt>&lt;</tt>" symbol the element starts with.
+     *   Called when an open element (an <i>open tag</i>) is found. The name of
+     *   the element is also reported.
      * </p>
      * <p>
      *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
@@ -142,71 +98,28 @@ public interface IDetailedElementHandling extends IAttributeSequenceHandling {
      * </p>
      * 
      * @param buffer the document buffer (not copied)
-     * @param offset the offset (position in buffer) where the artifact starts.
-     * @param len the length (in chars) of the artifact, starting in offset.
+     * @param nameOffset the offset (position in buffer) where the element name appears.
+     * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
      * @throws AttoParseException
      */
     public void handleOpenElementStart(
             final char[] buffer, 
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException;
     
     /**
      * <p>
-     *   Called when the name of an open element (an <i>open tag</i>) is found. E.g., the
-     *   "element name" of an element like <tt>&lt;div class="basic"&gt;</tt> would be "<tt>div</tt>".
-     * </p>
-     * <p>
-     *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
-     *   should not be considered to be immutable, so reported structures should be copied if they need
-     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
-     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification). 
-     * </p>
-     * <p>
-     *   <b>Implementations of this handler should never modify the document buffer.</b> 
+     *   Called when the end of an open element (an <i>open tag</i>) is found.
      * </p>
      * 
-     * @param buffer the document buffer (not copied)
-     * @param offset the offset (position in buffer) where the artifact starts.
-     * @param len the length (in chars) of the artifact, starting in offset.
-     * @param line the line in the original document where this artifact starts.
-     * @param col the column in the original document where this artifact starts.
-     * @throws AttoParseException
-     */
-    public void handleOpenElementName(
-            final char[] buffer, 
-            final int offset, final int len,
-            final int line, final int col)
-            throws AttoParseException;
-    
-    /**
-     * <p>
-     *   Called when the end of an open element (an <i>open tag</i>) is found. This
-     *   "end" is considered to be the "<tt>&gt;</tt>" symbol the element ends with.
-     * </p>
-     * <p>
-     *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
-     *   should not be considered to be immutable, so reported structures should be copied if they need
-     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
-     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification). 
-     * </p>
-     * <p>
-     *   <b>Implementations of this handler should never modify the document buffer.</b> 
-     * </p>
-     * 
-     * @param buffer the document buffer (not copied)
-     * @param offset the offset (position in buffer) where the artifact starts.
-     * @param len the length (in chars) of the artifact, starting in offset.
-     * @param line the line in the original document where this artifact starts.
-     * @param col the column in the original document where this artifact starts.
+     * @param line the line in the original document where the element ending structure appears.
+     * @param col the column in the original document where the element ending structure appears.
      * @throws AttoParseException
      */
     public void handleOpenElementEnd(
-            final char[] buffer, 
-            final int offset, final int len,
             final int line, final int col)
             throws AttoParseException;
 
@@ -217,8 +130,8 @@ public interface IDetailedElementHandling extends IAttributeSequenceHandling {
     
     /**
      * <p>
-     *   Called when the start of a close element (a <i>close tag</i>) is found. This
-     *   "start" is considered to be the "<tt>&lt;/</tt>" sequence the element starts with.
+     *   Called when the start of a close element (a <i>close tag</i>) is found. The name of
+     *   the element is also reported.
      * </p>
      * <p>
      *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
@@ -231,50 +144,35 @@ public interface IDetailedElementHandling extends IAttributeSequenceHandling {
      * </p>
      * 
      * @param buffer the document buffer (not copied)
-     * @param offset the offset (position in buffer) where the artifact starts.
-     * @param len the length (in chars) of the artifact, starting in offset.
+     * @param nameOffset the offset (position in buffer) where the element name appears.
+     * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
      * @throws AttoParseException
      */
     public void handleCloseElementStart(
             final char[] buffer, 
-            final int offset, final int len,
-            final int line, final int col)
-            throws AttoParseException;
-
-    /**
-     * <p>
-     *   Called when the name of a close element (a <i>close tag</i>) is found. E.g., the
-     *   "element name" of an element like <tt>&lt;/div&gt;</tt> would be "<tt>div</tt>".
-     * </p>
-     * <p>
-     *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
-     *   should not be considered to be immutable, so reported structures should be copied if they need
-     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
-     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification). 
-     * </p>
-     * <p>
-     *   <b>Implementations of this handler should never modify the document buffer.</b> 
-     * </p>
-     * 
-     * @param buffer the document buffer (not copied)
-     * @param offset the offset (position in buffer) where the artifact starts.
-     * @param len the length (in chars) of the artifact, starting in offset.
-     * @param line the line in the original document where this artifact starts.
-     * @param col the column in the original document where this artifact starts.
-     * @throws AttoParseException
-     */
-    public void handleCloseElementName(
-            final char[] buffer, 
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException;
     
     /**
      * <p>
-     *   Called when the end of a close element (a <i>close tag</i>) is found. This
-     *   "end" is considered to be the "<tt>&gt;</tt>" symbol the element ends with.
+     *   Called when the end of a close element (a <i>close tag</i>) is found.
+     * </p>
+     * 
+     * @param line the line in the original document where the element ending structure appears.
+     * @param col the column in the original document where the element ending structure appears.
+     * @throws AttoParseException
+     */
+    public void handleCloseElementEnd(
+            final int line, final int col)
+            throws AttoParseException;
+
+    /**
+     * <p>
+     *   Called when the start of an unmatched close element (<i>close tag</i>) is found. The name of
+     *   the element is also reported.
      * </p>
      * <p>
      *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
@@ -287,18 +185,73 @@ public interface IDetailedElementHandling extends IAttributeSequenceHandling {
      * </p>
      * 
      * @param buffer the document buffer (not copied)
-     * @param offset the offset (position in buffer) where the artifact starts.
-     * @param len the length (in chars) of the artifact, starting in offset.
+     * @param nameOffset the offset (position in buffer) where the element name appears.
+     * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
      * @throws AttoParseException
      */
-    public void handleCloseElementEnd(
+    public void handleUnmatchedCloseElementStart(
             final char[] buffer, 
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
+            throws AttoParseException;
+    
+    /**
+     * <p>
+     *   Called when the end of an unmatched close element (<i>close tag</i>) is found.
+     * </p>
+     * 
+     * @param line the line in the original document where the element ending structure appears.
+     * @param col the column in the original document where the element ending structure appears.
+     * @throws AttoParseException
+     */
+    public void handleUnmatchedCloseElementEnd(
+            final int line, final int col)
+            throws AttoParseException;
+    
+    /**
+     * <p>
+     *   Called for signaling the start of an auto-close element (a synthetic <i>close tag</i>), 
+     *   created for balancing an unclosed tag. The name of the element is also reported.
+     * </p>
+     * <p>
+     *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
+     *   should not be considered to be immutable, so reported structures should be copied if they need
+     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
+     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification). 
+     * </p>
+     * <p>
+     *   <b>Implementations of this handler should never modify the document buffer.</b> 
+     * </p>
+     * 
+     * @param buffer the document buffer (not copied)
+     * @param nameOffset the offset (position in buffer) where the element name appears.
+     * @param nameLen the length (in chars) of the element name.
+     * @param line the line in the original document where this artifact starts.
+     * @param col the column in the original document where this artifact starts.
+     * @throws AttoParseException
+     */
+    public void handleAutoCloseElementStart(
+            final char[] buffer, 
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
+            throws AttoParseException;
+    
+    /**
+     * <p>
+     *   Called for signaling the end of an auto-close element, created for
+     *   balancing an unclosed tag. 
+     * </p>
+     * 
+     * @param line the line in the original document where the element ending structure appears.
+     * @param col the column in the original document where the element ending structure appears.
+     * @throws AttoParseException
+     */
+    public void handleAutoCloseElementEnd(
             final int line, final int col)
             throws AttoParseException;
 
-
+    
     
 }

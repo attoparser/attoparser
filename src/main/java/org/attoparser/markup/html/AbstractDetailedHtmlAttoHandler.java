@@ -102,40 +102,26 @@ public abstract class AbstractDetailedHtmlAttoHandler
             final int offset, final int len, 
             final int line, final int col) 
             throws AttoParseException {
-        super.handleStandaloneElementStart(buffer, offset, len, line, col);
-        //
-        // Nothing to be done until we know the name of the element
-        //
-    }
-
-    @Override
-    public final void handleStandaloneElementName(
-            final char[] buffer, 
-            final int offset, final int len,
-            final int line, final int col) 
-            throws AttoParseException {
         
-        super.handleStandaloneElementName(buffer, offset, len, line, col);
+        super.handleStandaloneElementStart(buffer, offset, len, line, col);
         
         this.currentElement = getElementByName(buffer, offset, len);
-        this.currentElement.handleStandaloneElementStartAndName(buffer, offset, len, line, col, this.stack, this);
+        this.currentElement.handleStandaloneElementStart(buffer, offset, len, line, col, this.stack, this);
 
     }
 
     @Override
     public final void handleStandaloneElementEnd(
-            final char[] buffer, 
-            final int offset, final int len,
             final int line, final int col) 
             throws AttoParseException {
         
-        super.handleStandaloneElementEnd(buffer, offset, len, line, col);
+        super.handleStandaloneElementEnd(line, col);
 
         if (this.currentElement == null) {
             throw new IllegalStateException("Cannot end element: no current element");
         }
 
-        this.currentElement.handleStandaloneElementEnd(buffer, offset, len, line, col, this.stack, this);
+        this.currentElement.handleStandaloneElementEnd(line, col, this.stack, this);
         this.currentElement = null;
 
     }
@@ -149,40 +135,26 @@ public abstract class AbstractDetailedHtmlAttoHandler
             final int offset, final int len,
             final int line, final int col) 
             throws AttoParseException {
+        
         super.handleOpenElementStart(buffer, offset, len, line, col);
-        //
-        // Nothing to be done until we know the name of the element
-        //
-    }
-
-    @Override
-    public final void handleOpenElementName(
-            final char[] buffer, 
-            final int offset, final int len,
-            final int line, final int col) 
-            throws AttoParseException {
-
-        super.handleOpenElementName(buffer, offset, len, line, col);
         
         this.currentElement = getElementByName(buffer, offset, len);
-        this.currentElement.handleOpenElementStartAndName(buffer, offset, len, line, col, this.stack, this);
+        this.currentElement.handleOpenElementStart(buffer, offset, len, line, col, this.stack, this);
 
     }
 
     @Override
     public final void handleOpenElementEnd(
-            final char[] buffer, 
-            final int offset, final int len,
             final int line, final int col) 
             throws AttoParseException {
 
-        super.handleOpenElementEnd(buffer, offset, len, line, col);
+        super.handleOpenElementEnd(line, col);
 
         if (this.currentElement == null) {
             throw new IllegalStateException("Cannot end element: no current element");
         }
 
-        this.currentElement.handleOpenElementEnd(buffer, offset, len, line, col, this.stack, this);
+        this.currentElement.handleOpenElementEnd(line, col, this.stack, this);
         this.currentElement = null;
         
     }
@@ -196,40 +168,26 @@ public abstract class AbstractDetailedHtmlAttoHandler
             final int offset, final int len,
             final int line, final int col) 
             throws AttoParseException {
+        
         super.handleCloseElementStart(buffer, offset, len, line, col);
-        //
-        // Nothing to be done until we know the name of the element
-        //
-    }
-
-    @Override
-    public final void handleCloseElementName(
-            final char[] buffer, 
-            final int offset, final int len,
-            final int line, final int col) 
-            throws AttoParseException {
-
-        super.handleCloseElementName(buffer, offset, len, line, col);
         
         this.currentElement = getElementByName(buffer, offset, len);
-        this.currentElement.handleCloseElementStartAndName(buffer, offset, len, line, col, this.stack, this);
+        this.currentElement.handleCloseElementStart(buffer, offset, len, line, col, this.stack, this);
         
     }
 
     @Override
     public final void handleCloseElementEnd(
-            final char[] buffer, 
-            final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
 
-        super.handleCloseElementEnd(buffer, offset, len, line, col);
+        super.handleCloseElementEnd(line, col);
 
         if (this.currentElement == null) {
             throw new IllegalStateException("Cannot end element: no current element");
         }
 
-        this.currentElement.handleCloseElementEnd(buffer, offset, len, line, col, this.stack, this);
+        this.currentElement.handleCloseElementEnd(line, col, this.stack, this);
         this.currentElement = null;
 
     }
@@ -243,40 +201,26 @@ public abstract class AbstractDetailedHtmlAttoHandler
             final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
+        
         super.handleAutoCloseElementStart(buffer, offset, len, line, col);
-        //
-        // Nothing to be done until we know the name of the element
-        //
-    }
-
-    @Override
-    public final void handleAutoCloseElementName(
-            final char[] buffer, 
-            final int offset, final int len, 
-            final int line, final int col) 
-            throws AttoParseException {
-
-        super.handleAutoCloseElementName(buffer, offset, len, line, col);
         
         this.currentElement = getElementByName(buffer, offset, len);
-        this.currentElement.handleAutoCloseElementStartAndName(buffer, offset, len, line, col, this.stack, this);
+        this.currentElement.handleAutoCloseElementStart(buffer, offset, len, line, col, this.stack, this);
         
     }
 
     @Override
     public final void handleAutoCloseElementEnd(
-            final char[] buffer, 
-            final int offset, final int len, 
             final int line, final int col) 
             throws AttoParseException {
 
-        super.handleAutoCloseElementEnd(buffer, offset, len, line, col);
+        super.handleAutoCloseElementEnd(line, col);
 
         if (this.currentElement == null) {
             throw new IllegalStateException("Cannot end element: no current element");
         }
 
-        this.currentElement.handleAutoCloseElementEnd(buffer, offset, len, line, col, this.stack, this);
+        this.currentElement.handleAutoCloseElementEnd(line, col, this.stack, this);
         this.currentElement = null;
         
     }
@@ -290,40 +234,26 @@ public abstract class AbstractDetailedHtmlAttoHandler
             final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
+        
         super.handleUnmatchedCloseElementStart(buffer, offset, len, line, col);
-        //
-        // Nothing to be done until we know the name of the element
-        //
-    }
-
-    @Override
-    public final void handleUnmatchedCloseElementName(
-            final char[] buffer, 
-            final int offset, final int len, 
-            final int line, final int col) 
-            throws AttoParseException {
-
-        super.handleUnmatchedCloseElementName(buffer, offset, len, line, col);
         
         this.currentElement = getElementByName(buffer, offset, len);
-        this.currentElement.handleUnmatchedCloseElementStartAndName(buffer, offset, len, line, col, this.stack, this);
+        this.currentElement.handleUnmatchedCloseElementStart(buffer, offset, len, line, col, this.stack, this);
         
     }
 
     @Override
     public final void handleUnmatchedCloseElementEnd(
-            final char[] buffer, 
-            final int offset, final int len, 
             final int line, final int col) 
             throws AttoParseException {
 
-        super.handleUnmatchedCloseElementEnd(buffer, offset, len, line, col);
+        super.handleUnmatchedCloseElementEnd(line, col);
 
         if (this.currentElement == null) {
             throw new IllegalStateException("Cannot end element: no current element");
         }
 
-        this.currentElement.handleUnmatchedCloseElementEnd(buffer, offset, len, line, col, this.stack, this);
+        this.currentElement.handleUnmatchedCloseElementEnd(line, col, this.stack, this);
         this.currentElement = null;
         
     }
@@ -363,19 +293,19 @@ public abstract class AbstractDetailedHtmlAttoHandler
 
 
     @Override
-    public final void handleAttributeSeparator(
+    public final void handleInnerWhiteSpace(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
 
-        super.handleAttributeSeparator(buffer, offset, len, line, col);
+        super.handleInnerWhiteSpace(buffer, offset, len, line, col);
 
         if (this.currentElement == null) {
             throw new IllegalStateException("Cannot handle attribute: no current element");
         }
         
-        this.currentElement.handleAttributeSeparator(buffer, offset, len, line, col, this.stack, this);
+        this.currentElement.handleInnerWhiteSpace(buffer, offset, len, line, col, this.stack, this);
         
     }
 
@@ -432,23 +362,13 @@ public abstract class AbstractDetailedHtmlAttoHandler
 
     public void handleHtmlMinimizedStandaloneElementStart(
             final char[] buffer, 
-            final int offset, final int len, 
+            final int nameOffset, final int nameLen, 
             final int line, final int col) 
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
 
-    public void handleHtmlMinimizedStandaloneElementName(
-            final char[] buffer, 
-            final int offset, final int len, 
-            final int line, final int col)
-            throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
-    }
-
     public void handleHtmlMinimizedStandaloneElementEnd(
-            final char[] buffer, 
-            final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
@@ -463,23 +383,13 @@ public abstract class AbstractDetailedHtmlAttoHandler
 
     public void handleHtmlNonMinimizedStandaloneElementStart(
             final char[] buffer, 
-            final int offset, final int len, 
+            final int nameOffset, final int nameLen, 
             final int line, final int col) 
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
 
-    public void handleHtmlNonMinimizedStandaloneElementName(
-            final char[] buffer, 
-            final int offset, final int len, 
-            final int line, final int col)
-            throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
-    }
-
     public void handleHtmlNonMinimizedStandaloneElementEnd(
-            final char[] buffer, 
-            final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
@@ -494,23 +404,13 @@ public abstract class AbstractDetailedHtmlAttoHandler
     
     public void handleHtmlOpenElementStart(
             final char[] buffer, 
-            final int offset, final int len,
-            final int line, final int col)
-            throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
-    }
-
-    public void handleHtmlOpenElementName(
-            final char[] buffer, 
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
 
     public void handleHtmlOpenElementEnd(
-            final char[] buffer, 
-            final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
@@ -525,23 +425,13 @@ public abstract class AbstractDetailedHtmlAttoHandler
     
     public void handleHtmlCloseElementStart(
             final char[] buffer, 
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
 
-    public void handleHtmlCloseElementName(
-            final char[] buffer, 
-            final int offset, final int len,
-            final int line, final int col) 
-            throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
-    }
-
     public void handleHtmlCloseElementEnd(
-            final char[] buffer, 
-            final int offset, final int len,
             final int line, final int col) 
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
@@ -556,23 +446,13 @@ public abstract class AbstractDetailedHtmlAttoHandler
     
     public void handleHtmlSyntheticOpenElementStart(
             final char[] buffer, 
-            final int offset, final int len, 
-            final int line, final int col)
-            throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
-    }
-
-    public void handleHtmlSyntheticOpenElementName(
-            final char[] buffer, 
-            final int offset, final int len, 
+            final int nameOffset, final int nameLen, 
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
 
     public void handleHtmlSyntheticOpenElementEnd(
-            final char[] buffer, 
-            final int offset, final int len, 
             final int line, final int col) 
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
@@ -580,23 +460,13 @@ public abstract class AbstractDetailedHtmlAttoHandler
     
     public void handleHtmlSyntheticCloseElementStart(
             final char[] buffer, 
-            final int offset, final int len, 
-            final int line, final int col)
-            throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
-    }
-
-    public void handleHtmlSyntheticCloseElementName(
-            final char[] buffer, 
-            final int offset, final int len, 
+            final int nameOffset, final int nameLen, 
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
 
     public void handleHtmlSyntheticCloseElementEnd(
-            final char[] buffer, 
-            final int offset, final int len, 
             final int line, final int col) 
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
@@ -611,23 +481,13 @@ public abstract class AbstractDetailedHtmlAttoHandler
     
     public void handleHtmlIgnorableCloseElementStart(
             final char[] buffer, 
-            final int offset, final int len, 
-            final int line, final int col) 
-            throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
-    }
-
-    public void handleHtmlIgnorableCloseElementName(
-            final char[] buffer, 
-            final int offset, final int len, 
+            final int nameOffset, final int nameLen, 
             final int line, final int col) 
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
 
     public void handleHtmlIgnorableCloseElementEnd(
-            final char[] buffer, 
-            final int offset, final int len, 
             final int line, final int col) 
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
@@ -656,7 +516,7 @@ public abstract class AbstractDetailedHtmlAttoHandler
 
 
 
-    public void handleHtmlAttributeSeparator(
+    public void handleHtmlInnerWhiteSpace(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col) 
