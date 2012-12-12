@@ -22,6 +22,7 @@ package org.attoparser.markup.html.elements;
 import org.attoparser.AttoParseException;
 import org.attoparser.markup.html.HtmlElementStack;
 import org.attoparser.markup.html.IDetailedHtmlElementHandling;
+import org.attoparser.markup.html.warnings.HtmlParsingEventWarnings;
 
 
 
@@ -57,7 +58,7 @@ public class BasicHtmlElement extends AbstractHtmlElement {
 
         stack.openElement(this);
         
-        handler.handleHtmlMinimizedStandaloneElementStart(buffer, nameOffset, nameLen, line, col);
+        handler.handleHtmlStandaloneElementStart(buffer, nameOffset, nameLen, line, col, true, HtmlParsingEventWarnings.WARNINGS_NONE);
         
     }
 
@@ -67,7 +68,7 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException {
         
-        handler.handleHtmlMinimizedStandaloneElementEnd(line, col);
+        handler.handleHtmlStandaloneElementEnd(line, col);
 
         stack.closeElement();
         
@@ -85,7 +86,7 @@ public class BasicHtmlElement extends AbstractHtmlElement {
         
         stack.openElement(this);
         
-        handler.handleHtmlOpenElementStart(buffer, nameOffset, nameLen, line, col);
+        handler.handleHtmlOpenElementStart(buffer, nameOffset, nameLen, line, col, HtmlParsingEventWarnings.WARNINGS_NONE);
 
     }
 
@@ -109,7 +110,7 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException {
         
-        handler.handleHtmlCloseElementStart(buffer, nameOffset, nameLen, line, col);
+        handler.handleHtmlCloseElementStart(buffer, nameOffset, nameLen, line, col, HtmlParsingEventWarnings.WARNINGS_NONE);
 
     }
 
@@ -162,7 +163,7 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             throws AttoParseException {
         
         // Stack should not be affected by this, simply delegate the event
-        handler.handleHtmlIgnorableCloseElementStart(buffer, nameOffset, nameLen, line, col);
+        handler.handleHtmlCloseElementStart(buffer, nameOffset, nameLen, line, col, HtmlParsingEventWarnings.WARNINGS_IGNORABLE_UNMATCHED_CLOSE_ELEMENT);
         
     }
 
@@ -173,7 +174,7 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             throws AttoParseException {
         
         // Stack should not be affected by this, simply delegate the event
-        handler.handleHtmlIgnorableCloseElementEnd(line, col);
+        handler.handleHtmlCloseElementEnd(line, col);
         
     }
 

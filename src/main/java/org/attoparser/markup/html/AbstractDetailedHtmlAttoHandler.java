@@ -25,6 +25,7 @@ import org.attoparser.markup.MarkupParsingConfiguration;
 import org.attoparser.markup.html.elements.BasicHtmlElement;
 import org.attoparser.markup.html.elements.HtmlElements;
 import org.attoparser.markup.html.elements.IHtmlElement;
+import org.attoparser.markup.html.warnings.HtmlParsingEventWarnings;
 
 
 
@@ -355,41 +356,22 @@ public abstract class AbstractDetailedHtmlAttoHandler
     
 
     /*
-     * ------------------------------------------
-     * MINIMIZED STANDALONE ELEMENTS: <img ... /> 
-     * ------------------------------------------
+     * -------------------------------------------------
+     * STANDALONE ELEMENTS: <img ... />, <img ... >, etc 
+     * -------------------------------------------------
      */
 
-    public void handleHtmlMinimizedStandaloneElementStart(
+    public void handleHtmlStandaloneElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen, 
-            final int line, final int col) 
+            final int line, final int col,
+            final boolean minimized,
+            final HtmlParsingEventWarnings warnings) 
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
 
-    public void handleHtmlMinimizedStandaloneElementEnd(
-            final int line, final int col)
-            throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
-    }
-
-    
-    /*
-     * --------------------------------------------
-     * NON-MINIMIZED STANDALONE ELEMENTS: <img ...> 
-     * --------------------------------------------
-     */
-
-    public void handleHtmlNonMinimizedStandaloneElementStart(
-            final char[] buffer, 
-            final int nameOffset, final int nameLen, 
-            final int line, final int col) 
-            throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
-    }
-
-    public void handleHtmlNonMinimizedStandaloneElementEnd(
+    public void handleHtmlStandaloneElementEnd(
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
@@ -405,7 +387,8 @@ public abstract class AbstractDetailedHtmlAttoHandler
     public void handleHtmlOpenElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
-            final int line, final int col)
+            final int line, final int col,
+            final HtmlParsingEventWarnings warnings)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
@@ -426,68 +409,13 @@ public abstract class AbstractDetailedHtmlAttoHandler
     public void handleHtmlCloseElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
-            final int line, final int col)
+            final int line, final int col,
+            final HtmlParsingEventWarnings warnings)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
 
     public void handleHtmlCloseElementEnd(
-            final int line, final int col) 
-            throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
-    }
-
-    
-    /*
-     * ------------------------------------------------------------------------------
-     * SYNTHETIC ELEMENTS
-     * ------------------------------------------------------------------------------
-     */
-    
-    public void handleHtmlSyntheticOpenElementStart(
-            final char[] buffer, 
-            final int nameOffset, final int nameLen, 
-            final int line, final int col)
-            throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
-    }
-
-    public void handleHtmlSyntheticOpenElementEnd(
-            final int line, final int col) 
-            throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
-    }
-    
-    public void handleHtmlSyntheticCloseElementStart(
-            final char[] buffer, 
-            final int nameOffset, final int nameLen, 
-            final int line, final int col)
-            throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
-    }
-
-    public void handleHtmlSyntheticCloseElementEnd(
-            final int line, final int col) 
-            throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
-    }
-
-    
-    /*
-     * -----------------------------------------------------------------------
-     * IGNORABLE CLOSE ELEMENTS
-     * -----------------------------------------------------------------------
-     */
-    
-    public void handleHtmlIgnorableCloseElementStart(
-            final char[] buffer, 
-            final int nameOffset, final int nameLen, 
-            final int line, final int col) 
-            throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
-    }
-
-    public void handleHtmlIgnorableCloseElementEnd(
             final int line, final int col) 
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required

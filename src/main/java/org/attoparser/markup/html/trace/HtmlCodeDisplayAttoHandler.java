@@ -25,6 +25,7 @@ import java.io.Writer;
 import org.attoparser.AttoParseException;
 import org.attoparser.markup.html.AbstractDetailedHtmlAttoHandler;
 import org.attoparser.markup.html.HtmlParsingConfiguration;
+import org.attoparser.markup.html.warnings.HtmlParsingEventWarnings;
 
 
 
@@ -214,10 +215,12 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
 
     
     @Override
-    public void handleHtmlMinimizedStandaloneElementStart(
+    public void handleHtmlStandaloneElementStart(
             final char[] buffer,
             final int offset, final int len, 
-            final int line, final int col) 
+            final int line, final int col,
+            final boolean minimized,
+            final HtmlParsingEventWarnings warnings) 
             throws AttoParseException {
         
         try {
@@ -234,7 +237,7 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
 
     
     @Override
-    public void handleHtmlMinimizedStandaloneElementEnd(
+    public void handleHtmlStandaloneElementEnd(
             final int line, final int col)
             throws AttoParseException {
         
@@ -253,48 +256,10 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
     
     
     @Override
-    public void handleHtmlNonMinimizedStandaloneElementStart(
-            final char[] buffer,
-            final int offset, final int len, 
-            final int line, final int col) 
-            throws AttoParseException {
-        
-        try {
-            
-            openStyle(STYLE_NON_MINIMIZED_STANDALONE);
-            this.writer.write(OPEN_TAG_START);
-            this.writer.write(buffer, offset, len);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
-    }
-
-    
-    @Override
-    public void handleHtmlNonMinimizedStandaloneElementEnd(
-            final int line, final int col)
-            throws AttoParseException {
-        
-        try {
-            
-            this.writer.write(OPEN_TAG_END);
-            closeStyle();
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
-    }
-
-    
-    
-    
-    @Override
     public void handleHtmlOpenElementStart(
             final char[] buffer, final int offset, final int len,
-            final int line, final int col)
+            final int line, final int col,
+            final HtmlParsingEventWarnings warnings)
             throws AttoParseException {
         
         try {
@@ -333,7 +298,8 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
     public void handleHtmlCloseElementStart(
             final char[] buffer, 
             final int offset, final int len,
-            final int line, final int col) 
+            final int line, final int col,
+            final HtmlParsingEventWarnings warnings) 
             throws AttoParseException {
         
         try {
@@ -351,123 +317,6 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
     
     @Override
     public void handleHtmlCloseElementEnd(
-            final int line, final int col) 
-            throws AttoParseException {
-        
-        try {
-            
-            this.writer.write(CLOSE_TAG_END);
-            closeStyle();
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
-    }
-
-    
-    
-    
-    @Override
-    public void handleHtmlSyntheticOpenElementStart(
-            final char[] buffer, 
-            final int offset, final int len, 
-            final int line, final int col) 
-            throws AttoParseException {
-        
-        try {
-            
-            openStyle(STYLE_SYNTHETIC_OPEN);
-            this.writer.write(OPEN_TAG_START);
-            this.writer.write(buffer, offset, len);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
-    }
-
-    
-    @Override
-    public void handleHtmlSyntheticOpenElementEnd(
-            final int line, final int col) 
-            throws AttoParseException {
-        
-        try {
-            
-            this.writer.write(OPEN_TAG_END);
-            closeStyle();
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
-    }
-
-    
-    
-    
-    @Override
-    public void handleHtmlSyntheticCloseElementStart(
-            final char[] buffer, 
-            final int offset, final int len, 
-            final int line, final int col) 
-            throws AttoParseException {
-        
-        try {
-            
-            openStyle(STYLE_SYNTHETIC_CLOSE);
-            this.writer.write(CLOSE_TAG_START);
-            this.writer.write(buffer, offset, len);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
-    }
-
-    
-    @Override
-    public void handleHtmlSyntheticCloseElementEnd(
-            final int line, final int col) 
-            throws AttoParseException {
-        
-        try {
-            
-            this.writer.write(CLOSE_TAG_END);
-            closeStyle();
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
-    }
-
-    
-    
-    
-    @Override
-    public void handleHtmlIgnorableCloseElementStart(
-            final char[] buffer, 
-            final int offset, final int len, 
-            final int line, final int col) 
-            throws AttoParseException {
-        
-        try {
-            
-            openStyle(STYLE_IGNORABLE_CLOSE);
-            this.writer.write(CLOSE_TAG_START);
-            this.writer.write(buffer, offset, len);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
-    }
-
-    
-    @Override
-    public void handleHtmlIgnorableCloseElementEnd(
             final int line, final int col) 
             throws AttoParseException {
         

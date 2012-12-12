@@ -22,6 +22,7 @@ package org.attoparser.markup.html.elements;
 import org.attoparser.AttoParseException;
 import org.attoparser.markup.html.HtmlElementStack;
 import org.attoparser.markup.html.IDetailedHtmlElementHandling;
+import org.attoparser.markup.html.warnings.HtmlParsingEventWarnings;
 
 
 
@@ -59,7 +60,7 @@ public class StandaloneHtmlElement extends BasicHtmlElement {
         
         stack.openElement(this);
         
-        handler.handleHtmlNonMinimizedStandaloneElementStart(buffer, nameOffset, nameLen, line, col);
+        handler.handleHtmlStandaloneElementStart(buffer, nameOffset, nameLen, line, col, false, HtmlParsingEventWarnings.WARNINGS_NONE);
 
     }
 
@@ -70,7 +71,7 @@ public class StandaloneHtmlElement extends BasicHtmlElement {
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException {
         
-        handler.handleHtmlNonMinimizedStandaloneElementEnd(line, col);
+        handler.handleHtmlStandaloneElementEnd(line, col);
         
     }
 
@@ -85,7 +86,7 @@ public class StandaloneHtmlElement extends BasicHtmlElement {
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException {
         
-        handler.handleHtmlIgnorableCloseElementStart(buffer, nameOffset, nameLen, line, col);
+        handler.handleHtmlCloseElementStart(buffer, nameOffset, nameLen, line, col, HtmlParsingEventWarnings.WARNINGS_IGNORABLE_CLOSE_STANDALONE_ELEMENT);
 
     }
 
@@ -96,7 +97,7 @@ public class StandaloneHtmlElement extends BasicHtmlElement {
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException {
         
-        handler.handleHtmlIgnorableCloseElementEnd(line, col);
+        handler.handleHtmlCloseElementEnd(line, col);
 
         stack.closeElement();
         
