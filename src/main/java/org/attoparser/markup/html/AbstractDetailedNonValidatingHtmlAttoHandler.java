@@ -23,9 +23,9 @@ import org.attoparser.AttoParseException;
 import org.attoparser.markup.AbstractDetailedMarkupAttoHandler;
 import org.attoparser.markup.MarkupParsingConfiguration;
 import org.attoparser.markup.html.elements.BasicHtmlElement;
+import org.attoparser.markup.html.elements.HtmlElementStack;
 import org.attoparser.markup.html.elements.HtmlElements;
 import org.attoparser.markup.html.elements.IHtmlElement;
-import org.attoparser.markup.html.warnings.HtmlParsingEventWarnings;
 
 
 
@@ -38,7 +38,7 @@ import org.attoparser.markup.html.warnings.HtmlParsingEventWarnings;
  * @since 1.1
  *
  */
-public abstract class AbstractDetailedHtmlAttoHandler 
+public abstract class AbstractDetailedNonValidatingHtmlAttoHandler 
         extends AbstractDetailedMarkupAttoHandler
         implements IDetailedHtmlElementHandling {
 
@@ -50,7 +50,7 @@ public abstract class AbstractDetailedHtmlAttoHandler
 
     
     
-    protected AbstractDetailedHtmlAttoHandler(final HtmlParsingConfiguration configuration) {
+    protected AbstractDetailedNonValidatingHtmlAttoHandler(final HtmlParsingConfiguration configuration) {
         super(HtmlParsing.markupParsingConfiguration(configuration));
         this.stack = new HtmlElementStack();
         this.configuration = configuration;
@@ -362,18 +362,19 @@ public abstract class AbstractDetailedHtmlAttoHandler
      */
 
     public void handleHtmlStandaloneElementStart(
+            final IHtmlElement element,
+            final boolean minimized,
             final char[] buffer, 
             final int nameOffset, final int nameLen, 
-            final int line, final int col,
-            final boolean minimized,
-            final HtmlParsingEventWarnings warnings) 
+            final int line, final int col) 
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
 
     public void handleHtmlStandaloneElementEnd(
-            final int line, final int col,
-            final boolean minimized)
+            final IHtmlElement element,
+            final boolean minimized,
+            final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
@@ -386,15 +387,16 @@ public abstract class AbstractDetailedHtmlAttoHandler
      */
     
     public void handleHtmlOpenElementStart(
+            final IHtmlElement element,
             final char[] buffer, 
             final int nameOffset, final int nameLen,
-            final int line, final int col,
-            final HtmlParsingEventWarnings warnings)
+            final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
 
     public void handleHtmlOpenElementEnd(
+            final IHtmlElement element,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
@@ -408,15 +410,16 @@ public abstract class AbstractDetailedHtmlAttoHandler
      */
     
     public void handleHtmlCloseElementStart(
+            final IHtmlElement element,
             final char[] buffer, 
             final int nameOffset, final int nameLen,
-            final int line, final int col,
-            final HtmlParsingEventWarnings warnings)
+            final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }
 
     public void handleHtmlCloseElementEnd(
+            final IHtmlElement element,
             final int line, final int col) 
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required

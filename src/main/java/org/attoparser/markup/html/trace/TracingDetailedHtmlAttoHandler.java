@@ -23,9 +23,9 @@ import java.io.IOException;
 import java.io.Writer;
 
 import org.attoparser.AttoParseException;
-import org.attoparser.markup.html.AbstractDetailedHtmlAttoHandler;
+import org.attoparser.markup.html.AbstractDetailedNonValidatingHtmlAttoHandler;
 import org.attoparser.markup.html.HtmlParsingConfiguration;
-import org.attoparser.markup.html.warnings.HtmlParsingEventWarnings;
+import org.attoparser.markup.html.elements.IHtmlElement;
 
 
 
@@ -40,7 +40,7 @@ import org.attoparser.markup.html.warnings.HtmlParsingEventWarnings;
  * @since 1.1
  *
  */
-public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHandler {
+public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatingHtmlAttoHandler {
 
     
     private final Writer writer;
@@ -93,11 +93,11 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
     
     @Override
     public void handleHtmlStandaloneElementStart(
+            final IHtmlElement element,
+            final boolean minimized,
             final char[] buffer,
             final int offset, final int len, 
-            final int line, final int col,
-            final boolean minimized,
-            final HtmlParsingEventWarnings warnings) 
+            final int line, final int col) 
             throws AttoParseException {
         
         try {
@@ -109,7 +109,6 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
             this.writer.write('(');
             this.writer.write(buffer, offset, len);
             this.writer.write(')');
-            writeWarnings(this.writer, warnings);
             writePosition(this.writer, line, col);
             
         } catch (final Exception e) {
@@ -121,8 +120,9 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
     
     @Override
     public void handleHtmlStandaloneElementEnd(
-            final int line, final int col,
-            final boolean minimized)
+            final IHtmlElement element,
+            final boolean minimized,
+            final int line, final int col)
             throws AttoParseException {
         
         try {
@@ -144,9 +144,10 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
     
     @Override
     public void handleHtmlOpenElementStart(
-            final char[] buffer, final int offset, final int len,
-            final int line, final int col,
-            final HtmlParsingEventWarnings warnings)
+            final IHtmlElement element,
+            final char[] buffer, 
+            final int offset, final int len,
+            final int line, final int col)
             throws AttoParseException {
         
         try {
@@ -157,7 +158,6 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
             this.writer.write('(');
             this.writer.write(buffer, offset, len);
             this.writer.write(')');
-            writeWarnings(this.writer, warnings);
             writePosition(this.writer, line, col);
             
         } catch (final Exception e) {
@@ -169,6 +169,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
     
     @Override
     public void handleHtmlOpenElementEnd(
+            final IHtmlElement element,
             final int line, final int col) 
             throws AttoParseException {
         
@@ -190,10 +191,10 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
     
     @Override
     public void handleHtmlCloseElementStart(
+            final IHtmlElement element,
             final char[] buffer, 
             final int offset, final int len,
-            final int line, final int col,
-            final HtmlParsingEventWarnings warnings) 
+            final int line, final int col) 
             throws AttoParseException {
         
         try {
@@ -204,7 +205,6 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
             this.writer.write('(');
             this.writer.write(buffer, offset, len);
             this.writer.write(')');
-            writeWarnings(this.writer, warnings);
             writePosition(this.writer, line, col);
             
         } catch (final Exception e) {
@@ -216,6 +216,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
     
     @Override
     public void handleHtmlCloseElementEnd(
+            final IHtmlElement element,
             final int line, final int col) 
             throws AttoParseException {
         
@@ -521,13 +522,6 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         writer.write(',');
         writer.write(String.valueOf(col));
         writer.write('}');
-    }
-
-    
-    private static void writeWarnings(final Writer writer, final HtmlParsingEventWarnings warnings) throws IOException {
-        if (!warnings.isEmpty()) {
-            writer.append(warnings.toString());
-        }
     }
 
 

@@ -42,7 +42,7 @@ public final class HtmlParsingConfiguration implements Serializable {
     
     
     private boolean caseSensitive = false;
-    private boolean requireUniqueAttributesInElement = true;
+    private boolean requireUniqueAttributesInElement = false;
     private boolean requireXmlWellFormedAttributeValues = false;
     private UniqueRootElementPresence uniqueRootElementPresence = UniqueRootElementPresence.DEPENDS_ON_PROLOG_DOCTYPE;
     
@@ -115,7 +115,7 @@ public final class HtmlParsingConfiguration implements Serializable {
      *   Determines whether attributes should never appear duplicated in elements.
      * </p>
      * <p>
-     *   Default is <b>true</b>.
+     *   Default is <b>false</b>.
      * </p>
      * 
      * @return whether attributes should never appear duplicated in elements.

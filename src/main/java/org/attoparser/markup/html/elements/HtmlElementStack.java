@@ -17,11 +17,10 @@
  * 
  * =============================================================================
  */
-package org.attoparser.markup.html;
+package org.attoparser.markup.html.elements;
 
 import java.util.Arrays;
 
-import org.attoparser.markup.html.elements.IHtmlElement;
 
 
 

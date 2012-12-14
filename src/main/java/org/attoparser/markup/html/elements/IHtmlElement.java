@@ -20,7 +20,6 @@
 package org.attoparser.markup.html.elements;
 
 import org.attoparser.AttoParseException;
-import org.attoparser.markup.html.HtmlElementStack;
 import org.attoparser.markup.html.IDetailedHtmlElementHandling;
 
 

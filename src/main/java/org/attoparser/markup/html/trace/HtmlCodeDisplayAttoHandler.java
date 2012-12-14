@@ -21,18 +21,14 @@ package org.attoparser.markup.html.trace;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import org.attoparser.AttoParseException;
-import org.attoparser.markup.html.AbstractDetailedHtmlAttoHandler;
+import org.attoparser.markup.html.AbstractDetailedNonValidatingHtmlAttoHandler;
 import org.attoparser.markup.html.HtmlParsingConfiguration;
-import org.attoparser.markup.html.warnings.HtmlParsingEventWarnings;
-import org.attoparser.markup.html.warnings.IHtmlParsingEventWarning;
-import org.attoparser.markup.html.warnings.IgnorableArtifactWarning;
-import org.attoparser.markup.html.warnings.QuestionableStyleWarning;
+import org.attoparser.markup.html.elements.IHtmlElement;
 
 
 
@@ -47,7 +43,7 @@ import org.attoparser.markup.html.warnings.QuestionableStyleWarning;
  * @since 1.1
  *
  */
-public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler {
+public class HtmlCodeDisplayAttoHandler extends AbstractDetailedNonValidatingHtmlAttoHandler {
 
     private static final String OPEN_TAG_START = "&lt;";
     private static final String OPEN_TAG_END = "&gt;";
@@ -56,50 +52,45 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
     private static final String MINIMIZED_TAG_END = "/&gt;";
     
     
-    private static final String STYLES = "\n" +
-            "body {\n" +
+    private static final String DOCUMENT_STYLES = "\n" +
+            "div.atto_source {\n" +
             "    font-family: Courier, 'Courier New', monospace;\n" +
             "    font-size: 12px;\n" +
-            "}\n" +
-            ".element {\n" +
+            "}\n";
+
+    
+    private static final String FRAGMENT_STYLES = "\n" +
+            "@@ .element {\n" +
             "    font-weight: bold;\n" + 
             "    color: black;\n" + 
             "}\n" +
-            ".attr-name {\n" +
+            "@@ .attr-name {\n" +
             "    font-weight: normal;\n" + 
             "    color: red;\n" + 
             "}\n" +
-            ".attr-value {\n" +
+            "@@ .attr-value {\n" +
             "    font-weight: normal;\n" + 
             "    color: blue;\n" + 
             "}\n" +
-            ".questionable-style {\n" +
-            "    background: #ddd;\n" + 
-            "}\n" +
-            ".ignorable-artifact {\n" +
-            "    font-weight: normal;\n" + 
-            "    color: #888;\n" + 
-            "    background: lightskyblue;\n" + 
-            "}\n" +
-            ".doctype {\n" +
+            "@@ .doctype {\n" +
             "    font-weight: bold;\n" + 
             "    font-style: italics;\n" + 
             "    color: #888;\n" + 
             "}\n" +
-            ".comment {\n" +
+            "@@ .comment {\n" +
             "    font-style: italic;\n" + 
             "    color: black;\n" + 
-            "    background: palegreen;\n" + 
+            "    background: #ddd;\n" + 
             "}\n" +
-            ".xml-declaration {\n" +
+            "@@ .xml-declaration {\n" +
             "    font-weight: bold;\n" + 
             "    color: olivedrab;\n" + 
             "}\n" +
-            ".processing-instruction {\n" +
+            "@@ .processing-instruction {\n" +
             "    color: white;\n" + 
             "    background: black;\n" + 
             "}\n" +
-            ".text {\n" +
+            "@@ .text {\n" +
             "    color: #444;\n" + 
             "    background: white;\n" + 
             "}\n" +
@@ -116,24 +107,34 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
     private static final String STYLE_ATTR_VALUE = "attr-value";
     private static final String STYLE_TEXT = "text";
     
-    private static final String STYLE_QUESTIONABLE_STYLE = "questionable-style";
-    private static final String STYLE_IGNORABLE_ARTIFACT = "ignorable-artifact";
-    
     private static final String TAG_FORMAT_START = "<span class=\"%1$s\">";
     private static final String TAG_FORMAT_END = "</span>";
+
     
+    
+    private final String documentName;
+    private final String documentId;
     private final Writer writer;
+    private final boolean createHtmlAsFragment;
     
     
-    public HtmlCodeDisplayAttoHandler(final Writer writer) {
+    
+    
+    public HtmlCodeDisplayAttoHandler(final String documentName, final Writer writer, final boolean createHtmlAsFragment) {
         super(new HtmlParsingConfiguration());
+        this.documentName = documentName;
+        this.documentId = tokenify(this.documentName);
         this.writer = writer;
+        this.createHtmlAsFragment = createHtmlAsFragment;
     }
 
     
-    public HtmlCodeDisplayAttoHandler(final Writer writer, final HtmlParsingConfiguration configuration) {
+    public HtmlCodeDisplayAttoHandler(final String documentName, final Writer writer, final HtmlParsingConfiguration configuration, final boolean createHtmlFragment) {
         super(configuration);
+        this.documentName = documentName;
+        this.documentId = tokenify(this.documentName);
         this.writer = writer;
+        this.createHtmlAsFragment = createHtmlFragment;
     }
     
     
@@ -173,21 +174,22 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
         this.writer.write(String.format(TAG_FORMAT_START, strBuilder.toString()));
     }
     
-    private void openStyles(final HtmlParsingEventWarnings warnings) throws IOException {
-        final List<String> styles = new ArrayList<String>();
-        styles.add(STYLE_ELEMENT);
-        for (final IHtmlParsingEventWarning warning : warnings.getWarnings()) {
-            if (warning instanceof QuestionableStyleWarning) {
-                styles.add(STYLE_QUESTIONABLE_STYLE);
-            } else if (warning instanceof IgnorableArtifactWarning) {
-                styles.add(STYLE_IGNORABLE_ARTIFACT);
-            }
-        }
-        openStyles(styles);
-    }
-    
     private void closeStyle() throws IOException {
         this.writer.write(TAG_FORMAT_END);
+    }
+    
+    
+    
+    
+    public String tokenify(final String text) {
+        final StringBuilder strBuilder = new StringBuilder();
+        for (int i = 0; i < text.length(); i++) {
+            final char c = text.charAt(i);
+            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')) {
+                strBuilder.append(c);
+            }
+        }
+        return strBuilder.toString();
     }
     
     
@@ -201,8 +203,19 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
         
         try {
             
-            this.writer.write("<!DOCTYPE html>\n");
-            this.writer.write("<html>\n<head>\n<style>\n" + STYLES + "\n</style>\n</head>\n<body>");
+            if (!this.createHtmlAsFragment) {
+                this.writer.write("<!DOCTYPE html>\n");
+                this.writer.write("<html>\n");
+                this.writer.write("<head>\n");
+                this.writer.write("<title>Document output: " + this.documentName + "</title>\n");
+                this.writer.write("<style>" + DOCUMENT_STYLES + "</style>\n");
+                this.writer.write("</head>\n");
+                this.writer.write("<body>\n");
+            }
+            
+            this.writer.write("<div class=\"atto_source\" id=\"atto_source_" + this.documentId + "\">\n");
+            this.writer.write("<style>\n" + FRAGMENT_STYLES.replaceAll("@@", "#atto_source_content_" + this.documentId ) + "</style>\n");
+            this.writer.write("<div class=\"atto_source_content id=\"atto_source_content_" + this.documentId + "\">");
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -220,7 +233,12 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
         
         try {
             
-            this.writer.write("</body></html>");
+            this.writer.write("</div>");
+            
+            if (!this.createHtmlAsFragment) {
+                this.writer.write("</body>\n");
+                this.writer.write("</html>\n");
+            }
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
@@ -233,16 +251,16 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
     
     @Override
     public void handleHtmlStandaloneElementStart(
+            final IHtmlElement element,
+            final boolean minimized,
             final char[] buffer,
             final int offset, final int len, 
-            final int line, final int col,
-            final boolean minimized,
-            final HtmlParsingEventWarnings warnings) 
+            final int line, final int col) 
             throws AttoParseException {
         
         try {
             
-            openStyles(warnings);
+            openStyle(STYLE_ELEMENT);
             this.writer.write(OPEN_TAG_START);
             this.writer.write(buffer, offset, len);
             
@@ -255,8 +273,9 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
     
     @Override
     public void handleHtmlStandaloneElementEnd(
-            final int line, final int col,
-            final boolean minimized)
+            final IHtmlElement element,
+            final boolean minimized,
+            final int line, final int col)
             throws AttoParseException {
         
         try {
@@ -275,14 +294,15 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
     
     @Override
     public void handleHtmlOpenElementStart(
-            final char[] buffer, final int offset, final int len,
-            final int line, final int col,
-            final HtmlParsingEventWarnings warnings)
+            final IHtmlElement element,
+            final char[] buffer, 
+            final int offset, final int len,
+            final int line, final int col)
             throws AttoParseException {
         
         try {
             
-            openStyles(warnings);
+            openStyle(STYLE_ELEMENT);
             this.writer.write(OPEN_TAG_START);
             this.writer.write(buffer, offset, len);
             
@@ -295,6 +315,7 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
     
     @Override
     public void handleHtmlOpenElementEnd(
+            final IHtmlElement element,
             final int line, final int col) 
             throws AttoParseException {
         
@@ -314,15 +335,15 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
     
     @Override
     public void handleHtmlCloseElementStart(
+            final IHtmlElement element,
             final char[] buffer, 
             final int offset, final int len,
-            final int line, final int col,
-            final HtmlParsingEventWarnings warnings) 
+            final int line, final int col) 
             throws AttoParseException {
         
         try {
             
-            openStyles(warnings);
+            openStyle(STYLE_ELEMENT);
             this.writer.write(CLOSE_TAG_START);
             this.writer.write(buffer, offset, len);
             
@@ -335,6 +356,7 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
     
     @Override
     public void handleHtmlCloseElementEnd(
+            final IHtmlElement element,
             final int line, final int col) 
             throws AttoParseException {
         

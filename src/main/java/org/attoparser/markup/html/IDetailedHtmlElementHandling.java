@@ -20,7 +20,7 @@
 package org.attoparser.markup.html;
 
 import org.attoparser.AttoParseException;
-import org.attoparser.markup.html.warnings.HtmlParsingEventWarnings;
+import org.attoparser.markup.html.elements.IHtmlElement;
 
 
 /**
@@ -45,10 +45,6 @@ public interface IDetailedHtmlElementHandling extends IHtmlAttributeSequenceHand
      *   but not from the XML or XHTML standpoints).
      * </p>
      * <p>
-     *   The reported warnings explain the issues found with this element
-     *   during parsing (misplacement, bad nesting, etc.) 
-     * </p>
-     * <p>
      *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
      *   should not be considered to be immutable, so reported structures should be copied if they need
      *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
@@ -58,21 +54,21 @@ public interface IDetailedHtmlElementHandling extends IHtmlAttributeSequenceHand
      *   <b>Implementations of this handler should never modify the document buffer.</b> 
      * </p>
      * 
-     * @param buffer the document buffer (not copied)
+     * @param element the {@link IHtmlElement} element object representing the corresponding HTML element.
+     * @param minimized whether the tag representing this element is minimized (self-closed) or not.
+     * @param buffer the document buffer (not copied).
      * @param nameOffset the offset (position in buffer) where the element name appears.
      * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
-     * @param minimized whether the tag representing this element is minimized (self-closed) or not.
-     * @param warnings the list of warnings applicable to the parsing of this element.
      * @throws AttoParseException
      */
     public void handleHtmlStandaloneElementStart(
+            final IHtmlElement element,
+            final boolean minimized,
             final char[] buffer, 
             final int nameOffset, final int nameLen,
-            final int line, final int col,
-            final boolean minimized,
-            final HtmlParsingEventWarnings warnings)
+            final int line, final int col)
             throws AttoParseException;
     
     /**
@@ -80,14 +76,16 @@ public interface IDetailedHtmlElementHandling extends IHtmlAttributeSequenceHand
      *   Called when the end of a standalone element is found.
      * </p>
      * 
+     * @param element the {@link IHtmlElement} element object representing the corresponding HTML element.
+     * @param minimized whether the tag representing this element is minimized (self-closed) or not.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
-     * @param minimized whether the tag representing this element is minimized (self-closed) or not.
      * @throws AttoParseException
      */
     public void handleHtmlStandaloneElementEnd(
-            final int line, final int col,
-            final boolean minimized)
+            final IHtmlElement element,
+            final boolean minimized,
+            final int line, final int col)
             throws AttoParseException;
 
     
@@ -98,10 +96,6 @@ public interface IDetailedHtmlElementHandling extends IHtmlAttributeSequenceHand
      *   Called when the start of an open element (an <i>open tag</i>) is found.
      * </p>
      * <p>
-     *   The reported warnings explain the issues found with this element
-     *   during parsing (misplacement, bad nesting, etc.) 
-     * </p>
-     * <p>
      *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
      *   should not be considered to be immutable, so reported structures should be copied if they need
      *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
@@ -111,19 +105,19 @@ public interface IDetailedHtmlElementHandling extends IHtmlAttributeSequenceHand
      *   <b>Implementations of this handler should never modify the document buffer.</b> 
      * </p>
      * 
-     * @param buffer the document buffer (not copied)
+     * @param element the {@link IHtmlElement} element object representing the corresponding HTML element.
+     * @param buffer the document buffer (not copied).
      * @param nameOffset the offset (position in buffer) where the element name appears.
      * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
-     * @param warnings the list of warnings applicable to the parsing of this element.
      * @throws AttoParseException
      */
     public void handleHtmlOpenElementStart(
+            final IHtmlElement element,
             final char[] buffer, 
             final int nameOffset, final int nameLen,
-            final int line, final int col,
-            final HtmlParsingEventWarnings warnings)
+            final int line, final int col)
             throws AttoParseException;
     
     /**
@@ -131,11 +125,13 @@ public interface IDetailedHtmlElementHandling extends IHtmlAttributeSequenceHand
      *   Called when the end of an open element (an <i>open tag</i>) is found.
      * </p>
      * 
+     * @param element the {@link IHtmlElement} element object representing the corresponding HTML element.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
      * @throws AttoParseException
      */
     public void handleHtmlOpenElementEnd(
+            final IHtmlElement element,
             final int line, final int col)
             throws AttoParseException;
 
@@ -149,10 +145,6 @@ public interface IDetailedHtmlElementHandling extends IHtmlAttributeSequenceHand
      *   Called when the start of a close element (a <i>close tag</i>) is found.
      * </p>
      * <p>
-     *   The reported warnings explain the issues found with this element
-     *   during parsing (misplacement, bad nesting, etc.) 
-     * </p>
-     * <p>
      *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
      *   should not be considered to be immutable, so reported structures should be copied if they need
      *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
@@ -162,19 +154,19 @@ public interface IDetailedHtmlElementHandling extends IHtmlAttributeSequenceHand
      *   <b>Implementations of this handler should never modify the document buffer.</b> 
      * </p>
      * 
-     * @param buffer the document buffer (not copied)
+     * @param element the {@link IHtmlElement} element object representing the corresponding HTML element.
+     * @param buffer the document buffer (not copied).
      * @param nameOffset the offset (position in buffer) where the element name appears.
      * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
-     * @param warnings the list of warnings applicable to the parsing of this element.
      * @throws AttoParseException
      */
     public void handleHtmlCloseElementStart(
+            final IHtmlElement element,
             final char[] buffer, 
             final int nameOffset, final int nameLen,
-            final int line, final int col,
-            final HtmlParsingEventWarnings warnings)
+            final int line, final int col)
             throws AttoParseException;
     
     /**
@@ -182,11 +174,13 @@ public interface IDetailedHtmlElementHandling extends IHtmlAttributeSequenceHand
      *   Called when the end of a close element (a <i>close tag</i>) is found.
      * </p>
      * 
+     * @param element the {@link IHtmlElement} element object representing the corresponding HTML element.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
      * @throws AttoParseException
      */
     public void handleHtmlCloseElementEnd(
+            final IHtmlElement element,
             final int line, final int col)
             throws AttoParseException;
     
