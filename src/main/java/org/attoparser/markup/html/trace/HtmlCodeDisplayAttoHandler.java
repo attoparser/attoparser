@@ -215,7 +215,7 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedNonValidatingHtm
             
             this.writer.write("<div class=\"atto_source\" id=\"atto_source_" + this.documentId + "\">\n");
             this.writer.write("<style>\n" + FRAGMENT_STYLES.replaceAll("@@", "#atto_source_content_" + this.documentId ) + "</style>\n");
-            this.writer.write("<div class=\"atto_source_content id=\"atto_source_content_" + this.documentId + "\">");
+            this.writer.write("<div class=\"atto_source_content\" id=\"atto_source_content_" + this.documentId + "\">");
             
         } catch (final Exception e) {
             throw new AttoParseException(e);
