@@ -38,9 +38,11 @@ public final class HtmlParsingEventWarnings {
 
     
     
-    // IGN-0010
-    public static final IHtmlParsingEventWarning IGNORABLE_UNMATCHED_CLOSE_ELEMENT = new IgnorableUnmatchedCloseElementWarning();
+    // STY-0010
+    public static final IHtmlParsingEventWarning NON_MINIMIZED_STANDALONE_ELEMENT = new NonMinimizedStandaloneElementWarning();
     // IGN-0020
+    public static final IHtmlParsingEventWarning IGNORABLE_UNMATCHED_CLOSE_ELEMENT = new IgnorableUnmatchedCloseElementWarning();
+    // IGN-0030
     public static final IHtmlParsingEventWarning IGNORABLE_CLOSE_STANDALONE_ELEMENT = new IgnorableCloseStandaloneElementWarning();
     
     
@@ -54,6 +56,7 @@ public final class HtmlParsingEventWarnings {
      */
     
     public static final HtmlParsingEventWarnings WARNINGS_NONE = new HtmlParsingEventWarnings();
+    public static final HtmlParsingEventWarnings WARNINGS_NON_MINIMIZED_STANDALONE_ELEMENT = new HtmlParsingEventWarnings(NON_MINIMIZED_STANDALONE_ELEMENT);
     public static final HtmlParsingEventWarnings WARNINGS_IGNORABLE_UNMATCHED_CLOSE_ELEMENT = new HtmlParsingEventWarnings(IGNORABLE_UNMATCHED_CLOSE_ELEMENT);
     public static final HtmlParsingEventWarnings WARNINGS_IGNORABLE_CLOSE_STANDALONE_ELEMENT = new HtmlParsingEventWarnings(IGNORABLE_CLOSE_STANDALONE_ELEMENT);
     

@@ -30,15 +30,15 @@ package org.attoparser.markup.html.warnings;
  * @since 1.1
  *
  */
-public class IgnorableCloseStandaloneElementWarning extends IgnorableArtifactWarning {
+public class NonMinimizedStandaloneElementWarning extends QuestionableStyleWarning {
 
-    public static final String CODE = "IGN-0030";
+    public static final String CODE = "STY-0010";
     public static final String MESSAGE = 
-            "This close element should be ignored, as it references an HTML standalone (no-body) element. " +
-            "No closing elements should exist for these HTML standalone elements.";
-    
-    
-    protected IgnorableCloseStandaloneElementWarning() {
+            "Even if the HTML standards allow standalone elements like 'img', 'meta', etc. to be left " +
+            "unclosed or non-minimized (i.e. <img src=\"...\"> instead of <img src=\"...\" />), it is " +
+            "considered better style to closed these elements in order to improve interoperability.";
+
+    protected NonMinimizedStandaloneElementWarning() {
         super(CODE, MESSAGE);
     }
     

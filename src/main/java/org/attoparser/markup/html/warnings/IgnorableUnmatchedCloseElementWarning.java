@@ -30,9 +30,9 @@ package org.attoparser.markup.html.warnings;
  * @since 1.1
  *
  */
-public class IgnorableUnmatchedCloseElementWarning extends AbstractHtmlParsingEventWarning {
+public class IgnorableUnmatchedCloseElementWarning extends IgnorableArtifactWarning {
 
-    public static final String CODE = "IGN-0010";
+    public static final String CODE = "IGN-0020";
     public static final String MESSAGE = 
             "This close element should be ignored, as it does not correspond to any previously " +
             "open element.";

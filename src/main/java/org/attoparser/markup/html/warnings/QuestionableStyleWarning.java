@@ -30,16 +30,10 @@ package org.attoparser.markup.html.warnings;
  * @since 1.1
  *
  */
-public class IgnorableCloseStandaloneElementWarning extends IgnorableArtifactWarning {
+public class QuestionableStyleWarning extends AbstractHtmlParsingEventWarning {
 
-    public static final String CODE = "IGN-0030";
-    public static final String MESSAGE = 
-            "This close element should be ignored, as it references an HTML standalone (no-body) element. " +
-            "No closing elements should exist for these HTML standalone elements.";
-    
-    
-    protected IgnorableCloseStandaloneElementWarning() {
-        super(CODE, MESSAGE);
+    protected QuestionableStyleWarning(final String code, final String message) {
+        super(code, message);
     }
     
 }

@@ -372,7 +372,8 @@ public abstract class AbstractDetailedHtmlAttoHandler
     }
 
     public void handleHtmlStandaloneElementEnd(
-            final int line, final int col)
+            final int line, final int col,
+            final boolean minimized)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
     }

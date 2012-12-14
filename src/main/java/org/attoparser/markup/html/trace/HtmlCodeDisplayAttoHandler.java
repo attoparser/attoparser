@@ -21,11 +21,18 @@ package org.attoparser.markup.html.trace;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 import org.attoparser.AttoParseException;
 import org.attoparser.markup.html.AbstractDetailedHtmlAttoHandler;
 import org.attoparser.markup.html.HtmlParsingConfiguration;
 import org.attoparser.markup.html.warnings.HtmlParsingEventWarnings;
+import org.attoparser.markup.html.warnings.IHtmlParsingEventWarning;
+import org.attoparser.markup.html.warnings.IgnorableArtifactWarning;
+import org.attoparser.markup.html.warnings.QuestionableStyleWarning;
 
 
 
@@ -54,6 +61,10 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
             "    font-family: Courier, 'Courier New', monospace;\n" +
             "    font-size: 12px;\n" +
             "}\n" +
+            ".element {\n" +
+            "    font-weight: bold;\n" + 
+            "    color: black;\n" + 
+            "}\n" +
             ".attr-name {\n" +
             "    font-weight: normal;\n" + 
             "    color: red;\n" + 
@@ -62,28 +73,13 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
             "    font-weight: normal;\n" + 
             "    color: blue;\n" + 
             "}\n" +
-            ".minimized-standalone {\n" +
-            "    font-weight: bold;\n" + 
-            "    color: black;\n" + 
+            ".questionable-style {\n" +
+            "    background: #ddd;\n" + 
             "}\n" +
-            ".non-minimized-standalone {\n" +
-            "    font-weight: bold;\n" + 
-            "    color: black;\n" + 
-            "    background: wheat;\n" + 
-            "}\n" +
-            ".open, .close {\n" +
-            "    font-weight: bold;\n" + 
-            "    color: black;\n" + 
-            "}\n" +
-            ".synthetic-open, .synthetic-close {\n" +
-            "    font-weight: bold;\n" + 
-            "    color: ghostwhite;\n" + 
-            "    background: orangered;\n" + 
-            "}\n" +
-            ".ignorable-close {\n" +
-            "    font-weight: bold;\n" + 
-            "    color: ghostwhite;\n" + 
-            "    background: indigo;\n" + 
+            ".ignorable-artifact {\n" +
+            "    font-weight: normal;\n" + 
+            "    color: #888;\n" + 
+            "    background: lightskyblue;\n" + 
             "}\n" +
             ".doctype {\n" +
             "    font-weight: bold;\n" + 
@@ -115,16 +111,13 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
     private static final String STYLE_CDATA = "cdata";
     private static final String STYLE_XML_DECLARATION = "xml-declaration";
     private static final String STYLE_PROCESSING_INSTRUCTION = "processing-instruction";
-    private static final String STYLE_MINIMIZED_STANDALONE = "minimized-standalone";
-    private static final String STYLE_NON_MINIMIZED_STANDALONE = "non-minimized-standalone";
-    private static final String STYLE_OPEN = "open";
-    private static final String STYLE_CLOSE = "close";
-    private static final String STYLE_SYNTHETIC_OPEN = "synthetic-open";
-    private static final String STYLE_SYNTHETIC_CLOSE = "synthetic-close";
-    private static final String STYLE_IGNORABLE_CLOSE = "ignorable-close";
+    private static final String STYLE_ELEMENT = "element";
     private static final String STYLE_ATTR_NAME = "attr-name";
     private static final String STYLE_ATTR_VALUE = "attr-value";
     private static final String STYLE_TEXT = "text";
+    
+    private static final String STYLE_QUESTIONABLE_STYLE = "questionable-style";
+    private static final String STYLE_IGNORABLE_ARTIFACT = "ignorable-artifact";
     
     private static final String TAG_FORMAT_START = "<span class=\"%1$s\">";
     private static final String TAG_FORMAT_END = "</span>";
@@ -166,7 +159,31 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
     
     
     private void openStyle(final String style) throws IOException {
-        this.writer.write(String.format(TAG_FORMAT_START, style));
+        openStyles(Collections.singletonList(style));
+    }
+    
+    private void openStyles(final List<String> styles) throws IOException {
+        final StringBuilder strBuilder = new StringBuilder();
+        final Iterator<String> stylesIter = styles.iterator();
+        strBuilder.append(stylesIter.next());
+        while (stylesIter.hasNext()) {
+            strBuilder.append(' ');
+            strBuilder.append(stylesIter.next());
+        }
+        this.writer.write(String.format(TAG_FORMAT_START, strBuilder.toString()));
+    }
+    
+    private void openStyles(final HtmlParsingEventWarnings warnings) throws IOException {
+        final List<String> styles = new ArrayList<String>();
+        styles.add(STYLE_ELEMENT);
+        for (final IHtmlParsingEventWarning warning : warnings.getWarnings()) {
+            if (warning instanceof QuestionableStyleWarning) {
+                styles.add(STYLE_QUESTIONABLE_STYLE);
+            } else if (warning instanceof IgnorableArtifactWarning) {
+                styles.add(STYLE_IGNORABLE_ARTIFACT);
+            }
+        }
+        openStyles(styles);
     }
     
     private void closeStyle() throws IOException {
@@ -225,7 +242,7 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
         
         try {
             
-            openStyle(STYLE_MINIMIZED_STANDALONE);
+            openStyles(warnings);
             this.writer.write(OPEN_TAG_START);
             this.writer.write(buffer, offset, len);
             
@@ -238,12 +255,13 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
     
     @Override
     public void handleHtmlStandaloneElementEnd(
-            final int line, final int col)
+            final int line, final int col,
+            final boolean minimized)
             throws AttoParseException {
         
         try {
             
-            this.writer.write(MINIMIZED_TAG_END);
+            this.writer.write((minimized? MINIMIZED_TAG_END : OPEN_TAG_END));
             closeStyle();
             
         } catch (final Exception e) {
@@ -264,7 +282,7 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
         
         try {
             
-            openStyle(STYLE_OPEN);
+            openStyles(warnings);
             this.writer.write(OPEN_TAG_START);
             this.writer.write(buffer, offset, len);
             
@@ -304,7 +322,7 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
         
         try {
             
-            openStyle(STYLE_CLOSE);
+            openStyles(warnings);
             this.writer.write(CLOSE_TAG_START);
             this.writer.write(buffer, offset, len);
             
@@ -608,7 +626,7 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedHtmlAttoHandler 
 
     
     
-    
+
     
     
 }

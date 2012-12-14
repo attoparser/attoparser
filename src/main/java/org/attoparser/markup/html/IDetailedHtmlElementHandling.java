@@ -82,10 +82,12 @@ public interface IDetailedHtmlElementHandling extends IHtmlAttributeSequenceHand
      * 
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
+     * @param minimized whether the tag representing this element is minimized (self-closed) or not.
      * @throws AttoParseException
      */
     public void handleHtmlStandaloneElementEnd(
-            final int line, final int col)
+            final int line, final int col,
+            final boolean minimized)
             throws AttoParseException;
 
     

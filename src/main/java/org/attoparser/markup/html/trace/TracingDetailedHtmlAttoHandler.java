@@ -102,7 +102,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
         
         try {
             
-            this.writer.write('C');
+            this.writer.write((minimized? 'M' : 'U'));
             this.writer.write('S');
             this.writer.write('E');
             this.writer.write('S');
@@ -121,12 +121,13 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedHtmlAttoHand
     
     @Override
     public void handleHtmlStandaloneElementEnd(
-            final int line, final int col)
+            final int line, final int col,
+            final boolean minimized)
             throws AttoParseException {
         
         try {
             
-            this.writer.write('C');
+            this.writer.write((minimized? 'M' : 'U'));
             this.writer.write('S');
             this.writer.write('E');
             this.writer.write('E');

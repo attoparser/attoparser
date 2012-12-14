@@ -68,7 +68,7 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException {
         
-        handler.handleHtmlStandaloneElementEnd(line, col);
+        handler.handleHtmlStandaloneElementEnd(line, col, true);
 
         stack.closeElement();
         

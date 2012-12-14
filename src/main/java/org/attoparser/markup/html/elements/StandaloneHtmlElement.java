@@ -60,7 +60,7 @@ public class StandaloneHtmlElement extends BasicHtmlElement {
         
         stack.openElement(this);
         
-        handler.handleHtmlStandaloneElementStart(buffer, nameOffset, nameLen, line, col, false, HtmlParsingEventWarnings.WARNINGS_NONE);
+        handler.handleHtmlStandaloneElementStart(buffer, nameOffset, nameLen, line, col, false, HtmlParsingEventWarnings.WARNINGS_NON_MINIMIZED_STANDALONE_ELEMENT);
 
     }
 
@@ -71,7 +71,7 @@ public class StandaloneHtmlElement extends BasicHtmlElement {
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException {
         
-        handler.handleHtmlStandaloneElementEnd(line, col);
+        handler.handleHtmlStandaloneElementEnd(line, col, false);
         
     }
 
