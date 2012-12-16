@@ -24,6 +24,9 @@ import org.attoparser.markup.html.elements.IHtmlElement;
 
 
 /**
+ * <p>
+ *   Common interface for all handlers that support reporting detailed HTML parsing events.
+ * </p>
  * 
  * @author Daniel Fern&aacute;ndez
  * 
