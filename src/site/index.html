@@ -219,6 +219,17 @@ parser.parse(documentReader, handler);
             
               <tr>
                 <td>
+                  <strong>HTML-specific intelligence</strong>
+                </td>
+                <td>
+                  attoparser offers specific intelligence in order to correctly parse HTML markup. For example:
+                  it can report an <kbd>&lt;img src="..."&gt;</kbd> element as a <i>standalone element</i> even
+                  if it is not minimized (<kbd>&lt;img src="..." /&gt;</kbd>) and it has no closing tag. 
+                </td>
+              </tr>
+            
+              <tr>
+                <td>
                   <strong>Optional DOM-style</strong>
                 </td>
                 <td>
@@ -311,7 +322,7 @@ parser.parse(documentReader, handler);
           <h3>Project status</h3>
 
           <p>
-            attoparser is stable and production-ready. Current version is <b>1.0</b>. 
+            attoparser is stable and production-ready. Current version is <b>1.1</b>. 
           </p>
           
         </div>

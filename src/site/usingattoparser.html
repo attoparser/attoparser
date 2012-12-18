@@ -177,6 +177,8 @@
             having a default empty implementation&mdash;, and each of these sets of methods will
             offer a different level of detail to us:
           </p>
+        
+          <h6>Example general handlers</h6>
 
           
           <table class="table table-striped">
@@ -210,6 +212,52 @@
                   more similar to the Standard SAX <kbd>ContentHandler</kbd>s (fewer
                   events, use of <kbd>String</kbd> instead of <kbd>char[]</kbd>, 
                   attributes reported as <kbd>Map&lt;String,String&gt;</kbd>, etc).  
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+        
+          <h6>Example XML handlers</h6>
+
+          
+          <table class="table table-striped">
+            <tbody>
+              <tr>
+                <td class="span4"><strong><kbd>AbstractDetailedXmlAttoHandler</kbd></strong></td>
+                <td class="span8">
+                  Abstract handler with the same level of detail as <kbd>AbstractDetailedMarkupAttoHandler</kbd>,
+                  using specific XML configuration.
+                </td>
+              </tr>
+              <tr>
+                <td><strong><kbd>AbstractStandardXmlMarkupAttoHandler</kbd></strong></td>
+                <td>
+                  Higher-level abstract handler similar to <kbd>AbstractStandardMarkupAttoHandler</kbd>,
+                  using specific XML configuration.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+        
+          <h6>Example HTML handlers</h6>
+
+          
+          <table class="table table-striped">
+            <tbody>
+              <tr>
+                <td class="span4"><strong><kbd>AbstractDetailedNonValidatingHtmlAttoHandler</kbd></strong></td>
+                <td class="span8">
+                  Abstract handler with the same level of detail as <kbd>AbstractDetailedMarkupAttoHandler</kbd>,
+                  using specific HTML configuration and intelligence.
+                </td>
+              </tr>
+              <tr>
+                <td><strong><kbd>AbstractStandardNonValidatingHtmlMarkupAttoHandler</kbd></strong></td>
+                <td>
+                  Higher-level abstract handler similar to <kbd>AbstractStandardMarkupAttoHandler</kbd>,
+                  using specific HTML configuration and intelligence.
                 </td>
               </tr>
             </tbody>
