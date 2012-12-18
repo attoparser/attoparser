@@ -237,6 +237,12 @@
                   using specific XML configuration.
                 </td>
               </tr>
+              <tr>
+                <td><strong><kbd>DOMXmlAttoHandler</kbd></strong></td>
+                <td>
+                  Specialized handler that converts SAX-style events into an attoDOM tree.
+                </td>
+              </tr>
             </tbody>
           </table>
 
@@ -271,13 +277,13 @@
           </p>
 
 <pre class="prettyprint linenums language-java">
-public class StandaloneCountingAttoHandler extends AbstractStandardMarkupAttoHandler {
+public class StandaloneCountingAttoHandler extends AbstractStandardXmlAttoHandler {
 
     // Let's count the number of standalone elements in our document!
     private int standaloneCount = 0;
     
     public StandaloneCountingAttoHandler() {
-        super(DocumentRestrictions.wellFormed());
+        super();
     }
     
     public int getStandaloneCount() {
@@ -285,7 +291,7 @@ public class StandaloneCountingAttoHandler extends AbstractStandardMarkupAttoHan
     }
 
     @Override
-    public void handleStandaloneElement(
+    public void handleXmlStandaloneElement(
             final String elementName, final Map&lt;String, String&gt; attributes, 
             final int line, final int col)
             throws AttoParseException {
@@ -296,7 +302,7 @@ public class StandaloneCountingAttoHandler extends AbstractStandardMarkupAttoHan
 </pre>
 
           <p>
-            Looking at the code above, note that attoparser offers different handlers for
+            Looking at the code above, note that most attoparser handlers offer different handlers for
             <em>opening elements</em> and <em>standalone elements</em>, a differentiation that is
             not easy to achieve using standard SAX parsers. 
           </p>
@@ -305,12 +311,18 @@ public class StandaloneCountingAttoHandler extends AbstractStandardMarkupAttoHan
             of these standalone elements in the document.
           </p>
           <p>
-            And finally, note the <code>DocumentRestrictions.wellFormed()</code> constructor
-            argument that instructs attoparser to require the parsed document to be well-formed from an
-            XML/XHTML standpoint. This means a well-formed prolog, balanced tags, correctly formatted 
-            attribute values, etc. We could have disabled these checks by using
-            <code>DocumentRestrictions.none()</code> instead, or even enable or disable each of these
-            restrictions separately.
+            And finally, note the fact that we are using an <i>XML-specific</i> handler,
+            which instructs attoparser to require the parsed document to be well-formed from an
+            XML standpoint. This means a well-formed prolog, balanced tags, correctly formatted 
+            attribute values, etc.
+          </p>
+          <p>
+            If our code was HTML instead of XML, we could have created our handler as an implementation
+            of, for example, <kbd>AbstractStandardNonValidatingHtmlMarkupAttoHandler</kbd>, which 
+            would offer similar events to those of its XML counterpart, but removing a lot of 
+            restrictions of format (of attributes, for instance) and adding some HTML-specific
+            intelligence like knowing that a <code>&lt;img src="..."&gt;</code> is a standalone tag
+            (and not an <i>open tag</i>) even if it isn't written like <code>&lt;img src="..." /&gt;</code>.
           </p>
         
         
@@ -396,15 +408,17 @@ final int standaloneCount = handler.getStandaloneCount();
           <p>
             As a plus to its main SAX-style parsing capabilities, attoparser offers us a DOM-style
             interface that enables us to handle a document as an attoDOM tree.
+            Note that, currently, only an XML version of the DOM conversion facilities is offered 
+            out-of-the-box.
           </p>
           <p>
-            Using it is easy: we just need to use the prebuilt <kbd>DOMMarkupAttoHandler</kbd>:
+            Using it is easy: we just need to use the prebuilt <kbd>DOMXmlAttoHandler</kbd>:
           </p>
 
 <pre class="prettyprint linenums language-java">
 final Reader reader = ...
                 
-final DOMMarkupAttoHandler handler = new DOMMarkupAttoHandler();
+final DOMXmlAttoHandler handler = new DOMXmlAttoHandler();
 parser.parse(reader, handler);
 
 final Document doc = handler.getDocument();
@@ -413,15 +427,11 @@ final List&lt;Element&gt; elements = doc.getRootElement().getElementChildren();
 ...
 </pre>          
         
-        <h5>DOM visitors</h5>
+        <h5>Writing markup from an attoDOM tree</h5>
         
         <p>
-          attoDOM trees have a nice feature: they allow the execution of <em>visitors</em> on them. Visitors are classes implementing
-          the <kbd>AttoDOMVisitor</kbd> or extending its abstract base implementation <kbd>AbstractAttoDOMVisitor</kbd>.
-        </p>
-        <p>
-          attoparser provides, out-of-the-box, a visitor implementation capable of writing an attoDOM tree as
-          markup code again. It's the <kbd>MarkupWriterAttoDOMVisitor</kbd>:
+          attoparser provides, out-of-the-box, a writer object capable of writing an attoDOM tree as
+          markup code again. It's the <kbd>XmlDOMWriter</kbd> class:
         </p>
           
 <pre class="prettyprint linenums language-java">
@@ -430,14 +440,14 @@ final Document doc = ...
 // Modify our document if we wish 
 ...
                 
-final StringWriter writer = new StringWriter();
-final MarkupWriterAttoDOMVisitor visitor = new MarkupWriterAttoDOMVisitor(writer); 
+final StringWriter stringWriter = new StringWriter();
+final XmlDOMWriter domWriter = new XmlDOMWriter(); 
 
-// Apply the visitor
-doc.visit(visitor);
+// Execute the writer
+domWriter.writeDocument(doc, stringWriter);
 
 // Obtain the result of executing the visitor            
-final String markup = writer.toString();
+final String markup = stringWriter.toString();
 </pre>
         
         </div>
