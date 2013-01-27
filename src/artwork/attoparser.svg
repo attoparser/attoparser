@@ -29,7 +29,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="1.4"
      inkscape:cx="378.86823"
-     inkscape:cy="902.54325"
+     inkscape:cy="722.76832"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -93,5 +93,33 @@
          x="48.571423"
          y="58.790752"
          style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Segoe Script;-inkscape-font-specification:Segoe Script;fill:#cccccc">powerful and easy java parser for XML and HTML markup</tspan></text>
+    <rect
+       style="fill:#000000;fill-opacity:1;stroke:none"
+       id="rect2999-1"
+       width="101.94243"
+       height="101.94243"
+       x="224.28586"
+       y="345.37366"
+       ry="11.476957"
+       inkscape:export-filename="C:\Users\daniel\workspace37\attoparser\src\artwork\attoparser_logo_small.png"
+       inkscape:export-xdpi="441.42569"
+       inkscape:export-ydpi="441.42569" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Segoe Script;-inkscape-font-specification:Segoe Script"
+       x="234.28575"
+       y="412.50504"
+       id="text2985-7"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="C:\Users\daniel\workspace37\attoparser\src\artwork\attoparser_logo_small.png"
+       inkscape:export-xdpi="441.42569"
+       inkscape:export-ydpi="441.42569"><tspan
+         sodipodi:role="line"
+         id="tspan2987-4"
+         x="234.28575"
+         y="412.50504"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:Segoe Script;-inkscape-font-specification:Segoe Script Bold"><tspan
+           style="fill:#ff7f2a"
+           id="tspan2989-0">atto</tspan></tspan></text>
   </g>
 </svg>
