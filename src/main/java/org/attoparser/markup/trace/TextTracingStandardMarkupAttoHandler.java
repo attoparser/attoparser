@@ -36,19 +36,19 @@ import org.attoparser.markup.MarkupParsingConfiguration;
  * @since 1.0
  *
  */
-public final class TracingStandardMarkupAttoHandler extends AbstractStandardMarkupAttoHandler {
+public final class TextTracingStandardMarkupAttoHandler extends AbstractStandardMarkupAttoHandler {
 
     
     private final Writer writer;
     
 
     
-    public TracingStandardMarkupAttoHandler(final Writer writer) {
+    public TextTracingStandardMarkupAttoHandler(final Writer writer) {
         super();
         this.writer = writer;
     }
     
-    public TracingStandardMarkupAttoHandler(final Writer writer, final MarkupParsingConfiguration markupParsingConfiguration) {
+    public TextTracingStandardMarkupAttoHandler(final Writer writer, final MarkupParsingConfiguration markupParsingConfiguration) {
         super(markupParsingConfiguration);
         this.writer = writer;
     }

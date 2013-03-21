@@ -19,13 +19,14 @@
  */
 package org.attoparser.markup.html.trace;
 
-import java.io.IOException;
-import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.attoparser.AttoParseException;
 import org.attoparser.markup.html.AbstractDetailedNonValidatingHtmlAttoHandler;
 import org.attoparser.markup.html.HtmlParsingConfiguration;
 import org.attoparser.markup.html.elements.IHtmlElement;
+import org.attoparser.markup.trace.TraceEvent;
 
 
 
@@ -37,24 +38,47 @@ import org.attoparser.markup.html.elements.IHtmlElement;
  * 
  * @author Daniel Fern&aacute;ndez
  * 
- * @since 1.1
+ * @since 1.2
  *
  */
 public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatingHtmlAttoHandler {
 
     
-    private final Writer writer;
+    public static final String TRACE_TYPE_DOCUMENT_START = "DS";
+    public static final String TRACE_TYPE_DOCUMENT_END = "DE";
+
+    public static final String TRACE_TYPE_STANDALONE_ELEMENT_START = "SES";
+    public static final String TRACE_TYPE_STANDALONE_ELEMENT_END = "SEE";
+
+    public static final String TRACE_TYPE_OPEN_ELEMENT_START = "OES";
+    public static final String TRACE_TYPE_OPEN_ELEMENT_END = "OEE";
+
+    public static final String TRACE_TYPE_CLOSE_ELEMENT_START = "CES";
+    public static final String TRACE_TYPE_CLOSE_ELEMENT_END = "CEE";
+
+    public static final String TRACE_TYPE_ATTRIBUTE = "A";
+    public static final String TRACE_TYPE_TEXT = "T";
+    public static final String TRACE_TYPE_COMMENT = "C";
+    public static final String TRACE_TYPE_CDATA = "D";
+    public static final String TRACE_TYPE_XMLDECL = "X";
+    public static final String TRACE_TYPE_INNERWHITESPACE = "IW";
+    public static final String TRACE_TYPE_DOCTYPE = "DT";
+    public static final String TRACE_TYPE_PROCESSINGINSTRUCTION = "P";
+    
+
+    
+    private final List<TraceEvent> trace = new ArrayList<TraceEvent>();
+    
+
     
     
-    public TracingDetailedHtmlAttoHandler(final Writer writer) {
+    public TracingDetailedHtmlAttoHandler() {
         super(new HtmlParsingConfiguration());
-        this.writer = writer;
     }
 
     
-    public TracingDetailedHtmlAttoHandler(final Writer writer, final HtmlParsingConfiguration configuration) {
+    public TracingDetailedHtmlAttoHandler(final HtmlParsingConfiguration configuration) {
         super(configuration);
-        this.writer = writer;
     }
     
     
@@ -67,11 +91,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
             final int line, final int col,
             final HtmlParsingConfiguration configuration)
             throws AttoParseException {
-        try {
-            this.writer.write('[');
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
+        this.trace.add(new TraceEvent(line, col, TRACE_TYPE_DOCUMENT_START));
     }
 
     
@@ -81,11 +101,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
             final int line, final int col, 
             final HtmlParsingConfiguration configuration)
             throws AttoParseException {
-        try {
-            this.writer.write(']');
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
+        this.trace.add(new TraceEvent(line, col, TRACE_TYPE_DOCUMENT_END));
     }
     
     
@@ -99,22 +115,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
             final int offset, final int len, 
             final int line, final int col) 
             throws AttoParseException {
-        
-        try {
-            
-            this.writer.write((minimized? 'M' : 'U'));
-            this.writer.write('S');
-            this.writer.write('E');
-            this.writer.write('S');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
+        this.trace.add(new TraceEvent(line, col, TRACE_TYPE_STANDALONE_ELEMENT_START, element.getName(), Boolean.toString(minimized), new String(buffer, offset, len)));
     }
 
     
@@ -124,19 +125,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
             final boolean minimized,
             final int line, final int col)
             throws AttoParseException {
-        
-        try {
-            
-            this.writer.write((minimized? 'M' : 'U'));
-            this.writer.write('S');
-            this.writer.write('E');
-            this.writer.write('E');
-            writePosition(this.writer, line, col);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
+        this.trace.add(new TraceEvent(line, col, TRACE_TYPE_STANDALONE_ELEMENT_END, element.getName(), Boolean.toString(minimized)));
     }
 
     
@@ -149,21 +138,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
-        
-        try {
-            
-            this.writer.write('O');
-            this.writer.write('E');
-            this.writer.write('S');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
+        this.trace.add(new TraceEvent(line, col, TRACE_TYPE_OPEN_ELEMENT_START, element.getName(), new String(buffer, offset, len)));
     }
 
     
@@ -172,18 +147,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
             final IHtmlElement element,
             final int line, final int col) 
             throws AttoParseException {
-        
-        try {
-            
-            this.writer.write('O');
-            this.writer.write('E');
-            this.writer.write('E');
-            writePosition(this.writer, line, col);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
+        this.trace.add(new TraceEvent(line, col, TRACE_TYPE_OPEN_ELEMENT_END, element.getName()));
     }
 
     
@@ -196,21 +160,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
             final int offset, final int len,
             final int line, final int col) 
             throws AttoParseException {
-        
-        try {
-            
-            this.writer.write('C');
-            this.writer.write('E');
-            this.writer.write('S');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
+        this.trace.add(new TraceEvent(line, col, TRACE_TYPE_CLOSE_ELEMENT_START, element.getName(), new String(buffer, offset, len)));
     }
 
     
@@ -219,18 +169,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
             final IHtmlElement element,
             final int line, final int col) 
             throws AttoParseException {
-        
-        try {
-            
-            this.writer.write('C');
-            this.writer.write('E');
-            this.writer.write('E');
-            writePosition(this.writer, line, col);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
+        this.trace.add(new TraceEvent(line, col, TRACE_TYPE_CLOSE_ELEMENT_END, element.getName()));
     }
 
 
@@ -247,27 +186,13 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
             final int valueOuterOffset, final int valueOuterLen,
             final int valueLine, final int valueCol)
             throws AttoParseException {
-        
-        try {
-            
-            this.writer.write('A');
-            this.writer.write('(');
-            this.writer.write(buffer, nameOffset, nameLen);
-            this.writer.write(')');
-            writePosition(this.writer, nameLine, nameCol);
-            this.writer.write('(');
-            this.writer.write(buffer, operatorOffset, operatorLen);
-            this.writer.write(')');
-            writePosition(this.writer, operatorLine, operatorCol);
-            this.writer.write('(');
-            this.writer.write(buffer, valueOuterOffset, valueOuterLen);
-            this.writer.write(')');
-            writePosition(this.writer, valueLine, valueCol);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
+        this.trace.add(
+                new TraceEvent(
+                        nameLine, nameCol, 
+                        TRACE_TYPE_ATTRIBUTE, 
+                        new String(buffer, nameOffset, nameLen),
+                        new String(buffer, operatorOffset, operatorLen),
+                        new String(buffer, valueOuterOffset, valueOuterLen)));
     }
 
 
@@ -277,20 +202,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
             final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
-        
-        try {
-            
-            this.writer.write('A');
-            this.writer.write('S');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
+        this.trace.add(new TraceEvent(line, col, TRACE_TYPE_INNERWHITESPACE, new String(buffer, offset, len)));
     }
 
 
@@ -302,19 +214,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
     public void handleText(final char[] buffer, final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
-        
-        try {
-            
-            this.writer.write('T');
-            this.writer.write('(');
-            this.writer.write(buffer, offset, len);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
+        this.trace.add(new TraceEvent(line, col, TRACE_TYPE_TEXT, new String(buffer, offset, len)));
     }
 
 
@@ -326,19 +226,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
             final int outerOffset, final int outerLen, 
             final int line, final int col)
             throws AttoParseException {
-        
-        try {
-            
-            this.writer.write('C');
-            this.writer.write('(');
-            this.writer.write(buffer, contentOffset, contentLen);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
+        this.trace.add(new TraceEvent(line, col, TRACE_TYPE_COMMENT, new String(buffer, contentOffset, contentLen)));
     }
 
     
@@ -349,19 +237,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
             final int outerOffset, final int outerLen,
             final int line, final int col)
             throws AttoParseException {
-        
-        try {
-            
-            this.writer.write('D');
-            this.writer.write('(');
-            this.writer.write(buffer, contentOffset, contentLen);
-            this.writer.write(')');
-            writePosition(this.writer, line, col);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
+        this.trace.add(new TraceEvent(line, col, TRACE_TYPE_CDATA, new String(buffer, contentOffset, contentLen)));
     }
 
     
@@ -381,35 +257,14 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
             final int outerOffset, final int outerLen,
             final int line,final int col) 
             throws AttoParseException {
-        
-        try {
-            
-            this.writer.write("X");
-            this.writer.write('(');
-            this.writer.write(buffer, versionOffset, versionLen);
-            this.writer.write(')');
-            writePosition(this.writer, versionLine, versionCol);
-            this.writer.write('(');
-            if (encodingOffset != 0) {
-                this.writer.write(buffer, encodingOffset, encodingLen);
-            } else {
-                this.writer.write("null");
-            }
-            this.writer.write(')');
-            writePosition(this.writer, encodingLine, encodingCol);
-            this.writer.write('(');
-            if (standaloneOffset != 0) {
-                this.writer.write(buffer, standaloneOffset, standaloneLen);
-            } else {
-                this.writer.write("null");
-            }
-            this.writer.write(')');
-            writePosition(this.writer, standaloneLine, standaloneCol);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
+        this.trace.add(
+                new TraceEvent(
+                        line, col, 
+                        TRACE_TYPE_XMLDECL, 
+                        new String(buffer, keywordOffset, keywordLen),
+                        new String(buffer, versionOffset, versionLen),
+                        new String(buffer, encodingOffset, encodingLen),
+                        new String(buffer, standaloneOffset, standaloneLen)));
     }
 
     
@@ -434,40 +289,16 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
             final int outerOffset, final int outerLen,
             final int outerLine, final int outerCol) 
             throws AttoParseException {
-        
-        try {
-            
-            this.writer.write('D');
-            this.writer.write('T');
-            this.writer.write('(');
-            this.writer.write(buffer, keywordOffset, keywordLen);
-            this.writer.write(')');
-            writePosition(this.writer, keywordLine, keywordCol);
-            this.writer.write('(');
-            this.writer.write(buffer, elementNameOffset, elementNameLen);
-            this.writer.write(')');
-            writePosition(this.writer, elementNameLine, elementNameCol);
-            this.writer.write('(');
-            this.writer.write(buffer, typeOffset, typeLen);
-            this.writer.write(')');
-            writePosition(this.writer, typeLine, typeCol);
-            this.writer.write('(');
-            this.writer.write(buffer, publicIdOffset, publicIdLen);
-            this.writer.write(')');
-            writePosition(this.writer, publicIdLine, publicIdCol);
-            this.writer.write('(');
-            this.writer.write(buffer, systemIdOffset, systemIdLen);
-            this.writer.write(')');
-            writePosition(this.writer, systemIdLine, systemIdCol);
-            this.writer.write('(');
-            this.writer.write(buffer, internalSubsetOffset, internalSubsetLen);
-            this.writer.write(')');
-            writePosition(this.writer, internalSubsetLine, internalSubsetCol);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
+        this.trace.add(
+                new TraceEvent(
+                        outerLine, outerCol, 
+                        TRACE_TYPE_DOCTYPE, 
+                        new String(buffer, keywordOffset, keywordLen),
+                        new String(buffer, elementNameOffset, elementNameLen),
+                        new String(buffer, typeOffset, typeLen),
+                        new String(buffer, publicIdOffset, publicIdLen),
+                        new String(buffer, systemIdOffset, systemIdLen),
+                        new String(buffer, internalSubsetOffset, internalSubsetLen)));
     }
 
 
@@ -484,47 +315,17 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
             final int outerOffset, final int outerLen, 
             final int line, final int col)
             throws AttoParseException {
-        
-        try {
-            
-            this.writer.write("P");
-            this.writer.write('(');
-            this.writer.write(buffer, targetOffset, targetLen);
-            this.writer.write(')');
-            writePosition(this.writer, targetLine, targetCol);
-            this.writer.write('(');
-            if (contentOffset != 0) {
-                this.writer.write(buffer, contentOffset, contentLen);
-            } else {
-                this.writer.write("null");
-            }
-            this.writer.write(')');
-            writePosition(this.writer, contentLine, contentCol);
-            
-        } catch (final Exception e) {
-            throw new AttoParseException(e);
-        }
-        
+        this.trace.add(
+                new TraceEvent(
+                        line, col, 
+                        TRACE_TYPE_PROCESSINGINSTRUCTION, 
+                        new String(buffer, targetOffset, targetLen),
+                        new String(buffer, contentOffset, contentLen)));
     }
 
     
     
     
-    
-    
-    
-    
-    
-    
-    private static void writePosition(final Writer writer, final int line, final int col) throws IOException {
-        writer.write('{');
-        writer.write(String.valueOf(line));
-        writer.write(',');
-        writer.write(String.valueOf(col));
-        writer.write('}');
-    }
-
-
 
     
     

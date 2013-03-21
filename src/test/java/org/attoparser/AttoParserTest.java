@@ -32,9 +32,9 @@ import org.attoparser.markup.MarkupParsingConfiguration.PrologPresence;
 import org.attoparser.markup.MarkupParsingConfiguration.UniqueRootElementPresence;
 import org.attoparser.markup.duplicate.DuplicatingBasicMarkupAttoHandler;
 import org.attoparser.markup.duplicate.DuplicatingDetailedMarkupAttoHandler;
-import org.attoparser.markup.trace.TracingBasicMarkupAttoHandler;
-import org.attoparser.markup.trace.TracingDetailedMarkupAttoHandler;
-import org.attoparser.markup.trace.TracingStandardMarkupAttoHandler;
+import org.attoparser.markup.trace.TextTracingBasicMarkupAttoHandler;
+import org.attoparser.markup.trace.TextTracingDetailedMarkupAttoHandler;
+import org.attoparser.markup.trace.TextTracingStandardMarkupAttoHandler;
 
 
 
@@ -88,22 +88,22 @@ public class AttoParserTest extends TestCase {
         final IAttoParser p = new MarkupAttoParser();
         
         StringWriter sw1 = new StringWriter();
-        IAttoHandler h = new TracingBasicMarkupAttoHandler(sw1);        
+        IAttoHandler h = new TextTracingBasicMarkupAttoHandler(sw1);        
         p.parse(dt1, h);
         assertEquals("[DT(){1,1}]", sw1.toString());
         
         StringWriter sw2 = new StringWriter();
-        h = new TracingBasicMarkupAttoHandler(sw2);        
+        h = new TextTracingBasicMarkupAttoHandler(sw2);        
         p.parse(dt2, h);
         assertEquals("[DT(html){1,1}]", sw2.toString());
         
         StringWriter sw3 = new StringWriter();
-        h = new TracingBasicMarkupAttoHandler(sw3);        
+        h = new TextTracingBasicMarkupAttoHandler(sw3);        
         p.parse(dt3, h);
         assertEquals("[DT(html public \"lala\"){1,1}]", sw3.toString());
         
         StringWriter sw4 = new StringWriter();
-        h = new TracingBasicMarkupAttoHandler(sw4);        
+        h = new TextTracingBasicMarkupAttoHandler(sw4);        
         p.parse(dt4, h);
         assertEquals("[DT(html public \"aaa\" [<!ELEMENT>]){1,1}]", sw4.toString());
         
@@ -1292,7 +1292,7 @@ public class AttoParserTest extends TestCase {
             // TEST WITH TRACING HANDLER
             {
                 final StringWriter sw = new StringWriter(); 
-                final IAttoHandler handler = new TracingDetailedMarkupAttoHandler(sw, markupParsingConfiguration);
+                final IAttoHandler handler = new TextTracingDetailedMarkupAttoHandler(sw, markupParsingConfiguration);
                 if (offset == 0 && len == input.length) {
                     ((AbstractBufferedAttoParser)parser).parseDocument(new CharArrayReader(input), handler, bufferSize);
                 } else { 
@@ -1341,7 +1341,7 @@ public class AttoParserTest extends TestCase {
                 // TEST WITH TRACING SIMPLE MARKUP HANDLER (String literals)
                 {
                     final StringWriter sw = new StringWriter(); 
-                    final IAttoHandler handler = new TracingStandardMarkupAttoHandler(sw, markupParsingConfiguration);
+                    final IAttoHandler handler = new TextTracingStandardMarkupAttoHandler(sw, markupParsingConfiguration);
                     if (offset == 0 && len == input.length) {
                         ((AbstractBufferedAttoParser)parser).parseDocument(new CharArrayReader(input), handler, bufferSize);
                     } else { 

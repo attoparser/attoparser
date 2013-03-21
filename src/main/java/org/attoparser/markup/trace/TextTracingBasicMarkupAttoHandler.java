@@ -34,13 +34,13 @@ import org.attoparser.markup.AbstractBasicMarkupAttoHandler;
  * @since 1.0
  *
  */
-public final class TracingBasicMarkupAttoHandler extends AbstractBasicMarkupAttoHandler {
+public final class TextTracingBasicMarkupAttoHandler extends AbstractBasicMarkupAttoHandler {
 
     
     private final Writer writer;
     
     
-    public TracingBasicMarkupAttoHandler(final Writer writer) {
+    public TextTracingBasicMarkupAttoHandler(final Writer writer) {
         super();
         this.writer = writer;
     }
