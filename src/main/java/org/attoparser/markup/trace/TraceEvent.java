@@ -19,6 +19,8 @@
  */
 package org.attoparser.markup.trace;
 
+import java.util.Arrays;
+
 
 
 
@@ -74,5 +76,94 @@ public final class TraceEvent {
         return this.col;
     }
 
+    
+    
+    @Override
+    public String toString() {
+        final StringBuilder strBuilder = new StringBuilder();
+        strBuilder.append("[" + this.line + "," + this.col + "] " + this.type);
+        if (hasContent()) {
+            for (final String contentItem : getContent()) {
+                strBuilder.append("(" + contentItem + ")");
+            }
+        }
+        return strBuilder.toString();
+    }
+
+    
+    
+    
+    public boolean matchesTypeAndContent(final TraceEvent event) {
+        if (this == event) {
+            return true;
+        }
+        if (event == null) {
+            return false;
+        }
+        if (this.content == null) {
+            if (event.content != null) {
+                return false;
+            }
+        } else if (!Arrays.equals(this.content, event.content)) {
+            return false;
+        }
+        if (this.type == null) {
+            if (event.type != null) {
+                return false;
+            }
+        } else if (!this.type.equals(event.type)) {
+            return false;
+        }
+        return true;
+    }
+    
+    
+    
+    
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + this.col;
+        result = prime * result + Arrays.hashCode(this.content);
+        result = prime * result + this.line;
+        result = prime * result + ((this.type == null) ? 0 : this.type.hashCode());
+        return result;
+    }
+
+    
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        TraceEvent other = (TraceEvent) obj;
+        if (this.col != other.col) {
+            return false;
+        }
+        if (!Arrays.equals(this.content, other.content)) {
+            return false;
+        }
+        if (this.line != other.line) {
+            return false;
+        }
+        if (this.type == null) {
+            if (other.type != null) {
+                return false;
+            }
+        } else if (!this.type.equals(other.type)) {
+            return false;
+        }
+        return true;
+    }
+    
     
 }
