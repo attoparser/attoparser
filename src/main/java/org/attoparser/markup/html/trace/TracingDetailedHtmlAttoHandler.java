@@ -20,6 +20,7 @@
 package org.attoparser.markup.html.trace;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.attoparser.AttoParseException;
@@ -86,6 +87,14 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
     
     
     
+    public List<TraceEvent> getTrace() {
+        return Collections.unmodifiableList(this.trace);
+    }
+    
+    
+    
+    
+    
     @Override
     public void handleDocumentStart(final long startTimeNanos, 
             final int line, final int col,
@@ -115,7 +124,10 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
             final int offset, final int len, 
             final int line, final int col) 
             throws AttoParseException {
-        this.trace.add(new TraceEvent(line, col, TRACE_TYPE_STANDALONE_ELEMENT_START, element.getName(), Boolean.toString(minimized), new String(buffer, offset, len)));
+        this.trace.add(
+                new TraceEvent(
+                        line, col, TRACE_TYPE_STANDALONE_ELEMENT_START, 
+                        element.getName(), Boolean.toString(minimized), new String(buffer, offset, len)));
     }
 
     
@@ -125,7 +137,10 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
             final boolean minimized,
             final int line, final int col)
             throws AttoParseException {
-        this.trace.add(new TraceEvent(line, col, TRACE_TYPE_STANDALONE_ELEMENT_END, element.getName(), Boolean.toString(minimized)));
+        this.trace.add(
+                new TraceEvent(
+                        line, col, TRACE_TYPE_STANDALONE_ELEMENT_END, 
+                        element.getName(), Boolean.toString(minimized)));
     }
 
     
@@ -138,7 +153,10 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
-        this.trace.add(new TraceEvent(line, col, TRACE_TYPE_OPEN_ELEMENT_START, element.getName(), new String(buffer, offset, len)));
+        this.trace.add(
+                new TraceEvent(
+                        line, col, TRACE_TYPE_OPEN_ELEMENT_START, 
+                        element.getName(), new String(buffer, offset, len)));
     }
 
     
@@ -160,7 +178,10 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
             final int offset, final int len,
             final int line, final int col) 
             throws AttoParseException {
-        this.trace.add(new TraceEvent(line, col, TRACE_TYPE_CLOSE_ELEMENT_START, element.getName(), new String(buffer, offset, len)));
+        this.trace.add(
+                new TraceEvent(
+                        line, col, TRACE_TYPE_CLOSE_ELEMENT_START,
+                        element.getName(), new String(buffer, offset, len)));
     }
 
     
@@ -226,7 +247,8 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
             final int outerOffset, final int outerLen, 
             final int line, final int col)
             throws AttoParseException {
-        this.trace.add(new TraceEvent(line, col, TRACE_TYPE_COMMENT, new String(buffer, contentOffset, contentLen)));
+        this.trace.add(
+                new TraceEvent(line, col, TRACE_TYPE_COMMENT, new String(buffer, contentOffset, contentLen)));
     }
 
     
@@ -237,7 +259,8 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
             final int outerOffset, final int outerLen,
             final int line, final int col)
             throws AttoParseException {
-        this.trace.add(new TraceEvent(line, col, TRACE_TYPE_CDATA, new String(buffer, contentOffset, contentLen)));
+        this.trace.add(
+                new TraceEvent(line, col, TRACE_TYPE_CDATA, new String(buffer, contentOffset, contentLen)));
     }
 
     

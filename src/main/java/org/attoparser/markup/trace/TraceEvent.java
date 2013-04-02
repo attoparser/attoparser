@@ -100,18 +100,18 @@ public final class TraceEvent {
         if (event == null) {
             return false;
         }
-        if (this.content == null) {
-            if (event.content != null) {
-                return false;
-            }
-        } else if (!Arrays.equals(this.content, event.content)) {
-            return false;
-        }
         if (this.type == null) {
             if (event.type != null) {
                 return false;
             }
         } else if (!this.type.equals(event.type)) {
+            return false;
+        }
+        if (this.content == null) {
+            if (event.content != null) {
+                return false;
+            }
+        } else if (!Arrays.equals(this.content, event.content)) {
             return false;
         }
         return true;
@@ -145,11 +145,8 @@ public final class TraceEvent {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        TraceEvent other = (TraceEvent) obj;
+        final TraceEvent other = (TraceEvent) obj;
         if (this.col != other.col) {
-            return false;
-        }
-        if (!Arrays.equals(this.content, other.content)) {
             return false;
         }
         if (this.line != other.line) {
@@ -160,6 +157,13 @@ public final class TraceEvent {
                 return false;
             }
         } else if (!this.type.equals(other.type)) {
+            return false;
+        }
+        if (this.content == null) {
+            if (other.content != null) {
+                return false;
+            }
+        } else if (!Arrays.equals(this.content, other.content)) {
             return false;
         }
         return true;

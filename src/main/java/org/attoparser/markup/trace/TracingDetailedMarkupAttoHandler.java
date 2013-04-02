@@ -113,7 +113,10 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
-        this.trace.add(new TraceEvent(line, col, TRACE_TYPE_STANDALONE_ELEMENT_START, new String(buffer, offset, len)));
+        this.trace.add(
+                new TraceEvent(
+                        line, col, TRACE_TYPE_STANDALONE_ELEMENT_START, 
+                        new String(buffer, offset, len)));
     }
 
 
@@ -134,7 +137,10 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
-        this.trace.add(new TraceEvent(line, col, TRACE_TYPE_OPEN_ELEMENT_START, new String(buffer, offset, len)));
+        this.trace.add(
+                new TraceEvent(
+                        line, col, TRACE_TYPE_OPEN_ELEMENT_START, 
+                        new String(buffer, offset, len)));
     }
     
     
@@ -156,7 +162,10 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
-        this.trace.add(new TraceEvent(line, col, TRACE_TYPE_CLOSE_ELEMENT_START, new String(buffer, offset, len)));
+        this.trace.add(
+                new TraceEvent(
+                        line, col, TRACE_TYPE_CLOSE_ELEMENT_START, 
+                        new String(buffer, offset, len)));
     }
     
     
@@ -178,7 +187,10 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
-        this.trace.add(new TraceEvent(line, col, TRACE_TYPE_AUTOCLOSE_ELEMENT_START, new String(buffer, offset, len)));
+        this.trace.add(
+                new TraceEvent(
+                        line, col, TRACE_TYPE_AUTOCLOSE_ELEMENT_START, 
+                        new String(buffer, offset, len)));
     }
     
     
@@ -200,7 +212,10 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
-        this.trace.add(new TraceEvent(line, col, TRACE_TYPE_UNMATCHEDCLOSE_ELEMENT_START, new String(buffer, offset, len)));
+        this.trace.add(
+                new TraceEvent(
+                        line, col, TRACE_TYPE_UNMATCHEDCLOSE_ELEMENT_START, 
+                        new String(buffer, offset, len)));
     }
     
     
