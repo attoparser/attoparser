@@ -1203,6 +1203,21 @@ public class AttoParserTest extends TestCase {
                 "[SES(a){1,1}IWS( ){1,3}SEE{1,4}]", 
                 "[SE(a){1,1}]", 
                 wellFormedXml);
+        testDoc( 
+                "<!--| something |-->",
+                "[C(| something |){1,1}]", 
+                "[C(| something |){1,1}]", 
+                wellFormedXml);
+        testDoc( 
+                "<!--|> something <|-->",
+                "[C(|> something <|){1,1}]", 
+                "[C(|> something <|){1,1}]", 
+                wellFormedXml);
+        testDoc( 
+                "<!--%> something <%-->",
+                "[C(%> something <%){1,1}]", 
+                "[C(%> something <%){1,1}]", 
+                wellFormedXml);
         
         System.out.println("TOTAL Test executions: " + totalTestExecutions);
         
