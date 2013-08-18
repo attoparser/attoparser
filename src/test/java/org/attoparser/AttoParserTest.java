@@ -1218,6 +1218,21 @@ public class AttoParserTest extends TestCase {
                 "[C(%> something <%){1,1}]", 
                 "[C(%> something <%){1,1}]", 
                 wellFormedXml);
+        testDoc( 
+                "<@block b=\"2\"/>",
+                "[SES(@block){1,1}IWS( ){1,8}A(b){1,9}(=){1,10}(\"2\"){1,11}SEE{1,14}]", 
+                "[SE(@block[b='2']){1,1}]", 
+                wellFormedXml);
+        testDoc( 
+                "<@inject b=\"2\"/>",
+                "[SES(@inject){1,1}IWS( ){1,9}A(b){1,10}(=){1,11}(\"2\"){1,12}SEE{1,15}]", 
+                "[SE(@inject[b='2']){1,1}]", 
+                wellFormedXml);
+        testDoc( 
+                "</@inject>",
+                "[UCES(@inject){1,1}UCEE{1,10}]", 
+                "[UCE(@inject){1,1}]", 
+                noRestrictions);
         
         System.out.println("TOTAL Test executions: " + totalTestExecutions);
         
