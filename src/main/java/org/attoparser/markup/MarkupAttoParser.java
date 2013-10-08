@@ -54,19 +54,30 @@ import org.attoparser.IAttoHandler;
  */
 public final class MarkupAttoParser extends AbstractBufferedAttoParser {
 
+    private final boolean splitText;
 
-    
     /**
      * <p>
      *   Creates a new instance of this parser.
      * </p>
      */
     public MarkupAttoParser() {
-        super();
+        this(false);
+    }
+
+    /**
+     * <p>
+     *   Creates a new instance of this parser.
+     * </p>
+     *
+     * @param splitText if {@code true}, text nodes may be split and sent to the handler as multiple text nodes.  The
+     *                  default is {@code false}.
+     */
+    public MarkupAttoParser(boolean splitText) {
+        this.splitText = splitText;
     }
     
 
-    
     
     
     
@@ -112,6 +123,10 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                 tagStart = MarkupParsingUtil.findNextStructureStart(buffer, i, maxi, locator);
                 
                 if (tagStart == -1) {
+                    if (splitText) {
+                        handler.handleText(buffer, current, len - current, currentLine, currentCol);
+                        current = len;
+                    }
                     return new BufferParseResult(current, currentLine, currentCol, false);
                 }
 
@@ -241,7 +256,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                 } else if (inCdata) {
                     // This is a CDATA section
                     
-                    while (tagEnd - current < 12 || buffer[tagEnd - 1] != ']' || buffer[tagEnd - 2] != ']') {
+                    while (tagEnd - current < 11 || buffer[tagEnd - 1] != ']' || buffer[tagEnd - 2] != ']') {
                         // the '>' we chose is not the comment-closing one. Let's find again
                         
                         LocatorUtils.countChar(locator, buffer[tagEnd]);

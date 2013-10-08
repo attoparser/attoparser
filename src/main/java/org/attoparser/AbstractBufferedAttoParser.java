@@ -118,17 +118,17 @@ public abstract class AbstractBufferedAttoParser extends AbstractAttoParser {
                         final char[] newBuffer = new char[bufferSize];
                         System.arraycopy(buffer, 0, newBuffer, 0, bufferContentSize);
                         buffer = newBuffer;
-                        
-                        readOffset = bufferContentSize;
-                        readLen = bufferSize - readOffset;
-                        
+
                     }
-                    
+
+                    // it's possible for two reads to occur in a row and 1) read less than the bufferSize and 2)
+                    // still not find the next tag/end of structure
+                    readOffset = bufferContentSize;
+                    readLen = bufferSize - readOffset;
+
                 } else if (bufferParseOffset < bufferContentSize) {
-                    
-                    for (int i = bufferParseOffset; i < bufferContentSize; i++) {
-                        buffer[i - bufferParseOffset] = buffer[i];
-                    }
+
+                    System.arraycopy(buffer, bufferParseOffset, buffer, 0, bufferContentSize - bufferParseOffset);
                     
                     readOffset = bufferContentSize - bufferParseOffset;
                     readLen = bufferSize - readOffset;
