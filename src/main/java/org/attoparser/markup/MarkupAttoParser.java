@@ -54,7 +54,7 @@ import org.attoparser.IAttoHandler;
  */
 public final class MarkupAttoParser extends AbstractBufferedAttoParser {
 
-    private final boolean splitText;
+    private final boolean canSplitText;
 
     /**
      * <p>
@@ -70,11 +70,12 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
      *   Creates a new instance of this parser.
      * </p>
      *
-     * @param splitText if {@code true}, text nodes may be split and sent to the handler as multiple text nodes.  The
+     * @param canSplitText if {@code true}, text nodes may be split and sent to the handler as multiple text nodes.  The
      *                  default is {@code false}.
      */
-    public MarkupAttoParser(boolean splitText) {
-        this.splitText = splitText;
+    public MarkupAttoParser(final boolean canSplitText) {
+        super();
+        this.canSplitText = canSplitText;
     }
     
 
@@ -123,7 +124,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                 tagStart = MarkupParsingUtil.findNextStructureStart(buffer, i, maxi, locator);
                 
                 if (tagStart == -1) {
-                    if (splitText) {
+                    if (canSplitText) {
                         handler.handleText(buffer, current, len - current, currentLine, currentCol);
                         current = len;
                     }

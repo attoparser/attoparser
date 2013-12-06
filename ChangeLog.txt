@@ -1,3 +1,10 @@
+1.2
+=======
+- Fixed bug reading buffer when read() operations don't return all the available bytes just because they
+  are not ready (e.g. a pipe).
+- Added to MarkupParser the possibility to split Text nodes (call several Text events in sequence).
+
+
 1.1
 =======
 - Added new events to handlers for automatically balancing tags, by creating synthetic closing elements.
