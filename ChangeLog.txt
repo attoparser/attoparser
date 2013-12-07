@@ -1,8 +1,14 @@
-1.2
+1.3
 =======
 - Fixed bug reading buffer when read() operations don't return all the available bytes just because they
   are not ready (e.g. a pipe).
 - Added to MarkupParser the possibility to split Text nodes (call several Text events in sequence).
+
+
+1.2
+=======
+- Added event-based tracing atto handlers.
+- Added Object-based tracing event system.
 
 
 1.1
