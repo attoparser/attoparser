@@ -67,7 +67,7 @@ public final class MarkupParsingConfiguration implements Serializable {
 
     /**
      * <p>
-     *   Creates a {@link HtmlParsingConfiguration} instance enforcing no restrictions at all.
+     *   Creates a {@link MarkupParsingConfiguration} instance enforcing no restrictions at all.
      * </p>
      * <p>
      *   This is the setup:
@@ -80,8 +80,6 @@ public final class MarkupParsingConfiguration implements Serializable {
      *   <li><tt>{@link #getPrologParsingConfiguration()} = new {@link PrologParsingConfiguration}()</tt></li>
      *   <li><tt>{@link #getUniqueRootElementPresence()} = {@link UniqueRootElementPresence#DEPENDS_ON_PROLOG_DOCTYPE}</tt></li>
      * </ul>
-     * 
-     * @return the new instance.
      */
     public static MarkupParsingConfiguration noRestrictions() {
         return new MarkupParsingConfiguration();
@@ -93,7 +91,7 @@ public final class MarkupParsingConfiguration implements Serializable {
     
     /**
      * <p>
-     *   Creates a {@link HtmlParsingConfiguration} instance with
+     *   Creates a {@link MarkupParsingConfiguration} instance with
      *   a default configuration.
      * </p>
      * <p>
@@ -107,8 +105,6 @@ public final class MarkupParsingConfiguration implements Serializable {
      *   <li><tt>{@link #getPrologParsingConfiguration()} = new {@link PrologParsingConfiguration}()</tt></li>
      *   <li><tt>{@link #getUniqueRootElementPresence()} = {@link UniqueRootElementPresence#DEPENDS_ON_PROLOG_DOCTYPE}</tt></li>
      * </ul>
-     * 
-     * @return the new instance.
      */
     public MarkupParsingConfiguration() {
         super();

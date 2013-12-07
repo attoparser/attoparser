@@ -50,8 +50,9 @@ public final class HtmlParsingConfiguration implements Serializable {
     
     
     /**
-     * 
-     * @return the new instance.
+     * <p>
+     *   Creates a new HTML Parsing Configuration instance.
+     * </p>
      */
     public HtmlParsingConfiguration() {
         super();

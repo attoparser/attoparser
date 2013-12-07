@@ -41,7 +41,7 @@ import org.attoparser.util.SegmentedArray.IValueHandler;
  *   different events for them.
  * </p>
  * <p>
- *   Handlers extending from this class can make use of a {@link HtmlParsingConfiguration} instance
+ *   Handlers extending from this class can make use of a {@link MarkupParsingConfiguration} instance
  *   specifying a set of restrictions to be applied during document parsing (for example, 
  *   for ensuring that a document is well-formed from an XML/XHTML standpoint).
  * </p>
