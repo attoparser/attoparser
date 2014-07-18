@@ -113,9 +113,19 @@
         <configuration>
           <source>${maven.compile.source}</source>
           <target>${maven.compile.target}</target>
+          <encoding>US-ASCII</encoding>
         </configuration>
       </plugin>
-      
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.5</version>
+        <configuration>
+          <encoding>US-ASCII</encoding>
+        </configuration>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
