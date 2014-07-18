@@ -24,7 +24,7 @@
   <groupId>org.attoparser</groupId>
   <artifactId>attoparser</artifactId>
   <packaging>jar</packaging>
-  <version>1.4-SNAPSHOT</version>
+  <version>1.4.0-SNAPSHOT</version>
   <name>attoparser</name>
   <url>http://www.attoparser.org</url>
 
@@ -74,6 +74,11 @@
     </repository>
   </distributionManagement>
 
+  <properties>
+    <maven.compile.source>1.5</maven.compile.source>
+    <maven.compile.target>1.5</maven.compile.target>
+  </properties>
+
 
   <build>
   
@@ -104,17 +109,17 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-		<version>2.4</version>
+        <version>2.4</version>
         <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
+          <source>${maven.compile.source}</source>
+          <target>${maven.compile.target}</target>
         </configuration>
       </plugin>
       
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-		<version>2.8.1</version>
+        <version>2.8.1</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -134,7 +139,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-		<version>2.1.2</version>
+        <version>2.1.2</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -144,11 +149,54 @@
           </execution>
         </executions>
       </plugin>
-      
+
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>2.4.0</version>
+        <executions>
+          <execution>
+            <id>bundle-manifest</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <instructions>
+            <Import-Package>!org.attoparser.markup.dom</Import-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <archive>
+            <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+            <addMavenDescriptor>false</addMavenDescriptor>
+            <manifest>
+              <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+            <manifestEntries>
+              <!-- These two entries are non-standard, specified by the Apache Software Foundation in -->
+              <!-- their release preparation procedures as a way to pass this information on to the   -->
+              <!-- library users. See: http://commons.apache.org/releases/prepare.html                -->
+              <X-Compile-Source-JDK>${maven.compile.source}</X-Compile-Source-JDK>
+              <X-Compile-Target-JDK>${maven.compile.target}</X-Compile-Target-JDK>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
-		<version>1.1</version>
+        <version>1.1</version>
         <executions>
           <execution>
             <id>sign-artifacts</id>
@@ -190,7 +238,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
         <version>3.1</version>
-		<configuration>
+        <configuration>
           <reportPlugins>
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
