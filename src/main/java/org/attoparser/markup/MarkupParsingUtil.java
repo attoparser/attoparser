@@ -242,9 +242,19 @@ public final class MarkupParsingUtil {
             final char c = text[i];
             
             if (!inApos && c == '"') {
-                inQuotes = !inQuotes;
+                if (inQuotes) {
+                    LocatorUtils.countChar(locator, c);
+                    i++;
+                    return (i < maxi ? i : -1);
+                }
+                inQuotes = true;
             } else if (!inQuotes && c == '\'') {
-                inApos = !inApos;
+                if (inApos) {
+                    LocatorUtils.countChar(locator, c);
+                    i++;
+                    return (i < maxi ? i : -1);
+                }
+                inApos = true;
             } else if (!inQuotes && !inApos) {
                 return i;
             }
