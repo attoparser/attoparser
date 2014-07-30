@@ -798,8 +798,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 // Check there is an operator
                 if (operatorLen == 0)  {
                     throw new AttoParseException(
-                            "Malformed markup: Value for attribute \"" + new String(buffer, nameOffset, nameLen) + "\" " +
-                            "must include an equals (=) sign and a value surrounded by commas", 
+                            "Malformed markup: Attribute \"" + new String(buffer, nameOffset, nameLen) + "\" " +
+                            "must include an equals (=) sign and a value surrounded by quotes",
                             operatorLine, operatorCol);
                 }
                 
@@ -808,7 +808,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 if (valueOuterLen == 0 || valueOuterLen == valueContentLen)  {
                     throw new AttoParseException(
                             "Malformed markup: Value for attribute \"" + new String(buffer, nameOffset, nameLen) + "\" " +
-                            "must be surrounded by commas", 
+                            "must be surrounded by quotes",
                             valueLine, valueCol);
                 }
             
