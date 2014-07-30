@@ -150,6 +150,18 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedNonValidatingHtm
                 this.writer.write("<br />");
             } else if (c == ' ') {
                 this.writer.write("&nbsp;");
+            } else if (c == '\t') {
+                this.writer.write("&nbsp;&nbsp;&nbsp;&nbsp;");
+            } else if (c == '<') {
+                this.writer.write("&lt;");
+            } else if (c == '>') {
+                this.writer.write("&gt;");
+            } else if (c == '&') {
+                this.writer.write("&amp;");
+            } else if (c == '\"') {
+                this.writer.write("&quot;");
+            } else if (c == '\'') {
+                this.writer.write("&#39;");
             } else {
                 this.writer.write(c);
             }
@@ -395,7 +407,7 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedNonValidatingHtm
             this.writer.write(buffer, operatorOffset, operatorLen);
             
             openStyle(STYLE_ATTR_VALUE);
-            this.writer.write(buffer, valueOuterOffset, valueOuterLen);
+            writeEscaped(buffer, valueOuterOffset, valueOuterLen);
             closeStyle();
             
         } catch (final Exception e) {
@@ -458,7 +470,7 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedNonValidatingHtm
 
             openStyle(STYLE_COMMENT);
             this.writer.write("&lt;!--");
-            this.writer.write(buffer, contentOffset, contentLen);
+            writeEscaped(buffer, contentOffset, contentLen);
             this.writer.write("--&gt;");
             closeStyle();
             
@@ -481,7 +493,7 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedNonValidatingHtm
             
             openStyle(STYLE_CDATA);
             this.writer.write("&lt;![CDATA[");
-            this.writer.write(buffer, contentOffset, contentLen);
+            writeEscaped(buffer, contentOffset, contentLen);
             this.writer.write("]]&gt;");
             closeStyle();
             
