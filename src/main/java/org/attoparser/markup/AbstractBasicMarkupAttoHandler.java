@@ -69,30 +69,36 @@ public abstract class AbstractBasicMarkupAttoHandler
 
 
     @Override
-    public final void handleStructure(
+    public final char[] handleStructure(
             final char[] buffer,
             final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
         
         super.handleStructure(buffer, offset, len, line, col);
-        
-        if (!ElementMarkupParsingUtil.tryParseElement(buffer, offset, len, line, col, this)) {
-            if (!CommentMarkupParsingUtil.tryParseComment(buffer, offset, len, line, col, this)) {
-                 if (!CdataMarkupParsingUtil.tryParseCdata(buffer, offset, len, line, col, this )) {
-                     if (!DocTypeMarkupParsingUtil.tryParseDocType(buffer, offset, len, line, col, this)) {
-                         if (!XmlDeclarationMarkupParsingUtil.tryParseXmlDeclaration(buffer, offset, len, line, col, this)) {
-                             if (!ProcessingInstructionMarkupParsingUtil.tryParseProcessingInstruction(buffer, offset, len, line, col, this)) {
-                                 throw new AttoParseException(
-                                         "Could not parse as markup structure: " +
-                                         "\"" + new String(buffer, offset, len) + "\"", 
-                                         line, col);
-                             }
+
+        final char[] tryParseElementResult =
+                ElementMarkupParsingUtil.tryParseElement(buffer, offset, len, line, col, this);
+        if (tryParseElementResult != ElementMarkupParsingUtil.TRY_PARSE_ELEMENT_FALSE) {
+            return tryParseElementResult;
+        }
+
+        if (!CommentMarkupParsingUtil.tryParseComment(buffer, offset, len, line, col, this)) {
+             if (!CdataMarkupParsingUtil.tryParseCdata(buffer, offset, len, line, col, this )) {
+                 if (!DocTypeMarkupParsingUtil.tryParseDocType(buffer, offset, len, line, col, this)) {
+                     if (!XmlDeclarationMarkupParsingUtil.tryParseXmlDeclaration(buffer, offset, len, line, col, this)) {
+                         if (!ProcessingInstructionMarkupParsingUtil.tryParseProcessingInstruction(buffer, offset, len, line, col, this)) {
+                             throw new AttoParseException(
+                                     "Could not parse as markup structure: " +
+                                     "\"" + new String(buffer, offset, len) + "\"",
+                                     line, col);
                          }
                      }
                  }
-            }
+             }
         }
+
+        return null;
 
     }
 
@@ -109,33 +115,36 @@ public abstract class AbstractBasicMarkupAttoHandler
     
     
 
-    public void handleStandaloneElement(
+    public char[] handleStandaloneElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
 
-    public void handleOpenElement(
+    public char[] handleOpenElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
     
-    public void handleCloseElement(
+    public char[] handleCloseElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
     

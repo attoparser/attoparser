@@ -61,7 +61,8 @@ public final class MarkupParsingConfiguration implements Serializable {
  
     private PrologParsingConfiguration prologParsingConfiguration = new PrologParsingConfiguration();
     private UniqueRootElementPresence uniqueRootElementPresence = UniqueRootElementPresence.DEPENDS_ON_PROLOG_DOCTYPE;
-    
+
+    private char[][] nonProcessableElementNames = null;
 
 
 
@@ -272,9 +273,36 @@ public final class MarkupParsingConfiguration implements Serializable {
         validateNotNull(uniqueRootElementPresence, "The \"unique root element presence\" configuration value cannot be null");
         this.uniqueRootElementPresence = uniqueRootElementPresence;
     }
-    
-    
-    
+
+
+
+
+    /**
+     * <p>
+     *   This value determines the names of the elements which content should
+     *   not be considered <em>parsable</em> (i.e. are <kbd>CDATA</kbd> instead
+     *   of <kbd>PCDATA</kbd>).
+     * </p>
+     * <p>
+     *   In HTML parsing, this array will contain the <kbd>script</kbd> and
+     *   <kbd>style</kbd> element names, so that the parser does not mind about
+     *   markup-significant characters appearing inside these elements' contents.
+     * </p>
+     *
+     * @return the names of the elements which contents will not be processed.
+     * @since 1.4.0
+     */
+    public char[][] getNonProcessableElementNames() {
+        return this.nonProcessableElementNames;
+    }
+
+    public void setNonProcessableElementNames(final char[][] nonProcessableElementNames) {
+        this.nonProcessableElementNames = nonProcessableElementNames;
+    }
+
+
+
+
     
     @Override
     public MarkupParsingConfiguration clone() throws CloneNotSupportedException {
@@ -285,6 +313,7 @@ public final class MarkupParsingConfiguration implements Serializable {
         conf.requireXmlWellFormedAttributeValues = this.requireXmlWellFormedAttributeValues;
         conf.uniqueRootElementPresence = this.uniqueRootElementPresence;
         conf.prologParsingConfiguration = this.prologParsingConfiguration.clone();
+        conf.nonProcessableElementNames = this.nonProcessableElementNames; // no real need to copy the array
         return conf;
     }
 

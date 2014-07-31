@@ -80,11 +80,12 @@ import org.attoparser.util.SegmentedArray.IValueHandler;
  */
 public abstract class AbstractDetailedMarkupAttoHandler 
         extends AbstractBasicMarkupAttoHandler
-        implements IDetailedElementHandling, IDetailedDocTypeHandling {
+        implements IDetailedElementHandling, IDetailedDocTypeHandling, IConfigurableMarkupHandling {
 
     private static final MarkupParsingConfiguration NO_RESTRICTIONS = MarkupParsingConfiguration.noRestrictions(); 
     
     private final StackAwareWrapper wrapper;
+    private final MarkupParsingConfiguration markupParsingConfiguration;
     
     
     
@@ -97,12 +98,17 @@ public abstract class AbstractDetailedMarkupAttoHandler
     protected AbstractDetailedMarkupAttoHandler(final MarkupParsingConfiguration markupParsingConfiguration) {
         super();
         this.wrapper = new StackAwareWrapper(this, markupParsingConfiguration);
+        this.markupParsingConfiguration = markupParsingConfiguration;
     }
 
-    
 
 
-    
+    public MarkupParsingConfiguration getMarkupParsingConfiguration() {
+        return this.markupParsingConfiguration;
+    }
+
+
+
     @Override
     public final void handleDocumentStart(final long startTimeNanos, final int line, final int col)
             throws AttoParseException {
@@ -170,7 +176,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
     
     
     @Override
-    public final void handleStandaloneElement(
+    public final char[] handleStandaloneElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
@@ -178,13 +184,13 @@ public abstract class AbstractDetailedMarkupAttoHandler
             throws AttoParseException {
 
         super.handleStandaloneElement(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
-        ElementMarkupParsingUtil.parseDetailedStandaloneElement(buffer, outerOffset, outerLen, line, col, this.wrapper);
+        return ElementMarkupParsingUtil.parseDetailedStandaloneElement(buffer, outerOffset, outerLen, line, col, this.wrapper);
         
     }
 
     
     @Override
-    public final void handleOpenElement(
+    public final char[] handleOpenElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
@@ -192,13 +198,13 @@ public abstract class AbstractDetailedMarkupAttoHandler
             throws AttoParseException {
 
         super.handleOpenElement(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
-        ElementMarkupParsingUtil.parseDetailedOpenElement(buffer, outerOffset, outerLen, line, col, this.wrapper);
+        return ElementMarkupParsingUtil.parseDetailedOpenElement(buffer, outerOffset, outerLen, line, col, this.wrapper);
         
     }
 
     
     @Override
-    public final void handleCloseElement(
+    public final char[] handleCloseElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
@@ -206,7 +212,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
             throws AttoParseException {
 
         super.handleCloseElement(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
-        ElementMarkupParsingUtil.parseDetailedCloseElement(buffer, outerOffset, outerLen, line, col, this.wrapper);
+        return ElementMarkupParsingUtil.parseDetailedCloseElement(buffer, outerOffset, outerLen, line, col, this.wrapper);
 
     }
     
@@ -453,7 +459,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
     
     
     static final class StackAwareWrapper
-            implements IDetailedElementHandling, IDetailedDocTypeHandling {
+            implements IDetailedElementHandling, IDetailedDocTypeHandling, IConfigurableMarkupHandling {
 
         private static final int DEFAULT_STACK_SIZE = 20;
         private static final int DEFAULT_ATTRIBUTE_NAMES_SIZE = 5;
@@ -544,7 +550,14 @@ public abstract class AbstractDetailedMarkupAttoHandler
             
         }
 
-        
+
+
+        public MarkupParsingConfiguration getMarkupParsingConfiguration() {
+            return this.markupParsingConfiguration;
+        }
+
+
+
         public void handleDocumentStart(final long startTimeNanos, final int line, final int col)
                 throws AttoParseException {
             this.handler.handleDocumentStart(startTimeNanos, line, col, this.markupParsingConfiguration);

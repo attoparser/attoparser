@@ -201,6 +201,12 @@ public interface IAttoHandler {
      *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification). 
      * </p>
      * <p>
+     *   This method will return a <kbd>char[]</kbd> if, as a result of handling this structure, parsing
+     *   should be disabled until the returned char sequence is found in input. This allows
+     *   e.g. ignoring the contents of non-processable elements like HTML's <kbd>&lt;script&gt;</kbd>
+     *   or <kbd>&lt;style&gt;</kbd>.
+     * </p>
+     * <p>
      *   <b>Implementations of this handler should never modify the document buffer.</b> 
      * </p>
      * 
@@ -209,9 +215,12 @@ public interface IAttoHandler {
      * @param len the length (in chars) of the structure artifact, starting in offset.
      * @param line the line in the original document where this structure artifact starts.
      * @param col the column in the original document where this structure artifact starts.
+     * @return will return a char[] if, as a result of handling this structure, parsing should
+     *         be disabled until the returned char sequence is found in input. Will return
+     *         <kbd>null</kbd> if parsing should not be disabled (most common case).
      * @throws AttoParseException
      */
-    public void handleStructure(final char[] buffer, final int offset, final int len, 
+    public char[] handleStructure(final char[] buffer, final int offset, final int len,
             final int line, final int col)
             throws AttoParseException;
     

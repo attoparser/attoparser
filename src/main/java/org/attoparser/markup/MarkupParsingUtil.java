@@ -267,7 +267,45 @@ public final class MarkupParsingUtil {
         
     }
 
-    
-    
-    
+
+
+
+    static int findCharacterSequence(
+            final char[] text, final int offset, final int maxi,
+            final int[] locator, final char[] charSeq) {
+
+        if (charSeq == null || charSeq.length == 0) {
+            return offset;
+        }
+
+        final char c1 = charSeq[0];
+
+        int colIndex = offset;
+        for (int i = offset; i < maxi; i++) {
+
+            final char c = text[i];
+
+            if (c == c1) {
+                // First char matches, let's see the others
+
+                int j = 1;
+                for ( ; j < charSeq.length && (i + j) < maxi ; j++) {
+                    if (text[i + j] != charSeq[j]) {
+                        break;
+                    }
+                }
+                if (j >= charSeq.length) {
+                    return i;
+                }
+
+            }
+
+            LocatorUtils.countChar(locator, c);
+
+        }
+
+        return -1;
+
+    }
+
 }

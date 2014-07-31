@@ -31,7 +31,7 @@ import java.io.Reader;
  * </p>
  * <p>
  *   Subclasses of this abstract class should only implement the abstract
- *   {@link #parseBuffer(char[], int, int, IAttoHandler, int, int)} method.
+ *   {@link #parseBuffer(char[], int, int, IAttoHandler, int, int, char[])} method.
  * </p>
  * <p>
  *   This class closes the document {@link Reader} provided after parsing.  
@@ -95,11 +95,13 @@ public abstract class AbstractBufferedAttoParser extends AbstractAttoParser {
             int bufferParseLine = 1;
             int bufferParseCol = 1;
             boolean bufferParseInStructure = false;
-            
+
+            char[] skipUntilSeq = null;
+
             while (cont) {
 
                 final BufferParseResult bufferParseResult = 
-                        parseBuffer(buffer, 0, bufferContentSize, handler, bufferParseLine, bufferParseCol);
+                    parseBuffer(buffer, 0, bufferContentSize, handler, bufferParseLine, bufferParseCol, skipUntilSeq);
 
                 int readOffset = 0;
                 int readLen = bufferSize;
@@ -108,6 +110,7 @@ public abstract class AbstractBufferedAttoParser extends AbstractAttoParser {
                 bufferParseLine = bufferParseResult.getLine();
                 bufferParseCol = bufferParseResult.getCol();
                 bufferParseInStructure = bufferParseResult.isInStructure();
+                skipUntilSeq = bufferParseResult.getSkipUntilSequence();
                 
                 if (bufferParseOffset == 0) {
                     
@@ -215,7 +218,8 @@ public abstract class AbstractBufferedAttoParser extends AbstractAttoParser {
      */
     protected abstract BufferParseResult parseBuffer(
             final char[] buffer, final int offset, final int len, 
-            final IAttoHandler handler, final int line, final int col) 
+            final IAttoHandler handler, final int line, final int col,
+            final char[] skipUntil)
             throws AttoParseException;
     
     
@@ -254,6 +258,7 @@ public abstract class AbstractBufferedAttoParser extends AbstractAttoParser {
         private final int line;
         private final int col;
         private final boolean inStructure;
+        private final char[] skipUntilSequence;
         
         
         /**
@@ -265,13 +270,16 @@ public abstract class AbstractBufferedAttoParser extends AbstractAttoParser {
          * @param line line of the last unfinished artifact.
          * @param col column of the last unfinished artifact.
          * @param inStructure whether the last unfinished artifact is a structure or not.
+         * @param skipUntilSequence whether parsing must be disabled until a specific char sequence is found, or null.
          */
-        public BufferParseResult(final int offset, final int line, final int col, final boolean inStructure) {
+        public BufferParseResult(final int offset, final int line, final int col, final boolean inStructure,
+                                 final char[] skipUntilSequence) {
             super();
             this.offset = offset;
             this.line = line;
             this.col = col;
             this.inStructure = inStructure;
+            this.skipUntilSequence = skipUntilSequence;
         }
         
         public int getOffset() {
@@ -289,7 +297,11 @@ public abstract class AbstractBufferedAttoParser extends AbstractAttoParser {
         public boolean isInStructure() {
             return this.inStructure;
         }
-    
+
+        public char[] getSkipUntilSequence() {
+            return skipUntilSequence;
+        }
+
     }
     
 }

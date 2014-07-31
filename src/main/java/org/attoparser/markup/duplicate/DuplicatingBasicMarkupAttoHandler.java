@@ -86,7 +86,7 @@ public final class DuplicatingBasicMarkupAttoHandler extends AbstractBasicMarkup
 
 
     @Override
-    public void handleStandaloneElement(
+    public char[] handleStandaloneElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
@@ -98,14 +98,16 @@ public final class DuplicatingBasicMarkupAttoHandler extends AbstractBasicMarkup
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
 
 
 
 
     @Override
-    public void handleOpenElement(
+    public char[] handleOpenElement(
             final char[] buffer, 
             int contentOffset, int contentLen,
             int outerOffset, int outerLen, int line, int col)
@@ -116,14 +118,16 @@ public final class DuplicatingBasicMarkupAttoHandler extends AbstractBasicMarkup
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
 
 
 
 
     @Override
-    public void handleCloseElement(char[] buffer, int contentOffset, int contentLen,
+    public char[] handleCloseElement(char[] buffer, int contentOffset, int contentLen,
             int outerOffset, int outerLen, int line, int col)
             throws AttoParseException {
         
@@ -132,7 +136,9 @@ public final class DuplicatingBasicMarkupAttoHandler extends AbstractBasicMarkup
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
 
 

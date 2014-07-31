@@ -73,7 +73,7 @@ public final class TextTracingBasicMarkupAttoHandler extends AbstractBasicMarkup
 
 
     @Override
-    public void handleStandaloneElement(
+    public char[] handleStandaloneElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
@@ -89,7 +89,9 @@ public final class TextTracingBasicMarkupAttoHandler extends AbstractBasicMarkup
             this.writer.write(buffer, contentOffset, contentLen);
             this.writer.write(')');
             writePosition(this.writer, line, col);
-            
+
+            return null;
+
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
@@ -100,7 +102,7 @@ public final class TextTracingBasicMarkupAttoHandler extends AbstractBasicMarkup
 
     
     @Override
-    public void handleOpenElement(
+    public char[] handleOpenElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
@@ -116,7 +118,9 @@ public final class TextTracingBasicMarkupAttoHandler extends AbstractBasicMarkup
             this.writer.write(buffer, contentOffset, contentLen);
             this.writer.write(')');
             writePosition(this.writer, line, col);
-            
+
+            return null;
+
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
@@ -127,7 +131,7 @@ public final class TextTracingBasicMarkupAttoHandler extends AbstractBasicMarkup
 
     
     @Override
-    public void handleCloseElement(
+    public char[] handleCloseElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
@@ -143,7 +147,9 @@ public final class TextTracingBasicMarkupAttoHandler extends AbstractBasicMarkup
             this.writer.write(buffer, contentOffset, contentLen);
             this.writer.write(')');
             writePosition(this.writer, line, col);
-            
+
+            return null;
+
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }

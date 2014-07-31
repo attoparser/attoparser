@@ -32,6 +32,7 @@ import org.attoparser.markup.MarkupParsingConfiguration.PrologPresence;
 import org.attoparser.markup.MarkupParsingConfiguration.UniqueRootElementPresence;
 import org.attoparser.markup.duplicate.DuplicatingBasicMarkupAttoHandler;
 import org.attoparser.markup.duplicate.DuplicatingDetailedMarkupAttoHandler;
+import org.attoparser.markup.html.HtmlParsing;
 import org.attoparser.markup.trace.TextTracingBasicMarkupAttoHandler;
 import org.attoparser.markup.trace.TextTracingDetailedMarkupAttoHandler;
 import org.attoparser.markup.trace.TextTracingStandardMarkupAttoHandler;
@@ -88,235 +89,286 @@ public class AttoParserTest extends TestCase {
         final IAttoParser p = new MarkupAttoParser();
         
         StringWriter sw1 = new StringWriter();
-        IAttoHandler h = new TextTracingBasicMarkupAttoHandler(sw1);        
+        IAttoHandler h = new TextTracingBasicMarkupAttoHandler(sw1);
         p.parse(dt1, h);
         assertEquals("[DT(){1,1}]", sw1.toString());
-        
+
         StringWriter sw2 = new StringWriter();
-        h = new TextTracingBasicMarkupAttoHandler(sw2);        
+        h = new TextTracingBasicMarkupAttoHandler(sw2);
         p.parse(dt2, h);
         assertEquals("[DT(html){1,1}]", sw2.toString());
-        
+
         StringWriter sw3 = new StringWriter();
-        h = new TextTracingBasicMarkupAttoHandler(sw3);        
+        h = new TextTracingBasicMarkupAttoHandler(sw3);
         p.parse(dt3, h);
         assertEquals("[DT(html public \"lala\"){1,1}]", sw3.toString());
-        
+
         StringWriter sw4 = new StringWriter();
-        h = new TextTracingBasicMarkupAttoHandler(sw4);        
+        h = new TextTracingBasicMarkupAttoHandler(sw4);
         p.parse(dt4, h);
         assertEquals("[DT(html public \"aaa\" [<!ELEMENT>]){1,1}]", sw4.toString());
-        
-        
-        testDoc( 
+
+
+        testDoc(
+            "<br a>Hello",
+            "[OES(br){1,1}IWS( ){1,4}A(a){1,5}(){1,6}(){1,6}OEE{1,6}T(Hello){1,7}]",
+            "[OE(br[a='']){1,1}T(Hello){1,7}]",
+            noRestrictions);
+        testDoc(
+            "<br a b>Hello",
+            "[OES(br){1,1}IWS( ){1,4}A(a){1,5}(){1,6}(){1,6}IWS( ){1,6}A(b){1,7}(){1,8}(){1,8}OEE{1,8}T(Hello){1,9}]",
+            "[OE(br[a='',b='']){1,1}T(Hello){1,9}]",
+            noRestrictions);
+        testDocError(
+            "<li a=\"11\"\">Hello</li>",
+            null,
+            null,
+            1, 1,
+            noRestrictions);
+        testDoc(
+            "<li a=\"a < 0\">Hello</li>",
+            "[OES(li){1,1}IWS( ){1,4}A(a){1,5}(=){1,6}(\"a < 0\"){1,7}OEE{1,14}T(Hello){1,15}CES(li){1,20}CEE{1,24}]",
+            "[OE(li[a='a < 0']){1,1}T(Hello){1,15}CE(li){1,20}]",
+            noRestrictions);
+        testDoc(
+            "<script> var a = \"<div>\" if (a < 0)</script>",
+            "[OES(script){1,1}OEE{1,8}T( var a = \"){1,9}OES(div){1,19}OEE{1,23}T(\" if (a < 0)){1,24}CES(script){1,36}CEE{1,44}]",
+            "[OE(script){1,1}T( var a = \"){1,9}OE(div){1,19}T(\" if (a < 0)){1,24}CE(script){1,36}]",
+            noRestrictions);
+        testDoc(
+            "<style> a = \"<div>\" if (a < 0)</style>",
+            "[OES(style){1,1}OEE{1,7}T( a = \"){1,8}OES(div){1,14}OEE{1,18}T(\" if (a < 0)){1,19}CES(style){1,31}CEE{1,38}]",
+            "[OE(style){1,1}T( a = \"){1,8}OE(div){1,14}T(\" if (a < 0)){1,19}CE(style){1,31}]",
+            noRestrictions);
+        testDoc(
+            "<script> var a = \"<div>\" if (a < 0)</script>",
+            "[OES(script){1,1}OEE{1,8}T( var a = \"<div>\" if (a < 0)){1,9}CES(script){1,36}CEE{1,44}]",
+            "[OE(script){1,1}T( var a = \"<div>\" if (a < 0)){1,9}CE(script){1,36}]",
+            HtmlParsing.markupParsingConfiguration(HtmlParsing.htmlParsingConfiguration()));
+        testDoc(
+            "<style> a = \"<div>\" if (a < 0)</style>",
+            "[OES(style){1,1}OEE{1,7}T( a = \"<div>\" if (a < 0)){1,8}CES(style){1,31}CEE{1,38}]",
+            "[OE(style){1,1}T( a = \"<div>\" if (a < 0)){1,8}CE(style){1,31}]",
+            HtmlParsing.markupParsingConfiguration(HtmlParsing.htmlParsingConfiguration()));
+        testDoc(
+            "<script> var a = \"<div>\"\n\nif (a < 0)</script>",
+            "[OES(script){1,1}OEE{1,8}T( var a = \"<div>\"\n\nif (a < 0)){1,9}CES(script){3,11}CEE{3,19}]",
+            "[OE(script){1,1}T( var a = \"<div>\"\n\nif (a < 0)){1,9}CE(script){3,11}]",
+            HtmlParsing.markupParsingConfiguration(HtmlParsing.htmlParsingConfiguration()));
+        testDoc(
+            "<style> a = \"<div>\"\n\nif (a < 0)</style>",
+            "[OES(style){1,1}OEE{1,7}T( a = \"<div>\"\n\nif (a < 0)){1,8}CES(style){3,11}CEE{3,18}]",
+            "[OE(style){1,1}T( a = \"<div>\"\n\nif (a < 0)){1,8}CE(style){3,11}]",
+            HtmlParsing.markupParsingConfiguration(HtmlParsing.htmlParsingConfiguration()));
+        testDoc(
             "<h1>Hello</ h1>",
             "[OES(h1){1,1}OEE{1,4}T(Hello</ h1>){1,5}ACES(h1){1,16}ACEE{1,16}]",
-            "[OE(h1){1,1}T(Hello</ h1>){1,5}ACE(h1){1,16}]", 
+            "[OE(h1){1,1}T(Hello</ h1>){1,5}ACE(h1){1,16}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<h1>Hello</ h1>",
             "[OES(h1){1,1}OEE{1,4}T(Hello</ h1>){1,5}]",
-            "[OE(h1){1,1}T(Hello</ h1>){1,5}]", 
+            "[OE(h1){1,1}T(Hello</ h1>){1,5}]",
             noRestrictions);
-        testDoc( 
+        testDoc(
             "<p><h1>Hello</ h1></p>",
             "[OES(p){1,1}OEE{1,3}OES(h1){1,4}OEE{1,7}T(Hello</ h1>){1,8}ACES(h1){1,19}ACEE{1,19}CES(p){1,19}CEE{1,22}]",
-            "[OE(p){1,1}OE(h1){1,4}T(Hello</ h1>){1,8}ACE(h1){1,19}CE(p){1,19}]", 
+            "[OE(p){1,1}OE(h1){1,4}T(Hello</ h1>){1,8}ACE(h1){1,19}CE(p){1,19}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<p><h1>Hello</ h1></p>",
             "[OES(p){1,1}OEE{1,3}OES(h1){1,4}OEE{1,7}T(Hello</ h1>){1,8}CES(p){1,19}CEE{1,22}]",
-            "[OE(p){1,1}OE(h1){1,4}T(Hello</ h1>){1,8}CE(p){1,19}]", 
+            "[OE(p){1,1}OE(h1){1,4}T(Hello</ h1>){1,8}CE(p){1,19}]",
             noRestrictions);
-        testDoc( 
+        testDoc(
             "Hello, World!",
             "[T(Hello, World!){1,1}]",
-            "[T(Hello, World!){1,1}]", 
+            "[T(Hello, World!){1,1}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "",
             "[]",
-            "[]", 
+            "[]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<p>Hello</p>",
             "[OES(p){1,1}OEE{1,3}T(Hello){1,4}CES(p){1,9}CEE{1,12}]",
-            "[OE(p){1,1}T(Hello){1,4}CE(p){1,9}]", 
+            "[OE(p){1,1}T(Hello){1,4}CE(p){1,9}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<h1>Hello</h1>",
             "[OES(h1){1,1}OEE{1,4}T(Hello){1,5}CES(h1){1,10}CEE{1,14}]",
-            "[OE(h1){1,1}T(Hello){1,5}CE(h1){1,10}]", 
+            "[OE(h1){1,1}T(Hello){1,5}CE(h1){1,10}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<h1>Hello</h1 >",
             "[OES(h1){1,1}OEE{1,4}T(Hello){1,5}CES(h1){1,10}IWS( ){1,14}CEE{1,15}]",
-            "[OE(h1){1,1}T(Hello){1,5}CE(h1){1,10}]", 
+            "[OE(h1){1,1}T(Hello){1,5}CE(h1){1,10}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<h1>Hello</h1 \n\n>",
             "[OES(h1){1,1}OEE{1,4}T(Hello){1,5}CES(h1){1,10}IWS( \n\n){1,14}CEE{3,1}]",
-            "[OE(h1){1,1}T(Hello){1,5}CE(h1){1,10}]", 
+            "[OE(h1){1,1}T(Hello){1,5}CE(h1){1,10}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<\np  >Hello</p>",
             "[T(<\np  >Hello){1,1}UCES(p){2,10}UCEE{2,13}]",
-            "[T(<\np  >Hello){1,1}UCE(p){2,10}]", 
+            "[T(<\np  >Hello){1,1}UCE(p){2,10}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "< h1  >Hello</h1>",
             "[T(< h1  >Hello){1,1}UCES(h1){1,13}UCEE{1,17}]",
-            "[T(< h1  >Hello){1,1}UCE(h1){1,13}]", 
+            "[T(< h1  >Hello){1,1}UCE(h1){1,13}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<h1>Hello</ h1>",
             "[OES(h1){1,1}OEE{1,4}T(Hello</ h1>){1,5}ACES(h1){1,16}ACEE{1,16}]",
-            "[OE(h1){1,1}T(Hello</ h1>){1,5}ACE(h1){1,16}]", 
+            "[OE(h1){1,1}T(Hello</ h1>){1,5}ACE(h1){1,16}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "< h1>Hello</ h1>",
             "[T(< h1>Hello</ h1>){1,1}]",
-            "[T(< h1>Hello</ h1>){1,1}]", 
+            "[T(< h1>Hello</ h1>){1,1}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello, World!",
             "[T(ello, Worl){1,1}]",
             "[T(ello, Worl){1,1}]",
-            1, 10, 
+            1, 10,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello, World!",
             "[T(e){1,1}]",
             "[T(e){1,1}]",
-            1, 1, 
+            1, 1,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello, <p>lala</p>",
             "[T(Hello, ){1,1}OES(p){1,8}OEE{1,10}T(lala){1,11}CES(p){1,15}CEE{1,18}]",
-            "[T(Hello, ){1,1}OE(p){1,8}T(lala){1,11}CE(p){1,15}]", 
+            "[T(Hello, ){1,1}OE(p){1,8}T(lala){1,11}CE(p){1,15}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello, <p>lal'a</p>",
             "[T(Hello, ){1,1}OES(p){1,8}OEE{1,10}T(lal'a){1,11}CES(p){1,16}CEE{1,19}]",
-            "[T(Hello, ){1,1}OE(p){1,8}T(lal'a){1,11}CE(p){1,16}]", 
+            "[T(Hello, ){1,1}OE(p){1,8}T(lal'a){1,11}CE(p){1,16}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello, <p>l'al'a</p>",
             "[T(Hello, ){1,1}OES(p){1,8}OEE{1,10}T(l'al'a){1,11}CES(p){1,17}CEE{1,20}]",
-            "[T(Hello, ){1,1}OE(p){1,8}T(l'al'a){1,11}CE(p){1,17}]", 
+            "[T(Hello, ){1,1}OE(p){1,8}T(l'al'a){1,11}CE(p){1,17}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello, <p>lala</p>",
             "[T(o, ){1,1}OES(p){1,4}OEE{1,6}T(l){1,7}ACES(p){1,8}ACEE{1,8}]",
             "[T(o, ){1,1}OE(p){1,4}T(l){1,7}ACE(p){1,8}]",
-            4, 7, 
+            4, 7,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello, <br/>",
             "[T(Hello, ){1,1}SES(br){1,8}SEE{1,11}]",
-            "[T(Hello, ){1,1}SE(br){1,8}]", 
+            "[T(Hello, ){1,1}SE(br){1,8}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello, <br th:text=\"ll\"/>",
             "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}(=){1,19}(\"ll\"){1,20}SEE{1,24}]",
-            "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]", 
+            "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello, <br th:text='ll'/>",
             "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}(=){1,19}('ll'){1,20}SEE{1,24}]",
-            "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]", 
+            "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello, <br th:text =\"ll\"/>",
             "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =){1,19}(\"ll\"){1,21}SEE{1,25}]",
-            "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]", 
+            "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello, <br th:text =   \"ll\"/>",
             "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}(\"ll\"){1,24}SEE{1,28}]",
-            "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]", 
+            "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello, <br th:text =   ll/>",
             "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}(ll){1,24}SEE{1,26}]",
-            "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]", 
+            "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello, <br th:text =   \"ll\"a=2/>",
             "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}(\"ll\"){1,24}A(a){1,28}(=){1,29}(2){1,30}SEE{1,31}]",
-            "[T(Hello, ){1,1}SE(br[th:text='ll',a='2']){1,8}]", 
+            "[T(Hello, ){1,1}SE(br[th:text='ll',a='2']){1,8}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello, <br th:text =   'll'a=2/>",
             "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}('ll'){1,24}A(a){1,28}(=){1,29}(2){1,30}SEE{1,31}]",
-            "[T(Hello, ){1,1}SE(br[th:text='ll',a='2']){1,8}]", 
+            "[T(Hello, ){1,1}SE(br[th:text='ll',a='2']){1,8}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello, <br th:text =   \"ll\"a= \n 2/>",
             "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}(\"ll\"){1,24}A(a){1,28}(= \n ){1,29}(2){2,2}SEE{2,3}]",
-            "[T(Hello, ){1,1}SE(br[th:text='ll',a='2']){1,8}]", 
+            "[T(Hello, ){1,1}SE(br[th:text='ll',a='2']){1,8}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello, <br th:text =   ll a= \n 2/>",
             "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}(ll){1,24}IWS( ){1,26}A(a){1,27}(= \n ){1,28}(2){2,2}SEE{2,3}]",
-            "[T(Hello, ){1,1}SE(br[th:text='ll',a='2']){1,8}]", 
+            "[T(Hello, ){1,1}SE(br[th:text='ll',a='2']){1,8}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello, <br th:text =   ll a/>",
             "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}(ll){1,24}IWS( ){1,26}A(a){1,27}(){1,28}(){1,28}SEE{1,28}]",
-            "[T(Hello, ){1,1}SE(br[th:text='ll',a='']){1,8}]", 
+            "[T(Hello, ){1,1}SE(br[th:text='ll',a='']){1,8}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello, <br th:text =   ll a=/>",
             "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}(ll){1,24}IWS( ){1,26}A(a){1,27}(=){1,28}(){1,29}SEE{1,29}]",
-            "[T(Hello, ){1,1}SE(br[th:text='ll',a='']){1,8}]", 
+            "[T(Hello, ){1,1}SE(br[th:text='ll',a='']){1,8}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello, <br th:text = a=/>",
             "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( = ){1,19}(a=){1,22}SEE{1,24}]",
-            "[T(Hello, ){1,1}SE(br[th:text='a=']){1,8}]", 
+            "[T(Hello, ){1,1}SE(br[th:text='a=']){1,8}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello, <br th:text = a= b/>",
             "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( = ){1,19}(a=){1,22}IWS( ){1,24}A(b){1,25}(){1,26}(){1,26}SEE{1,26}]",
-            "[T(Hello, ){1,1}SE(br[th:text='a=',b='']){1,8}]", 
+            "[T(Hello, ){1,1}SE(br[th:text='a=',b='']){1,8}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello, <br th:text = a=b/>",
             "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( = ){1,19}(a=b){1,22}SEE{1,25}]",
-            "[T(Hello, ){1,1}SE(br[th:text='a=b']){1,8}]", 
+            "[T(Hello, ){1,1}SE(br[th:text='a=b']){1,8}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello, <br th:text = \"a=b\"/>",
             "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( = ){1,19}(\"a=b\"){1,22}SEE{1,27}]",
-            "[T(Hello, ){1,1}SE(br[th:text='a=b']){1,8}]", 
+            "[T(Hello, ){1,1}SE(br[th:text='a=b']){1,8}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello, <br th:text = \"a= b\"/>",
             "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( = ){1,19}(\"a= b\"){1,22}SEE{1,28}]",
-            "[T(Hello, ){1,1}SE(br[th:text='a= b']){1,8}]", 
+            "[T(Hello, ){1,1}SE(br[th:text='a= b']){1,8}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello, <br th:text = 'a= b'/>",
             "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( = ){1,19}('a= b'){1,22}SEE{1,28}]",
-            "[T(Hello, ){1,1}SE(br[th:text='a= b']){1,8}]", 
+            "[T(Hello, ){1,1}SE(br[th:text='a= b']){1,8}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello, <br th:text = \"a= b\"\n/>",
             "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( = ){1,19}(\"a= b\"){1,22}IWS(\n){1,28}SEE{2,1}]",
-            "[T(Hello, ){1,1}SE(br[th:text='a= b']){1,8}]", 
+            "[T(Hello, ){1,1}SE(br[th:text='a= b']){1,8}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello, <br  th:text=\"ll\"/>",
             "[T(Hello, ){1,1}SES(br){1,8}IWS(  ){1,11}A(th:text){1,13}(=){1,20}(\"ll\"){1,21}SEE{1,25}]",
-            "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]", 
+            "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello, <br \nth:text=\"ll\"/>",
             "[T(Hello, ){1,1}SES(br){1,8}IWS( \n){1,11}A(th:text){2,1}(=){2,8}(\"ll\"){2,9}SEE{2,13}]",
-            null, 
+            null,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello, World! <br/>\n<div\n l\n     a=\"12 3\" zas    o=\"\"  b=\"lelo\n  = s\">lala</div> <p th=\"lala\" >liool</p>",
             "[T(Hello, World! ){1,1}SES(br){1,15}SEE{1,18}T(\n){1,20}" +
               "OES(div){2,1}IWS(\n ){2,5}A(l){3,2}(){3,3}(){3,3}IWS(\n     ){3,3}" +
@@ -325,66 +377,66 @@ public class AttoParserTest extends TestCase {
               "OEE{5,7}T(lala){5,8}CES(div){5,12}CEE{5,17}T( ){5,18}" +
               "OES(p){5,19}IWS( ){5,21}A(th){5,22}(=){5,24}(\"lala\"){5,25}IWS( ){5,31}OEE{5,32}" +
               "T(liool){5,33}CES(p){5,38}CEE{5,41}]",
-              null, 
+              null,
               noRestrictionsAutoClose);
 
-        testDoc( 
+        testDoc(
             "Hello<!--hi!-->, <br/>",
             "[T(Hello){1,1}C(hi!){1,6}T(, ){1,16}SES(br){1,18}SEE{1,21}]",
-            null, 
+            null,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello<!--hi\"!-->, <br/>",
             "[T(Hello){1,1}C(hi\"!){1,6}T(, ){1,17}SES(br){1,19}SEE{1,22}]",
-            null, 
+            null,
             noRestrictionsAutoClose);
 
-        testDoc( 
+        testDoc(
             "Hello<!-- 4 > 3 -->, <br/>",
             "[T(Hello){1,1}C( 4 > 3 ){1,6}T(, ){1,20}SES(br){1,22}SEE{1,25}]",
-            null, 
+            null,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello<!-- 4 > 3 > 10 -->, <br/>",
             "[T(Hello){1,1}C( 4 > 3 > 10 ){1,6}T(, ){1,25}SES(br){1,27}SEE{1,30}]",
-            "[T(Hello){1,1}C( 4 > 3 > 10 ){1,6}T(, ){1,25}SE(br){1,27}]", 
+            "[T(Hello){1,1}C( 4 > 3 > 10 ){1,6}T(, ){1,25}SE(br){1,27}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello<!-- 4 > 3\n > 10 -->, <br/>",
             "[T(Hello){1,1}C( 4 > 3\n > 10 ){1,6}T(, ){2,10}SES(br){2,12}SEE{2,15}]",
-            null, 
+            null,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello<![CDATA[ 4 > 3\n > 10 ]]>, <br/>",
             "[T(Hello){1,1}D( 4 > 3\n > 10 ){1,6}T(, ){2,10}SES(br){2,12}SEE{2,15}]",
-            null, 
+            null,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello<![CDATA[ 4 > 3\n \"> 10 ]]>, <br/>",
             "[T(Hello){1,1}D( 4 > 3\n \"> 10 ){1,6}T(, ){2,11}SES(br){2,13}SEE{2,16}]",
-            "[T(Hello){1,1}D( 4 > 3\n \"> 10 ){1,6}T(, ){2,11}SE(br){2,13}]", 
+            "[T(Hello){1,1}D( 4 > 3\n \"> 10 ){1,6}T(, ){2,11}SE(br){2,13}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello<![CDATA[ 4 > 3\n '> 10 ]]>, <br/>",
             "[T(Hello){1,1}D( 4 > 3\n '> 10 ){1,6}T(, ){2,11}SES(br){2,13}SEE{2,16}]",
-            "[T(Hello){1,1}D( 4 > 3\n '> 10 ){1,6}T(, ){2,11}SE(br){2,13}]", 
+            "[T(Hello){1,1}D( 4 > 3\n '> 10 ){1,6}T(, ){2,11}SE(br){2,13}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello<![CDATA[ 4 > 3 > 10 ]]>, <br/>",
             "[T(Hello){1,1}D( 4 > 3 > 10 ){1,6}T(, ){1,30}SES(br){1,32}SEE{1,35}]",
-            null, 
+            null,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello<![CDATA[ 4 > 3\n\n\n\n > 10 ]]>, <br/>",
             "[T(Hello){1,1}D( 4 > 3\n\n\n\n > 10 ){1,6}T(, ){5,10}SES(br){5,12}SEE{5,15}]",
-            null, 
+            null,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello<![CDATA[ 4 > 3\n\n  \n   \n   \t> 10 ]]>, <br/>",
             "[T(Hello){1,1}D( 4 > 3\n\n  \n   \n   \t> 10 ){1,6}T(, ){5,13}SES(br){5,15}SEE{5,18}]",
-            null, 
+            null,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "Hello<![CDATA[ 4 > 3\n\n  \n   \n   \t> 10 ]]>, <br/>\n" +
             "Hello<![CDATA[ 4 > 3\n\n  \n   \n   \t> 10 ]]>, <br/>\n" +
             "Hello<![CDATA[ 4 > 3\n\n  \n   \n   \t> 10 ]]>, <br/>\n" +
@@ -395,9 +447,9 @@ public class AttoParserTest extends TestCase {
             "T(\nHello){10,20}D( 4 > 3\n\n  \n   \n   \t> 10 ){11,6}T(, ){15,13}SES(br){15,15}SEE{15,18}" +
             "T(\nHello){15,20}D( 4 > 3\n\n  \n   \n   \t> 10 ){16,6}T(, ){20,13}SES(br){20,15}SEE{20,18}" +
             "T(\nHello){20,20}D( 4 > 3\n\n  \n   \n   \t> 10 ){21,6}T(, ){25,13}SES(br){25,15}SEE{25,18}]",
-            null, 
+            null,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "kl\njasdl kjaslkj asjqq9\nk fiuh 23kj hdfkjh assd\nflkjh lkjh fdfasdfkjlh dfs" +
             "llk\nd8u u hkkj asyu 4lk vl jhksajhd889p3rk sl a, alkj a9\n))sad lkjsalkja aslk" +
             "la \n&aacute; lasd &amp; aiass da & asdll . asi ua&$\" khj askjh 1 kh ak hhjh" +
@@ -410,9 +462,9 @@ public class AttoParserTest extends TestCase {
             "kljasdl kjaslkj asjqq9k fiuh 23kj hdfkjh assdflkjh lkjh fdfa\nsdfkjlh dfs" +
             "llkd8u u \nhkkj asyu 4lk vl jhksajhd889p3rk sl a, alkj a9))sad l\nkjsalkja aslk" +
             "la &aacute;\n lasd &amp; aiass da & asdll . asi ua&$\" khj askjh 1 kh ak hh\njh){1,1}]",
-            null, 
+            null,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "kl\njasdl kjaslkj asjqq9\nk fiuh 23kj hdfkjh assd\nflkjh lkjh fdfasdfkjlh dfs" +
             "llk\nd8u u hkkj asyu 4lk vl jhksajhd889p3rk sl a, alkj a9\n))sad lkjsalkja aslk" +
             "la \n&aacute; lasd &amp; aiass da & asdll . asi ua&$\" khj askjh 1 kh ak hhjh" +
@@ -499,9 +551,9 @@ public class AttoParserTest extends TestCase {
             "llkd8u u \nhkkj asyu 4lk vl jhksajhd889p3rk sl a, alkj a9))sad l\nkjsalkja aslk" +
             "la &aacute;\n lasd &amp; aiass da & asdll . asi ua&$\" khj askjh 1 kh ak hh\njh" +
             "){1,1}]",
-            null, 
+            null,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "kl\njasdl kjaslkj asjqq9\nk fiuh 23kj hdfkjh assd\nflkjh lkjh fdfasdfkjlh dfs" +
             "llk\nd8u u hkkj asyu 4lk vl jhksajhd889p3rk sl a, alkj a9\n))sad lkjsalkja aslk" +
             "la \n&aacute; lasd &amp; aiass da & asdll . asi ua&$\" khj askjh 1 kh ak hhjh" +
@@ -588,650 +640,650 @@ public class AttoParserTest extends TestCase {
             "llkd8u u \nhkkj asyu 4lk vl jhksajhd889p3rk sl a, alkj a9))sad l\nkjsalkja aslk" +
             "la &aacute;\n lasd &amp; aiass da & asdll . asi ua&$\" khj askjh 1 kh ak hh\njh" +
             "){22,45}]",
-            null, 
+            null,
             noRestrictionsAutoClose);
 
-        testDocError( 
+        testDocError(
             "Hello, <p>lala</p>",
             null, null,
             4, 5,
-            1, 4, 
+            1, 4,
             noRestrictionsAutoClose);
-        
-        testDocError( 
+
+        testDocError(
             "Hello, <!--lala-->",
             null, null,
             4, 8,
-            1, 4, 
+            1, 4,
             noRestrictionsAutoClose);
-        
-        testDoc( 
+
+        testDoc(
             "Hello, <![CDATA[lala]]>",
             "[T(o, <![CD){1,1}]",
             null,
-            4, 8, 
+            4, 8,
             noRestrictionsAutoClose);
 
-        testDocError( 
+        testDocError(
             "Hello, <![CDATA[lala]]>",
             null, null,
-            4, 12, 
-            1, 4, 
+            4, 12,
+            1, 4,
             noRestrictionsAutoClose);
 
-        testDocError( 
+        testDocError(
             "Hello, <br th:text = \"a= b/>",
             null, null,
-            1, 8, 
+            1, 8,
             noRestrictionsAutoClose);
-        
-        testDoc( 
+
+        testDoc(
             "<div class = \"lala\">",
             "[OES(div){1,1}IWS( ){1,5}A(class){1,6}( = ){1,11}(\"lala\"){1,14}OEE{1,20}ACES(div){1,21}ACEE{1,21}]",
-            null, 
+            null,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<div class \n\n= \nlala li=\nlla>",
             "[OES(div){1,1}IWS( ){1,5}A(class){1,6}( \n\n= \n){1,11}(lala){4,1}IWS( ){4,5}A(li){4,6}(=\n){4,8}(lla){5,1}OEE{5,4}ACES(div){5,5}ACEE{5,5}]",
-            null, 
+            null,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<div class \n\n= \n\"lala\"li=\nlla>",
             "[OES(div){1,1}IWS( ){1,5}A(class){1,6}( \n\n= \n){1,11}(\"lala\"){4,1}A(li){4,7}(=\n){4,9}(lla){5,1}OEE{5,4}ACES(div){5,5}ACEE{5,5}]",
-            null, 
+            null,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<div class \n\n= \n'lala'li=\nlla>",
             "[OES(div){1,1}IWS( ){1,5}A(class){1,6}( \n\n= \n){1,11}('lala'){4,1}A(li){4,7}(=\n){4,9}(lla){5,1}OEE{5,4}ACES(div){5,5}ACEE{5,5}]",
-            null, 
+            null,
             noRestrictionsAutoClose);
-        
 
-        testDoc( 
+
+        testDoc(
             "<!DOCTYPE>",
             "[DT(DOCTYPE){1,3}(){1,10}(){1,10}(){1,10}(){1,10}(){1,10}]",
-            "[DT()()()(){1,1}]", 
+            "[DT()()()(){1,1}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<!doctype>",
             "[DT(doctype){1,3}(){1,10}(){1,10}(){1,10}(){1,10}(){1,10}]",
-            "[DT()()()(){1,1}]", 
+            "[DT()()()(){1,1}]",
             noRestrictionsAutoClose);
-        testDocError( 
+        testDocError(
             "<!doctype>",
             null, null, 1, 1,
             noRestrictionsUpperCaseDocType);
-        testDocError( 
+        testDocError(
             "<!DOCTYPE html system \"lala\">",
             null, null, 1, 1,
             noRestrictionsUpperCaseDocType);
-        testDoc( 
+        testDoc(
             "<!DOCTYPE  >",
             "[DT(DOCTYPE){1,3}(){1,10}(){1,10}(){1,10}(){1,10}(){1,10}]",
-            null, 
+            null,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<!DOCTYPE html>",
             "[DT(DOCTYPE){1,3}(html){1,11}(){1,15}(){1,15}(){1,15}(){1,15}]",
-            null, 
+            null,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<!DOCTYPE  \nhtml>",
             "[DT(DOCTYPE){1,3}(html){2,1}(){2,5}(){2,5}(){2,5}(){2,5}]",
-            "[DT(html)()()(){1,1}]", 
+            "[DT(html)()()(){1,1}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<!DOCTYPE html >",
             "[DT(DOCTYPE){1,3}(html){1,11}(){1,16}(){1,16}(){1,16}(){1,16}]",
-            "[DT(html)()()(){1,1}]", 
+            "[DT(html)()()(){1,1}]",
             noRestrictionsAutoClose);
-        testDocError( 
+        testDocError(
             "<!DOCTYPE html \"lalero\">",
             null, null,
-            1,1, 
+            1,1,
             noRestrictionsAutoClose);
-        testDocError( 
+        testDocError(
             "<!DOCTYPE html lalero>",
             null, null,
-            1,1, 
+            1,1,
             noRestrictionsAutoClose);
-        testDocError( 
+        testDocError(
             "<!DOCTYPE html lalero>",
             null, null,
-            1,1, 
+            1,1,
             noRestrictionsAutoClose);
-        testDocError( 
+        testDocError(
             "<!DOCTYPE html \"lalero\">",
             null, null,
-            1,1, 
+            1,1,
             noRestrictionsAutoClose);
-        testDocError( 
+        testDocError(
             "<!DOCTYPE html \"lalero\"  >",
             null, null,
-            1,1, 
+            1,1,
             noRestrictionsAutoClose);
-        testDocError( 
+        testDocError(
             "<!DOCTYPE html \"lalero>",
             null, null,
-            1, 1, 
+            1, 1,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<!DOCTYPE html PUBLIC \"lalero\">",
             "[DT(DOCTYPE){1,3}(html){1,11}(PUBLIC){1,16}(lalero){1,23}(){1,31}(){1,31}]",
-            null, 
+            null,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<!DOCTYPE html PUBLIC 'lalero'>",
             "[DT(DOCTYPE){1,3}(html){1,11}(PUBLIC){1,16}(lalero){1,23}(){1,31}(){1,31}]",
-            null, 
+            null,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<!DOCTYPE html SYSTEM \"lalero\">",
             "[DT(DOCTYPE){1,3}(html){1,11}(SYSTEM){1,16}(){1,23}(lalero){1,23}(){1,31}]",
-            "[DT(html)()(lalero)(){1,1}]", 
+            "[DT(html)()(lalero)(){1,1}]",
             noRestrictionsAutoClose);
-        testDocError( 
+        testDocError(
             "<!DOCTYPE html PUBLIC lalero>",
             null, null,
-            1,1, 
+            1,1,
             noRestrictionsAutoClose);
-        testDocError( 
+        testDocError(
             "<!DOCTYPE html PUBLIC lalero   as>",
             null, null,
-            1,1, 
+            1,1,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<!DOCTYPE html PUBLIC \"lalero\">",
             "[DT(DOCTYPE){1,3}(html){1,11}(PUBLIC){1,16}(lalero){1,23}(){1,31}(){1,31}]",
-            null, 
+            null,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<!DOCTYPE html system \"lalero\"  >",
             "[DT(DOCTYPE){1,3}(html){1,11}(system){1,16}(){1,23}(lalero){1,23}(){1,33}]",
-            "[DT(html)()(lalero)(){1,1}]", 
+            "[DT(html)()(lalero)(){1,1}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<!DOCTYPE html public \"lalero\"   \n\"hey\">",
             "[DT(DOCTYPE){1,3}(html){1,11}(public){1,16}(lalero){1,23}(hey){2,1}(){2,6}]",
-            "[DT(html)(lalero)(hey)(){1,1}]", 
+            "[DT(html)(lalero)(hey)(){1,1}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<!DOCTYPE html public 'lalero'   \n'hey'>",
             "[DT(DOCTYPE){1,3}(html){1,11}(public){1,16}(lalero){1,23}(hey){2,1}(){2,6}]",
-            "[DT(html)(lalero)(hey)(){1,1}]", 
+            "[DT(html)(lalero)(hey)(){1,1}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<!DOCTYPE html public \"lalero\n\"   \n\"hey\">",
             "[DT(DOCTYPE){1,3}(html){1,11}(public){1,16}(lalero\n){1,23}(hey){3,1}(){3,6}]",
-            "[DT(html)(lalero\n)(hey)(){1,1}]", 
+            "[DT(html)(lalero\n)(hey)(){1,1}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<!DOCTYPE html system \n\"lalero\"\"le\">",
             "[DT(DOCTYPE){1,3}(html){1,11}(system){1,16}(){2,1}(lalero\"\"le){2,1}(){2,13}]",
-            null, 
+            null,
             noRestrictionsAutoClose);
-        testDocError( 
+        testDocError(
             "<!DOCTYPE html system \n\"lalero\" \"le\">",
             null, null,
-            1,1, 
+            1,1,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<!DOCTYPE html system \n\"lalero\" [somethinghere]>",
             "[DT(DOCTYPE){1,3}(html){1,11}(system){1,16}(){2,1}(lalero){2,1}(somethinghere){2,10}]",
-            "[DT(html)()(lalero)(somethinghere){1,1}]", 
+            "[DT(html)()(lalero)(somethinghere){1,1}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<!DOCTYPE html public \n\"lalero\" [somethinghere]>",
             "[DT(DOCTYPE){1,3}(html){1,11}(public){1,16}(lalero){2,1}(){2,10}(somethinghere){2,10}]",
-            "[DT(html)(lalero)()(somethinghere){1,1}]", 
+            "[DT(html)(lalero)()(somethinghere){1,1}]",
             noRestrictionsAutoClose);
-        testDocError( 
+        testDocError(
             "<!DOCTYPE html public \n\"lalero\" asas [somethinghere]>",
             null, null,
-            1,1, 
+            1,1,
             noRestrictionsAutoClose);
-        testDocError( 
+        testDocError(
             "<!DOCTYPE html system \n\"lalero\" asas [somethinghere]>",
-            null, null, 
-            1,1, 
+            null, null,
+            1,1,
             noRestrictionsAutoClose);
-        testDocError( 
+        testDocError(
             "<!DOCTYPE html system \n\"lalero\" \"asas\" [somethinghere]>",
-            null, null, 
-            1,1, 
+            null, null,
+            1,1,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<!DOCTYPE html public \n\"lalero\" \"asas\" [somethinghere]>",
             "[DT(DOCTYPE){1,3}(html){1,11}(public){1,16}(lalero){2,1}(asas){2,10}(somethinghere){2,17}]",
-            null, 
+            null,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<!DOCTYPE html public \n\"lalero\" \"asas\" \n\n[somethinghere]\n  >",
             "[DT(DOCTYPE){1,3}(html){1,11}(public){1,16}(lalero){2,1}(asas){2,10}(somethinghere){4,1}]",
-            "[DT(html)(lalero)(asas)(somethinghere){1,1}]", 
+            "[DT(html)(lalero)(asas)(somethinghere){1,1}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<!DOCTYPE sgml public \"lele\" [\n <!ELEMENT sgml ANY>\n  <!ENTITY % std       \"standard SGML\">\n ]>",
             "[DT(DOCTYPE){1,3}(sgml){1,11}(public){1,16}(lele){1,23}(){1,30}(\n <!ELEMENT sgml ANY>\n  <!ENTITY % std       \"standard SGML\">\n ){1,30}]",
-            null, 
+            null,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<!DOCTYPE sgml [\n <!ELEMENT sgml ANY>\n  <!ENTITY % std       \"standard SGML\">\n ]>",
             "[DT(DOCTYPE){1,3}(sgml){1,11}(){1,16}(){1,16}(){1,16}(\n <!ELEMENT sgml ANY>\n  <!ENTITY % std       \"standard SGML\">\n ){1,16}]",
-            "[DT(sgml)()()(\n <!ELEMENT sgml ANY>\n  <!ENTITY % std       \"standard SGML\">\n ){1,1}]", 
+            "[DT(sgml)()()(\n <!ELEMENT sgml ANY>\n  <!ENTITY % std       \"standard SGML\">\n ){1,1}]",
             noRestrictionsAutoClose);
-        testDocError( 
+        testDocError(
             "<!DOCTYPE sgml public [\n <!ELEMENT sgml ANY>\n  <!ENTITY % std       \"standard SGML\">\n ]>",
             null, null,
-            1,1, 
+            1,1,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<!DOCTYPE sgml public \"lele\" [\n <!ELEMENT sgml ANY>\n <!-- this is a comment inside --> <!ENTITY % std       \"standard SGML\">\n ]>",
             "[DT(DOCTYPE){1,3}(sgml){1,11}(public){1,16}(lele){1,23}(){1,30}(\n <!ELEMENT sgml ANY>\n <!-- this is a comment inside --> <!ENTITY % std       \"standard SGML\">\n ){1,30}]",
-            null, 
+            null,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<!DOCTYPE sgml system \"lele\" [\n <!ELEMENT sgml ANY>\n <!-- this is a comment inside --> <!ENTITY % std       \"standard SGML\">\n ]>",
             "[DT(DOCTYPE){1,3}(sgml){1,11}(system){1,16}(){1,23}(lele){1,23}(\n <!ELEMENT sgml ANY>\n <!-- this is a comment inside --> <!ENTITY % std       \"standard SGML\">\n ){1,30}]",
-            "[DT(sgml)()(lele)(\n <!ELEMENT sgml ANY>\n <!-- this is a comment inside --> <!ENTITY % std       \"standard SGML\">\n ){1,1}]", 
+            "[DT(sgml)()(lele)(\n <!ELEMENT sgml ANY>\n <!-- this is a comment inside --> <!ENTITY % std       \"standard SGML\">\n ){1,1}]",
             noRestrictionsAutoClose);
-        testDocError( 
+        testDocError(
             "<!DOCTYPE sgml public \"lele\" [\n <!ELEMENT sgml [ ANY>\n <!-- this is a comment inside --> <!ENTITY % std       \"standard SGML\">\n ]>",
             null, null,
-            1,1, 
+            1,1,
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<!DOCTYPE sgml public \"lele\" [\n <!ELEMENT sgml [ ANY>]\n <!-- this is a comment inside --> <!ENTITY % std       \"standard SGML\">\n ]>",
             "[DT(DOCTYPE){1,3}(sgml){1,11}(public){1,16}(lele){1,23}(){1,30}(\n <!ELEMENT sgml [ ANY>]\n <!-- this is a comment inside --> <!ENTITY % std       \"standard SGML\">\n ){1,30}]",
-            "[DT(sgml)(lele)()(\n <!ELEMENT sgml [ ANY>]\n <!-- this is a comment inside --> <!ENTITY % std       \"standard SGML\">\n ){1,1}]", 
-            noRestrictionsAutoClose);
-        
-        testDoc( 
-            "<?xml version=\"1.0\"?>",
-            "[X(1.0){1,15}(null){1,20}(null){1,20}]",
-            "[X(1.0)(null)(null){1,1}]", 
-            noRestrictionsAutoClose);
-        
-        testDoc( 
-            "<?xml version=\"1.0\" encoding=\"\"?>",
-            "[X(1.0){1,15}(){1,30}(null){1,32}]",
-            "[X(1.0)()(null){1,1}]", 
-            noRestrictionsAutoClose);
-        
-        testDoc( 
-            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-            "[X(1.0){1,15}(UTF-8){1,30}(null){1,37}]",
-            "[X(1.0)(UTF-8)(null){1,1}]", 
-            noRestrictionsAutoClose);
-        
-        testDoc( 
-            "<?xml version=\"1.0\"   \nencoding=\"UTF-8\"   ?>",
-            "[X(1.0){1,15}(UTF-8){2,10}(null){2,20}]",
-            "[X(1.0)(UTF-8)(null){1,1}]", 
-            noRestrictionsAutoClose);
-        
-        testDoc( 
-            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>",
-            "[X(1.0){1,15}(UTF-8){1,30}(yes){1,49}]",
-            "[X(1.0)(UTF-8)(yes){1,1}]", 
-            noRestrictionsAutoClose);
-        
-        testDocError( 
-            "<?xml version=\"1.0\" standalone=\"yes\" encoding=\"UTF-8\"?>",
-            null, null, 1, 1, 
-            noRestrictionsAutoClose);
-        
-        testDocError( 
-            "<?xml standalone=\"yes\" version=\"1.0\" encoding=\"UTF-8\"?>",
-            null, null, 1, 1, 
-            noRestrictionsAutoClose);
-        
-        testDocError( 
-            "<?xml versio=\"1.0\"?>",
-            null, null, 1, 1, 
-            noRestrictionsAutoClose);
-        
-        testDocError( 
-            "<?xml?>",
-            null, null, 1, 1, 
-            noRestrictionsAutoClose);
-        
-        testDocError( 
-            "<?xml  ?>",
-            null, null, 1, 1, 
-            noRestrictionsAutoClose);
-        
-        testDoc( 
-            "<?XML version=\"1.0\"?>",
-            "[P(XML){1,3}(version=\"1.0\"){1,7}]",
-            "[P(XML)(version=\"1.0\"){1,1}]", 
-            noRestrictionsAutoClose);
-        
-        testDocError( 
-            "<?xml Version=\"1.0\"?>",
-            null, null, 1, 1, 
-            noRestrictionsAutoClose);
-        
-        testDoc( 
-            "<?xml version=\"1.0\"  ?>",
-            "[X(1.0){1,15}(null){1,22}(null){1,22}]",
-            "[X(1.0)(null)(null){1,1}]", 
-            noRestrictionsAutoClose);
-            
-        testDoc( 
-            "<?xml version=\"1.0\"?><!DOCTYPE html>",
-            "[X(1.0){1,15}(null){1,20}(null){1,20}DT(DOCTYPE){1,24}(html){1,32}(){1,36}(){1,36}(){1,36}(){1,36}]",
-            "[X(1.0)(null)(null){1,1}DT(html)()()(){1,22}]", 
-            noRestrictionsAutoClose);
-        testDoc( 
-            "<?xml version=\"1.0\"?>\n<!DOCTYPE html>",
-            "[X(1.0){1,15}(null){1,20}(null){1,20}T(\n){1,22}DT(DOCTYPE){2,3}(html){2,11}(){2,15}(){2,15}(){2,15}(){2,15}]",
-            "[X(1.0)(null)(null){1,1}T(\n){1,22}DT(html)()()(){2,1}]", 
-            noRestrictionsAutoClose);
-                
-        testDoc( 
-            "\n <!ELEMENT sgml ANY>",
-            "[T(\n ){1,1}OES(!ELEMENT){2,2}IWS( ){2,11}A(sgml){2,12}(){2,16}(){2,16}IWS( ){2,16}A(ANY){2,17}(){2,20}(){2,20}OEE{2,20}ACES(!ELEMENT){2,21}ACEE{2,21}]",
-            "[T(\n ){1,1}OE(!ELEMENT[sgml='',ANY='']){2,2}ACE(!ELEMENT){2,21}]", 
-            noRestrictionsAutoClose);
-        testDoc( 
-            "\n <!ELEMENT sgml ANY>\n <!-- this is a comment inside --> <!ENTITY % std       \"standard SGML\">\n",
-            "[T(\n ){1,1}OES(!ELEMENT){2,2}IWS( ){2,11}A(sgml){2,12}(){2,16}(){2,16}IWS( ){2,16}A(ANY){2,17}(){2,20}(){2,20}OEE{2,20}T(\n ){2,21}C( this is a comment inside ){3,2}T( ){3,35}OES(!ENTITY){3,36}IWS( ){3,44}A(%){3,45}(){3,46}(){3,46}IWS( ){3,46}A(std){3,47}(){3,50}(){3,50}IWS(       ){3,50}A(\"standard){3,57}(){3,66}(){3,66}IWS( ){3,66}A(SGML\"){3,67}(){3,72}(){3,72}OEE{3,72}T(\n){3,73}ACES(!ENTITY){4,1}ACEE{4,1}ACES(!ELEMENT){4,1}ACEE{4,1}]",
-            "[T(\n ){1,1}OE(!ELEMENT[sgml='',ANY='']){2,2}T(\n ){2,21}C( this is a comment inside ){3,2}T( ){3,35}OE(!ENTITY[%='',std='',\"standard='',SGML\"='']){3,36}T(\n){3,73}ACE(!ENTITY){4,1}ACE(!ELEMENT){4,1}]", 
+            "[DT(sgml)(lele)()(\n <!ELEMENT sgml [ ANY>]\n <!-- this is a comment inside --> <!ENTITY % std       \"standard SGML\">\n ){1,1}]",
             noRestrictionsAutoClose);
 
-        
-        testDoc( 
+        testDoc(
+            "<?xml version=\"1.0\"?>",
+            "[X(1.0){1,15}(null){1,20}(null){1,20}]",
+            "[X(1.0)(null)(null){1,1}]",
+            noRestrictionsAutoClose);
+
+        testDoc(
+            "<?xml version=\"1.0\" encoding=\"\"?>",
+            "[X(1.0){1,15}(){1,30}(null){1,32}]",
+            "[X(1.0)()(null){1,1}]",
+            noRestrictionsAutoClose);
+
+        testDoc(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "[X(1.0){1,15}(UTF-8){1,30}(null){1,37}]",
+            "[X(1.0)(UTF-8)(null){1,1}]",
+            noRestrictionsAutoClose);
+
+        testDoc(
+            "<?xml version=\"1.0\"   \nencoding=\"UTF-8\"   ?>",
+            "[X(1.0){1,15}(UTF-8){2,10}(null){2,20}]",
+            "[X(1.0)(UTF-8)(null){1,1}]",
+            noRestrictionsAutoClose);
+
+        testDoc(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>",
+            "[X(1.0){1,15}(UTF-8){1,30}(yes){1,49}]",
+            "[X(1.0)(UTF-8)(yes){1,1}]",
+            noRestrictionsAutoClose);
+
+        testDocError(
+            "<?xml version=\"1.0\" standalone=\"yes\" encoding=\"UTF-8\"?>",
+            null, null, 1, 1,
+            noRestrictionsAutoClose);
+
+        testDocError(
+            "<?xml standalone=\"yes\" version=\"1.0\" encoding=\"UTF-8\"?>",
+            null, null, 1, 1,
+            noRestrictionsAutoClose);
+
+        testDocError(
+            "<?xml versio=\"1.0\"?>",
+            null, null, 1, 1,
+            noRestrictionsAutoClose);
+
+        testDocError(
+            "<?xml?>",
+            null, null, 1, 1,
+            noRestrictionsAutoClose);
+
+        testDocError(
+            "<?xml  ?>",
+            null, null, 1, 1,
+            noRestrictionsAutoClose);
+
+        testDoc(
+            "<?XML version=\"1.0\"?>",
+            "[P(XML){1,3}(version=\"1.0\"){1,7}]",
+            "[P(XML)(version=\"1.0\"){1,1}]",
+            noRestrictionsAutoClose);
+
+        testDocError(
+            "<?xml Version=\"1.0\"?>",
+            null, null, 1, 1,
+            noRestrictionsAutoClose);
+
+        testDoc(
+            "<?xml version=\"1.0\"  ?>",
+            "[X(1.0){1,15}(null){1,22}(null){1,22}]",
+            "[X(1.0)(null)(null){1,1}]",
+            noRestrictionsAutoClose);
+
+        testDoc(
+            "<?xml version=\"1.0\"?><!DOCTYPE html>",
+            "[X(1.0){1,15}(null){1,20}(null){1,20}DT(DOCTYPE){1,24}(html){1,32}(){1,36}(){1,36}(){1,36}(){1,36}]",
+            "[X(1.0)(null)(null){1,1}DT(html)()()(){1,22}]",
+            noRestrictionsAutoClose);
+        testDoc(
+            "<?xml version=\"1.0\"?>\n<!DOCTYPE html>",
+            "[X(1.0){1,15}(null){1,20}(null){1,20}T(\n){1,22}DT(DOCTYPE){2,3}(html){2,11}(){2,15}(){2,15}(){2,15}(){2,15}]",
+            "[X(1.0)(null)(null){1,1}T(\n){1,22}DT(html)()()(){2,1}]",
+            noRestrictionsAutoClose);
+
+        testDoc(
+            "\n <!ELEMENT sgml ANY>",
+            "[T(\n ){1,1}OES(!ELEMENT){2,2}IWS( ){2,11}A(sgml){2,12}(){2,16}(){2,16}IWS( ){2,16}A(ANY){2,17}(){2,20}(){2,20}OEE{2,20}ACES(!ELEMENT){2,21}ACEE{2,21}]",
+            "[T(\n ){1,1}OE(!ELEMENT[sgml='',ANY='']){2,2}ACE(!ELEMENT){2,21}]",
+            noRestrictionsAutoClose);
+        testDoc(
+            "\n <!ELEMENT sgml ANY>\n <!-- this is a comment inside --> <!ENTITY % std       \"standard SGML\">\n",
+            "[T(\n ){1,1}OES(!ELEMENT){2,2}IWS( ){2,11}A(sgml){2,12}(){2,16}(){2,16}IWS( ){2,16}A(ANY){2,17}(){2,20}(){2,20}OEE{2,20}T(\n ){2,21}C( this is a comment inside ){3,2}T( ){3,35}OES(!ENTITY){3,36}IWS( ){3,44}A(%){3,45}(){3,46}(){3,46}IWS( ){3,46}A(std){3,47}(){3,50}(){3,50}IWS(       ){3,50}A(\"standard){3,57}(){3,66}(){3,66}IWS( ){3,66}A(SGML\"){3,67}(){3,72}(){3,72}OEE{3,72}T(\n){3,73}ACES(!ENTITY){4,1}ACEE{4,1}ACES(!ELEMENT){4,1}ACEE{4,1}]",
+            "[T(\n ){1,1}OE(!ELEMENT[sgml='',ANY='']){2,2}T(\n ){2,21}C( this is a comment inside ){3,2}T( ){3,35}OE(!ENTITY[%='',std='',\"standard='',SGML\"='']){3,36}T(\n){3,73}ACE(!ENTITY){4,1}ACE(!ELEMENT){4,1}]",
+            noRestrictionsAutoClose);
+
+
+        testDoc(
             "<?xsl-stylesheet a=\"1\"?>",
             "[P(xsl-stylesheet){1,3}(a=\"1\"){1,18}]",
-            "[P(xsl-stylesheet)(a=\"1\"){1,1}]", 
+            "[P(xsl-stylesheet)(a=\"1\"){1,1}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<?xsl-stylesheet ?>",
             "[P(xsl-stylesheet){1,3}(null){1,18}]",
-            "[P(xsl-stylesheet)(null){1,1}]", 
+            "[P(xsl-stylesheet)(null){1,1}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<?xsl-stylesheet?>",
             "[P(xsl-stylesheet){1,3}(null){1,17}]",
-            "[P(xsl-stylesheet)(null){1,1}]", 
+            "[P(xsl-stylesheet)(null){1,1}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<?xsl-stylesheet a=\"1\" a b > uas23 ?>",
             "[P(xsl-stylesheet){1,3}(a=\"1\" a b > uas23 ){1,18}]",
-            "[P(xsl-stylesheet)(a=\"1\" a b > uas23 ){1,1}]", 
+            "[P(xsl-stylesheet)(a=\"1\" a b > uas23 ){1,1}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<p><!--a--></p>",
             "[OES(p){1,1}OEE{1,3}C(a){1,4}CES(p){1,12}CEE{1,15}]",
-            "[OE(p){1,1}C(a){1,4}CE(p){1,12}]", 
+            "[OE(p){1,1}C(a){1,4}CE(p){1,12}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<p><!--a-->",
             "[OES(p){1,1}OEE{1,3}C(a){1,4}ACES(p){1,12}ACEE{1,12}]",
-            "[OE(p){1,1}C(a){1,4}ACE(p){1,12}]", 
+            "[OE(p){1,1}C(a){1,4}ACE(p){1,12}]",
             noRestrictionsAutoClose);
-        testDoc( 
+        testDoc(
             "<p><?xsl-stylesheet a=\"1\" a b > uas23 ?>",
             "[OES(p){1,1}OEE{1,3}P(xsl-stylesheet){1,6}(a=\"1\" a b > uas23 ){1,21}ACES(p){1,41}ACEE{1,41}]",
-            "[OE(p){1,1}P(xsl-stylesheet)(a=\"1\" a b > uas23 ){1,4}ACE(p){1,41}]", 
+            "[OE(p){1,1}P(xsl-stylesheet)(a=\"1\" a b > uas23 ){1,4}ACE(p){1,41}]",
             noRestrictionsAutoClose);
-        
-        testDoc( 
+
+        testDoc(
             "<p>Hello</p>",
             "[OES(p){1,1}OEE{1,3}T(Hello){1,4}CES(p){1,9}CEE{1,12}]",
-            "[OE(p){1,1}T(Hello){1,4}CE(p){1,9}]", 
+            "[OE(p){1,1}T(Hello){1,4}CE(p){1,9}]",
             wellFormedXml);
-        testDoc( 
+        testDoc(
             "<h1>Hello</h1>",
             "[OES(h1){1,1}OEE{1,4}T(Hello){1,5}CES(h1){1,10}CEE{1,14}]",
-            "[OE(h1){1,1}T(Hello){1,5}CE(h1){1,10}]", 
+            "[OE(h1){1,1}T(Hello){1,5}CE(h1){1,10}]",
             wellFormedXml);
-        testDocError( 
+        testDocError(
             "<p>Hello</h1>",
             null, null, 1, 9,
             wellFormedXml);
-        testDocError( 
+        testDocError(
             "<p>Hello",
             null, null, -1, -1,
             wellFormedXml);
-        testDocError( 
+        testDocError(
             "Hello</h1>",
-            null, null, 1, 6, 
+            null, null, 1, 6,
             wellFormedXml);
-        testDoc( 
+        testDoc(
             "<h1>Hello</h1 >",
             "[OES(h1){1,1}OEE{1,4}T(Hello){1,5}CES(h1){1,10}IWS( ){1,14}CEE{1,15}]",
-            "[OE(h1){1,1}T(Hello){1,5}CE(h1){1,10}]", 
+            "[OE(h1){1,1}T(Hello){1,5}CE(h1){1,10}]",
             wellFormedXml);
-        
-        testDoc( 
+
+        testDoc(
             "<?xml version=\"1.0\"?>\n<!DOCTYPE html>\n<html></html>",
             "[X(1.0){1,15}(null){1,20}(null){1,20}T(\n){1,22}DT(DOCTYPE){2,3}(html){2,11}(){2,15}(){2,15}(){2,15}(){2,15}T(\n){2,16}OES(html){3,1}OEE{3,6}CES(html){3,7}CEE{3,13}]",
-            "[X(1.0)(null)(null){1,1}T(\n){1,22}DT(html)()()(){2,1}T(\n){2,16}OE(html){3,1}CE(html){3,7}]", 
+            "[X(1.0)(null)(null){1,1}T(\n){1,22}DT(html)()()(){2,1}T(\n){2,16}OE(html){3,1}CE(html){3,7}]",
             wellFormedXml);
-        testDoc( 
+        testDoc(
             "<?xml version=\"1.0\"?>\n<html></html>",
             "[X(1.0){1,15}(null){1,20}(null){1,20}T(\n){1,22}OES(html){2,1}OEE{2,6}CES(html){2,7}CEE{2,13}]",
-            "[X(1.0)(null)(null){1,1}T(\n){1,22}OE(html){2,1}CE(html){2,7}]", 
+            "[X(1.0)(null)(null){1,1}T(\n){1,22}OE(html){2,1}CE(html){2,7}]",
             wellFormedXml);
-        testDoc( 
+        testDoc(
             "<!DOCTYPE html>\n<html></html>",
             "[DT(DOCTYPE){1,3}(html){1,11}(){1,15}(){1,15}(){1,15}(){1,15}T(\n){1,16}OES(html){2,1}OEE{2,6}CES(html){2,7}CEE{2,13}]",
-            "[DT(html)()()(){1,1}T(\n){1,16}OE(html){2,1}CE(html){2,7}]", 
+            "[DT(html)()()(){1,1}T(\n){1,16}OE(html){2,1}CE(html){2,7}]",
             wellFormedXml);
-        testDoc( 
+        testDoc(
             "\n<!DOCTYPE html>\n<html></html>",
             "[T(\n){1,1}DT(DOCTYPE){2,3}(html){2,11}(){2,15}(){2,15}(){2,15}(){2,15}T(\n){2,16}OES(html){3,1}OEE{3,6}CES(html){3,7}CEE{3,13}]",
-            "[T(\n){1,1}DT(html)()()(){2,1}T(\n){2,16}OE(html){3,1}CE(html){3,7}]", 
+            "[T(\n){1,1}DT(html)()()(){2,1}T(\n){2,16}OE(html){3,1}CE(html){3,7}]",
             wellFormedXml);
-        testDoc( 
+        testDoc(
             "\n<?xml version=\"1.0\"?>\n<!DOCTYPE html>\n<html></html>",
             "[T(\n){1,1}X(1.0){2,15}(null){2,20}(null){2,20}T(\n){2,22}DT(DOCTYPE){3,3}(html){3,11}(){3,15}(){3,15}(){3,15}(){3,15}T(\n){3,16}OES(html){4,1}OEE{4,6}CES(html){4,7}CEE{4,13}]",
-            "[T(\n){1,1}X(1.0)(null)(null){2,1}T(\n){2,22}DT(html)()()(){3,1}T(\n){3,16}OE(html){4,1}CE(html){4,7}]", 
+            "[T(\n){1,1}X(1.0)(null)(null){2,1}T(\n){2,22}DT(html)()()(){3,1}T(\n){3,16}OE(html){4,1}CE(html){4,7}]",
             wellFormedXml);
-        testDoc( 
+        testDoc(
             "<?xml version=\"1.0\"?>\n<!-- a comment -->\n<!DOCTYPE html>\n<html></html>",
             "[X(1.0){1,15}(null){1,20}(null){1,20}T(\n){1,22}C( a comment ){2,1}T(\n){2,19}DT(DOCTYPE){3,3}(html){3,11}(){3,15}(){3,15}(){3,15}(){3,15}T(\n){3,16}OES(html){4,1}OEE{4,6}CES(html){4,7}CEE{4,13}]",
-            "[X(1.0)(null)(null){1,1}T(\n){1,22}C( a comment ){2,1}T(\n){2,19}DT(html)()()(){3,1}T(\n){3,16}OE(html){4,1}CE(html){4,7}]", 
+            "[X(1.0)(null)(null){1,1}T(\n){1,22}C( a comment ){2,1}T(\n){2,19}DT(html)()()(){3,1}T(\n){3,16}OE(html){4,1}CE(html){4,7}]",
             wellFormedXml);
-        testDoc( 
+        testDoc(
             "<!-- a comment -->\n<?xml version=\"1.0\"?>\n<!DOCTYPE html>\n<html></html>",
             "[C( a comment ){1,1}T(\n){1,19}X(1.0){2,15}(null){2,20}(null){2,20}T(\n){2,22}DT(DOCTYPE){3,3}(html){3,11}(){3,15}(){3,15}(){3,15}(){3,15}T(\n){3,16}OES(html){4,1}OEE{4,6}CES(html){4,7}CEE{4,13}]",
-            "[C( a comment ){1,1}T(\n){1,19}X(1.0)(null)(null){2,1}T(\n){2,22}DT(html)()()(){3,1}T(\n){3,16}OE(html){4,1}CE(html){4,7}]", 
+            "[C( a comment ){1,1}T(\n){1,19}X(1.0)(null)(null){2,1}T(\n){2,22}DT(html)()()(){3,1}T(\n){3,16}OE(html){4,1}CE(html){4,7}]",
             wellFormedXml);
-        testDoc( 
+        testDoc(
             "<!DOCTYPE html>\n<html><?xml version=\"1.0\"?>\n</html>",
-            "[DT(DOCTYPE){1,3}(html){1,11}(){1,15}(){1,15}(){1,15}(){1,15}T(\n){1,16}OES(html){2,1}OEE{2,6}X(1.0){2,21}(null){2,26}(null){2,26}T(\n){2,28}CES(html){3,1}CEE{3,7}]", 
+            "[DT(DOCTYPE){1,3}(html){1,11}(){1,15}(){1,15}(){1,15}(){1,15}T(\n){1,16}OES(html){2,1}OEE{2,6}X(1.0){2,21}(null){2,26}(null){2,26}T(\n){2,28}CES(html){3,1}CEE{3,7}]",
             "[DT(html)()()(){1,1}T(\n){1,16}OE(html){2,1}X(1.0)(null)(null){2,7}T(\n){2,28}CE(html){3,1}]",
             noRestrictionsAutoClose);
-        testDocError( 
+        testDocError(
             "<!DOCTYPE html>\n<?xml version=\"1.0\"?>\n<html></html>",
             null, null, 2, 1,
             wellFormedXml);
-        testDocError( 
+        testDocError(
             "<!DOCTYPE html>\n<html><?xml version=\"1.0\"?>\n</html>",
             null, null, 2, 7,
             wellFormedXml);
-        testDocError( 
+        testDocError(
             "<html><?xml version=\"1.0\"?>\n</html>",
             null, null, 1, 7,
             wellFormedXml);
-        testDocError( 
+        testDocError(
             "<html><!DOCTYPE html>\n</html>",
             null, null, 1, 7,
             wellFormedXml);
-        testDocError( 
+        testDocError(
             "<!DOCTYPE html><!DOCTYPE html>",
             null, null, 1, 16,
             wellFormedXml);
-        testDoc( 
+        testDoc(
             "<!DOCTYPE html><!DOCTYPE html>",
-            "[DT(DOCTYPE){1,3}(html){1,11}(){1,15}(){1,15}(){1,15}(){1,15}DT(DOCTYPE){1,18}(html){1,26}(){1,30}(){1,30}(){1,30}(){1,30}]", 
+            "[DT(DOCTYPE){1,3}(html){1,11}(){1,15}(){1,15}(){1,15}(){1,15}DT(DOCTYPE){1,18}(html){1,26}(){1,30}(){1,30}(){1,30}(){1,30}]",
             null,
             noRestrictionsAutoClose);
-        
-        testDoc( 
+
+        testDoc(
             "Hello, <br th:text=\"ll\"/>",
             "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}(=){1,19}(\"ll\"){1,20}SEE{1,24}]",
-            "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]", 
+            "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]",
             wellFormedXml);
-        testDoc( 
+        testDoc(
             "Hello, <br th:text='ll'/>",
             "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}(=){1,19}('ll'){1,20}SEE{1,24}]",
-            "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]", 
+            "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]",
             wellFormedXml);
-        testDocError( 
+        testDocError(
             "Hello, <br th:text=ll/>",
             null, null, 1, 20,
             wellFormedXml);
-        testDocError( 
+        testDocError(
             "Hello, <br th:text=/>",
             null, null, 1, 20,
             wellFormedXml);
-        testDocError( 
+        testDocError(
             "Hello, <br th:text/>",
             null, null, 1, 19,
             wellFormedXml);
-        testDoc( 
+        testDoc(
             "<html></html><html></html>",
-            "[OES(html){1,1}OEE{1,6}CES(html){1,7}CEE{1,13}OES(html){1,14}OEE{1,19}CES(html){1,20}CEE{1,26}]", 
-            "[OE(html){1,1}CE(html){1,7}OE(html){1,14}CE(html){1,20}]", 
+            "[OES(html){1,1}OEE{1,6}CES(html){1,7}CEE{1,13}OES(html){1,14}OEE{1,19}CES(html){1,20}CEE{1,26}]",
+            "[OE(html){1,1}CE(html){1,7}OE(html){1,14}CE(html){1,20}]",
             wellFormedXml);
-        testDocError( 
+        testDocError(
             "<!DOCTYPE html><html></html><html></html>",
-            null, null, 1, 29, 
+            null, null, 1, 29,
             wellFormedXml);
-        testDocError( 
+        testDocError(
             "<!DOCTYPE html><htmla></htmla>",
             null, null, 1, 16,
             wellFormedXml);
-        testDocError( 
+        testDocError(
             "<!DOCTYPE html><htma></htma>",
             null, null, 1, 16,
             wellFormedXml);
-        testDocError( 
+        testDocError(
             "<!DOCTYPE html><htma/>",
             null, null, 1, 16,
             wellFormedXml);
-        testDoc( 
+        testDoc(
             "Hello, <br th:text=\"ll\" th:text=\"la\"/>",
             "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}(=){1,19}(\"ll\"){1,20}IWS( ){1,24}A(th:text){1,25}(=){1,32}(\"la\"){1,33}SEE{1,37}]",
-            "[T(Hello, ){1,1}SE(br[th:text='la']){1,8}]", 
+            "[T(Hello, ){1,1}SE(br[th:text='la']){1,8}]",
             noRestrictionsAutoClose);
-        testDocError( 
+        testDocError(
             "Hello, <br th:text=\"ll\" th:text=\"la\"/>",
             null, null, 1, 25,
             wellFormedXml);
-        testDocError( 
+        testDocError(
             "<!DOCTYPE html>",
-            null, null, -1, -1, 
+            null, null, -1, -1,
             wellFormedXml);
-        
-        testDoc( 
+
+        testDoc(
                 "<h1>Hello</h1>",
                 "[OES(h1){1,1}OEE{1,4}T(Hello){1,5}CES(h1){1,10}CEE{1,14}]",
-                "[OE(h1){1,1}T(Hello){1,5}CE(h1){1,10}]", 
+                "[OE(h1){1,1}T(Hello){1,5}CE(h1){1,10}]",
                 noUnbalacedClosed);
-        testDocError( 
+        testDocError(
                 "Hello</h1>",
                 null,
-                null, 
+                null,
                 1, 6,
                 noUnbalacedClosed);
-        testDoc( 
+        testDoc(
                 "<h1>Hello",
                 "[OES(h1){1,1}OEE{1,4}T(Hello){1,5}ACES(h1){1,10}ACEE{1,10}]",
-                "[OE(h1){1,1}T(Hello){1,5}ACE(h1){1,10}]", 
+                "[OE(h1){1,1}T(Hello){1,5}ACE(h1){1,10}]",
                 noRestrictionsAutoClose);
-        testDocError( 
+        testDocError(
                 "<h2>Hello</h1>",
                 null,
                 null,
                 1, 10,
                 noUnbalacedClosed);
-        testDoc( 
+        testDoc(
                 "<h1><h2>Hello</h1>",
                 "[OES(h1){1,1}OEE{1,4}OES(h2){1,5}OEE{1,8}T(Hello){1,9}ACES(h2){1,14}ACEE{1,14}CES(h1){1,14}CEE{1,18}]",
-                "[OE(h1){1,1}OE(h2){1,5}T(Hello){1,9}ACE(h2){1,14}CE(h1){1,14}]", 
+                "[OE(h1){1,1}OE(h2){1,5}T(Hello){1,9}ACE(h2){1,14}CE(h1){1,14}]",
                 noUnbalacedClosed);
-        testDocError( 
+        testDocError(
                 "Hello</h1>",
                 null,
                 null,
-                1, 6, 
+                1, 6,
                 noUnbalacedClosed);
-        testDoc( 
+        testDoc(
                 "<h1><h2>Hello</h2>",
                 "[OES(h1){1,1}OEE{1,4}OES(h2){1,5}OEE{1,8}T(Hello){1,9}CES(h2){1,14}CEE{1,18}ACES(h1){1,19}ACEE{1,19}]",
-                "[OE(h1){1,1}OE(h2){1,5}T(Hello){1,9}CE(h2){1,14}ACE(h1){1,19}]", 
+                "[OE(h1){1,1}OE(h2){1,5}T(Hello){1,9}CE(h2){1,14}ACE(h1){1,19}]",
                 noUnbalacedClosed);
-        testDoc( 
+        testDoc(
                 "<h1><h2>Hello<!--a--></h1>",
                 "[OES(h1){1,1}OEE{1,4}OES(h2){1,5}OEE{1,8}T(Hello){1,9}C(a){1,14}ACES(h2){1,22}ACEE{1,22}CES(h1){1,22}CEE{1,26}]",
-                "[OE(h1){1,1}OE(h2){1,5}T(Hello){1,9}C(a){1,14}ACE(h2){1,22}CE(h1){1,22}]", 
+                "[OE(h1){1,1}OE(h2){1,5}T(Hello){1,9}C(a){1,14}ACE(h2){1,22}CE(h1){1,22}]",
                 noUnbalacedClosed);
-        testDoc( 
+        testDoc(
                 "<h1></H1>",
                 "[OES(h1){1,1}OEE{1,4}CES(H1){1,5}CEE{1,9}]",
-                "[OE(h1){1,1}CE(H1){1,5}]", 
+                "[OE(h1){1,1}CE(H1){1,5}]",
                 wellFormedXmlCaseInsensitive);
-        testDocError( 
+        testDocError(
                 "<h1></H1>",
-                null, null, 1, 5, 
+                null, null, 1, 5,
                 wellFormedXml);
-        testDoc( 
+        testDoc(
                 "<!DOCTYPE h1><H1></H1>",
                 "[DT(DOCTYPE){1,3}(h1){1,11}(){1,13}(){1,13}(){1,13}(){1,13}OES(H1){1,14}OEE{1,17}CES(H1){1,18}CEE{1,22}]",
-                "[DT(h1)()()(){1,1}OE(H1){1,14}CE(H1){1,18}]", 
+                "[DT(h1)()()(){1,1}OE(H1){1,14}CE(H1){1,18}]",
                 wellFormedXmlCaseInsensitive);
-        testDocError( 
+        testDocError(
                 "<!DOCTYPE h1><H1></H1>",
-                null, null, 1, 14, 
+                null, null, 1, 14,
                 wellFormedXml);
-        testDocError( 
+        testDocError(
                 "<a b=\"2\" B=\"3\"/>",
-                null, null, 1, 10, 
+                null, null, 1, 10,
                 wellFormedXmlCaseInsensitive);
-        testDoc( 
+        testDoc(
                 "<a b=\"2\" B=\"3\"/>",
-                "[SES(a){1,1}IWS( ){1,3}A(b){1,4}(=){1,5}(\"2\"){1,6}IWS( ){1,9}A(B){1,10}(=){1,11}(\"3\"){1,12}SEE{1,15}]", 
-                "[SE(a[b='2',B='3']){1,1}]", 
+                "[SES(a){1,1}IWS( ){1,3}A(b){1,4}(=){1,5}(\"2\"){1,6}IWS( ){1,9}A(B){1,10}(=){1,11}(\"3\"){1,12}SEE{1,15}]",
+                "[SE(a[b='2',B='3']){1,1}]",
                 wellFormedXml);
-        testDoc( 
+        testDoc(
                 "<a />",
-                "[SES(a){1,1}IWS( ){1,3}SEE{1,4}]", 
-                "[SE(a){1,1}]", 
+                "[SES(a){1,1}IWS( ){1,3}SEE{1,4}]",
+                "[SE(a){1,1}]",
                 wellFormedXml);
-        testDoc( 
+        testDoc(
                 "<!--| something |-->",
-                "[C(| something |){1,1}]", 
-                "[C(| something |){1,1}]", 
+                "[C(| something |){1,1}]",
+                "[C(| something |){1,1}]",
                 wellFormedXml);
-        testDoc( 
+        testDoc(
                 "<!--|> something <|-->",
-                "[C(|> something <|){1,1}]", 
-                "[C(|> something <|){1,1}]", 
+                "[C(|> something <|){1,1}]",
+                "[C(|> something <|){1,1}]",
                 wellFormedXml);
-        testDoc( 
+        testDoc(
                 "<!--%> something <%-->",
-                "[C(%> something <%){1,1}]", 
-                "[C(%> something <%){1,1}]", 
+                "[C(%> something <%){1,1}]",
+                "[C(%> something <%){1,1}]",
                 wellFormedXml);
-        testDoc( 
+        testDoc(
                 "<@block b=\"2\"/>",
-                "[SES(@block){1,1}IWS( ){1,8}A(b){1,9}(=){1,10}(\"2\"){1,11}SEE{1,14}]", 
-                "[SE(@block[b='2']){1,1}]", 
+                "[SES(@block){1,1}IWS( ){1,8}A(b){1,9}(=){1,10}(\"2\"){1,11}SEE{1,14}]",
+                "[SE(@block[b='2']){1,1}]",
                 wellFormedXml);
-        testDoc( 
+        testDoc(
                 "<@inject b=\"2\"/>",
-                "[SES(@inject){1,1}IWS( ){1,9}A(b){1,10}(=){1,11}(\"2\"){1,12}SEE{1,15}]", 
-                "[SE(@inject[b='2']){1,1}]", 
+                "[SES(@inject){1,1}IWS( ){1,9}A(b){1,10}(=){1,11}(\"2\"){1,12}SEE{1,15}]",
+                "[SE(@inject[b='2']){1,1}]",
                 wellFormedXml);
-        testDoc( 
+        testDoc(
                 "</@inject>",
-                "[UCES(@inject){1,1}UCEE{1,10}]", 
-                "[UCE(@inject){1,1}]", 
+                "[UCES(@inject){1,1}UCEE{1,10}]",
+                "[UCE(@inject){1,1}]",
                 noRestrictions);
         
         System.out.println("TOTAL Test executions: " + totalTestExecutions);

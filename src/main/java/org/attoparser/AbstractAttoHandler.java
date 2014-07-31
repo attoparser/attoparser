@@ -69,10 +69,11 @@ public abstract class AbstractAttoHandler
         // Nothing to be done here
     }
 
-    public void handleStructure(final char[] buffer, final int offset, final int len, 
+    public char[] handleStructure(final char[] buffer, final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here
+        return null;
     }
     
     

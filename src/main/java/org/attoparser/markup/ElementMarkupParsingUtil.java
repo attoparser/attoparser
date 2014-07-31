@@ -43,30 +43,38 @@ public final class ElementMarkupParsingUtil {
         super();
     }
 
-    
-    
 
-    
-    
-    
-    
-    public static void parseElement(
+
+
+
+
+
+
+
+    /*
+     * We need this structure in order to determine whether the parsing did not succeed as an element
+     * (return == FALSE constant) or rather it suceeded but the result means that parsing should NOT be disabled until
+     * a specific char[] is found in input (return == null)
+     */
+    public static final char[] TRY_PARSE_ELEMENT_FALSE = new char[] { (char)0 };
+
+    public static char[] parseElement(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col, 
             final IBasicElementHandling handler)
             throws AttoParseException {
-        
-        if (!tryParseElement(buffer, offset, len, line, col, handler)) {
+
+        final char[] tryParseElementResult = tryParseElement(buffer, offset, len, line, col, handler);
+        if (tryParseElementResult == TRY_PARSE_ELEMENT_FALSE) {
             throw new AttoParseException(
                     "Could not parse as markup element: \"" + new String(buffer, offset, len) + "\"", line, col);
         }
-        
+        return tryParseElementResult;
+
     }
-    
-    
-    
-    public static boolean tryParseElement(
+
+    public static char[] tryParseElement(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col,
@@ -77,27 +85,24 @@ public final class ElementMarkupParsingUtil {
                 isCloseElementStart(buffer, offset, offset + len) &&
                 buffer[offset + len - 1] == '>') {
             
-            handler.handleCloseElement(buffer, offset + 2, len - 3, offset, len, line, col);
-            return true;
-            
+            return handler.handleCloseElement(buffer, offset + 2, len - 3, offset, len, line, col);
+
         } else if (len > 3 &&
                 isOpenElementStart(buffer, offset, offset + len) &&
                 buffer[offset + len - 2] == '/' &&
                 buffer[offset + len - 1] == '>') {
             
-            handler.handleStandaloneElement(buffer, offset + 1, len - 3, offset, len, line, col);
-            return true;
-            
+            return handler.handleStandaloneElement(buffer, offset + 1, len - 3, offset, len, line, col);
+
         } else if (len > 2 && 
                 isOpenElementStart(buffer, offset, offset + len) &&
                 buffer[offset + len - 1] == '>'){
             
-            handler.handleOpenElement(buffer, offset + 1, len - 2, offset, len, line, col);
-            return true;
-            
+            return handler.handleOpenElement(buffer, offset + 1, len - 2, offset, len, line, col);
+
         }
         
-        return false;
+        return TRY_PARSE_ELEMENT_FALSE;
         
     }
     
@@ -108,106 +113,112 @@ public final class ElementMarkupParsingUtil {
     
     
     
-    public static void parseDetailedStandaloneElement(
+    public static <T extends IDetailedElementHandling & IConfigurableMarkupHandling> char[] parseDetailedStandaloneElement(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col, 
-            final IDetailedElementHandling handler)
+            final T handler)
             throws AttoParseException {
-        
-        if (!tryParseDetailedStandaloneElement(buffer, offset, len, line, col, handler)) {
+
+        final char[] tryParseDefailedStandaloneElementResult =
+                tryParseDetailedStandaloneElement(buffer, offset, len, line, col, handler);
+        if (tryParseDefailedStandaloneElementResult == TRY_PARSE_ELEMENT_FALSE) {
             throw new AttoParseException(
                     "Could not parse as a broken down standalone tag: \"" + new String(buffer, offset, len) + "\"", line, col);
         }
+        return tryParseDefailedStandaloneElementResult;
 
     }
     
     
-    public static void parseDetailedOpenElement(
+    public static <T extends IDetailedElementHandling & IConfigurableMarkupHandling> char[] parseDetailedOpenElement(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col, 
-            final IDetailedElementHandling handler)
+            final T handler)
             throws AttoParseException {
-        
-        if (!tryParseDetailedOpenElement(buffer, offset, len, line, col, handler)) {
+
+        final char[] tryParseDefailedOpenElementResult =
+                tryParseDetailedOpenElement(buffer, offset, len, line, col, handler);
+        if (tryParseDefailedOpenElementResult == TRY_PARSE_ELEMENT_FALSE) {
             throw new AttoParseException(
                     "Could not parse as a broken down opening tag: \"" + new String(buffer, offset, len) + "\"", line, col);
         }
+        return tryParseDefailedOpenElementResult;
 
     }
     
     
-    public static void parseDetailedCloseElement(
+    public static <T extends IDetailedElementHandling & IConfigurableMarkupHandling> char[] parseDetailedCloseElement(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col, 
-            final IDetailedElementHandling handler)
+            final T handler)
             throws AttoParseException {
-        
-        if (!tryParseDetailedCloseElement(buffer, offset, len, line, col, handler)) {
+
+        final char[] tryParseDefailedCloseElementResult =
+                tryParseDetailedCloseElement(buffer, offset, len, line, col, handler);
+        if (tryParseDefailedCloseElementResult == TRY_PARSE_ELEMENT_FALSE) {
             throw new AttoParseException(
                     "Could not parse as a broken down closing tag: \"" + new String(buffer, offset, len) + "\"", line, col);
         }
-        
+        return tryParseDefailedCloseElementResult;
+
     }
     
     
 
-    public static boolean tryParseDetailedStandaloneElement(
+    public static <T extends IDetailedElementHandling & IConfigurableMarkupHandling> char[] tryParseDetailedStandaloneElement(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col, 
-            final IDetailedElementHandling handler)
+            final T handler)
             throws AttoParseException {
         
         if (len > 3 &&
                 isOpenElementStart(buffer, offset, offset + len) &&
                 buffer[offset + len - 2] == '/' &&
                 buffer[offset + len - 1] == '>') {
-            doTryParseDetailedOpenOrStandaloneElement(
+            return doTryParseDetailedOpenOrStandaloneElement(
                     buffer, offset + 1, len - 3, offset, len, line, col, handler, true);
-            return true;
         }
-        return false;
+        return TRY_PARSE_ELEMENT_FALSE;
 
     }
     
     
-    public static boolean tryParseDetailedOpenElement(
+    public static <T extends IDetailedElementHandling & IConfigurableMarkupHandling> char[] tryParseDetailedOpenElement(
             final char[] buffer,
             final int offset, final int len, 
             final int line, final int col, 
-            final IDetailedElementHandling handler)
+            final T handler)
             throws AttoParseException {
         
         if (len > 2 && 
                 isOpenElementStart(buffer, offset, offset + len) &&
                 buffer[offset + len - 1] == '>'){
-            doTryParseDetailedOpenOrStandaloneElement(
+            return doTryParseDetailedOpenOrStandaloneElement(
                     buffer, offset + 1, len - 2, offset, len, line, col, handler, false);
-            return true;
         }
-        return false;
+        return TRY_PARSE_ELEMENT_FALSE;
         
     }
     
     
-    public static boolean tryParseDetailedCloseElement(
+    public static <T extends IDetailedElementHandling & IConfigurableMarkupHandling> char[] tryParseDetailedCloseElement(
             final char[] buffer,
             final int offset, final int len, 
             final int line, final int col, 
-            final IDetailedElementHandling handler)
+            final T handler)
             throws AttoParseException {
 
         if (len > 3 &&
                 isCloseElementStart(buffer, offset, offset + len) &&
                 buffer[offset + len - 1] == '>') {
-            doTryParseDetailedCloseElement(
+            return doTryParseDetailedCloseElement(
                     buffer, offset + 2, len - 3, offset, len, line, col, handler);
-            return true;
         }
-        return false;
+        return TRY_PARSE_ELEMENT_FALSE;
         
     }
     
@@ -216,12 +227,12 @@ public final class ElementMarkupParsingUtil {
 
     
     
-    private static void doTryParseDetailedOpenOrStandaloneElement(
+    private static <T extends IDetailedElementHandling & IConfigurableMarkupHandling> char[] doTryParseDetailedOpenOrStandaloneElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen, 
             @SuppressWarnings("unused") final int outerOffset, @SuppressWarnings("unused") final int outerLen, 
             final int line, final int col, 
-            final IDetailedElementHandling handler, 
+            final T handler,
             final boolean isStandalone)
             throws AttoParseException {
 
@@ -240,20 +251,50 @@ public final class ElementMarkupParsingUtil {
             // The buffer only contains the element name
             
             if (isStandalone) {
+
                 handler.handleStandaloneElementStart(
                         buffer, contentOffset, contentLen, 
                         line, col);
                 handler.handleStandaloneElementEnd(
                         locator[0], locator[1]);
+
             } else {
+
                 handler.handleOpenElementStart(
                         buffer, contentOffset, contentLen, 
                         line, col);
                 handler.handleOpenElementEnd(
                         locator[0], locator[1]);
+
+                /*
+                 * Once the events have been fired, we need to know whether we must disable parsing until
+                 * the "close element" structure is found. This will enable support for certain elements
+                 * which contents must not be parsed (e.g. in HTML, <script> and <style> tags).
+                 */
+
+                final char[][] nonProcessableElementNames =
+                        handler.getMarkupParsingConfiguration().getNonProcessableElementNames();
+                final int nonProcessableIndex =
+                    checkElementNameInArray(buffer, contentOffset, contentLen, nonProcessableElementNames);
+
+                if (nonProcessableIndex >= 0) {
+
+                    final char[] closingSequence = new char[nonProcessableElementNames[nonProcessableIndex].length + 3];
+                    closingSequence[0] = '<';
+                    closingSequence[1] = '/';
+                    System.arraycopy(
+                            nonProcessableElementNames[nonProcessableIndex], 0,
+                            closingSequence, 2,
+                            nonProcessableElementNames[nonProcessableIndex].length);
+                    closingSequence[closingSequence.length - 1] = '>';
+
+                    return closingSequence;
+
+                }
+
             }
             
-            return;
+            return null;
             
         }
 
@@ -281,20 +322,53 @@ public final class ElementMarkupParsingUtil {
             handler.handleOpenElementEnd(
                     locator[0], locator[1]);
         }
+
+
+
+        /*
+         * Once the events have been fired, we need to know whether we must disable parsing until
+         * the "close element" structure is found. This will enable support for certain elements
+         * which contents must not be parsed (e.g. in HTML, <script> and <style> tags).
+         */
+
+        if (!isStandalone) {
+
+            final char[][] nonProcessableElementNames =
+                    handler.getMarkupParsingConfiguration().getNonProcessableElementNames();
+            final int nonProcessableIndex =
+                    checkElementNameInArray(buffer, contentOffset, (elementNameEnd - contentOffset), nonProcessableElementNames);
+
+            if (nonProcessableIndex >= 0) {
+
+                final char[] closingSequence = new char[nonProcessableElementNames[nonProcessableIndex].length + 3];
+                closingSequence[0] = '<';
+                closingSequence[1] = '/';
+                System.arraycopy(
+                        nonProcessableElementNames[nonProcessableIndex], 0,
+                        closingSequence, 2,
+                        nonProcessableElementNames[nonProcessableIndex].length);
+                closingSequence[closingSequence.length - 1] = '>';
+
+                return closingSequence;
+
+            }
+
+        }
+
         
-        return;
+        return null;
         
     }
 
 
     
     
-    private static void doTryParseDetailedCloseElement(
+    private static <T extends IDetailedElementHandling & IConfigurableMarkupHandling> char[] doTryParseDetailedCloseElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
             final int line, final int col, 
-            final IDetailedElementHandling handler)
+            final T handler)
             throws AttoParseException {
 
         final int maxi = contentOffset + contentLen;
@@ -317,7 +391,7 @@ public final class ElementMarkupParsingUtil {
             handler.handleCloseElementEnd(
                     locator[0], locator[1]);
             
-            return;
+            return null;
             
         }
 
@@ -352,7 +426,9 @@ public final class ElementMarkupParsingUtil {
         
         handler.handleCloseElementEnd(
                 locator[0], locator[1]);
-        
+
+        return null;
+
     }
     
     
@@ -413,10 +489,44 @@ public final class ElementMarkupParsingUtil {
                 buffer[offset] != '[' && !Character.isWhitespace(buffer[offset]));
         
     }
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+    static int checkElementNameInArray(
+            final char[] buffer, final int nameOffset, final int nameLen, final char[][] names) {
+
+        if (names == null) {
+            return -1;
+        }
+
+        for (int i = 0; i < names.length; i++) {
+
+            if (nameLen != names[i].length) {
+                // Name doesn't fit in structure!
+                continue;
+            }
+
+            int j = 0;
+            for ( ; j < names[i].length; j++) {
+                if (buffer[nameOffset + j] != names[i][j]) {
+                    break;
+                }
+            }
+
+            if (j >= names[i].length) {
+                return i;
+            }
+
+        }
+
+        return -1;
+
+    }
+
+
     
 }

@@ -62,7 +62,13 @@ public interface IBasicElementHandling {
      *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification). 
      * </p>
      * <p>
-     *   <b>Implementations of this handler should never modify the document buffer.</b> 
+     *   This method will return a <kbd>char[]</kbd> if, as a result of handling this element, parsing
+     *   should be disabled until the returned char sequence is found in input. This allows
+     *   e.g. ignoring the contents of non-processable elements like HTML's <kbd>&lt;script&gt;</kbd>
+     *   or <kbd>&lt;style&gt;</kbd>.
+     * </p>
+     * <p>
+     *   <b>Implementations of this handler should never modify the document buffer.</b>
      * </p>
      * 
      * @param buffer the document buffer (not copied)
@@ -72,9 +78,12 @@ public interface IBasicElementHandling {
      * @param outerLen length of the <i>outer</i> partition.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
+     * @return will return a char[] if, as a result of handling this structure, parsing should
+     *         be disabled until the returned char sequence is found in input. Will return
+     *         <kbd>null</kbd> if parsing should not be disabled (most common case).
      * @throws AttoParseException
      */
-    public void handleStandaloneElement(
+    public char[] handleStandaloneElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
@@ -108,6 +117,12 @@ public interface IBasicElementHandling {
      *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification). 
      * </p>
      * <p>
+     *   This method will return a <kbd>char[]</kbd> if, as a result of handling this element, parsing
+     *   should be disabled until the returned char sequence is found in input. This allows
+     *   e.g. ignoring the contents of non-processable elements like HTML's <kbd>&lt;script&gt;</kbd>
+     *   or <kbd>&lt;style&gt;</kbd>.
+     * </p>
+     * <p>
      *   <b>Implementations of this handler should never modify the document buffer.</b> 
      * </p>
      * 
@@ -118,9 +133,12 @@ public interface IBasicElementHandling {
      * @param outerLen length of the <i>outer</i> partition.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
+     * @return will return a char[] if, as a result of handling this structure, parsing should
+     *         be disabled until the returned char sequence is found in input. Will return
+     *         <kbd>null</kbd> if parsing should not be disabled (most common case).
      * @throws AttoParseException
      */
-    public void handleOpenElement(
+    public char[] handleOpenElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
@@ -154,6 +172,12 @@ public interface IBasicElementHandling {
      *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification). 
      * </p>
      * <p>
+     *   This method will return a <kbd>char[]</kbd> if, as a result of handling this element, parsing
+     *   should be disabled until the returned char sequence is found in input. This allows
+     *   e.g. ignoring the contents of non-processable elements like HTML's <kbd>&lt;script&gt;</kbd>
+     *   or <kbd>&lt;style&gt;</kbd>.
+     * </p>
+     * <p>
      *   <b>Implementations of this handler should never modify the document buffer.</b> 
      * </p>
      * 
@@ -164,9 +188,12 @@ public interface IBasicElementHandling {
      * @param outerLen length of the <i>outer</i> partition.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
+     * @return will return a char[] if, as a result of handling this structure, parsing should
+     *         be disabled until the returned char sequence is found in input. Will return
+     *         <kbd>null</kbd> if parsing should not be disabled (most common case).
      * @throws AttoParseException
      */
-    public void handleCloseElement(
+    public char[] handleCloseElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
