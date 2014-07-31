@@ -1,3 +1,10 @@
+1.4.0
+=======
+- Added capability to disable parsing inside elements which contents should not be processed at all,
+  e.g. <script> and <style> tags in HTML, which are CDATA and not PCDATA, and should allow markup significant
+  characters in their contents (<,>,&,"). The whole contents of these elements are reported as a Text node.
+- Improved library metadata in META-INF/MANIFEST.MF and added OSGi metadata.
+
 1.3
 =======
 - Fixed bug reading buffer when read() operations don't return all the available bytes just because they
