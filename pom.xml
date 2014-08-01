@@ -24,7 +24,7 @@
   <groupId>org.attoparser</groupId>
   <artifactId>attoparser</artifactId>
   <packaging>jar</packaging>
-  <version>1.4.0-SNAPSHOT</version>
+  <version>1.4.0.RELEASE</version>
   <name>attoparser</name>
   <url>http://www.attoparser.org</url>
 
