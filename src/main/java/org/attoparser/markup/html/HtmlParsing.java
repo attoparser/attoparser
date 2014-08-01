@@ -46,7 +46,8 @@ public class HtmlParsing {
 
     // The contents of these two elements are non-parsable in HTML (CDATA instead of PCDATA)
     private static final char[][] HTML_NON_PROCESSABLE_ELEMENT_NAMES =
-            new char[][] { "script".toCharArray(), "style".toCharArray() };
+            new char[][] { "script".toCharArray(), "style".toCharArray(),
+                           "SCRIPT".toCharArray(), "STYLE".toCharArray() };
     
     
     

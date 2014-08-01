@@ -161,6 +161,41 @@ public class AttoParserTest extends TestCase {
             "[OE(style){1,1}T( a = \"<div>\"\n\nif (a < 0)){1,8}CE(style){3,11}]",
             HtmlParsing.markupParsingConfiguration(HtmlParsing.htmlParsingConfiguration()));
         testDoc(
+            "<SCRIPT> var a = \"<div>\" if (a < 0)</SCRIPT>",
+            "[OES(SCRIPT){1,1}OEE{1,8}T( var a = \"){1,9}OES(div){1,19}OEE{1,23}T(\" if (a < 0)){1,24}CES(SCRIPT){1,36}CEE{1,44}]",
+            "[OE(SCRIPT){1,1}T( var a = \"){1,9}OE(div){1,19}T(\" if (a < 0)){1,24}CE(SCRIPT){1,36}]",
+            noRestrictions);
+        testDoc(
+            "<STYLE> a = \"<div>\" if (a < 0)</STYLE>",
+            "[OES(STYLE){1,1}OEE{1,7}T( a = \"){1,8}OES(div){1,14}OEE{1,18}T(\" if (a < 0)){1,19}CES(STYLE){1,31}CEE{1,38}]",
+            "[OE(STYLE){1,1}T( a = \"){1,8}OE(div){1,14}T(\" if (a < 0)){1,19}CE(STYLE){1,31}]",
+            noRestrictions);
+        testDoc(
+            "<SCRIPT> var a = \"<div>\" if (a < 0)</SCRIPT>",
+            "[OES(SCRIPT){1,1}OEE{1,8}T( var a = \"<div>\" if (a < 0)){1,9}CES(SCRIPT){1,36}CEE{1,44}]",
+            "[OE(SCRIPT){1,1}T( var a = \"<div>\" if (a < 0)){1,9}CE(SCRIPT){1,36}]",
+            HtmlParsing.markupParsingConfiguration(HtmlParsing.htmlParsingConfiguration()));
+        testDoc(
+            "<STYLE> a = \"<div>\" if (a < 0)</STYLE>",
+            "[OES(STYLE){1,1}OEE{1,7}T( a = \"<div>\" if (a < 0)){1,8}CES(STYLE){1,31}CEE{1,38}]",
+            "[OE(STYLE){1,1}T( a = \"<div>\" if (a < 0)){1,8}CE(STYLE){1,31}]",
+            HtmlParsing.markupParsingConfiguration(HtmlParsing.htmlParsingConfiguration()));
+        testDoc(
+            "<SCRIPT> var a = \"<div>\"\n\nif (a < 0)</SCRIPT>",
+            "[OES(SCRIPT){1,1}OEE{1,8}T( var a = \"<div>\"\n\nif (a < 0)){1,9}CES(SCRIPT){3,11}CEE{3,19}]",
+            "[OE(SCRIPT){1,1}T( var a = \"<div>\"\n\nif (a < 0)){1,9}CE(SCRIPT){3,11}]",
+            HtmlParsing.markupParsingConfiguration(HtmlParsing.htmlParsingConfiguration()));
+        testDoc(
+            "<STYLE> a = \"<div>\"\n\nif (a < 0)</STYLE>",
+            "[OES(STYLE){1,1}OEE{1,7}T( a = \"<div>\"\n\nif (a < 0)){1,8}CES(STYLE){3,11}CEE{3,18}]",
+            "[OE(STYLE){1,1}T( a = \"<div>\"\n\nif (a < 0)){1,8}CE(STYLE){3,11}]",
+            HtmlParsing.markupParsingConfiguration(HtmlParsing.htmlParsingConfiguration()));
+        testDoc(
+            "<h1 a=\"if (a < 0)\">Hello</ h1>",
+            "[OES(h1){1,1}IWS( ){1,4}A(a){1,5}(=){1,6}(\"if (a < 0)\"){1,7}OEE{1,19}T(Hello</ h1>){1,20}ACES(h1){1,31}ACEE{1,31}]",
+            "[OE(h1[a='if (a < 0)']){1,1}T(Hello</ h1>){1,20}ACE(h1){1,31}]",
+            noRestrictionsAutoClose);
+        testDoc(
             "<h1>Hello</ h1>",
             "[OES(h1){1,1}OEE{1,4}T(Hello</ h1>){1,5}ACES(h1){1,16}ACEE{1,16}]",
             "[OE(h1){1,1}T(Hello</ h1>){1,5}ACE(h1){1,16}]",
