@@ -23,11 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.attoparser.AttoParseException;
-
-
-
-
-
+import org.attoparser.IAttoHandleResult;
 
 
 /**
@@ -57,93 +53,90 @@ public abstract class AbstractStandardXmlAttoHandler
     
 
     @Override
-    public final void handleXmlStandaloneElementStart(
+    public final IAttoHandleResult handleXmlStandaloneElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final int line, final int col) 
             throws AttoParseException {
         
-        super.handleXmlStandaloneElementStart(buffer, nameOffset, nameLen, line, col);
-        
         this.currentElementName = new String(buffer, nameOffset, nameLen);
         this.currentElementAttributes = null;
         this.currentElementLine = line;
         this.currentElementCol = col;
-        
+
+        return null;
+
     }
 
     
     
     @Override
-    public final void handleXmlStandaloneElementEnd(
+    public final IAttoHandleResult handleXmlStandaloneElementEnd(
             final int line, final int col)
             throws AttoParseException {
         
-        super.handleXmlStandaloneElementEnd(line, col);
-        
-        handleXmlStandaloneElement(this.currentElementName, this.currentElementAttributes, this.currentElementLine, this.currentElementCol);
+        return handleXmlStandaloneElement(
+                this.currentElementName, this.currentElementAttributes, this.currentElementLine, this.currentElementCol);
         
     }
 
     
     
     @Override
-    public final void handleXmlOpenElementStart(
+    public final IAttoHandleResult handleXmlOpenElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen, 
             final int line, final int col) 
             throws AttoParseException {
 
-        super.handleXmlOpenElementStart(buffer, nameOffset, nameLen, line, col);
-
         this.currentElementName = new String(buffer, nameOffset, nameLen);
         this.currentElementAttributes = null;
         this.currentElementLine = line;
         this.currentElementCol = col;
-        
+
+        return null;
+
     }
 
     
     
     @Override
-    public final void handleXmlOpenElementEnd(
+    public final IAttoHandleResult handleXmlOpenElementEnd(
             final int line, final int col) 
             throws AttoParseException {
 
-        super.handleXmlOpenElementEnd(line, col);
-        
-        handleXmlOpenElement(this.currentElementName, this.currentElementAttributes, this.currentElementLine, this.currentElementCol);
+        return handleXmlOpenElement(
+                this.currentElementName, this.currentElementAttributes, this.currentElementLine, this.currentElementCol);
         
     }
 
     
     
     @Override
-    public final void handleXmlCloseElementStart(
+    public final IAttoHandleResult handleXmlCloseElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen, 
             final int line, final int col) 
             throws AttoParseException {
 
-        super.handleXmlCloseElementStart(buffer, nameOffset, nameLen, line, col);
-        
         this.currentElementName = new String(buffer, nameOffset, nameLen);
         this.currentElementAttributes = null;
         this.currentElementLine = line;
         this.currentElementCol = col;
-        
+
+        return null;
+
     }
 
     
     
     @Override
-    public final void handleXmlCloseElementEnd(
+    public final IAttoHandleResult handleXmlCloseElementEnd(
             final int line, final int col) 
             throws AttoParseException {
 
-        super.handleXmlCloseElementEnd(line, col);
-
-        handleXmlCloseElement(this.currentElementName, this.currentElementLine, this.currentElementCol);
+        return handleXmlCloseElement(
+                this.currentElementName, this.currentElementLine, this.currentElementCol);
         
     }
 
@@ -151,7 +144,7 @@ public abstract class AbstractStandardXmlAttoHandler
     
     
     @Override
-    public final void handleAttribute(
+    public final IAttoHandleResult handleAttribute(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol, 
@@ -162,11 +155,6 @@ public abstract class AbstractStandardXmlAttoHandler
             final int valueLine, final int valueCol)
             throws AttoParseException {
 
-        super.handleAttribute(buffer, nameOffset, nameLen, nameLine, nameCol,
-                operatorOffset, operatorLen, operatorLine, operatorCol,
-                valueContentOffset, valueContentLen, valueOuterOffset, valueOuterLen,
-                valueLine, valueCol);
-        
         final String attributeName = new String(buffer, nameOffset, nameLen);
         final String attributeValue = 
                 (valueContentLen <= 0?  "" : new String(buffer, valueContentOffset, valueContentLen));
@@ -176,26 +164,28 @@ public abstract class AbstractStandardXmlAttoHandler
         }
 
         this.currentElementAttributes.put(attributeName, attributeValue);
-        
+
+        return null;
+
     }
 
     
     
     @Override
-    public final void handleInnerWhiteSpace(
+    public final IAttoHandleResult handleInnerWhiteSpace(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col) 
             throws AttoParseException {
 
-        super.handleInnerWhiteSpace(buffer, offset, len, line, col);
-        
+        return null;
+
     }
 
     
     
     @Override
-    public final void handleDocType(
+    public final IAttoHandleResult handleDocType(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol, 
@@ -213,14 +203,7 @@ public abstract class AbstractStandardXmlAttoHandler
             final int outerLine, final int outerCol)
             throws AttoParseException {
 
-        super.handleDocType(buffer, keywordOffset, keywordLen, keywordLine, keywordCol,
-                elementNameOffset, elementNameLen, elementNameLine, elementNameCol,
-                typeOffset, typeLen, typeLine, typeCol, publicIdOffset, publicIdLen,
-                publicIdLine, publicIdCol, systemIdOffset, systemIdLen, systemIdLine,
-                systemIdCol, internalSubsetOffset, internalSubsetLen, internalSubsetLine, 
-                internalSubsetCol, outerOffset, outerLen, outerLine, outerCol);
-        
-        handleDocType(
+        return handleDocType(
                 new String(buffer, elementNameOffset, elementNameLen),
                 (publicIdOffset <= 0? null : new String(buffer, publicIdOffset, publicIdLen)),
                 (systemIdOffset <= 0? null : new String(buffer, systemIdOffset, systemIdLen)),
@@ -232,39 +215,35 @@ public abstract class AbstractStandardXmlAttoHandler
 
     
     @Override
-    public final void handleComment(
+    public final IAttoHandleResult handleComment(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
             final int line, final int col)
             throws AttoParseException {
 
-        super.handleComment(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
-        
-        handleComment(buffer, contentOffset, contentLen, line, col);
+        return handleComment(buffer, contentOffset, contentLen, line, col);
         
     }
 
 
     
     @Override
-    public final void handleCDATASection(
+    public final IAttoHandleResult handleCDATASection(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
             final int line, final int col)
             throws AttoParseException {
 
-        super.handleCDATASection(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
-        
-        handleCDATASection(buffer, contentOffset, contentLen, line, col);
+        return handleCDATASection(buffer, contentOffset, contentLen, line, col);
         
     }
     
     
 
     @Override
-    public final void handleXmlDeclarationDetail(
+    public final IAttoHandleResult handleXmlDeclarationDetail(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -278,14 +257,6 @@ public abstract class AbstractStandardXmlAttoHandler
             final int line, final int col)
             throws AttoParseException {
 
-        super.handleXmlDeclarationDetail(
-                buffer, 
-                keywordOffset, keywordLen, keywordLine, keywordCol,
-                versionOffset, versionLen, versionLine, versionCol, 
-                encodingOffset, encodingLen, encodingLine, encodingCol, 
-                standaloneOffset, standaloneLen, standaloneLine, standaloneCol, 
-                outerOffset, outerLen, line, col);
-        
         final String version = new String(buffer, versionOffset, versionLen);
         final String encoding =
                 (encodingOffset > 0?
@@ -296,14 +267,14 @@ public abstract class AbstractStandardXmlAttoHandler
                         new String(buffer, standaloneOffset, standaloneLen) :
                         null);
         
-        handleXmlDeclaration(version, encoding, standalone, line, col);
+        return handleXmlDeclaration(version, encoding, standalone, line, col);
         
     }
 
 
     
     @Override
-    public final void handleProcessingInstruction(
+    public final IAttoHandleResult handleProcessingInstruction(
             final char[] buffer, 
             final int targetOffset, final int targetLen, 
             final int targetLine, final int targetCol,
@@ -313,13 +284,7 @@ public abstract class AbstractStandardXmlAttoHandler
             final int line, final int col)
             throws AttoParseException {
 
-        super.handleProcessingInstruction(
-                buffer, 
-                targetOffset, targetLen, targetLine, targetCol, 
-                contentOffset, contentLen, contentLine, contentCol,
-                outerOffset, outerLen, line, col);
-        
-        handleProcessingInstruction(
+        return handleProcessingInstruction(
                 new String(buffer, targetOffset, targetLen), 
                 (contentOffset <= 0? null : new String(buffer, contentOffset, contentLen)), 
                 line, col);
@@ -342,14 +307,16 @@ public abstract class AbstractStandardXmlAttoHandler
      * @param attributes the element attributes map, or null if no attributes are present.
      * @param line the line in the document where this elements appears.
      * @param col the column in the document where this element appears.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
     @SuppressWarnings("unused")
-    public void handleXmlStandaloneElement(
+    public IAttoHandleResult handleXmlStandaloneElement(
             final String elementName, final Map<String,String> attributes,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
 
@@ -365,14 +332,16 @@ public abstract class AbstractStandardXmlAttoHandler
      * @param attributes the element attributes map, or null if no attributes are present.
      * @param line the line in the document where this elements appears.
      * @param col the column in the document where this element appears.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
     @SuppressWarnings("unused")
-    public void handleXmlOpenElement(
+    public IAttoHandleResult handleXmlOpenElement(
             final String elementName, final Map<String,String> attributes,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
     
 
@@ -384,13 +353,15 @@ public abstract class AbstractStandardXmlAttoHandler
      * @param elementName the element name (e.g. "&lt;/div&gt;" -> "div").
      * @param line the line in the document where this elements appears.
      * @param col the column in the document where this element appears.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
     @SuppressWarnings("unused")
-    public void handleXmlCloseElement(
+    public IAttoHandleResult handleXmlCloseElement(
             final String elementName, final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
 
@@ -406,14 +377,16 @@ public abstract class AbstractStandardXmlAttoHandler
      * @param internalSubset the internal subset specified, if present (might be null).
      * @param line the line in the document where this elements appears.
      * @param col the column in the document where this element appears.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
     @SuppressWarnings("unused")
-    public void handleDocType(
+    public IAttoHandleResult handleDocType(
             final String elementName, final String publicId, final String systemId, 
             final String internalSubset, final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
     
 
@@ -433,14 +406,16 @@ public abstract class AbstractStandardXmlAttoHandler
      * @param len the length (in chars) of the artifact.
      * @param line the line in the document where this elements appears.
      * @param col the column in the document where this element appears.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
     @SuppressWarnings("unused")
-    public void handleComment(
+    public IAttoHandleResult handleComment(
             final char[] buffer, final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
     
 
@@ -460,14 +435,16 @@ public abstract class AbstractStandardXmlAttoHandler
      * @param len the length (in chars) of the artifact.
      * @param line the line in the document where this elements appears.
      * @param col the column in the document where this element appears.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
     @SuppressWarnings("unused")
-    public void handleCDATASection(
+    public IAttoHandleResult handleCDATASection(
             final char[] buffer, final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
 
@@ -482,16 +459,18 @@ public abstract class AbstractStandardXmlAttoHandler
      * @param standalone the standalone value specified (can be null).
      * @param line the line in the document where this elements appears.
      * @param col the column in the document where this element appears.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
     @SuppressWarnings("unused")
-    public void handleXmlDeclaration(
+    public IAttoHandleResult handleXmlDeclaration(
             final String version, 
             final String encoding, 
             final String standalone, 
             final int line, final int col) 
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
 
@@ -505,14 +484,16 @@ public abstract class AbstractStandardXmlAttoHandler
      * @param content the content of the processing instruction, if specified (might be null).
      * @param line the line in the document where this elements appears.
      * @param col the column in the document where this element appears.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
     @SuppressWarnings("unused")
-    public void handleProcessingInstruction(
+    public IAttoHandleResult handleProcessingInstruction(
             final String target, final String content, 
             final int line, final int col) 
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
 

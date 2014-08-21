@@ -20,7 +20,7 @@
 package org.attoparser.markup;
 
 import org.attoparser.AttoParseException;
-
+import org.attoparser.IAttoHandleResult;
 
 
 /**
@@ -49,25 +49,29 @@ public final class ProcessingInstructionMarkupParsingUtil {
     
     
     
-    public static void parseProcessingInstruction(
+    public static IAttoHandleResult parseProcessingInstruction(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col, 
             final IProcessingInstructionHandling handler)
             throws AttoParseException {
-        
-        if (!tryParseProcessingInstruction(buffer, offset, len, line, col, handler)) {
+
+        final BestEffortParsingResult bestEffortParsingResult =
+                tryParseProcessingInstruction(buffer, offset, len, line, col, handler);
+        if (bestEffortParsingResult == null) {
             throw new AttoParseException(
                     "Could not parse as processing instruction: \"" + new String(buffer, offset, len) + "\"", line, col);
         }
-        
+
+        return bestEffortParsingResult.getHandleResult();
+
     }
 
     
 
     
     
-    public static boolean tryParseProcessingInstruction(
+    public static BestEffortParsingResult tryParseProcessingInstruction(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col, 
@@ -79,19 +83,19 @@ public final class ProcessingInstructionMarkupParsingUtil {
                 buffer[offset + len - 2] == '?' &&
                 buffer[offset + len - 1] == '>') {
 
-            doParseProcessingInstruction(
-                    buffer, offset + 2, len - 4, offset, len, line, col, handler);
-            return true;
-            
+            return BestEffortParsingResult.forHandleResult(
+                    doParseProcessingInstruction(
+                        buffer, offset + 2, len - 4, offset, len, line, col, handler));
+
         }
         
-        return false;
+        return null;
         
     }
 
 
     
-    private static void doParseProcessingInstruction(
+    private static IAttoHandleResult doParseProcessingInstruction(
             final char[] buffer, 
             final int internalOffset, final int internalLen, 
             final int outerOffset, final int outerLen,
@@ -115,7 +119,7 @@ public final class ProcessingInstructionMarkupParsingUtil {
         if (targetEnd == -1) {
             // There is no content, only target
             
-            handler.handleProcessingInstruction(
+            return handler.handleProcessingInstruction(
                     buffer, 
                     i, maxi - i,                                      // target
                     line, col + 2,                                    // target
@@ -123,9 +127,7 @@ public final class ProcessingInstructionMarkupParsingUtil {
                     locator[0], locator[1],                        // content
                     outerOffset, outerLen,                            // outer 
                     line, col);                                       // outer
-            
-            return;
-            
+
         }
         
         
@@ -146,7 +148,7 @@ public final class ProcessingInstructionMarkupParsingUtil {
         if (contentStart == -1) {
             // There is no content. Only whitespace until the end of the structure
             
-            handler.handleProcessingInstruction(
+            return handler.handleProcessingInstruction(
                     buffer, 
                     targetOffset, targetLen,                          // target
                     line, col + 2,                                    // target
@@ -154,13 +156,11 @@ public final class ProcessingInstructionMarkupParsingUtil {
                     locator[0], locator[1],                        // content
                     outerOffset, outerLen,                            // outer 
                     line, col);                                       // outer
-            
-            return;
-            
+
         }
 
         
-        handler.handleProcessingInstruction(
+        return handler.handleProcessingInstruction(
                 buffer, 
                 targetOffset, targetLen,                          // target
                 line, col + 2,                                    // target

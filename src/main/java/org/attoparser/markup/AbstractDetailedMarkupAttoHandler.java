@@ -22,6 +22,7 @@ package org.attoparser.markup;
 import java.util.Arrays;
 
 import org.attoparser.AttoParseException;
+import org.attoparser.IAttoHandleResult;
 import org.attoparser.markup.MarkupParsingConfiguration.ElementBalancing;
 import org.attoparser.markup.MarkupParsingConfiguration.PrologParsingConfiguration;
 import org.attoparser.markup.MarkupParsingConfiguration.UniqueRootElementPresence;
@@ -80,13 +81,12 @@ import org.attoparser.util.SegmentedArray.IValueHandler;
  */
 public abstract class AbstractDetailedMarkupAttoHandler 
         extends AbstractBasicMarkupAttoHandler
-        implements IDetailedElementHandling, IDetailedDocTypeHandling, IConfigurableMarkupHandling {
+        implements IDetailedElementHandling, IDetailedDocTypeHandling {
 
     private static final MarkupParsingConfiguration NO_RESTRICTIONS = MarkupParsingConfiguration.noRestrictions(); 
     
     private final StackAwareWrapper wrapper;
-    private final MarkupParsingConfiguration markupParsingConfiguration;
-    
+
     
     
     
@@ -98,36 +98,27 @@ public abstract class AbstractDetailedMarkupAttoHandler
     protected AbstractDetailedMarkupAttoHandler(final MarkupParsingConfiguration markupParsingConfiguration) {
         super();
         this.wrapper = new StackAwareWrapper(this, markupParsingConfiguration);
-        this.markupParsingConfiguration = markupParsingConfiguration;
-    }
-
-
-
-    public MarkupParsingConfiguration getMarkupParsingConfiguration() {
-        return this.markupParsingConfiguration;
     }
 
 
 
     @Override
-    public final void handleDocumentStart(final long startTimeNanos, final int line, final int col)
+    public final IAttoHandleResult handleDocumentStart(final long startTimeNanos, final int line, final int col)
             throws AttoParseException {
-        super.handleDocumentStart(startTimeNanos, line, col);
-        this.wrapper.handleDocumentStart(startTimeNanos, line, col);
+        return this.wrapper.handleDocumentStart(startTimeNanos, line, col);
     }
 
 
     @Override
-    public final void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
+    public final IAttoHandleResult handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
             throws AttoParseException {
-        super.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col);
-        this.wrapper.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col);
+        return this.wrapper.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col);
     }
     
 
     
     @Override
-    public final void handleXmlDeclaration(
+    public final IAttoHandleResult handleXmlDeclaration(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen, 
             final int keywordLine, final int keywordCol, 
@@ -140,14 +131,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
             final int outerOffset, final int outerLen, 
             final int line, final int col) 
             throws AttoParseException {
-        
-        super.handleXmlDeclaration(buffer, keywordOffset, keywordLen, keywordLine,
-                keywordCol, versionOffset, versionLen, versionLine, versionCol,
-                encodingOffset, encodingLen, encodingLine, encodingCol,
-                standaloneOffset, standaloneLen, standaloneLine, standaloneCol,
-                outerOffset, outerLen, line, col);
-        
-        this.wrapper.handleXmlDeclaration(
+
+        return this.wrapper.handleXmlDeclaration(
                 buffer, 
                 keywordOffset, keywordLen, keywordLine, keywordCol, 
                 versionOffset, versionLen, versionLine, versionCol, 
@@ -160,15 +145,14 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
 
     @Override
-    public final void handleDocType(
+    public final IAttoHandleResult handleDocType(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
             final int line, final int col)
             throws AttoParseException {
         
-        super.handleDocType(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
-        DocTypeMarkupParsingUtil.parseDetailedDocType(
+        return DocTypeMarkupParsingUtil.parseDetailedDocType(
                 buffer, outerOffset, outerLen, line, col, this.wrapper);
         
     }
@@ -176,7 +160,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
     
     
     @Override
-    public final char[] handleStandaloneElement(
+    public final IAttoHandleResult handleStandaloneElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
@@ -190,7 +174,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
     
     @Override
-    public final char[] handleOpenElement(
+    public final IAttoHandleResult handleOpenElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
@@ -204,7 +188,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
     
     @Override
-    public final char[] handleCloseElement(
+    public final IAttoHandleResult handleCloseElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
@@ -226,14 +210,16 @@ public abstract class AbstractDetailedMarkupAttoHandler
      * </p>
      * 
      * @param startTimeNanos the starting time, in nanoseconds.
-     * @param documentRestrictions the document restrictions being applied.
+     * @param configuration the document restrictions being applied.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
     @SuppressWarnings("unused")
-    public void handleDocumentStart(final long startTimeNanos, 
-            final int line, final int col, final MarkupParsingConfiguration documentRestrictions)
+    public IAttoHandleResult handleDocumentStart(final long startTimeNanos,
+            final int line, final int col, final MarkupParsingConfiguration configuration)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
 
@@ -244,14 +230,16 @@ public abstract class AbstractDetailedMarkupAttoHandler
      * 
      * @param endTimeNanos the parsing end time, in nanoseconds.
      * @param totalTimeNanos the difference between parsing start and end times.
-     * @param documentRestrictions the document restrictions being applied.
+     * @param configuration the document restrictions being applied.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
     @SuppressWarnings("unused")
-    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, 
-            final int line, final int col, final MarkupParsingConfiguration documentRestrictions)
+    public IAttoHandleResult handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos,
+            final int line, final int col, final MarkupParsingConfiguration configuration)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
     
 
@@ -301,10 +289,11 @@ public abstract class AbstractDetailedMarkupAttoHandler
      * @param outerLen length of the <i>outer</i> partition.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
     @SuppressWarnings("unused")
-    public void handleXmlDeclarationDetail(
+    public IAttoHandleResult handleXmlDeclarationDetail(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen, 
             final int keywordLine, final int keywordCol, 
@@ -318,93 +307,104 @@ public abstract class AbstractDetailedMarkupAttoHandler
             final int line, final int col) 
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
     
 
     
     
-    public void handleStandaloneElementStart(
+    public IAttoHandleResult handleStandaloneElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
-    public void handleStandaloneElementEnd(
+    public IAttoHandleResult handleStandaloneElementEnd(
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
     
 
-    public void handleOpenElementStart(
+    public IAttoHandleResult handleOpenElementStart(
             final char[] buffer,
             final int nameOffset, final int nameLen, 
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
-    public void handleOpenElementEnd(
+    public IAttoHandleResult handleOpenElementEnd(
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
 
     
-    public void handleCloseElementStart(
+    public IAttoHandleResult handleCloseElementStart(
             final char[] buffer,
             final int nameOffset, final int nameLen, 
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
-    public void handleCloseElementEnd(
+    public IAttoHandleResult handleCloseElementEnd(
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
 
     
-    public void handleAutoCloseElementStart(
+    public IAttoHandleResult handleAutoCloseElementStart(
             final char[] buffer,
             final int nameOffset, final int nameLen, 
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
-    public void handleAutoCloseElementEnd(
+    public IAttoHandleResult handleAutoCloseElementEnd(
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
     
 
     
-    public void handleUnmatchedCloseElementStart(
+    public IAttoHandleResult handleUnmatchedCloseElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen, 
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
 
-    public void handleUnmatchedCloseElementEnd(
+    public IAttoHandleResult handleUnmatchedCloseElementEnd(
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
 
     
-    public void handleAttribute(
+    public IAttoHandleResult handleAttribute(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol,
@@ -415,21 +415,23 @@ public abstract class AbstractDetailedMarkupAttoHandler
             final int valueLine, final int valueCol)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
 
     
-    public void handleInnerWhiteSpace(
+    public IAttoHandleResult handleInnerWhiteSpace(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
 
 
-    public void handleDocType(
+    public IAttoHandleResult handleDocType(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -447,6 +449,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
             final int outerLine, final int outerCol) 
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
     
@@ -459,14 +462,14 @@ public abstract class AbstractDetailedMarkupAttoHandler
     
     
     static final class StackAwareWrapper
-            implements IDetailedElementHandling, IDetailedDocTypeHandling, IConfigurableMarkupHandling {
+            implements IDetailedElementHandling, IDetailedDocTypeHandling {
 
         private static final int DEFAULT_STACK_SIZE = 20;
         private static final int DEFAULT_ATTRIBUTE_NAMES_SIZE = 5;
         
         private final AbstractDetailedMarkupAttoHandler handler;
 
-        private final MarkupParsingConfiguration markupParsingConfiguration; 
+        private final MarkupParsingConfiguration markupParsingConfiguration;
 
         private final boolean autoClose;
         private final boolean requireBalancedElements;
@@ -511,9 +514,9 @@ public abstract class AbstractDetailedMarkupAttoHandler
             super();
             
             this.handler = handler;
-            this.markupParsingConfiguration = markupParsingConfiguration;
 
             this.caseSensitive = markupParsingConfiguration.isCaseSensitive();
+            this.markupParsingConfiguration = markupParsingConfiguration;
             
             this.autoClose =
                     (ElementBalancing.AUTO_CLOSE.equals(markupParsingConfiguration.getElementBalancing()) ||
@@ -552,19 +555,13 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
 
 
-        public MarkupParsingConfiguration getMarkupParsingConfiguration() {
-            return this.markupParsingConfiguration;
-        }
-
-
-
-        public void handleDocumentStart(final long startTimeNanos, final int line, final int col)
+        public IAttoHandleResult handleDocumentStart(final long startTimeNanos, final int line, final int col)
                 throws AttoParseException {
-            this.handler.handleDocumentStart(startTimeNanos, line, col, this.markupParsingConfiguration);
+            return this.handler.handleDocumentStart(startTimeNanos, line, col, this.markupParsingConfiguration);
         }
 
 
-        public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
+        public IAttoHandleResult handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
                 throws AttoParseException {
             
             if (this.requireBalancedElements && this.elementStackSize > 0) {
@@ -582,12 +579,12 @@ public abstract class AbstractDetailedMarkupAttoHandler
             
             cleanStack(line, col);
             
-            this.handler.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col, this.markupParsingConfiguration);
+            return this.handler.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col, this.markupParsingConfiguration);
 
         }
 
         
-        public final void handleXmlDeclaration(
+        public IAttoHandleResult handleXmlDeclaration(
                 final char[] buffer, 
                 final int keywordOffset, final int keywordLen, 
                 final int keywordLine, final int keywordCol, 
@@ -627,21 +624,24 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 }
                 
             }
-            
-            this.handler.handleXmlDeclarationDetail(buffer, keywordOffset, keywordLen, keywordLine,
-                    keywordCol, versionOffset, versionLen, versionLine, versionCol,
-                    encodingOffset, encodingLen, encodingLine, encodingCol,
-                    standaloneOffset, standaloneLen, standaloneLine, standaloneCol,
-                    outerOffset, outerLen, line, col);
+
+            final IAttoHandleResult result =
+                this.handler.handleXmlDeclarationDetail(buffer, keywordOffset, keywordLen, keywordLine,
+                        keywordCol, versionOffset, versionLen, versionLine, versionCol,
+                        encodingOffset, encodingLen, encodingLine, encodingCol,
+                        standaloneOffset, standaloneLen, standaloneLine, standaloneCol,
+                        outerOffset, outerLen, line, col);
 
             if (this.validateProlog) {
                 this.validPrologXmlDeclarationRead = true;
             }
+
+            return result;
             
         }
         
 
-        public void handleStandaloneElementStart(
+        public IAttoHandleResult handleStandaloneElementStart(
                 final char[] buffer, 
                 final int nameOffset, final int nameLen,
                 final int line, final int col)
@@ -656,22 +656,23 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 this.currentElementAttributeNamesSize = 0;
             }
             
-            this.handler.handleStandaloneElementStart(buffer, nameOffset, nameLen, line, col);
+            return this.handler.handleStandaloneElementStart(buffer, nameOffset, nameLen, line, col);
             
         }
 
-        public void handleStandaloneElementEnd(
+        public IAttoHandleResult handleStandaloneElementEnd(
                 final int line, final int col)
                 throws AttoParseException {
-            
-            this.handler.handleStandaloneElementEnd(line, col);
-            
+
+            final IAttoHandleResult result =
+                this.handler.handleStandaloneElementEnd(line, col);
             this.elementRead = true;
-            
+            return result;
+
         }
 
         
-        public void handleOpenElementStart(
+        public IAttoHandleResult handleOpenElementStart(
                 final char[] buffer,
                 final int nameOffset, final int nameLen, 
                 final int line, final int col)
@@ -685,25 +686,31 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 this.currentElementAttributeNames = null;
                 this.currentElementAttributeNamesSize = 0;
             }
-            
-            this.handler.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
+
+            final IAttoHandleResult result =
+                this.handler.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
             
             addToStack(buffer, nameOffset, nameLen);
-            
+
+            return result;
+
         }
 
-        public void handleOpenElementEnd(
+        public IAttoHandleResult handleOpenElementEnd(
                 final int line, final int col)
                 throws AttoParseException {
-            
-            this.handler.handleOpenElementEnd(line, col);
+
+            final IAttoHandleResult result =
+                this.handler.handleOpenElementEnd(line, col);
             
             this.elementRead = true;
+
+            return result;
             
         }
 
         
-        public void handleCloseElementStart(
+        public IAttoHandleResult handleCloseElementStart(
                 final char[] buffer, 
                 final int nameOffset, final int nameLen, 
                 final int line, final int col)
@@ -718,29 +725,32 @@ public abstract class AbstractDetailedMarkupAttoHandler
             }
 
             if (this.closeElementIsMatched) {
-                this.handler.handleCloseElementStart(buffer, nameOffset, nameLen, line, col);
+                return this.handler.handleCloseElementStart(buffer, nameOffset, nameLen, line, col);
             } else {
-                this.handler.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col);
+                return this.handler.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col);
             }
             
         }
 
-        public void handleCloseElementEnd(
+        public IAttoHandleResult handleCloseElementEnd(
                 final int line, final int col)
                 throws AttoParseException {
-            
+
+            final IAttoHandleResult result;
             if (this.closeElementIsMatched) {
-                this.handler.handleCloseElementEnd(line, col);
+                result = this.handler.handleCloseElementEnd(line, col);
             } else {
-                this.handler.handleUnmatchedCloseElementEnd(line, col);
+                result = this.handler.handleUnmatchedCloseElementEnd(line, col);
             }
             
             this.elementRead = true;
-            
+
+            return result;
+
         }
 
         
-        public void handleAttribute(
+        public IAttoHandleResult handleAttribute(
                 final char[] buffer,
                 final int nameOffset, final int nameLen,
                 final int nameLine, final int nameCol,
@@ -827,7 +837,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
             
             }
             
-            this.handler.handleAttribute(
+            return this.handler.handleAttribute(
                     buffer, 
                     nameOffset, nameLen, nameLine, nameCol, 
                     operatorOffset, operatorLen, operatorLine, operatorCol, 
@@ -837,19 +847,19 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
 
         
-        public void handleInnerWhiteSpace(
+        public IAttoHandleResult handleInnerWhiteSpace(
                 final char[] buffer,
                 final int offset, final int len,
                 final int line, final int col)
                 throws AttoParseException {
             
-            this.handler.handleInnerWhiteSpace(buffer, offset, len, line, col);
+            return this.handler.handleInnerWhiteSpace(buffer, offset, len, line, col);
             
         }
 
 
 
-        public void handleDocType(
+        public IAttoHandleResult handleDocType(
                 final char[] buffer, 
                 final int keywordOffset, final int keywordLen,
                 final int keywordLine, final int keywordCol,
@@ -928,25 +938,28 @@ public abstract class AbstractDetailedMarkupAttoHandler
             } else {
                 this.rootElementName = cachedElementName;
             }
-            
-            this.handler.handleDocType(
-                    buffer, 
-                    keywordOffset, keywordLen, keywordLine, keywordCol, 
-                    elementNameOffset, elementNameLen, elementNameLine, elementNameCol, 
-                    typeOffset, typeLen, typeLine, typeCol, 
-                    publicIdOffset, publicIdLen, publicIdLine, publicIdCol, 
-                    systemIdOffset, systemIdLen, systemIdLine, systemIdCol, 
-                    internalSubsetOffset, internalSubsetLen, internalSubsetLine, internalSubsetCol, 
-                    outerOffset, outerLen, outerLine, outerCol);
+
+            final IAttoHandleResult result =
+                this.handler.handleDocType(
+                        buffer,
+                        keywordOffset, keywordLen, keywordLine, keywordCol,
+                        elementNameOffset, elementNameLen, elementNameLine, elementNameCol,
+                        typeOffset, typeLen, typeLine, typeCol,
+                        publicIdOffset, publicIdLen, publicIdLine, publicIdCol,
+                        systemIdOffset, systemIdLen, systemIdLine, systemIdCol,
+                        internalSubsetOffset, internalSubsetLen, internalSubsetLine, internalSubsetCol,
+                        outerOffset, outerLen, outerLine, outerCol);
             
             if (this.validateProlog) {
                 this.validPrologDocTypeRead = true;
             }
+
+            return result;
             
         }
 
 
-        public void handleUnmatchedCloseElementStart(
+        public IAttoHandleResult handleUnmatchedCloseElementStart(
                 final char[] buffer, 
                 final int nameOffset, final int nameLen, 
                 final int line, final int col) 
@@ -957,7 +970,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
         }
 
 
-        public void handleUnmatchedCloseElementEnd(
+        public IAttoHandleResult handleUnmatchedCloseElementEnd(
                 final int line, final int col) 
                 throws AttoParseException {
             throw new UnsupportedOperationException(
@@ -966,7 +979,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
         }
 
 
-        public void handleAutoCloseElementStart(
+        public IAttoHandleResult handleAutoCloseElementStart(
                 final char[] buffer, 
                 final int nameOffset, final int nameLen, 
                 final int line, final int col) 
@@ -977,7 +990,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
         }
 
 
-        public void handleAutoCloseElementEnd(
+        public IAttoHandleResult handleAutoCloseElementEnd(
                 final int line, final int col)
                 throws AttoParseException {
             throw new UnsupportedOperationException(

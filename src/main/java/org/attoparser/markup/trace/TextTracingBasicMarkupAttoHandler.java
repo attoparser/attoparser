@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.Writer;
 
 import org.attoparser.AttoParseException;
+import org.attoparser.IAttoHandleResult;
 import org.attoparser.markup.AbstractBasicMarkupAttoHandler;
 
 
@@ -49,31 +50,33 @@ public final class TextTracingBasicMarkupAttoHandler extends AbstractBasicMarkup
     
     
     @Override
-    public void handleDocumentStart(final long startTimeNanos, final int line, final int col)
+    public IAttoHandleResult handleDocumentStart(final long startTimeNanos, final int line, final int col)
             throws AttoParseException {
         try {
             this.writer.write('[');
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
+        return null;
     }
 
     
     
     @Override
-    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
+    public IAttoHandleResult handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
             throws AttoParseException {
         try {
             this.writer.write(']');
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
+        return null;
     }
 
 
 
     @Override
-    public char[] handleStandaloneElement(
+    public IAttoHandleResult handleStandaloneElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
@@ -90,19 +93,19 @@ public final class TextTracingBasicMarkupAttoHandler extends AbstractBasicMarkup
             this.writer.write(')');
             writePosition(this.writer, line, col);
 
-            return null;
-
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
     
     
 
     
     @Override
-    public char[] handleOpenElement(
+    public IAttoHandleResult handleOpenElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
@@ -119,19 +122,19 @@ public final class TextTracingBasicMarkupAttoHandler extends AbstractBasicMarkup
             this.writer.write(')');
             writePosition(this.writer, line, col);
 
-            return null;
-
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
     
     
 
     
     @Override
-    public char[] handleCloseElement(
+    public IAttoHandleResult handleCloseElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
@@ -148,18 +151,18 @@ public final class TextTracingBasicMarkupAttoHandler extends AbstractBasicMarkup
             this.writer.write(')');
             writePosition(this.writer, line, col);
 
-            return null;
-
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
 
     
     
     @Override
-    public void handleText(final char[] buffer, final int offset, final int len, 
+    public IAttoHandleResult handleText(final char[] buffer, final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         
@@ -174,13 +177,15 @@ public final class TextTracingBasicMarkupAttoHandler extends AbstractBasicMarkup
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
 
 
     
     @Override
-    public void handleComment(
+    public IAttoHandleResult handleComment(
             final char[] buffer, 
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
@@ -198,12 +203,14 @@ public final class TextTracingBasicMarkupAttoHandler extends AbstractBasicMarkup
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
 
     
     @Override
-    public void handleCDATASection(
+    public IAttoHandleResult handleCDATASection(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
@@ -221,14 +228,16 @@ public final class TextTracingBasicMarkupAttoHandler extends AbstractBasicMarkup
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
 
     
     
     
     @Override
-    public void handleXmlDeclaration(
+    public IAttoHandleResult handleXmlDeclaration(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -259,7 +268,9 @@ public final class TextTracingBasicMarkupAttoHandler extends AbstractBasicMarkup
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
 
 
@@ -267,7 +278,7 @@ public final class TextTracingBasicMarkupAttoHandler extends AbstractBasicMarkup
 
 
     @Override
-    public void handleProcessingInstruction(
+    public IAttoHandleResult handleProcessingInstruction(
             final char[] buffer, 
             final int targetOffset, final int targetLen, 
             final int targetLine, final int targetCol,
@@ -291,7 +302,9 @@ public final class TextTracingBasicMarkupAttoHandler extends AbstractBasicMarkup
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
 
     
@@ -302,7 +315,7 @@ public final class TextTracingBasicMarkupAttoHandler extends AbstractBasicMarkup
 
 
     @Override
-    public void handleDocType(
+    public IAttoHandleResult handleDocType(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
@@ -321,7 +334,9 @@ public final class TextTracingBasicMarkupAttoHandler extends AbstractBasicMarkup
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
 
 

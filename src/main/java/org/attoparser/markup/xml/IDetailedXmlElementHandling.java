@@ -20,6 +20,7 @@
 package org.attoparser.markup.xml;
 
 import org.attoparser.AttoParseException;
+import org.attoparser.IAttoHandleResult;
 import org.attoparser.markup.IAttributeSequenceHandling;
 
 
@@ -57,9 +58,10 @@ public interface IDetailedXmlElementHandling extends IAttributeSequenceHandling 
      * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public void handleXmlStandaloneElementStart(
+    public IAttoHandleResult handleXmlStandaloneElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final int line, final int col)
@@ -72,9 +74,10 @@ public interface IDetailedXmlElementHandling extends IAttributeSequenceHandling 
      * 
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public void handleXmlStandaloneElementEnd(
+    public IAttoHandleResult handleXmlStandaloneElementEnd(
             final int line, final int col)
             throws AttoParseException;
 
@@ -102,9 +105,10 @@ public interface IDetailedXmlElementHandling extends IAttributeSequenceHandling 
      * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public void handleXmlOpenElementStart(
+    public IAttoHandleResult handleXmlOpenElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final int line, final int col)
@@ -117,9 +121,10 @@ public interface IDetailedXmlElementHandling extends IAttributeSequenceHandling 
      * 
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public void handleXmlOpenElementEnd(
+    public IAttoHandleResult handleXmlOpenElementEnd(
             final int line, final int col)
             throws AttoParseException;
 
@@ -148,9 +153,10 @@ public interface IDetailedXmlElementHandling extends IAttributeSequenceHandling 
      * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public void handleXmlCloseElementStart(
+    public IAttoHandleResult handleXmlCloseElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final int line, final int col)
@@ -163,9 +169,10 @@ public interface IDetailedXmlElementHandling extends IAttributeSequenceHandling 
      * 
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public void handleXmlCloseElementEnd(
+    public IAttoHandleResult handleXmlCloseElementEnd(
             final int line, final int col)
             throws AttoParseException;
 

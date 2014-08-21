@@ -20,6 +20,7 @@
 package org.attoparser.markup;
 
 import org.attoparser.AttoParseException;
+import org.attoparser.IAttoHandleResult;
 
 
 /**
@@ -77,9 +78,10 @@ public interface IProcessingInstructionHandling {
      * @param outerLen length of the <i>outer</i> partition.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public void handleProcessingInstruction(
+    public IAttoHandleResult handleProcessingInstruction(
             final char[] buffer, 
             final int targetOffset, final int targetLen,
             final int targetLine, final int targetCol,

@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.attoparser.AttoParseException;
+import org.attoparser.IAttoHandleResult;
 import org.attoparser.markup.html.AbstractDetailedNonValidatingHtmlAttoHandler;
 import org.attoparser.markup.html.HtmlParsingConfiguration;
 import org.attoparser.markup.html.elements.IHtmlElement;
@@ -96,28 +97,30 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
     
     
     @Override
-    public void handleDocumentStart(final long startTimeNanos, 
+    public IAttoHandleResult handleDocumentStart(final long startTimeNanos,
             final int line, final int col,
             final HtmlParsingConfiguration configuration)
             throws AttoParseException {
         this.trace.add(new TraceEvent(line, col, TRACE_TYPE_DOCUMENT_START));
+        return null;
     }
 
     
     
     @Override
-    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, 
+    public IAttoHandleResult handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos,
             final int line, final int col, 
             final HtmlParsingConfiguration configuration)
             throws AttoParseException {
         this.trace.add(new TraceEvent(line, col, TRACE_TYPE_DOCUMENT_END));
+        return null;
     }
     
     
 
     
     @Override
-    public void handleHtmlStandaloneElementStart(
+    public IAttoHandleResult handleHtmlStandaloneElementStart(
             final IHtmlElement element,
             final boolean minimized,
             final char[] buffer,
@@ -128,11 +131,12 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
                 new TraceEvent(
                         line, col, TRACE_TYPE_STANDALONE_ELEMENT_START, 
                         element.getName(), Boolean.toString(minimized), new String(buffer, offset, len)));
+        return null;
     }
 
     
     @Override
-    public void handleHtmlStandaloneElementEnd(
+    public IAttoHandleResult handleHtmlStandaloneElementEnd(
             final IHtmlElement element,
             final boolean minimized,
             final int line, final int col)
@@ -141,13 +145,14 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
                 new TraceEvent(
                         line, col, TRACE_TYPE_STANDALONE_ELEMENT_END, 
                         element.getName(), Boolean.toString(minimized)));
+        return null;
     }
 
     
     
     
     @Override
-    public void handleHtmlOpenElementStart(
+    public IAttoHandleResult handleHtmlOpenElementStart(
             final IHtmlElement element,
             final char[] buffer, 
             final int offset, final int len,
@@ -157,22 +162,24 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
                 new TraceEvent(
                         line, col, TRACE_TYPE_OPEN_ELEMENT_START, 
                         element.getName(), new String(buffer, offset, len)));
+        return null;
     }
 
     
     @Override
-    public void handleHtmlOpenElementEnd(
+    public IAttoHandleResult handleHtmlOpenElementEnd(
             final IHtmlElement element,
             final int line, final int col) 
             throws AttoParseException {
         this.trace.add(new TraceEvent(line, col, TRACE_TYPE_OPEN_ELEMENT_END, element.getName()));
+        return null;
     }
 
     
     
     
     @Override
-    public void handleHtmlCloseElementStart(
+    public IAttoHandleResult handleHtmlCloseElementStart(
             final IHtmlElement element,
             final char[] buffer, 
             final int offset, final int len,
@@ -182,22 +189,24 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
                 new TraceEvent(
                         line, col, TRACE_TYPE_CLOSE_ELEMENT_START,
                         element.getName(), new String(buffer, offset, len)));
+        return null;
     }
 
     
     @Override
-    public void handleHtmlCloseElementEnd(
+    public IAttoHandleResult handleHtmlCloseElementEnd(
             final IHtmlElement element,
             final int line, final int col) 
             throws AttoParseException {
         this.trace.add(new TraceEvent(line, col, TRACE_TYPE_CLOSE_ELEMENT_END, element.getName()));
+        return null;
     }
 
 
 
 
     @Override
-    public void handleHtmlAttribute(
+    public IAttoHandleResult handleHtmlAttribute(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol,
@@ -214,16 +223,18 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
                         new String(buffer, nameOffset, nameLen),
                         new String(buffer, operatorOffset, operatorLen),
                         new String(buffer, valueOuterOffset, valueOuterLen)));
+        return null;
     }
 
 
     @Override
-    public void handleHtmlInnerWhiteSpace(
+    public IAttoHandleResult handleHtmlInnerWhiteSpace(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
         this.trace.add(new TraceEvent(line, col, TRACE_TYPE_INNERWHITESPACE, new String(buffer, offset, len)));
+        return null;
     }
 
 
@@ -232,16 +243,17 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
     
     
     @Override
-    public void handleText(final char[] buffer, final int offset, final int len, 
+    public IAttoHandleResult handleText(final char[] buffer, final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         this.trace.add(new TraceEvent(line, col, TRACE_TYPE_TEXT, new String(buffer, offset, len)));
+        return null;
     }
 
 
     
     @Override
-    public void handleComment(
+    public IAttoHandleResult handleComment(
             final char[] buffer, 
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
@@ -249,11 +261,12 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
             throws AttoParseException {
         this.trace.add(
                 new TraceEvent(line, col, TRACE_TYPE_COMMENT, new String(buffer, contentOffset, contentLen)));
+        return null;
     }
 
     
     @Override
-    public void handleCDATASection(
+    public IAttoHandleResult handleCDATASection(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
@@ -261,13 +274,14 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
             throws AttoParseException {
         this.trace.add(
                 new TraceEvent(line, col, TRACE_TYPE_CDATA, new String(buffer, contentOffset, contentLen)));
+        return null;
     }
 
     
     
     
     @Override
-    public void handleXmlDeclarationDetail(
+    public IAttoHandleResult handleXmlDeclarationDetail(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -288,6 +302,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
                         new String(buffer, versionOffset, versionLen),
                         new String(buffer, encodingOffset, encodingLen),
                         new String(buffer, standaloneOffset, standaloneLen)));
+        return null;
     }
 
     
@@ -295,7 +310,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
 
 
     @Override
-    public void handleDocType(
+    public IAttoHandleResult handleDocType(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -322,6 +337,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
                         new String(buffer, publicIdOffset, publicIdLen),
                         new String(buffer, systemIdOffset, systemIdLen),
                         new String(buffer, internalSubsetOffset, internalSubsetLen)));
+        return null;
     }
 
 
@@ -329,7 +345,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
 
 
     @Override
-    public void handleProcessingInstruction(
+    public IAttoHandleResult handleProcessingInstruction(
             final char[] buffer, 
             final int targetOffset, final int targetLen, 
             final int targetLine, final int targetCol,
@@ -344,11 +360,9 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
                         TRACE_TYPE_PROCESSINGINSTRUCTION, 
                         new String(buffer, targetOffset, targetLen),
                         new String(buffer, contentOffset, contentLen)));
+        return null;
     }
 
-    
-    
-    
 
     
     

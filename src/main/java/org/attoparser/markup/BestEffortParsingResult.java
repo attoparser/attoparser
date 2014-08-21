@@ -19,32 +19,40 @@
  */
 package org.attoparser.markup;
 
+import org.attoparser.IAttoHandleResult;
+
+
 /**
  * <p>
- *   Handler feature interface to be implemented by {@link org.attoparser.IAttoHandler} implementations
- *   that are configured by means of a {@link org.attoparser.markup.MarkupParsingConfiguration} instance.
+ *   Inner class used for returning results in inner try* methods in Util parsing classes.
  * </p>
  * 
  * @author Daniel Fern&aacute;ndez
  * 
- * @since 1.4.0
+ * @since 1.5.0
  *
  */
-public interface IConfigurableMarkupHandling extends IAttributeSequenceHandling {
+final class BestEffortParsingResult {
+
+    static final BestEffortParsingResult PARSED_NO_RESULT = new BestEffortParsingResult(null);
+
+    private final IAttoHandleResult handleResult;
 
 
-
-    /**
-     * <p>
-     *   Returns the configured {@link org.attoparser.markup.MarkupParsingConfiguration}
-     *   instance.
-     * </p>
-     *
-     * @return the configuration object.
-     */
-    public MarkupParsingConfiguration getMarkupParsingConfiguration();
+    static BestEffortParsingResult forHandleResult(final IAttoHandleResult handleResult) {
+        if (handleResult == null) {
+            return PARSED_NO_RESULT;
+        }
+        return new BestEffortParsingResult(handleResult);
+    }
 
 
-    
-    
+    private BestEffortParsingResult(final IAttoHandleResult handleResult) {
+        super();
+        this.handleResult = handleResult;
+    }
+
+    public IAttoHandleResult getHandleResult() {
+        return this.handleResult;
+    }
 }

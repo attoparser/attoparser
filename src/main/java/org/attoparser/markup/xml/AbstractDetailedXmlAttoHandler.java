@@ -20,6 +20,7 @@
 package org.attoparser.markup.xml;
 
 import org.attoparser.AttoParseException;
+import org.attoparser.IAttoHandleResult;
 import org.attoparser.markup.AbstractDetailedMarkupAttoHandler;
 import org.attoparser.markup.MarkupParsingConfiguration;
 
@@ -50,93 +51,84 @@ public abstract class AbstractDetailedXmlAttoHandler
 
     
     @Override
-    public final void handleDocumentStart(final long startTimeNanos, 
+    public final IAttoHandleResult handleDocumentStart(final long startTimeNanos,
             final int line, final int col, final MarkupParsingConfiguration documentRestrictions)
             throws AttoParseException {
-        super.handleDocumentStart(startTimeNanos, line, col, documentRestrictions);
-        handleXmlDocumentStart(startTimeNanos, line, col);
+        return handleXmlDocumentStart(startTimeNanos, line, col);
     }
 
 
     @Override
-    public final void handleDocumentEnd(
+    public final IAttoHandleResult handleDocumentEnd(
             final long endTimeNanos, final long totalTimeNanos,
             final int line, final int col, final MarkupParsingConfiguration documentRestrictions)
             throws AttoParseException {
-        super.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col, documentRestrictions);
-        handleXmlDocumentEnd(endTimeNanos, totalTimeNanos, line, col);
+        return handleXmlDocumentEnd(endTimeNanos, totalTimeNanos, line, col);
     }
 
 
 
 
     @Override
-    public final void handleStandaloneElementStart(
+    public final IAttoHandleResult handleStandaloneElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen, 
             final int line, final int col)
             throws AttoParseException {
-        super.handleStandaloneElementStart(buffer, nameOffset, nameLen, line, col);
-        handleXmlStandaloneElementStart(buffer, nameOffset, nameLen, line, col);
+        return handleXmlStandaloneElementStart(buffer, nameOffset, nameLen, line, col);
     }
 
 
     @Override
-    public final void handleStandaloneElementEnd(
+    public final IAttoHandleResult handleStandaloneElementEnd(
             final int line, final int col)
             throws AttoParseException {
-        super.handleStandaloneElementEnd(line, col);
-        handleXmlStandaloneElementEnd(line, col);
+        return handleXmlStandaloneElementEnd(line, col);
     }
 
 
     @Override
-    public final void handleOpenElementStart(
+    public final IAttoHandleResult handleOpenElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
-        super.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
-        handleXmlOpenElementStart(buffer, nameOffset, nameLen, line, col);
+        return handleXmlOpenElementStart(buffer, nameOffset, nameLen, line, col);
     }
 
 
     @Override
-    public final void handleOpenElementEnd(
+    public final IAttoHandleResult handleOpenElementEnd(
             final int line, final int col)
             throws AttoParseException {
-        super.handleOpenElementEnd(line, col);
-        handleXmlOpenElementEnd(line, col);
+        return handleXmlOpenElementEnd(line, col);
     }
 
 
     @Override
-    public final void handleCloseElementStart(
+    public final IAttoHandleResult handleCloseElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
-        super.handleCloseElementStart(buffer, nameOffset, nameLen, line, col);
-        handleXmlCloseElementStart(buffer, nameOffset, nameLen, line, col);
+        return handleXmlCloseElementStart(buffer, nameOffset, nameLen, line, col);
     }
 
 
     @Override
-    public final void handleCloseElementEnd(
+    public final IAttoHandleResult handleCloseElementEnd(
             final int line, final int col)
             throws AttoParseException {
-        super.handleCloseElementEnd(line, col);
-        handleXmlCloseElementEnd(line, col);
+        return handleXmlCloseElementEnd(line, col);
     }
 
 
     @Override
-    public final void handleAutoCloseElementStart(
+    public final IAttoHandleResult handleAutoCloseElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
-        super.handleAutoCloseElementStart(buffer, nameOffset, nameLen, line, col);
         // Auto closing is disabled (markup has to be completely balanced).
         throw new AttoParseException(
                 "Malformed markup: Element \"" + new String(buffer, nameOffset, nameLen) + "\" " +
@@ -146,11 +138,11 @@ public abstract class AbstractDetailedXmlAttoHandler
 
     
     @Override
-    public final void handleAutoCloseElementEnd(
+    public final IAttoHandleResult handleAutoCloseElementEnd(
             final int line, final int col)
             throws AttoParseException {
-        super.handleAutoCloseElementEnd(line, col);
         // Auto closing is disabled (markup has to be completely balanced).
+        return null;
     }
 
 
@@ -165,67 +157,75 @@ public abstract class AbstractDetailedXmlAttoHandler
 
     
     @SuppressWarnings("unused")
-    public void handleXmlDocumentStart(final long startTimeNanos, 
+    public IAttoHandleResult handleXmlDocumentStart(final long startTimeNanos,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
 
     @SuppressWarnings("unused")
-    public void handleXmlDocumentEnd(
+    public IAttoHandleResult handleXmlDocumentEnd(
             final long endTimeNanos, final long totalTimeNanos,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
 
-    public void handleXmlStandaloneElementStart(
+    public IAttoHandleResult handleXmlStandaloneElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen, 
             final int line, final int col) 
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
 
-    public void handleXmlStandaloneElementEnd(
+    public IAttoHandleResult handleXmlStandaloneElementEnd(
             final int line, final int col) 
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
 
-    public void handleXmlOpenElementStart(
+    public IAttoHandleResult handleXmlOpenElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final int line, final int col) 
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
 
-    public void handleXmlOpenElementEnd(
+    public IAttoHandleResult handleXmlOpenElementEnd(
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
 
-    public void handleXmlCloseElementStart(
+    public IAttoHandleResult handleXmlCloseElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final int line, final int col) 
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
 
-    public void handleXmlCloseElementEnd(
+    public IAttoHandleResult handleXmlCloseElementEnd(
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
     
     

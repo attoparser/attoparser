@@ -20,6 +20,7 @@
 package org.attoparser.markup.html;
 
 import org.attoparser.AttoParseException;
+import org.attoparser.IAttoHandleResult;
 import org.attoparser.markup.html.elements.IHtmlElement;
 
 
@@ -64,9 +65,10 @@ public interface IDetailedHtmlElementHandling extends IHtmlAttributeSequenceHand
      * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public void handleHtmlStandaloneElementStart(
+    public IAttoHandleResult handleHtmlStandaloneElementStart(
             final IHtmlElement element,
             final boolean minimized,
             final char[] buffer, 
@@ -83,9 +85,10 @@ public interface IDetailedHtmlElementHandling extends IHtmlAttributeSequenceHand
      * @param minimized whether the tag representing this element is minimized (self-closed) or not.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public void handleHtmlStandaloneElementEnd(
+    public IAttoHandleResult handleHtmlStandaloneElementEnd(
             final IHtmlElement element,
             final boolean minimized,
             final int line, final int col)
@@ -114,9 +117,10 @@ public interface IDetailedHtmlElementHandling extends IHtmlAttributeSequenceHand
      * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public void handleHtmlOpenElementStart(
+    public IAttoHandleResult handleHtmlOpenElementStart(
             final IHtmlElement element,
             final char[] buffer, 
             final int nameOffset, final int nameLen,
@@ -131,9 +135,10 @@ public interface IDetailedHtmlElementHandling extends IHtmlAttributeSequenceHand
      * @param element the {@link IHtmlElement} element object representing the corresponding HTML element.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public void handleHtmlOpenElementEnd(
+    public IAttoHandleResult handleHtmlOpenElementEnd(
             final IHtmlElement element,
             final int line, final int col)
             throws AttoParseException;
@@ -163,9 +168,10 @@ public interface IDetailedHtmlElementHandling extends IHtmlAttributeSequenceHand
      * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public void handleHtmlCloseElementStart(
+    public IAttoHandleResult handleHtmlCloseElementStart(
             final IHtmlElement element,
             final char[] buffer, 
             final int nameOffset, final int nameLen,
@@ -180,9 +186,10 @@ public interface IDetailedHtmlElementHandling extends IHtmlAttributeSequenceHand
      * @param element the {@link IHtmlElement} element object representing the corresponding HTML element.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public void handleHtmlCloseElementEnd(
+    public IAttoHandleResult handleHtmlCloseElementEnd(
             final IHtmlElement element,
             final int line, final int col)
             throws AttoParseException;

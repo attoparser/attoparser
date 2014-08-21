@@ -21,9 +21,7 @@ package org.attoparser.markup;
 
 import org.attoparser.AbstractAttoHandler;
 import org.attoparser.AttoParseException;
-
-
-
+import org.attoparser.IAttoHandleResult;
 
 
 /**
@@ -69,53 +67,68 @@ public abstract class AbstractBasicMarkupAttoHandler
 
 
     @Override
-    public final char[] handleStructure(
+    public final IAttoHandleResult handleStructure(
             final char[] buffer,
             final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
-        
-        super.handleStructure(buffer, offset, len, line, col);
 
-        final char[] tryParseElementResult =
+        final BestEffortParsingResult elementBestEffortParsingResult =
                 ElementMarkupParsingUtil.tryParseElement(buffer, offset, len, line, col, this);
-        if (tryParseElementResult != ElementMarkupParsingUtil.TRY_PARSE_ELEMENT_FALSE) {
-            return tryParseElementResult;
+        if (elementBestEffortParsingResult != null) {
+            return elementBestEffortParsingResult.getHandleResult();
         }
 
-        if (!CommentMarkupParsingUtil.tryParseComment(buffer, offset, len, line, col, this)) {
-             if (!CdataMarkupParsingUtil.tryParseCdata(buffer, offset, len, line, col, this )) {
-                 if (!DocTypeMarkupParsingUtil.tryParseDocType(buffer, offset, len, line, col, this)) {
-                     if (!XmlDeclarationMarkupParsingUtil.tryParseXmlDeclaration(buffer, offset, len, line, col, this)) {
-                         if (!ProcessingInstructionMarkupParsingUtil.tryParseProcessingInstruction(buffer, offset, len, line, col, this)) {
-                             throw new AttoParseException(
-                                     "Could not parse as markup structure: " +
-                                     "\"" + new String(buffer, offset, len) + "\"",
-                                     line, col);
-                         }
-                     }
-                 }
-             }
+        final BestEffortParsingResult commentBestEffortParsingResult =
+                CommentMarkupParsingUtil.tryParseComment(buffer, offset, len, line, col, this);
+        if (commentBestEffortParsingResult != null) {
+            return commentBestEffortParsingResult.getHandleResult();
         }
 
-        return null;
+        final BestEffortParsingResult cdataBestEffortParsingResult =
+                CdataMarkupParsingUtil.tryParseCdata(buffer, offset, len, line, col, this);
+        if (cdataBestEffortParsingResult != null) {
+            return cdataBestEffortParsingResult.getHandleResult();
+        }
+
+        final BestEffortParsingResult docTypeBestEffortParsingResult =
+                DocTypeMarkupParsingUtil.tryParseDocType(buffer, offset, len, line, col, this);
+        if (docTypeBestEffortParsingResult != null) {
+            return docTypeBestEffortParsingResult.getHandleResult();
+        }
+
+        final BestEffortParsingResult xmlDeclarationBestEffortParsingResult =
+                XmlDeclarationMarkupParsingUtil.tryParseXmlDeclaration(buffer, offset, len, line, col, this);
+        if (xmlDeclarationBestEffortParsingResult != null) {
+            return xmlDeclarationBestEffortParsingResult.getHandleResult();
+        }
+
+        final BestEffortParsingResult processingInstructionBestEffortParsingResult =
+                ProcessingInstructionMarkupParsingUtil.tryParseProcessingInstruction(buffer, offset, len, line, col, this);
+        if (processingInstructionBestEffortParsingResult != null) {
+            return processingInstructionBestEffortParsingResult.getHandleResult();
+        }
+
+        throw new AttoParseException(
+                "Could not parse as markup structure: \"" + new String(buffer, offset, len) + "\"", line, col);
 
     }
 
 
 
-    public void handleDocType(
+    public IAttoHandleResult handleDocType(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
     
     
 
-    public char[] handleStandaloneElement(
+    public IAttoHandleResult handleStandaloneElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
@@ -126,7 +139,7 @@ public abstract class AbstractBasicMarkupAttoHandler
     }
 
 
-    public char[] handleOpenElement(
+    public IAttoHandleResult handleOpenElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
@@ -137,7 +150,7 @@ public abstract class AbstractBasicMarkupAttoHandler
     }
 
     
-    public char[] handleCloseElement(
+    public IAttoHandleResult handleCloseElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
@@ -148,27 +161,29 @@ public abstract class AbstractBasicMarkupAttoHandler
     }
 
     
-    public void handleComment(
+    public IAttoHandleResult handleComment(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
     
-    public void handleCDATASection(
+    public IAttoHandleResult handleCDATASection(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
 
-    public void handleXmlDeclaration(
+    public IAttoHandleResult handleXmlDeclaration(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -182,10 +197,11 @@ public abstract class AbstractBasicMarkupAttoHandler
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
 
-    public void handleProcessingInstruction(
+    public IAttoHandleResult handleProcessingInstruction(
             final char[] buffer, 
             final int targetOffset, final int targetLen, 
             final int targetLine, final int targetCol,
@@ -195,6 +211,7 @@ public abstract class AbstractBasicMarkupAttoHandler
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
 

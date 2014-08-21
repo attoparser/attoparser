@@ -124,9 +124,10 @@ public interface IAttoHandler {
      * 
      * @param line the line of the document where parsing starts (usually number 1)
      * @param col the column of the document where parsing starts (usually number 1)
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public void handleDocumentStart(final int line, final int col)
+    public IAttoHandleResult handleDocumentStart(final int line, final int col)
             throws AttoParseException;
     
     
@@ -137,9 +138,10 @@ public interface IAttoHandler {
      * 
      * @param line the line of the document where parsing ends (usually the last one)
      * @param col the column of the document where the parsing ends (usually the last one)
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public void handleDocumentEnd(final int line, final int col)
+    public IAttoHandleResult handleDocumentEnd(final int line, final int col)
             throws AttoParseException;
 
     
@@ -170,9 +172,10 @@ public interface IAttoHandler {
      * @param len the length (in chars) of the text artifact, starting in offset.
      * @param line the line in the original document where this text artifact starts.
      * @param col the column in the original document where this text artifact starts.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public void handleText(final char[] buffer, final int offset, final int len, 
+    public IAttoHandleResult handleText(final char[] buffer, final int offset, final int len,
             final int line, final int col)
             throws AttoParseException;
 
@@ -195,16 +198,10 @@ public interface IAttoHandler {
      *   {@link org.attoparser.markup.AbstractDetailedMarkupAttoHandler}).
      * </p>
      * <p>
-     *   Structure artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
+     *   Structure artifacts are reported using the document <tt>buffer</tt> directly, and this buffer
      *   should not be considered to be immutable, so reported structures should be copied if they need
      *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
      *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification). 
-     * </p>
-     * <p>
-     *   This method will return a <kbd>char[]</kbd> if, as a result of handling this structure, parsing
-     *   should be disabled until the returned char sequence is found in input. This allows
-     *   e.g. ignoring the contents of non-processable elements like HTML's <kbd>&lt;script&gt;</kbd>
-     *   or <kbd>&lt;style&gt;</kbd>.
      * </p>
      * <p>
      *   <b>Implementations of this handler should never modify the document buffer.</b> 
@@ -215,12 +212,10 @@ public interface IAttoHandler {
      * @param len the length (in chars) of the structure artifact, starting in offset.
      * @param line the line in the original document where this structure artifact starts.
      * @param col the column in the original document where this structure artifact starts.
-     * @return will return a char[] if, as a result of handling this structure, parsing should
-     *         be disabled until the returned char sequence is found in input. Will return
-     *         <kbd>null</kbd> if parsing should not be disabled (most common case).
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public char[] handleStructure(final char[] buffer, final int offset, final int len,
+    public IAttoHandleResult handleStructure(final char[] buffer, final int offset, final int len,
             final int line, final int col)
             throws AttoParseException;
     

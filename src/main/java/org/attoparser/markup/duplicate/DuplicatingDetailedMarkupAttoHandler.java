@@ -22,6 +22,7 @@ package org.attoparser.markup.duplicate;
 import java.io.Writer;
 
 import org.attoparser.AttoParseException;
+import org.attoparser.IAttoHandleResult;
 import org.attoparser.markup.AbstractDetailedMarkupAttoHandler;
 import org.attoparser.markup.MarkupParsingConfiguration;
 
@@ -55,21 +56,23 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
     
     
     @Override
-    public void handleDocumentStart(final long startTimeNanos, 
+    public IAttoHandleResult handleDocumentStart(final long startTimeNanos,
             final int line, final int col,
             final MarkupParsingConfiguration markupParsingConfiguration)
             throws AttoParseException {
         // Nothing to be done here
+        return null;
     }
 
     
     
     @Override
-    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, 
+    public IAttoHandleResult handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos,
             final int line, final int col,
             final MarkupParsingConfiguration markupParsingConfiguration)
             throws AttoParseException {
         // Nothing to be done here
+        return null;
     }
 
 
@@ -78,23 +81,22 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public void handleText(final char[] buffer, final int offset, final int len, final int line, final int col)
+    public IAttoHandleResult handleText(final char[] buffer, final int offset, final int len, final int line, final int col)
             throws AttoParseException {
         
         try {
-            
             this.writer.write(buffer, offset, len);
-            
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+        return null;
+
     }
     
 
     
     @Override
-    public void handleComment(
+    public IAttoHandleResult handleComment(
             final char[] buffer, 
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
@@ -102,18 +104,17 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
             throws AttoParseException {
         
         try {
-            
             this.writer.write(buffer, outerOffset, outerLen);
-            
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+        return null;
+
     }
 
     
     @Override
-    public void handleCDATASection(
+    public IAttoHandleResult handleCDATASection(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
@@ -121,204 +122,197 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
             throws AttoParseException {
         
         try {
-            
             this.writer.write(buffer, outerOffset, outerLen);
-            
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+        return null;
+
     }
 
 
 
 
     @Override
-    public void handleStandaloneElementStart(
+    public IAttoHandleResult handleStandaloneElementStart(
             final char[] buffer, final int offset, final int len,
             final int line, final int col) throws AttoParseException {
         
         try {
-            
             this.writer.write('<');
             this.writer.write(buffer, offset, len);
-            
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+        return null;
+
     }
 
 
 
 
     @Override
-    public void handleStandaloneElementEnd(
+    public IAttoHandleResult handleStandaloneElementEnd(
             final int line, final int col) throws AttoParseException {
         
         try {
-            
             this.writer.write("/>");
-            
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+        return null;
+
     }
 
 
 
 
     @Override
-    public void handleOpenElementStart(final char[] buffer, final int offset, final int len, final int line,
+    public IAttoHandleResult handleOpenElementStart(final char[] buffer, final int offset, final int len, final int line,
             final int col) throws AttoParseException {
         
         try {
-            
             this.writer.write('<');
             this.writer.write(buffer, offset, len);
-            
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+        return null;
+
     }
 
 
 
 
     @Override
-    public void handleOpenElementEnd(
+    public IAttoHandleResult handleOpenElementEnd(
             final int line, final int col) throws AttoParseException {
         
         try {
-            
             this.writer.write('>');
-            
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+        return null;
+
     }
 
 
 
 
     @Override
-    public void handleCloseElementStart(final char[] buffer, final int offset, final int len, final int line,
+    public IAttoHandleResult handleCloseElementStart(final char[] buffer, final int offset, final int len, final int line,
             final int col) throws AttoParseException {
         
         try {
-            
             this.writer.write("</");
             this.writer.write(buffer, offset, len);
-            
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+        return null;
+
     }
 
 
 
 
     @Override
-    public void handleCloseElementEnd(
+    public IAttoHandleResult handleCloseElementEnd(
             final int line, final int col) throws AttoParseException {
         
         try {
-            
             this.writer.write('>');
-            
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+        return null;
+
     }
 
 
 
 
     @Override
-    public void handleAutoCloseElementStart(final char[] buffer, final int offset, final int len, final int line,
+    public IAttoHandleResult handleAutoCloseElementStart(final char[] buffer, final int offset, final int len, final int line,
             final int col) throws AttoParseException {
         // Nothing to be done... balanced elements were not present at the original template!
+        return null;
     }
 
 
 
 
     @Override
-    public void handleAutoCloseElementEnd(final int line, final int col) throws AttoParseException {
+    public IAttoHandleResult handleAutoCloseElementEnd(final int line, final int col) throws AttoParseException {
         // Nothing to be done... balanced elements were not present at the original template!
+        return null;
     }
 
 
 
 
     @Override
-    public void handleUnmatchedCloseElementStart(final char[] buffer, final int offset, final int len, 
+    public IAttoHandleResult handleUnmatchedCloseElementStart(final char[] buffer, final int offset, final int len,
             final int line, final int col) throws AttoParseException {
         // They were present at the original template, so simply output them.
-        handleCloseElementStart(buffer, offset, len, line, col);
+        return handleCloseElementStart(buffer, offset, len, line, col);
     }
 
 
 
 
     @Override
-    public void handleUnmatchedCloseElementEnd(final int line, final int col) throws AttoParseException {
+    public IAttoHandleResult handleUnmatchedCloseElementEnd(final int line, final int col) throws AttoParseException {
         // They were present at the original template, so simply output them.
-        handleCloseElementEnd(line, col);
+        return handleCloseElementEnd(line, col);
     }
 
 
 
 
     @Override
-    public void handleAttribute(final char[] buffer, final int nameOffset, final int nameLen,
+    public IAttoHandleResult handleAttribute(final char[] buffer, final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol, final int operatorOffset, final int operatorLen,
             final int operatorLine, final int operatorCol, final int valueContentOffset,
             final int valueContentLen, final int valueOuterOffset, final int valueOuterLen,
             final int valueLine, final int valueCol) throws AttoParseException {
         
         try {
-            
             this.writer.write(buffer, nameOffset, nameLen);
             this.writer.write(buffer, operatorOffset, operatorLen);
             this.writer.write(buffer, valueOuterOffset, valueOuterLen);
-            
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+        return null;
+
     }
 
 
 
 
     @Override
-    public void handleInnerWhiteSpace(
+    public IAttoHandleResult handleInnerWhiteSpace(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
         
         try {
-            
             this.writer.write(buffer, offset, len);
-            
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+        return null;
+
     }
 
 
 
 
     @Override
-    public void handleDocType(
+    public IAttoHandleResult handleDocType(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol, 
@@ -336,20 +330,19 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
             final int outerLine, final int outerCol) throws AttoParseException {
         
         try {
-            
             this.writer.write(buffer, outerOffset, outerLen);
-            
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+        return null;
+
     }
 
     
     
     
     @Override
-    public void handleXmlDeclarationDetail(
+    public IAttoHandleResult handleXmlDeclarationDetail(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -421,7 +414,9 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
 
 
@@ -430,7 +425,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public void handleProcessingInstruction(
+    public IAttoHandleResult handleProcessingInstruction(
             final char[] buffer, 
             final int targetOffset, final int targetLen, 
             final int targetLine, final int targetCol,
@@ -457,7 +452,9 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
 
 

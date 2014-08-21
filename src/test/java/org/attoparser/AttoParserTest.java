@@ -24,7 +24,6 @@ import java.io.StringWriter;
 
 import junit.framework.ComparisonFailure;
 import junit.framework.TestCase;
-
 import org.attoparser.markup.MarkupAttoParser;
 import org.attoparser.markup.MarkupParsingConfiguration;
 import org.attoparser.markup.MarkupParsingConfiguration.ElementBalancing;
@@ -33,6 +32,8 @@ import org.attoparser.markup.MarkupParsingConfiguration.UniqueRootElementPresenc
 import org.attoparser.markup.duplicate.DuplicatingBasicMarkupAttoHandler;
 import org.attoparser.markup.duplicate.DuplicatingDetailedMarkupAttoHandler;
 import org.attoparser.markup.html.HtmlParsing;
+import org.attoparser.markup.html.HtmlParsingConfiguration;
+import org.attoparser.markup.html.trace.TextTracingDetailedHtmlAttoHandler;
 import org.attoparser.markup.trace.TextTracingBasicMarkupAttoHandler;
 import org.attoparser.markup.trace.TextTracingDetailedMarkupAttoHandler;
 import org.attoparser.markup.trace.TextTracingStandardMarkupAttoHandler;
@@ -140,26 +141,22 @@ public class AttoParserTest extends TestCase {
             "[OES(style){1,1}OEE{1,7}T( a = \"){1,8}OES(div){1,14}OEE{1,18}T(\" if (a < 0)){1,19}CES(style){1,31}CEE{1,38}]",
             "[OE(style){1,1}T( a = \"){1,8}OE(div){1,14}T(\" if (a < 0)){1,19}CE(style){1,31}]",
             noRestrictions);
-        testDoc(
+        testHtmlDoc(
             "<script> var a = \"<div>\" if (a < 0)</script>",
             "[OES(script){1,1}OEE{1,8}T( var a = \"<div>\" if (a < 0)){1,9}CES(script){1,36}CEE{1,44}]",
-            "[OE(script){1,1}T( var a = \"<div>\" if (a < 0)){1,9}CE(script){1,36}]",
-            HtmlParsing.markupParsingConfiguration(HtmlParsing.htmlParsingConfiguration()));
-        testDoc(
+            HtmlParsing.htmlParsingConfiguration());
+        testHtmlDoc(
             "<style> a = \"<div>\" if (a < 0)</style>",
             "[OES(style){1,1}OEE{1,7}T( a = \"<div>\" if (a < 0)){1,8}CES(style){1,31}CEE{1,38}]",
-            "[OE(style){1,1}T( a = \"<div>\" if (a < 0)){1,8}CE(style){1,31}]",
-            HtmlParsing.markupParsingConfiguration(HtmlParsing.htmlParsingConfiguration()));
-        testDoc(
+            HtmlParsing.htmlParsingConfiguration());
+        testHtmlDoc(
             "<script> var a = \"<div>\"\n\nif (a < 0)</script>",
             "[OES(script){1,1}OEE{1,8}T( var a = \"<div>\"\n\nif (a < 0)){1,9}CES(script){3,11}CEE{3,19}]",
-            "[OE(script){1,1}T( var a = \"<div>\"\n\nif (a < 0)){1,9}CE(script){3,11}]",
-            HtmlParsing.markupParsingConfiguration(HtmlParsing.htmlParsingConfiguration()));
-        testDoc(
+            HtmlParsing.htmlParsingConfiguration());
+        testHtmlDoc(
             "<style> a = \"<div>\"\n\nif (a < 0)</style>",
             "[OES(style){1,1}OEE{1,7}T( a = \"<div>\"\n\nif (a < 0)){1,8}CES(style){3,11}CEE{3,18}]",
-            "[OE(style){1,1}T( a = \"<div>\"\n\nif (a < 0)){1,8}CE(style){3,11}]",
-            HtmlParsing.markupParsingConfiguration(HtmlParsing.htmlParsingConfiguration()));
+            HtmlParsing.htmlParsingConfiguration());
         testDoc(
             "<SCRIPT> var a = \"<div>\" if (a < 0)</SCRIPT>",
             "[OES(SCRIPT){1,1}OEE{1,8}T( var a = \"){1,9}OES(div){1,19}OEE{1,23}T(\" if (a < 0)){1,24}CES(SCRIPT){1,36}CEE{1,44}]",
@@ -170,26 +167,22 @@ public class AttoParserTest extends TestCase {
             "[OES(STYLE){1,1}OEE{1,7}T( a = \"){1,8}OES(div){1,14}OEE{1,18}T(\" if (a < 0)){1,19}CES(STYLE){1,31}CEE{1,38}]",
             "[OE(STYLE){1,1}T( a = \"){1,8}OE(div){1,14}T(\" if (a < 0)){1,19}CE(STYLE){1,31}]",
             noRestrictions);
-        testDoc(
+        testHtmlDoc(
             "<SCRIPT> var a = \"<div>\" if (a < 0)</SCRIPT>",
             "[OES(SCRIPT){1,1}OEE{1,8}T( var a = \"<div>\" if (a < 0)){1,9}CES(SCRIPT){1,36}CEE{1,44}]",
-            "[OE(SCRIPT){1,1}T( var a = \"<div>\" if (a < 0)){1,9}CE(SCRIPT){1,36}]",
-            HtmlParsing.markupParsingConfiguration(HtmlParsing.htmlParsingConfiguration()));
-        testDoc(
+            HtmlParsing.htmlParsingConfiguration());
+        testHtmlDoc(
             "<STYLE> a = \"<div>\" if (a < 0)</STYLE>",
             "[OES(STYLE){1,1}OEE{1,7}T( a = \"<div>\" if (a < 0)){1,8}CES(STYLE){1,31}CEE{1,38}]",
-            "[OE(STYLE){1,1}T( a = \"<div>\" if (a < 0)){1,8}CE(STYLE){1,31}]",
-            HtmlParsing.markupParsingConfiguration(HtmlParsing.htmlParsingConfiguration()));
-        testDoc(
+            HtmlParsing.htmlParsingConfiguration());
+        testHtmlDoc(
             "<SCRIPT> var a = \"<div>\"\n\nif (a < 0)</SCRIPT>",
             "[OES(SCRIPT){1,1}OEE{1,8}T( var a = \"<div>\"\n\nif (a < 0)){1,9}CES(SCRIPT){3,11}CEE{3,19}]",
-            "[OE(SCRIPT){1,1}T( var a = \"<div>\"\n\nif (a < 0)){1,9}CE(SCRIPT){3,11}]",
-            HtmlParsing.markupParsingConfiguration(HtmlParsing.htmlParsingConfiguration()));
-        testDoc(
+            HtmlParsing.htmlParsingConfiguration());
+        testHtmlDoc(
             "<STYLE> a = \"<div>\"\n\nif (a < 0)</STYLE>",
             "[OES(STYLE){1,1}OEE{1,7}T( a = \"<div>\"\n\nif (a < 0)){1,8}CES(STYLE){3,11}CEE{3,18}]",
-            "[OE(STYLE){1,1}T( a = \"<div>\"\n\nif (a < 0)){1,8}CE(STYLE){3,11}]",
-            HtmlParsing.markupParsingConfiguration(HtmlParsing.htmlParsingConfiguration()));
+            HtmlParsing.htmlParsingConfiguration());
         testDoc(
             "<h1 a=\"if (a < 0)\">Hello</ h1>",
             "[OES(h1){1,1}IWS( ){1,4}A(a){1,5}(=){1,6}(\"if (a < 0)\"){1,7}OEE{1,19}T(Hello</ h1>){1,20}ACES(h1){1,31}ACEE{1,31}]",
@@ -1480,7 +1473,80 @@ public class AttoParserTest extends TestCase {
         }
         
     }
-    
-    
+
+
+
+
+
+
+
+    static void testHtmlDoc(final String input, final String outputBreakDown, final HtmlParsingConfiguration parsingConfiguration) throws AttoParseException {
+        testHtmlDoc(input.toCharArray(), outputBreakDown, 0, input.length(), parsingConfiguration);
+    }
+
+    static void testHtmlDoc(String input, final String outputBreakDown, final int offset, final int len, final HtmlParsingConfiguration parsingConfiguration) throws AttoParseException {
+        testHtmlDoc(input.toCharArray(), outputBreakDown, offset, len, parsingConfiguration);
+    }
+
+    static void testHtmlDoc(final String input, final String outputBreakDown, final int bufferSize, final HtmlParsingConfiguration parsingConfiguration) throws AttoParseException {
+        testHtmlDoc(input.toCharArray(), outputBreakDown, 0, input.length(), bufferSize, parsingConfiguration);
+    }
+
+    static void testHtmlDoc(String input, final String outputBreakDown, final int offset, final int len, final int bufferSize, final HtmlParsingConfiguration parsingConfiguration) throws AttoParseException {
+        testHtmlDoc(input.toCharArray(), outputBreakDown, offset, len, bufferSize, parsingConfiguration);
+    }
+
+
+
+
+    static void testHtmlDoc(final char[] input, final String outputBreakDown,
+                        final int offset, final int len, final HtmlParsingConfiguration parsingConfiguration) throws AttoParseException {
+
+        final int maxBufferSize = 16384;
+        for (int bufferSize = 1; bufferSize <= maxBufferSize; bufferSize++) {
+            testHtmlDoc(input, outputBreakDown, offset, len, bufferSize, parsingConfiguration);
+        }
+
+    }
+
+
+    static void testHtmlDoc(
+            final char[] input,
+            final String outputBreakDown,
+            final int offset, final int len, final int bufferSize,
+            final HtmlParsingConfiguration parsingConfiguration)
+            throws AttoParseException {
+
+        try {
+
+            final IAttoParser parser = new MarkupAttoParser();
+
+            // TEST WITH TRACING HTML DETAILED HANDLER
+            {
+                final StringWriter sw = new StringWriter();
+                final IAttoHandler handler = new TextTracingDetailedHtmlAttoHandler(sw, parsingConfiguration);
+                if (offset == 0 && len == input.length) {
+                    ((AbstractBufferedAttoParser)parser).parseDocument(new CharArrayReader(input), handler, bufferSize);
+                } else {
+                    ((AbstractBufferedAttoParser)parser).parseDocument(new CharArrayReader(input, offset, len), handler, bufferSize);
+                }
+                final String result = sw.toString();
+                if (outputBreakDown != null) {
+                    assertEquals(outputBreakDown, result);
+                }
+            }
+
+
+            totalTestExecutions++;
+
+        } catch (final ComparisonFailure cf) {
+            System.err.println("Error parsing text \"" + new String(input, offset, len) + "\" with buffer size: " + bufferSize);
+            throw cf;
+        } catch (final Exception e) {
+            throw new AttoParseException("Error parsing text \"" + new String(input, offset, len) + "\" with buffer size: " + bufferSize, e);
+        }
+
+    }
+
     
 }

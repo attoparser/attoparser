@@ -23,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.attoparser.AttoParseException;
+import org.attoparser.IAttoHandleResult;
 import org.attoparser.markup.html.elements.IHtmlElement;
 
 
@@ -72,7 +73,7 @@ public abstract class AbstractStandardNonValidatingHtmlAttoHandler
     
     
     @Override
-    public final void handleHtmlStandaloneElementStart(
+    public final IAttoHandleResult handleHtmlStandaloneElementStart(
             final IHtmlElement element,
             final boolean minimized, 
             final char[] buffer, 
@@ -80,59 +81,61 @@ public abstract class AbstractStandardNonValidatingHtmlAttoHandler
             final int line, final int col) 
             throws AttoParseException {
 
-        super.handleHtmlStandaloneElementStart(element, minimized, buffer, nameOffset, nameLen, line, col);
-        
         this.currentElementName = getInternedElementName(element, buffer, nameOffset, nameLen);
         this.currentElementAttributes = null;
         this.currentElementLine = line;
         this.currentElementCol = col;
+
+        return null;
         
     }
 
 
     @Override
-    public final void handleHtmlStandaloneElementEnd(
+    public final IAttoHandleResult handleHtmlStandaloneElementEnd(
             final IHtmlElement element,
             final boolean minimized,
             final int line, final int col) 
             throws AttoParseException {
 
-        super.handleHtmlStandaloneElementEnd(element, minimized, line, col);
-        
-        handleHtmlStandaloneElement(element, minimized, this.currentElementName, this.currentElementAttributes, this.currentElementLine, this.currentElementCol);
-        
+        return handleHtmlStandaloneElement(
+                element, minimized,
+                this.currentElementName, this.currentElementAttributes,
+                this.currentElementLine, this.currentElementCol);
+
     }
 
 
     
     
     @Override
-    public final void handleHtmlOpenElementStart(
+    public final IAttoHandleResult handleHtmlOpenElementStart(
             final IHtmlElement element, 
             final char[] buffer,
             final int nameOffset, final int nameLen, 
             final int line, final int col)
             throws AttoParseException {
 
-        super.handleHtmlOpenElementStart(element, buffer, nameOffset, nameLen, line, col);
-        
         this.currentElementName = getInternedElementName(element, buffer, nameOffset, nameLen);
         this.currentElementAttributes = null;
         this.currentElementLine = line;
         this.currentElementCol = col;
+
+        return null;
         
     }
 
 
     @Override
-    public final void handleHtmlOpenElementEnd(
+    public final IAttoHandleResult handleHtmlOpenElementEnd(
             final IHtmlElement element,
             final int line, final int col)
             throws AttoParseException {
 
-        super.handleHtmlOpenElementEnd(element, line, col);
-        
-        handleHtmlOpenElement(element, this.currentElementName, this.currentElementAttributes, this.currentElementLine, this.currentElementCol);
+        return handleHtmlOpenElement(
+                element,
+                this.currentElementName, this.currentElementAttributes,
+                this.currentElementLine, this.currentElementCol);
         
     }
 
@@ -140,32 +143,30 @@ public abstract class AbstractStandardNonValidatingHtmlAttoHandler
 
 
     @Override
-    public final void handleHtmlCloseElementStart(
+    public final IAttoHandleResult handleHtmlCloseElementStart(
             final IHtmlElement element,
             final char[] buffer, 
             final int nameOffset, final int nameLen, 
             final int line, final int col)
             throws AttoParseException {
 
-        super.handleHtmlCloseElementStart(element, buffer, nameOffset, nameLen, line, col);
-        
         this.currentElementName = getInternedElementName(element, buffer, nameOffset, nameLen);
         this.currentElementAttributes = null;
         this.currentElementLine = line;
         this.currentElementCol = col;
+
+        return null;
         
     }
 
     
     @Override
-    public final void handleHtmlCloseElementEnd(
+    public final IAttoHandleResult handleHtmlCloseElementEnd(
             final IHtmlElement element,
             int line, int col)
             throws AttoParseException {
 
-        super.handleHtmlCloseElementEnd(element, line, col);
-
-        handleHtmlCloseElement(element, this.currentElementName, this.currentElementLine, this.currentElementCol);
+        return handleHtmlCloseElement(element, this.currentElementName, this.currentElementLine, this.currentElementCol);
         
     }
 
@@ -173,7 +174,7 @@ public abstract class AbstractStandardNonValidatingHtmlAttoHandler
 
 
     @Override
-    public final void handleHtmlAttribute(
+    public final IAttoHandleResult handleHtmlAttribute(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol, 
@@ -184,11 +185,6 @@ public abstract class AbstractStandardNonValidatingHtmlAttoHandler
             final int valueLine, final int valueCol) 
             throws AttoParseException {
 
-        super.handleHtmlAttribute(buffer, nameOffset, nameLen, nameLine, nameCol,
-                operatorOffset, operatorLen, operatorLine, operatorCol,
-                valueContentOffset, valueContentLen, valueOuterOffset, valueOuterLen,
-                valueLine, valueCol);
-        
         final String attributeName = new String(buffer, nameOffset, nameLen);
         final String attributeValue = 
                 (valueContentLen <= 0?  "" : new String(buffer, valueContentOffset, valueContentLen));
@@ -198,18 +194,20 @@ public abstract class AbstractStandardNonValidatingHtmlAttoHandler
         }
 
         this.currentElementAttributes.put(attributeName, attributeValue);
-        
+
+        return null;
+
     }
    
 
     @Override
-    public final void handleHtmlInnerWhiteSpace(
+    public final IAttoHandleResult handleHtmlInnerWhiteSpace(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col) 
             throws AttoParseException {
 
-        super.handleHtmlInnerWhiteSpace(buffer, offset, len, line, col);
+        return null;
         
     }
 
@@ -217,7 +215,7 @@ public abstract class AbstractStandardNonValidatingHtmlAttoHandler
     
     
     @Override
-    public final void handleDocType(
+    public final IAttoHandleResult handleDocType(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol, 
@@ -235,14 +233,7 @@ public abstract class AbstractStandardNonValidatingHtmlAttoHandler
             final int outerLine, final int outerCol)
             throws AttoParseException {
 
-        super.handleDocType(buffer, keywordOffset, keywordLen, keywordLine, keywordCol,
-                elementNameOffset, elementNameLen, elementNameLine, elementNameCol,
-                typeOffset, typeLen, typeLine, typeCol, publicIdOffset, publicIdLen,
-                publicIdLine, publicIdCol, systemIdOffset, systemIdLen, systemIdLine,
-                systemIdCol, internalSubsetOffset, internalSubsetLen, internalSubsetLine, 
-                internalSubsetCol, outerOffset, outerLen, outerLine, outerCol);
-        
-        handleDocType(
+        return handleDocType(
                 new String(buffer, elementNameOffset, elementNameLen),
                 (publicIdOffset <= 0? null : new String(buffer, publicIdOffset, publicIdLen)),
                 (systemIdOffset <= 0? null : new String(buffer, systemIdOffset, systemIdLen)),
@@ -254,16 +245,14 @@ public abstract class AbstractStandardNonValidatingHtmlAttoHandler
 
     
     @Override
-    public final void handleComment(
+    public final IAttoHandleResult handleComment(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
             final int line, final int col)
             throws AttoParseException {
 
-        super.handleComment(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
-        
-        handleComment(buffer, contentOffset, contentLen, line, col);
+        return handleComment(buffer, contentOffset, contentLen, line, col);
         
     }
     
@@ -271,16 +260,14 @@ public abstract class AbstractStandardNonValidatingHtmlAttoHandler
 
     
     @Override
-    public final void handleCDATASection(
+    public final IAttoHandleResult handleCDATASection(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen, 
             final int line, final int col)
             throws AttoParseException {
 
-        super.handleCDATASection(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
-        
-        handleCDATASection(buffer, contentOffset, contentLen, line, col);
+        return handleCDATASection(buffer, contentOffset, contentLen, line, col);
         
     }
     
@@ -288,7 +275,7 @@ public abstract class AbstractStandardNonValidatingHtmlAttoHandler
 
     
     @Override
-    public final void handleXmlDeclarationDetail(
+    public final IAttoHandleResult handleXmlDeclarationDetail(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -302,14 +289,6 @@ public abstract class AbstractStandardNonValidatingHtmlAttoHandler
             final int line, final int col)
             throws AttoParseException {
 
-        super.handleXmlDeclarationDetail(
-                buffer, 
-                keywordOffset, keywordLen, keywordLine, keywordCol,
-                versionOffset, versionLen, versionLine, versionCol, 
-                encodingOffset, encodingLen, encodingLine, encodingCol, 
-                standaloneOffset, standaloneLen, standaloneLine, standaloneCol, 
-                outerOffset, outerLen, line, col);
-        
         final String version = new String(buffer, versionOffset, versionLen);
         final String encoding =
                 (encodingOffset > 0?
@@ -320,7 +299,7 @@ public abstract class AbstractStandardNonValidatingHtmlAttoHandler
                         new String(buffer, standaloneOffset, standaloneLen) :
                         null);
         
-        handleXmlDeclaration(version, encoding, standalone, line, col);
+        return handleXmlDeclaration(version, encoding, standalone, line, col);
         
     }
 
@@ -328,7 +307,7 @@ public abstract class AbstractStandardNonValidatingHtmlAttoHandler
     
     
     @Override
-    public final void handleProcessingInstruction(
+    public final IAttoHandleResult handleProcessingInstruction(
             final char[] buffer, 
             final int targetOffset, final int targetLen, 
             final int targetLine, final int targetCol,
@@ -338,13 +317,7 @@ public abstract class AbstractStandardNonValidatingHtmlAttoHandler
             final int line, final int col)
             throws AttoParseException {
 
-        super.handleProcessingInstruction(
-                buffer, 
-                targetOffset, targetLen, targetLine, targetCol, 
-                contentOffset, contentLen, contentLine, contentCol,
-                outerOffset, outerLen, line, col);
-        
-        handleProcessingInstruction(
+        return handleProcessingInstruction(
                 new String(buffer, targetOffset, targetLen), 
                 (contentOffset <= 0? null : new String(buffer, contentOffset, contentLen)), 
                 line, col);
@@ -386,10 +359,11 @@ public abstract class AbstractStandardNonValidatingHtmlAttoHandler
      * @param attributes the element attributes map, or null if no attributes are present.
      * @param line the line in the document where this elements appears.
      * @param col the column in the document where this element appears.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
     @SuppressWarnings("unused")
-    public void handleHtmlStandaloneElement(
+    public IAttoHandleResult handleHtmlStandaloneElement(
             final IHtmlElement element,
             final boolean minimized,
             final String elementName, 
@@ -397,6 +371,7 @@ public abstract class AbstractStandardNonValidatingHtmlAttoHandler
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
     
     
@@ -413,16 +388,18 @@ public abstract class AbstractStandardNonValidatingHtmlAttoHandler
      * @param attributes the element attributes map, or null if no attributes are present.
      * @param line the line in the document where this elements appears.
      * @param col the column in the document where this element appears.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
     @SuppressWarnings("unused")
-    public void handleHtmlOpenElement(
+    public IAttoHandleResult handleHtmlOpenElement(
             final IHtmlElement element,
             final String elementName, 
             final Map<String,String> attributes,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
     
     
@@ -435,15 +412,17 @@ public abstract class AbstractStandardNonValidatingHtmlAttoHandler
      * @param elementName the element name (e.g. "&lt;/div&gt;" -> "div").
      * @param line the line in the document where this elements appears.
      * @param col the column in the document where this element appears.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
     @SuppressWarnings("unused")
-    public void handleHtmlCloseElement(
+    public IAttoHandleResult handleHtmlCloseElement(
             final IHtmlElement element,
             final String elementName, 
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
     
     
@@ -461,14 +440,16 @@ public abstract class AbstractStandardNonValidatingHtmlAttoHandler
      * @param internalSubset the internal subset specified, if present (might be null).
      * @param line the line in the document where this elements appears.
      * @param col the column in the document where this element appears.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
     @SuppressWarnings("unused")
-    public void handleDocType(
+    public IAttoHandleResult handleDocType(
             final String elementName, final String publicId, final String systemId, 
             final String internalSubset, final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
     
     
@@ -488,14 +469,16 @@ public abstract class AbstractStandardNonValidatingHtmlAttoHandler
      * @param len the length (in chars) of the artifact.
      * @param line the line in the document where this elements appears.
      * @param col the column in the document where this element appears.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
     @SuppressWarnings("unused")
-    public void handleComment(
+    public IAttoHandleResult handleComment(
             final char[] buffer, final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
     
     
@@ -515,14 +498,16 @@ public abstract class AbstractStandardNonValidatingHtmlAttoHandler
      * @param len the length (in chars) of the artifact.
      * @param line the line in the document where this elements appears.
      * @param col the column in the document where this element appears.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
     @SuppressWarnings("unused")
-    public void handleCDATASection(
+    public IAttoHandleResult handleCDATASection(
             final char[] buffer, final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
     
     
@@ -537,16 +522,18 @@ public abstract class AbstractStandardNonValidatingHtmlAttoHandler
      * @param standalone the standalone value specified (can be null).
      * @param line the line in the document where this elements appears.
      * @param col the column in the document where this element appears.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
     @SuppressWarnings("unused")
-    public void handleXmlDeclaration(
+    public IAttoHandleResult handleXmlDeclaration(
             final String version, 
             final String encoding, 
             final String standalone, 
             final int line, final int col) 
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
     
     
@@ -560,14 +547,16 @@ public abstract class AbstractStandardNonValidatingHtmlAttoHandler
      * @param content the content of the processing instruction, if specified (might be null).
      * @param line the line in the document where this elements appears.
      * @param col the column in the document where this element appears.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
     @SuppressWarnings("unused")
-    public void handleProcessingInstruction(
+    public IAttoHandleResult handleProcessingInstruction(
             final String target, final String content, 
             final int line, final int col) 
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
     
     

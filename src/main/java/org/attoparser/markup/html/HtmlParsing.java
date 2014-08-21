@@ -44,11 +44,6 @@ public class HtmlParsing {
     // Cannot make public because it's mutable
     private static final HtmlParsingConfiguration HTML_PARSING_CONFIGURATION;
 
-    // The contents of these two elements are non-parsable in HTML (CDATA instead of PCDATA)
-    private static final char[][] HTML_NON_PROCESSABLE_ELEMENT_NAMES =
-            new char[][] { "script".toCharArray(), "style".toCharArray(),
-                           "SCRIPT".toCharArray(), "STYLE".toCharArray() };
-    
     
     
     static {
@@ -59,7 +54,6 @@ public class HtmlParsing {
         BASE_HTML_MARKUP_PARSING_CONFIGURATION.setRequireUniqueAttributesInElement(true);
         BASE_HTML_MARKUP_PARSING_CONFIGURATION.setRequireXmlWellFormedAttributeValues(false);
         BASE_HTML_MARKUP_PARSING_CONFIGURATION.setUniqueRootElementPresence(UniqueRootElementPresence.DEPENDS_ON_PROLOG_DOCTYPE);
-        BASE_HTML_MARKUP_PARSING_CONFIGURATION.setNonProcessableElementNames(HTML_NON_PROCESSABLE_ELEMENT_NAMES);
         BASE_HTML_MARKUP_PARSING_CONFIGURATION.getPrologParsingConfiguration().setValidateProlog(true);
         BASE_HTML_MARKUP_PARSING_CONFIGURATION.getPrologParsingConfiguration().setPrologPresence(PrologPresence.ALLOWED);
         BASE_HTML_MARKUP_PARSING_CONFIGURATION.getPrologParsingConfiguration().setXmlDeclarationPresence(PrologPresence.ALLOWED);

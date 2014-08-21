@@ -20,6 +20,7 @@
 package org.attoparser.markup;
 
 import org.attoparser.AttoParseException;
+import org.attoparser.IAttoHandleResult;
 
 
 /**
@@ -57,9 +58,10 @@ public interface IDetailedElementHandling extends IAttributeSequenceHandling {
      * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public void handleStandaloneElementStart(
+    public IAttoHandleResult handleStandaloneElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final int line, final int col)
@@ -72,9 +74,10 @@ public interface IDetailedElementHandling extends IAttributeSequenceHandling {
      * 
      * @param line the line in the original document where the element ending structure appears.
      * @param col the column in the original document where the element ending structure appears.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public void handleStandaloneElementEnd(
+    public IAttoHandleResult handleStandaloneElementEnd(
             final int line, final int col)
             throws AttoParseException;
 
@@ -102,9 +105,10 @@ public interface IDetailedElementHandling extends IAttributeSequenceHandling {
      * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public void handleOpenElementStart(
+    public IAttoHandleResult handleOpenElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final int line, final int col)
@@ -117,9 +121,10 @@ public interface IDetailedElementHandling extends IAttributeSequenceHandling {
      * 
      * @param line the line in the original document where the element ending structure appears.
      * @param col the column in the original document where the element ending structure appears.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public void handleOpenElementEnd(
+    public IAttoHandleResult handleOpenElementEnd(
             final int line, final int col)
             throws AttoParseException;
 
@@ -148,9 +153,10 @@ public interface IDetailedElementHandling extends IAttributeSequenceHandling {
      * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public void handleCloseElementStart(
+    public IAttoHandleResult handleCloseElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final int line, final int col)
@@ -163,9 +169,10 @@ public interface IDetailedElementHandling extends IAttributeSequenceHandling {
      * 
      * @param line the line in the original document where the element ending structure appears.
      * @param col the column in the original document where the element ending structure appears.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public void handleCloseElementEnd(
+    public IAttoHandleResult handleCloseElementEnd(
             final int line, final int col)
             throws AttoParseException;
 
@@ -189,9 +196,10 @@ public interface IDetailedElementHandling extends IAttributeSequenceHandling {
      * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public void handleUnmatchedCloseElementStart(
+    public IAttoHandleResult handleUnmatchedCloseElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final int line, final int col)
@@ -204,9 +212,10 @@ public interface IDetailedElementHandling extends IAttributeSequenceHandling {
      * 
      * @param line the line in the original document where the element ending structure appears.
      * @param col the column in the original document where the element ending structure appears.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public void handleUnmatchedCloseElementEnd(
+    public IAttoHandleResult handleUnmatchedCloseElementEnd(
             final int line, final int col)
             throws AttoParseException;
     
@@ -230,9 +239,10 @@ public interface IDetailedElementHandling extends IAttributeSequenceHandling {
      * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public void handleAutoCloseElementStart(
+    public IAttoHandleResult handleAutoCloseElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final int line, final int col)
@@ -246,9 +256,10 @@ public interface IDetailedElementHandling extends IAttributeSequenceHandling {
      * 
      * @param line the line in the original document where the element ending structure appears.
      * @param col the column in the original document where the element ending structure appears.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public void handleAutoCloseElementEnd(
+    public IAttoHandleResult handleAutoCloseElementEnd(
             final int line, final int col)
             throws AttoParseException;
 

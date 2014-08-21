@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.Writer;
 
 import org.attoparser.AttoParseException;
+import org.attoparser.IAttoHandleResult;
 import org.attoparser.markup.AbstractDetailedMarkupAttoHandler;
 import org.attoparser.markup.MarkupParsingConfiguration;
 
@@ -55,7 +56,7 @@ public final class TextTracingDetailedMarkupAttoHandler extends AbstractDetailed
     
     
     @Override
-    public void handleDocumentStart(final long startTimeNanos, 
+    public IAttoHandleResult handleDocumentStart(final long startTimeNanos,
             final int line, final int col,
             final MarkupParsingConfiguration markupParsingConfiguration)
             throws AttoParseException {
@@ -64,12 +65,13 @@ public final class TextTracingDetailedMarkupAttoHandler extends AbstractDetailed
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
+        return null;
     }
 
     
     
     @Override
-    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, 
+    public IAttoHandleResult handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos,
             final int line, final int col, 
             final MarkupParsingConfiguration markupParsingConfiguration)
             throws AttoParseException {
@@ -78,12 +80,13 @@ public final class TextTracingDetailedMarkupAttoHandler extends AbstractDetailed
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
+        return null;
     }
 
 
 
     @Override
-    public void handleStandaloneElementStart(
+    public IAttoHandleResult handleStandaloneElementStart(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
@@ -102,13 +105,15 @@ public final class TextTracingDetailedMarkupAttoHandler extends AbstractDetailed
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
 
 
 
     @Override
-    public void handleStandaloneElementEnd(
+    public IAttoHandleResult handleStandaloneElementEnd(
             final int line, final int col) 
             throws AttoParseException {
         
@@ -122,14 +127,16 @@ public final class TextTracingDetailedMarkupAttoHandler extends AbstractDetailed
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
     
     
 
     
     @Override
-    public void handleOpenElementStart(
+    public IAttoHandleResult handleOpenElementStart(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
@@ -148,14 +155,16 @@ public final class TextTracingDetailedMarkupAttoHandler extends AbstractDetailed
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
     
     
 
     
     @Override
-    public void handleOpenElementEnd(
+    public IAttoHandleResult handleOpenElementEnd(
             final int line, final int col)
             throws AttoParseException {
         
@@ -169,14 +178,16 @@ public final class TextTracingDetailedMarkupAttoHandler extends AbstractDetailed
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
     
     
 
     
     @Override
-    public void handleCloseElementStart(
+    public IAttoHandleResult handleCloseElementStart(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
@@ -195,14 +206,16 @@ public final class TextTracingDetailedMarkupAttoHandler extends AbstractDetailed
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
     
     
 
     
     @Override
-    public void handleCloseElementEnd(
+    public IAttoHandleResult handleCloseElementEnd(
             final int line, final int col)
             throws AttoParseException {
         
@@ -216,14 +229,16 @@ public final class TextTracingDetailedMarkupAttoHandler extends AbstractDetailed
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
     
     
 
     
     @Override
-    public void handleAutoCloseElementStart(
+    public IAttoHandleResult handleAutoCloseElementStart(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
@@ -243,14 +258,16 @@ public final class TextTracingDetailedMarkupAttoHandler extends AbstractDetailed
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
     
     
 
     
     @Override
-    public void handleAutoCloseElementEnd(
+    public IAttoHandleResult handleAutoCloseElementEnd(
             final int line, final int col)
             throws AttoParseException {
         
@@ -265,14 +282,16 @@ public final class TextTracingDetailedMarkupAttoHandler extends AbstractDetailed
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
     
     
 
     
     @Override
-    public void handleUnmatchedCloseElementStart(
+    public IAttoHandleResult handleUnmatchedCloseElementStart(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
@@ -292,14 +311,16 @@ public final class TextTracingDetailedMarkupAttoHandler extends AbstractDetailed
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
     
     
 
     
     @Override
-    public void handleUnmatchedCloseElementEnd(
+    public IAttoHandleResult handleUnmatchedCloseElementEnd(
             final int line, final int col)
             throws AttoParseException {
         
@@ -314,14 +335,16 @@ public final class TextTracingDetailedMarkupAttoHandler extends AbstractDetailed
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
 
     
     
     
     @Override
-    public void handleAttribute(
+    public IAttoHandleResult handleAttribute(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol,
@@ -352,13 +375,15 @@ public final class TextTracingDetailedMarkupAttoHandler extends AbstractDetailed
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
 
     
     
     @Override
-    public void handleText(final char[] buffer, final int offset, final int len, 
+    public IAttoHandleResult handleText(final char[] buffer, final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         
@@ -373,13 +398,15 @@ public final class TextTracingDetailedMarkupAttoHandler extends AbstractDetailed
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
 
 
     
     @Override
-    public void handleComment(
+    public IAttoHandleResult handleComment(
             final char[] buffer, 
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
@@ -397,12 +424,14 @@ public final class TextTracingDetailedMarkupAttoHandler extends AbstractDetailed
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
 
     
     @Override
-    public void handleCDATASection(
+    public IAttoHandleResult handleCDATASection(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
@@ -420,14 +449,16 @@ public final class TextTracingDetailedMarkupAttoHandler extends AbstractDetailed
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
 
     
     
     
     @Override
-    public void handleXmlDeclarationDetail(
+    public IAttoHandleResult handleXmlDeclarationDetail(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -468,7 +499,9 @@ public final class TextTracingDetailedMarkupAttoHandler extends AbstractDetailed
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
 
     
@@ -479,7 +512,7 @@ public final class TextTracingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public void handleInnerWhiteSpace(
+    public IAttoHandleResult handleInnerWhiteSpace(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col)
@@ -498,13 +531,15 @@ public final class TextTracingDetailedMarkupAttoHandler extends AbstractDetailed
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
 
 
 
     @Override
-    public void handleDocType(
+    public IAttoHandleResult handleDocType(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -554,7 +589,9 @@ public final class TextTracingDetailedMarkupAttoHandler extends AbstractDetailed
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
 
 
@@ -562,7 +599,7 @@ public final class TextTracingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public void handleProcessingInstruction(
+    public IAttoHandleResult handleProcessingInstruction(
             final char[] buffer, 
             final int targetOffset, final int targetLen, 
             final int targetLine, final int targetCol,
@@ -591,7 +628,9 @@ public final class TextTracingDetailedMarkupAttoHandler extends AbstractDetailed
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        
+
+        return null;
+
     }
 
 

@@ -20,6 +20,7 @@
 package org.attoparser.markup;
 
 import org.attoparser.AttoParseException;
+import org.attoparser.IAttoHandleResult;
 
 
 /**
@@ -94,9 +95,10 @@ public interface IDetailedDocTypeHandling {
      * @param outerLen length of the <i>outer</i> partition.
      * @param outerLine the line in the original document where this artifact starts.
      * @param outerCol the column in the original document where this artifact starts.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public void handleDocType(
+    public IAttoHandleResult handleDocType(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,

@@ -20,7 +20,7 @@
 package org.attoparser.markup;
 
 import org.attoparser.AttoParseException;
-
+import org.attoparser.IAttoHandleResult;
 
 
 /**
@@ -49,24 +49,28 @@ public final class CommentMarkupParsingUtil {
     
     
     
-    public static void parseComment(
+    public static IAttoHandleResult parseComment(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col, 
             final ICommentHandling handler)
             throws AttoParseException {
-        
-        if (!tryParseComment(buffer, offset, len, line, col, handler)) {
+
+        final BestEffortParsingResult bestEffortParsingResult =
+                tryParseComment(buffer, offset, len, line, col, handler);
+        if (bestEffortParsingResult == null) {
             throw new AttoParseException(
                     "Could not parse as markup comment: \"" + new String(buffer, offset, len) + "\"", line, col);
         }
-        
+
+        return bestEffortParsingResult.getHandleResult();
+
     }
     
     
     
     
-    public static boolean tryParseComment(
+    public static BestEffortParsingResult tryParseComment(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col, 
@@ -78,11 +82,11 @@ public final class CommentMarkupParsingUtil {
                 buffer[offset + len - 3] == '-' &&
                 buffer[offset + len - 2] == '-' &&
                 buffer[offset + len - 1] == '>') {
-            handler.handleComment(buffer, offset + 4, len - 7, offset, len, line, col);
-            return true;
+            return BestEffortParsingResult.forHandleResult(
+                    handler.handleComment(buffer, offset + 4, len - 7, offset, len, line, col));
         }
         
-        return false;
+        return null;
         
     }
 

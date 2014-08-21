@@ -22,6 +22,7 @@ package org.attoparser.markup.xml;
 import java.util.Map;
 
 import org.attoparser.AttoParseException;
+import org.attoparser.IAttoHandleResult;
 import org.attoparser.markup.dom.INestableNode;
 import org.attoparser.markup.dom.impl.CDATASection;
 import org.attoparser.markup.dom.impl.Comment;
@@ -150,33 +151,33 @@ public final class DOMXmlAttoHandler extends AbstractStandardXmlAttoHandler {
     
 
     @Override
-    public void handleXmlDocumentStart(
+    public IAttoHandleResult handleXmlDocumentStart(
             final long startTimeNanos, 
             final int line, final int col) 
             throws AttoParseException {
         
-        super.handleXmlDocumentStart(startTimeNanos, line, col);
-        
         this.document = new Document(this.documentName);
         this.parsingStartTimeNanos = startTimeNanos;
-        
+
+        return null;
+
     }
 
     
     
     @Override
-    public void handleXmlDocumentEnd(
+    public IAttoHandleResult handleXmlDocumentEnd(
             final long endTimeNanos, final long totalTimeNanos, 
             final int line, final int col)
             throws AttoParseException {
 
-        super.handleXmlDocumentEnd(endTimeNanos, totalTimeNanos, line, col);
-        
         this.parsingEndTimeNanos = endTimeNanos;
         this.parsingTotalTimeNanos = totalTimeNanos;
         
         this.parsingFinished = true;
-        
+
+        return null;
+
     }
 
     
@@ -184,36 +185,33 @@ public final class DOMXmlAttoHandler extends AbstractStandardXmlAttoHandler {
     
     
     @Override
-    public void handleXmlDeclaration(
+    public IAttoHandleResult handleXmlDeclaration(
             final String version, final String encoding, final String standalone, 
             final int line, final int col) 
             throws AttoParseException {
 
-        super.handleXmlDeclaration(version, encoding, standalone, line, col);
-        
         final XmlDeclaration xmlDeclaration = new XmlDeclaration(version, encoding, standalone);
         xmlDeclaration.setLine(Integer.valueOf(line));
         xmlDeclaration.setLine(Integer.valueOf(col));
-        
-        
+
         if (this.currentParent == null) {
             this.document.addChild(xmlDeclaration);
         } else {
             this.currentParent.addChild(xmlDeclaration);
         }
-        
+
+        return null;
+
     }
 
     
     
     @Override
-    public void handleDocType(
+    public IAttoHandleResult handleDocType(
             final String elementName, 
             final String publicId, final String systemId, final String internalSubset, 
             final int line, final int col)
             throws AttoParseException {
-
-        super.handleDocType(elementName, publicId, systemId, internalSubset, line, col);
 
         final DocType docType = new DocType(elementName, publicId, systemId, internalSubset);
         docType.setLine(Integer.valueOf(line));
@@ -224,7 +222,9 @@ public final class DOMXmlAttoHandler extends AbstractStandardXmlAttoHandler {
         } else {
             this.currentParent.addChild(docType);
         }
-        
+
+        return null;
+
     }
 
     
@@ -232,12 +232,10 @@ public final class DOMXmlAttoHandler extends AbstractStandardXmlAttoHandler {
     
     
     @Override
-    public void handleXmlStandaloneElement(
+    public IAttoHandleResult handleXmlStandaloneElement(
             final String elementName, final Map<String, String> attributes, 
             final int line, final int col)
             throws AttoParseException {
-
-        super.handleXmlStandaloneElement(elementName, attributes, line, col);
 
         final Element element = new Element(elementName);
         element.addAttributes(attributes);
@@ -249,18 +247,18 @@ public final class DOMXmlAttoHandler extends AbstractStandardXmlAttoHandler {
         } else {
             this.currentParent.addChild(element);
         }
-        
+
+        return null;
+
     }
 
     
     
     @Override
-    public void handleXmlOpenElement(
+    public IAttoHandleResult handleXmlOpenElement(
             final String elementName, final Map<String, String> attributes, 
             final int line, final int col)
             throws AttoParseException {
-
-        super.handleXmlOpenElement(elementName, attributes, line, col);
 
         final Element element = new Element(elementName);
         element.addAttributes(attributes);
@@ -273,20 +271,22 @@ public final class DOMXmlAttoHandler extends AbstractStandardXmlAttoHandler {
             this.currentParent.addChild(element);
         }
         this.currentParent = element;
-        
+
+        return null;
+
     }
 
 
     
     @Override
-    public void handleXmlCloseElement(
+    public IAttoHandleResult handleXmlCloseElement(
             final String elementName, 
             final int line, final int col)
             throws AttoParseException {
 
-        super.handleXmlCloseElement(elementName, line, col);
-
         this.currentParent = this.currentParent.getParent();
+
+        return null;
         
     }
 
@@ -296,13 +296,11 @@ public final class DOMXmlAttoHandler extends AbstractStandardXmlAttoHandler {
     
     
     @Override
-    public void handleComment(
+    public IAttoHandleResult handleComment(
             final char[] buffer, final int offset, final int len, 
             final int line, final int col) 
             throws AttoParseException {
 
-        super.handleComment(buffer, offset, len, line, col);
-        
         final Comment comment = new Comment(new String(buffer, offset, len));
         comment.setLine(Integer.valueOf(line));
         comment.setLine(Integer.valueOf(col));
@@ -312,19 +310,19 @@ public final class DOMXmlAttoHandler extends AbstractStandardXmlAttoHandler {
         } else {
             this.currentParent.addChild(comment);
         }
+
+        return null;
         
     }
     
     
 
     @Override
-    public void handleCDATASection(
+    public IAttoHandleResult handleCDATASection(
             final char[] buffer, final int offset, final int len,
             final int line, final int col) 
             throws AttoParseException {
 
-        super.handleCDATASection(buffer, offset, len, line, col);
-        
         final CDATASection cdataSection = new CDATASection(new String(buffer, offset, len));
         cdataSection.setLine(Integer.valueOf(line));
         cdataSection.setLine(Integer.valueOf(col));
@@ -334,19 +332,19 @@ public final class DOMXmlAttoHandler extends AbstractStandardXmlAttoHandler {
         } else {
             this.currentParent.addChild(cdataSection);
         }
-        
+
+        return null;
+
     }
     
     
 
     @Override
-    public void handleText(
+    public IAttoHandleResult handleText(
             final char[] buffer, final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
 
-        super.handleText(buffer, offset, len, line, col);
-        
         final Text text = new Text(new String(buffer, offset, len));
         text.setLine(Integer.valueOf(line));
         text.setLine(Integer.valueOf(col));
@@ -356,7 +354,9 @@ public final class DOMXmlAttoHandler extends AbstractStandardXmlAttoHandler {
         } else {
             this.currentParent.addChild(text);
         }
-        
+
+        return null;
+
     }
 
 
@@ -364,14 +364,12 @@ public final class DOMXmlAttoHandler extends AbstractStandardXmlAttoHandler {
     
     
     @Override
-    public void handleProcessingInstruction(
+    public IAttoHandleResult handleProcessingInstruction(
             final String target, final String content,
             final int line, final int col) 
             throws AttoParseException {
 
-        super.handleProcessingInstruction(target, content, line, col);
-        
-        final ProcessingInstruction processingInstruction = 
+        final ProcessingInstruction processingInstruction =
                 new ProcessingInstruction(target, content);
         processingInstruction.setLine(Integer.valueOf(line));
         processingInstruction.setLine(Integer.valueOf(col));
@@ -381,7 +379,10 @@ public final class DOMXmlAttoHandler extends AbstractStandardXmlAttoHandler {
         } else {
             this.currentParent.addChild(processingInstruction);
         }
+
+        return null;
         
     }
-    
+
+
 }

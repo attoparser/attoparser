@@ -48,7 +48,7 @@ public interface ITimedDocumentHandling {
      * @param col the column of the document where parsing starts (usually number 1)
      * @throws AttoParseException
      */
-    public void handleDocumentStart(final long startTimeNanos, final int line, final int col) 
+    public IAttoHandleResult handleDocumentStart(final long startTimeNanos, final int line, final int col)
             throws AttoParseException;
 
     /**
@@ -63,7 +63,7 @@ public interface ITimedDocumentHandling {
      * @param col the column of the document where the parsing ends (usually the last one)
      * @throws AttoParseException
      */
-    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final int line, final int col) 
+    public IAttoHandleResult handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
             throws AttoParseException;
 
     /**

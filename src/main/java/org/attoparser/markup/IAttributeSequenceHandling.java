@@ -20,6 +20,7 @@
 package org.attoparser.markup;
 
 import org.attoparser.AttoParseException;
+import org.attoparser.IAttoHandleResult;
 
 
 /**
@@ -76,9 +77,10 @@ public interface IAttributeSequenceHandling {
      * @param valueOuterLen length of the <i>valueOuter</i> partition.
      * @param valueLine the line in the original document where the <i>value</i> (outer) partition starts.
      * @param valueCol the column in the original document where the <i>value</i> (outer) partition starts.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public void handleAttribute(
+    public IAttoHandleResult handleAttribute(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol,
@@ -117,9 +119,10 @@ public interface IAttributeSequenceHandling {
      * @param len length of the artifact.
      * @param line the line in the original document where the artifact starts.
      * @param col the column in the original document where the artifact starts.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public void handleInnerWhiteSpace(
+    public IAttoHandleResult handleInnerWhiteSpace(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)

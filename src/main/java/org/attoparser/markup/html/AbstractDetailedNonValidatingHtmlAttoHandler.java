@@ -20,6 +20,7 @@
 package org.attoparser.markup.html;
 
 import org.attoparser.AttoParseException;
+import org.attoparser.IAttoHandleResult;
 import org.attoparser.markup.AbstractDetailedMarkupAttoHandler;
 import org.attoparser.markup.MarkupParsingConfiguration;
 import org.attoparser.markup.html.elements.BasicHtmlElement;
@@ -75,21 +76,21 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
     
     
     @Override
-    public final void handleDocumentStart(final long startTimeNanos, 
+    public final IAttoHandleResult handleDocumentStart(final long startTimeNanos,
             final int line, final int col,
             final MarkupParsingConfiguration markupParsingConfiguration)
             throws AttoParseException {
-        handleDocumentStart(startTimeNanos, line, col, this.configuration);
+        return handleDocumentStart(startTimeNanos, line, col, this.configuration);
     }
 
     
     
     @Override
-    public final void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, 
+    public final IAttoHandleResult handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos,
             final int line, final int col, 
             final MarkupParsingConfiguration markupParsingConfiguration)
             throws AttoParseException {
-        handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col, this.configuration);
+        return handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col, this.configuration);
     }
     
     
@@ -98,32 +99,31 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
     
     
     @Override
-    public final void handleStandaloneElementStart(
+    public final IAttoHandleResult handleStandaloneElementStart(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col) 
             throws AttoParseException {
         
-        super.handleStandaloneElementStart(buffer, offset, len, line, col);
-        
         this.currentElement = getElementByName(buffer, offset, len);
-        this.currentElement.handleStandaloneElementStart(buffer, offset, len, line, col, this.stack, this);
+        return this.currentElement.handleStandaloneElementStart(buffer, offset, len, line, col, this.stack, this);
 
     }
 
     @Override
-    public final void handleStandaloneElementEnd(
+    public final IAttoHandleResult handleStandaloneElementEnd(
             final int line, final int col) 
             throws AttoParseException {
         
-        super.handleStandaloneElementEnd(line, col);
-
         if (this.currentElement == null) {
             throw new IllegalStateException("Cannot end element: no current element");
         }
 
-        this.currentElement.handleStandaloneElementEnd(line, col, this.stack, this);
+        final IAttoHandleResult result =
+            this.currentElement.handleStandaloneElementEnd(line, col, this.stack, this);
         this.currentElement = null;
+
+        return result;
 
     }
 
@@ -131,65 +131,63 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
     
     
     @Override
-    public final void handleOpenElementStart(
+    public final IAttoHandleResult handleOpenElementStart(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col) 
             throws AttoParseException {
         
-        super.handleOpenElementStart(buffer, offset, len, line, col);
-        
         this.currentElement = getElementByName(buffer, offset, len);
-        this.currentElement.handleOpenElementStart(buffer, offset, len, line, col, this.stack, this);
+        return this.currentElement.handleOpenElementStart(buffer, offset, len, line, col, this.stack, this);
 
     }
 
     @Override
-    public final void handleOpenElementEnd(
+    public final IAttoHandleResult handleOpenElementEnd(
             final int line, final int col) 
             throws AttoParseException {
-
-        super.handleOpenElementEnd(line, col);
 
         if (this.currentElement == null) {
             throw new IllegalStateException("Cannot end element: no current element");
         }
 
-        this.currentElement.handleOpenElementEnd(line, col, this.stack, this);
+        final IAttoHandleResult result =
+            this.currentElement.handleOpenElementEnd(line, col, this.stack, this);
         this.currentElement = null;
-        
+
+        return result;
+
     }
 
     
     
     
     @Override
-    public final void handleCloseElementStart(
+    public final IAttoHandleResult handleCloseElementStart(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col) 
             throws AttoParseException {
         
-        super.handleCloseElementStart(buffer, offset, len, line, col);
-        
         this.currentElement = getElementByName(buffer, offset, len);
-        this.currentElement.handleCloseElementStart(buffer, offset, len, line, col, this.stack, this);
+        return this.currentElement.handleCloseElementStart(buffer, offset, len, line, col, this.stack, this);
         
     }
 
     @Override
-    public final void handleCloseElementEnd(
+    public final IAttoHandleResult handleCloseElementEnd(
             final int line, final int col)
             throws AttoParseException {
-
-        super.handleCloseElementEnd(line, col);
 
         if (this.currentElement == null) {
             throw new IllegalStateException("Cannot end element: no current element");
         }
 
-        this.currentElement.handleCloseElementEnd(line, col, this.stack, this);
+        final IAttoHandleResult result =
+            this.currentElement.handleCloseElementEnd(line, col, this.stack, this);
         this.currentElement = null;
+
+        return result;
 
     }
 
@@ -197,73 +195,71 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
     
     
     @Override
-    public final void handleAutoCloseElementStart(
+    public final IAttoHandleResult handleAutoCloseElementStart(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
         
-        super.handleAutoCloseElementStart(buffer, offset, len, line, col);
-        
         this.currentElement = getElementByName(buffer, offset, len);
-        this.currentElement.handleAutoCloseElementStart(buffer, offset, len, line, col, this.stack, this);
+        return this.currentElement.handleAutoCloseElementStart(buffer, offset, len, line, col, this.stack, this);
         
     }
 
     @Override
-    public final void handleAutoCloseElementEnd(
+    public final IAttoHandleResult handleAutoCloseElementEnd(
             final int line, final int col) 
             throws AttoParseException {
-
-        super.handleAutoCloseElementEnd(line, col);
 
         if (this.currentElement == null) {
             throw new IllegalStateException("Cannot end element: no current element");
         }
 
-        this.currentElement.handleAutoCloseElementEnd(line, col, this.stack, this);
+        final IAttoHandleResult result =
+            this.currentElement.handleAutoCloseElementEnd(line, col, this.stack, this);
         this.currentElement = null;
-        
+
+        return result;
+
     }
 
     
     
     
     @Override
-    public final void handleUnmatchedCloseElementStart(
+    public final IAttoHandleResult handleUnmatchedCloseElementStart(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
         
-        super.handleUnmatchedCloseElementStart(buffer, offset, len, line, col);
-        
         this.currentElement = getElementByName(buffer, offset, len);
-        this.currentElement.handleUnmatchedCloseElementStart(buffer, offset, len, line, col, this.stack, this);
+        return this.currentElement.handleUnmatchedCloseElementStart(buffer, offset, len, line, col, this.stack, this);
         
     }
 
     @Override
-    public final void handleUnmatchedCloseElementEnd(
+    public final IAttoHandleResult handleUnmatchedCloseElementEnd(
             final int line, final int col) 
             throws AttoParseException {
-
-        super.handleUnmatchedCloseElementEnd(line, col);
 
         if (this.currentElement == null) {
             throw new IllegalStateException("Cannot end element: no current element");
         }
 
-        this.currentElement.handleUnmatchedCloseElementEnd(line, col, this.stack, this);
+        final IAttoHandleResult result =
+            this.currentElement.handleUnmatchedCloseElementEnd(line, col, this.stack, this);
         this.currentElement = null;
-        
+
+        return result;
+
     }
     
     
     
     
     @Override
-    public final void handleAttribute(
+    public final IAttoHandleResult handleAttribute(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol, 
@@ -274,16 +270,11 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
             final int valueLine, final int valueCol)
             throws AttoParseException {
 
-        super.handleAttribute(buffer, nameOffset, nameLen, nameLine, nameCol,
-                operatorOffset, operatorLen, operatorLine, operatorCol,
-                valueContentOffset, valueContentLen, valueOuterOffset, valueOuterLen,
-                valueLine, valueCol);
-
         if (this.currentElement == null) {
             throw new IllegalStateException("Cannot handle attribute: no current element");
         }
         
-        this.currentElement.handleAttribute(buffer, nameOffset, nameLen, nameLine, nameCol,
+        return this.currentElement.handleAttribute(buffer, nameOffset, nameLen, nameLine, nameCol,
                 operatorOffset, operatorLen, operatorLine, operatorCol,
                 valueContentOffset, valueContentLen, valueOuterOffset, valueOuterLen,
                 valueLine, valueCol, this.stack, this);
@@ -294,19 +285,17 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
 
 
     @Override
-    public final void handleInnerWhiteSpace(
+    public final IAttoHandleResult handleInnerWhiteSpace(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
 
-        super.handleInnerWhiteSpace(buffer, offset, len, line, col);
-
         if (this.currentElement == null) {
             throw new IllegalStateException("Cannot handle attribute: no current element");
         }
         
-        this.currentElement.handleInnerWhiteSpace(buffer, offset, len, line, col, this.stack, this);
+        return this.currentElement.handleInnerWhiteSpace(buffer, offset, len, line, col, this.stack, this);
         
     }
 
@@ -325,22 +314,24 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
 
 
     @SuppressWarnings("unused")
-    public void handleDocumentStart(
+    public IAttoHandleResult handleDocumentStart(
             final long startTimeNanos, 
             final int line, final int col,
             final HtmlParsingConfiguration parsingConfiguration)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
     
     @SuppressWarnings("unused")
-    public void handleDocumentEnd(
+    public IAttoHandleResult handleDocumentEnd(
             final long endTimeNanos, final long totalTimeNanos, 
             final int line, final int col, 
             final HtmlParsingConfiguration parsingConfiguration)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
     
 
@@ -361,7 +352,7 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
      * -------------------------------------------------
      */
 
-    public void handleHtmlStandaloneElementStart(
+    public IAttoHandleResult handleHtmlStandaloneElementStart(
             final IHtmlElement element,
             final boolean minimized,
             final char[] buffer, 
@@ -369,14 +360,16 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
             final int line, final int col) 
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
-    public void handleHtmlStandaloneElementEnd(
+    public IAttoHandleResult handleHtmlStandaloneElementEnd(
             final IHtmlElement element,
             final boolean minimized,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
     
@@ -386,20 +379,22 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
      * -------------------------
      */
     
-    public void handleHtmlOpenElementStart(
+    public IAttoHandleResult handleHtmlOpenElementStart(
             final IHtmlElement element,
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
-    public void handleHtmlOpenElementEnd(
+    public IAttoHandleResult handleHtmlOpenElementEnd(
             final IHtmlElement element,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
     
@@ -409,20 +404,22 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
      * ----------------------
      */
     
-    public void handleHtmlCloseElementStart(
+    public IAttoHandleResult handleHtmlCloseElementStart(
             final IHtmlElement element,
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
-    public void handleHtmlCloseElementEnd(
+    public IAttoHandleResult handleHtmlCloseElementEnd(
             final IHtmlElement element,
             final int line, final int col) 
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
     
@@ -432,7 +429,7 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
      * -----------------------------------------------------------------------
      */
     
-    public void handleHtmlAttribute(
+    public IAttoHandleResult handleHtmlAttribute(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol, 
@@ -443,18 +440,21 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
             final int valueLine, final int valueCol)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
 
 
 
 
-    public void handleHtmlInnerWhiteSpace(
+    public IAttoHandleResult handleHtmlInnerWhiteSpace(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col) 
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
+        return null;
     }
-    
-    
+
+
+
 }

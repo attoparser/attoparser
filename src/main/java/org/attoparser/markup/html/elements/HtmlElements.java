@@ -55,10 +55,10 @@ public final class HtmlElements {
     public static final IHtmlElement BASE = new StandaloneHtmlElement("base");
     public static final IHtmlElement LINK = new StandaloneHtmlElement("link");
     public static final IHtmlElement META = new StandaloneHtmlElement("meta");
-    public static final IHtmlElement STYLE = new BasicHtmlElement("style");
+    public static final IHtmlElement STYLE = new CdataContentHtmlElement("style");
     
     // Scripting
-    public static final IHtmlElement SCRIPT = new BasicHtmlElement("script");
+    public static final IHtmlElement SCRIPT = new CdataContentHtmlElement("script");
     public static final IHtmlElement NOSCRIPT = new BasicHtmlElement("noscript");
     
     // Sections

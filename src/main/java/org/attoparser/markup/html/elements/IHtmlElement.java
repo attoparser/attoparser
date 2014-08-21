@@ -20,6 +20,7 @@
 package org.attoparser.markup.html.elements;
 
 import org.attoparser.AttoParseException;
+import org.attoparser.IAttoHandleResult;
 import org.attoparser.markup.html.IDetailedHtmlElementHandling;
 
 
@@ -46,67 +47,67 @@ public interface IHtmlElement {
     
 
     
-    public void handleStandaloneElementStart(
+    public IAttoHandleResult handleStandaloneElementStart(
             final char[] buffer, final int offset, final int len, final int line, final int col, 
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException;
     
-    public void handleStandaloneElementEnd(
+    public IAttoHandleResult handleStandaloneElementEnd(
             final int line, final int col, 
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException;
 
     
     
-    public void handleOpenElementStart(
+    public IAttoHandleResult handleOpenElementStart(
             final char[] buffer, final int offset, final int len, final int line, final int col, 
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException;
 
-    public void handleOpenElementEnd(
+    public IAttoHandleResult handleOpenElementEnd(
             final int line, final int col, 
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException;
 
     
     
-    public void handleCloseElementStart(
+    public IAttoHandleResult handleCloseElementStart(
             final char[] buffer, final int offset, final int len, final int line, final int col, 
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException;
 
-    public void handleCloseElementEnd(
+    public IAttoHandleResult handleCloseElementEnd(
             final int line, final int col,
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException;
 
     
     
-    public void handleAutoCloseElementStart(
+    public IAttoHandleResult handleAutoCloseElementStart(
             final char[] buffer, final int offset, final int len, final int line, final int col, 
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException;
 
-    public void handleAutoCloseElementEnd(
+    public IAttoHandleResult handleAutoCloseElementEnd(
             final int line, final int col, 
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException;
     
 
     
-    public void handleUnmatchedCloseElementStart(
+    public IAttoHandleResult handleUnmatchedCloseElementStart(
             final char[] buffer, final int offset, final int len, final int line, final int col, 
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException;
 
-    public void handleUnmatchedCloseElementEnd(
+    public IAttoHandleResult handleUnmatchedCloseElementEnd(
             final int line, final int col,
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException;
     
     
     
-    public void handleAttribute(
+    public IAttoHandleResult handleAttribute(
             final char[] buffer, 
             final int nameOffset, final int nameLen, final int nameLine, final int nameCol, 
             final int operatorOffset, final int operatorLen, final int operatorLine, final int operatorCol, 
@@ -115,7 +116,7 @@ public interface IHtmlElement {
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException;
 
-    public void handleInnerWhiteSpace(
+    public IAttoHandleResult handleInnerWhiteSpace(
             final char[] buffer, final int offset, final int len, final int line, final int col,
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException;

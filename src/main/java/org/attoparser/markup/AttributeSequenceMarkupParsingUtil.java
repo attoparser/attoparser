@@ -19,8 +19,9 @@
  */
 package org.attoparser.markup;
 
+import org.attoparser.AttoHandleResultUtil;
 import org.attoparser.AttoParseException;
-
+import org.attoparser.IAttoHandleResult;
 
 
 /**
@@ -49,23 +50,27 @@ public final class AttributeSequenceMarkupParsingUtil {
     
     
     
-    public static void parseAttributeSequence(
+    public static IAttoHandleResult parseAttributeSequence(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col, 
             final IAttributeSequenceHandling handler)
             throws AttoParseException {
-        
-        if (!tryParseAttributeSequence(buffer, offset, len, line, col, handler)) {
+
+        final BestEffortParsingResult bestEffortParsingResult =
+                tryParseAttributeSequence(buffer, offset, len, line, col, handler);
+        if (bestEffortParsingResult == null) {
             throw new AttoParseException(
                     "Could not parse as attribute sequence: \"" + new String(buffer, offset, len) + "\"", line, col);
         }
+
+        return bestEffortParsingResult.getHandleResult();
 
     }
 
     
     
-    static void parseAttributeSequence(
+    static IAttoHandleResult parseAttributeSequence(
             final char[] buffer, 
             final int offset, final int len, 
             final int[] locator, 
@@ -74,10 +79,15 @@ public final class AttributeSequenceMarkupParsingUtil {
         
         final int line = locator[0];
         final int col = locator[1];
-        if (!tryParseAttributeSequence(buffer, offset, len, locator, handler)) {
+
+        final BestEffortParsingResult bestEffortParsingResult =
+                tryParseAttributeSequence(buffer, offset, len, locator, handler);
+        if (bestEffortParsingResult == null) {
             throw new AttoParseException(
                     "Could not parse as attribute sequence: \"" + new String(buffer, offset, len) + "\"", line, col);
         }
+
+        return bestEffortParsingResult.getHandleResult();
 
     }
     
@@ -86,7 +96,7 @@ public final class AttributeSequenceMarkupParsingUtil {
     
 
     
-    public static boolean tryParseAttributeSequence(
+    static BestEffortParsingResult tryParseAttributeSequence(
             final char[] buffer,
             final int offset, final int len, 
             final int line, final int col, 
@@ -99,19 +109,20 @@ public final class AttributeSequenceMarkupParsingUtil {
     
 
     
-    static boolean tryParseAttributeSequence(
+    static BestEffortParsingResult tryParseAttributeSequence(
             final char[] buffer,
             final int offset, final int len, 
             final int[] locator, 
             final IAttributeSequenceHandling handler)
             throws AttoParseException {
 
-        // Any string will be recognized as an "attribute sequence", so this will always either return "true"
+        // Any string will be recognized as an "attribute sequence", so this will always either return a not-null result
         // or raise an exception.
         
         
         final int maxi = offset + len;
-        
+
+        IAttoHandleResult handleResult = null;
                
         int i = offset;
         int current = i;
@@ -136,7 +147,9 @@ public final class AttributeSequenceMarkupParsingUtil {
                 
                 final int wsOffset = current;
                 final int wsLen = maxi - current;
-                handler.handleInnerWhiteSpace(buffer, wsOffset, wsLen, currentArtifactLine, currentArtifactCol);
+                final IAttoHandleResult handleResult1 =
+                    handler.handleInnerWhiteSpace(buffer, wsOffset, wsLen, currentArtifactLine, currentArtifactCol);
+                handleResult = AttoHandleResultUtil.combinePriorityLast(handleResult,handleResult1);
                 i = maxi;
                 continue;
                 
@@ -146,7 +159,9 @@ public final class AttributeSequenceMarkupParsingUtil {
                 // We avoid empty whitespace fragments
                 final int wsOffset = current;
                 final int wsLen = wsEnd - current;
-                handler.handleInnerWhiteSpace(buffer, wsOffset, wsLen, currentArtifactLine, currentArtifactCol);
+                final IAttoHandleResult handleResult1 =
+                        handler.handleInnerWhiteSpace(buffer, wsOffset, wsLen, currentArtifactLine, currentArtifactCol);
+                handleResult = AttoHandleResultUtil.combinePriorityLast(handleResult,handleResult1);
                 i = wsEnd;
                 current = i;
             }
@@ -169,14 +184,16 @@ public final class AttributeSequenceMarkupParsingUtil {
                 
                 final int attributeNameOffset = current;
                 final int attributeNameLen = maxi - current;
-                handler.handleAttribute(
-                        buffer,                                                               // name 
-                        attributeNameOffset, attributeNameLen,                                // name
-                        currentArtifactLine, currentArtifactCol,                              // name
-                        0, 0,                                                                 // operator
-                        locator[0], locator[1],                                            // operator
-                        0, 0, 0, 0,                                                           // value
-                        locator[0], locator[1]);                                           // value
+                final IAttoHandleResult handleResult1 =
+                        handler.handleAttribute(
+                                buffer,                                                               // name
+                                attributeNameOffset, attributeNameLen,                                // name
+                                currentArtifactLine, currentArtifactCol,                              // name
+                                0, 0,                                                                 // operator
+                                locator[0], locator[1],                                               // operator
+                                0, 0, 0, 0,                                                           // value
+                                locator[0], locator[1]);                                              // value
+                handleResult = AttoHandleResultUtil.combinePriorityLast(handleResult,handleResult1);
                 i = maxi;
                 continue;
                 
@@ -229,34 +246,40 @@ public final class AttributeSequenceMarkupParsingUtil {
                 if (equalsPresent) {
                     // It is a no value with equals, so we will consider everything
                     // to be an operator
-                    
-                    handler.handleAttribute(
-                            buffer,                                                                // name 
-                            attributeNameOffset, attributeNameLen,                                 // name 
-                            attributeNameLine, attributeNameCol,                                   // name
-                            operatorOffset, operatorLen,                                           // operator 
-                            currentArtifactLine, currentArtifactCol,                               // operator
-                            0, 0, 0, 0,                                                            // value
-                            locator[0], locator[1]);                                            // value
-                    
+
+                    final IAttoHandleResult handleResult1 =
+                            handler.handleAttribute(
+                                buffer,                                                                // name
+                                attributeNameOffset, attributeNameLen,                                 // name
+                                attributeNameLine, attributeNameCol,                                   // name
+                                operatorOffset, operatorLen,                                           // operator
+                                currentArtifactLine, currentArtifactCol,                               // operator
+                                0, 0, 0, 0,                                                            // value
+                                locator[0], locator[1]);                                               // value
+                    handleResult = AttoHandleResultUtil.combinePriorityLast(handleResult, handleResult1);
+
                 } else {
                     // There is no "=", so we will first output the attribute with no
                     // operator and then a whitespace
-                    
-                    handler.handleAttribute(
-                            buffer,                                                                // name 
-                            attributeNameOffset, attributeNameLen,                                 // name 
-                            attributeNameLine, attributeNameCol,                                   // name
-                            0, 0,                                                                  // operator 
-                            currentArtifactLine, currentArtifactCol,                               // operator
-                            0, 0, 0, 0,                                                            // value
-                            currentArtifactLine, currentArtifactCol);                              // value
-                    
-                    handler.handleInnerWhiteSpace(
-                            buffer, 
-                            operatorOffset, operatorLen, 
-                            currentArtifactLine, currentArtifactCol);
-                    
+
+                    final IAttoHandleResult handleResult1 =
+                            handler.handleAttribute(
+                                    buffer,                                                                // name
+                                    attributeNameOffset, attributeNameLen,                                 // name
+                                    attributeNameLine, attributeNameCol,                                   // name
+                                    0, 0,                                                                  // operator
+                                    currentArtifactLine, currentArtifactCol,                               // operator
+                                    0, 0, 0, 0,                                                            // value
+                                    currentArtifactLine, currentArtifactCol);                              // value
+                    handleResult = AttoHandleResultUtil.combinePriorityLast(handleResult, handleResult1);
+
+                    final IAttoHandleResult handleResult2 =
+                            handler.handleInnerWhiteSpace(
+                                    buffer,
+                                    operatorOffset, operatorLen,
+                                    currentArtifactLine, currentArtifactCol);
+                    handleResult = AttoHandleResultUtil.combinePriorityLast(handleResult, handleResult2);
+
                 }
                 
                 i = maxi;
@@ -277,21 +300,25 @@ public final class AttributeSequenceMarkupParsingUtil {
             if (!equalsPresent) {
                 // It is not an operator, but a whitespace between this and the next attribute,
                 // so we will first output the attribute with no operator and then a whitespace
-                
-                handler.handleAttribute(
-                        buffer,                                                                // name 
-                        attributeNameOffset, attributeNameLen,                                 // name 
-                        attributeNameLine, attributeNameCol,                                   // name
-                        0, 0,                                                                  // operator 
-                        currentArtifactLine, currentArtifactCol,                               // operator
-                        0, 0, 0, 0,                                                            // value
-                        currentArtifactLine, currentArtifactCol);                              // value
-                
-                handler.handleInnerWhiteSpace(
-                        buffer, 
-                        current, (operatorEnd - current), 
-                        currentArtifactLine, currentArtifactCol);
-                
+
+                final IAttoHandleResult handleResult1 =
+                        handler.handleAttribute(
+                                buffer,                                                                // name
+                                attributeNameOffset, attributeNameLen,                                 // name
+                                attributeNameLine, attributeNameCol,                                   // name
+                                0, 0,                                                                  // operator
+                                currentArtifactLine, currentArtifactCol,                               // operator
+                                0, 0, 0, 0,                                                            // value
+                                currentArtifactLine, currentArtifactCol);                              // value
+                handleResult = AttoHandleResultUtil.combinePriorityLast(handleResult, handleResult1);
+
+                final IAttoHandleResult handleResult2 =
+                        handler.handleInnerWhiteSpace(
+                                buffer,
+                                current, (operatorEnd - current),
+                                currentArtifactLine, currentArtifactCol);
+                handleResult = AttoHandleResultUtil.combinePriorityLast(handleResult, handleResult2);
+
                 i = operatorEnd;
                 current = i;
                 continue;
@@ -334,15 +361,17 @@ public final class AttributeSequenceMarkupParsingUtil {
                     valueContentOffset = valueOuterOffset + 1;
                     valueContentLen = valueOuterLen - 2;
                 }
-                        
-                handler.handleAttribute(
-                        buffer,                                                               // name 
-                        attributeNameOffset, attributeNameLen,                                // name
-                        attributeNameLine, attributeNameCol,                                  // name
-                        operatorOffset, operatorLen,                                          // operator
-                        operatorLine, operatorCol,                                            // operator
-                        valueContentOffset, valueContentLen, valueOuterOffset, valueOuterLen, // value
-                        currentArtifactLine, currentArtifactCol);                             // value
+
+                final IAttoHandleResult handleResult1 =
+                        handler.handleAttribute(
+                                buffer,                                                               // name
+                                attributeNameOffset, attributeNameLen,                                // name
+                                attributeNameLine, attributeNameCol,                                  // name
+                                operatorOffset, operatorLen,                                          // operator
+                                operatorLine, operatorCol,                                            // operator
+                                valueContentOffset, valueContentLen, valueOuterOffset, valueOuterLen, // value
+                                currentArtifactLine, currentArtifactCol);                             // value
+                handleResult = AttoHandleResultUtil.combinePriorityLast(handleResult, handleResult1);
                 i = maxi;
                 continue;
                 
@@ -358,22 +387,24 @@ public final class AttributeSequenceMarkupParsingUtil {
                 valueContentOffset = valueOuterOffset + 1;
                 valueContentLen = valueOuterLen - 2;
             }
-                    
-            handler.handleAttribute(
-                    buffer,                                                               // name 
-                    attributeNameOffset, attributeNameLen,                                // name
-                    attributeNameLine, attributeNameCol,                                  // name
-                    operatorOffset, operatorLen,                                          // operator
-                    operatorLine, operatorCol,                                            // operator
-                    valueContentOffset, valueContentLen, valueOuterOffset, valueOuterLen, // value
-                    currentArtifactLine, currentArtifactCol);                             // value
+
+            final IAttoHandleResult handleResult1 =
+                    handler.handleAttribute(
+                            buffer,                                                               // name
+                            attributeNameOffset, attributeNameLen,                                // name
+                            attributeNameLine, attributeNameCol,                                  // name
+                            operatorOffset, operatorLen,                                          // operator
+                            operatorLine, operatorCol,                                            // operator
+                            valueContentOffset, valueContentLen, valueOuterOffset, valueOuterLen, // value
+                            currentArtifactLine, currentArtifactCol);                             // value
+            handleResult = AttoHandleResultUtil.combinePriorityLast(handleResult, handleResult1);
 
             i = valueEnd;
             current = i;
             
         }
         
-        return true;
+        return BestEffortParsingResult.forHandleResult(handleResult);
         
     }
 

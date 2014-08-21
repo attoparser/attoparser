@@ -20,6 +20,7 @@
 package org.attoparser.markup.html.elements;
 
 import org.attoparser.AttoParseException;
+import org.attoparser.IAttoHandleResult;
 import org.attoparser.markup.html.IDetailedHtmlElementHandling;
 
 
@@ -49,7 +50,7 @@ public class StandaloneHtmlElement extends BasicHtmlElement {
     
     
     @Override
-    public void handleOpenElementStart(
+    public IAttoHandleResult handleOpenElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen, 
             final int line, final int col, 
@@ -58,18 +59,18 @@ public class StandaloneHtmlElement extends BasicHtmlElement {
         
         stack.openElement(this);
         
-        handler.handleHtmlStandaloneElementStart(this, false, buffer, nameOffset, nameLen, line, col);
+        return handler.handleHtmlStandaloneElementStart(this, false, buffer, nameOffset, nameLen, line, col);
 
     }
 
     
     @Override
-    public void handleOpenElementEnd(
+    public IAttoHandleResult handleOpenElementEnd(
             final int line, final int col, 
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException {
-        
-        handler.handleHtmlStandaloneElementEnd(this, false, line, col);
+
+        return handler.handleHtmlStandaloneElementEnd(this, false, line, col);
         
     }
 
@@ -77,27 +78,30 @@ public class StandaloneHtmlElement extends BasicHtmlElement {
     
     
     @Override
-    public void handleCloseElementStart(
+    public IAttoHandleResult handleCloseElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen, 
             final int line, final int col, 
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException {
-        
-        handler.handleHtmlCloseElementStart(this, buffer, nameOffset, nameLen, line, col);
+
+        return handler.handleHtmlCloseElementStart(this, buffer, nameOffset, nameLen, line, col);
 
     }
 
     
     @Override
-    public void handleCloseElementEnd(
+    public IAttoHandleResult handleCloseElementEnd(
             final int line, final int col, 
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException {
-        
-        handler.handleHtmlCloseElementEnd(this, line, col);
+
+        final IAttoHandleResult result =
+            handler.handleHtmlCloseElementEnd(this, line, col);
 
         stack.closeElement();
+
+        return result;
         
     }
 

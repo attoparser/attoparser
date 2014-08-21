@@ -50,26 +50,27 @@ public abstract class AbstractAttoHandler
     }
     
     
-    public final void handleDocumentStart(final int line, final int col) throws AttoParseException {
+    public final IAttoHandleResult handleDocumentStart(final int line, final int col) throws AttoParseException {
         this.parsingStartTimeNanos = System.nanoTime();
-        handleDocumentStart(this.parsingStartTimeNanos, line, col);
+        return handleDocumentStart(this.parsingStartTimeNanos, line, col);
     }
 
     
-    public final void handleDocumentEnd(final int line, final int col) throws AttoParseException {
+    public final IAttoHandleResult handleDocumentEnd(final int line, final int col) throws AttoParseException {
         this.parsingEndTimeNanos = System.nanoTime();
         final long totalTimeNanos = this.parsingEndTimeNanos - this.parsingStartTimeNanos;
-        handleDocumentEnd(this.parsingEndTimeNanos, totalTimeNanos, line, col);
+        return handleDocumentEnd(this.parsingEndTimeNanos, totalTimeNanos, line, col);
     }
 
 
-    public void handleText(final char[] buffer, final int offset, final int len, 
+    public IAttoHandleResult handleText(final char[] buffer, final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here
+        return null;
     }
 
-    public char[] handleStructure(final char[] buffer, final int offset, final int len,
+    public IAttoHandleResult handleStructure(final char[] buffer, final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here
@@ -77,15 +78,17 @@ public abstract class AbstractAttoHandler
     }
     
     
-    public void handleDocumentStart(final long startTimeNanos, final int line, final int col) 
+    public IAttoHandleResult handleDocumentStart(final long startTimeNanos, final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here
+        return null;
     }
 
     
-    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
+    public IAttoHandleResult handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
            throws AttoParseException {
         // Nothing to be done here
+        return null;
     }
 
     

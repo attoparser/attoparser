@@ -20,7 +20,9 @@
 package org.attoparser.markup;
 
 import org.attoparser.AbstractBufferedAttoParser;
+import org.attoparser.AttoHandleResult;
 import org.attoparser.AttoParseException;
+import org.attoparser.IAttoHandleResult;
 import org.attoparser.IAttoHandler;
 
 
@@ -125,12 +127,22 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                 final int sequenceIndex =
                         MarkupParsingUtil.findCharacterSequence(buffer, i, maxi, locator, skipUntil);
                 if (sequenceIndex == -1) {
+
                     // Not found, should ask for more buffer
                     if (canSplitText) {
-                        handler.handleText(buffer, current, len - current, currentLine, currentCol);
+
+                        final IAttoHandleResult result =
+                            handler.handleText(buffer, current, len - current, currentLine, currentCol);
+                        if (result != null && result != AttoHandleResult.CONTINUE) {
+                            skipUntil = result.getParsingDisableLimit();
+                        }
+
                         current = len;
+
                     }
+
                     return new BufferParseResult(current, currentLine, currentCol, false, skipUntil);
+
                 }
                 i = sequenceIndex;
                 skipUntil = null;
@@ -144,11 +156,21 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                 tagStart = MarkupParsingUtil.findNextStructureStart(buffer, i, maxi, locator);
                 
                 if (tagStart == -1) {
+
                     if (canSplitText) {
-                        handler.handleText(buffer, current, len - current, currentLine, currentCol);
+
+                        final IAttoHandleResult result =
+                            handler.handleText(buffer, current, len - current, currentLine, currentCol);
+                        if (result != null && result != AttoHandleResult.CONTINUE) {
+                            skipUntil = result.getParsingDisableLimit();
+                        }
+
                         current = len;
+
                     }
+
                     return new BufferParseResult(current, currentLine, currentCol, false, skipUntil);
+
                 }
 
                 inOpenElement = ElementMarkupParsingUtil.isOpenElementStart(buffer, tagStart, maxi);
@@ -214,9 +236,16 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                 
                 if (tagStart > current) {
                     // We avoid empty-string text events
-                    handler.handleText(
-                            buffer, current, (tagStart - current), 
-                            currentLine, currentCol);
+
+                    final IAttoHandleResult result =
+                        handler.handleText(
+                                buffer, current, (tagStart - current),
+                                currentLine, currentCol);
+
+                    if (result != null && result != AttoHandleResult.CONTINUE) {
+                        skipUntil = result.getParsingDisableLimit();
+                    }
+
                 }
                 
                 current = tagStart;
@@ -246,16 +275,24 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                 
                 if (inOpenElement) {
                     // This is a closing tag
-                    
-                    skipUntil =
+
+                    final IAttoHandleResult result =
                             handler.handleStructure(buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
+                    if (result != null && result != AttoHandleResult.CONTINUE) {
+                        skipUntil = result.getParsingDisableLimit();
+                    }
+
                     inOpenElement = false;
                     
                 } else if (inCloseElement) {
                     // This is a closing tag
 
-                    skipUntil =
+                    final IAttoHandleResult result =
                             handler.handleStructure(buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
+                    if (result != null && result != AttoHandleResult.CONTINUE) {
+                        skipUntil = result.getParsingDisableLimit();
+                    }
+
                     inCloseElement = false;
                     
                 } else if (inComment) {
@@ -273,8 +310,12 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                         
                     }
 
-                    skipUntil =
+                    final IAttoHandleResult result =
                             handler.handleStructure(buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
+                    if (result != null && result != AttoHandleResult.CONTINUE) {
+                        skipUntil = result.getParsingDisableLimit();
+                    }
+
                     inComment = false;
                     
                 } else if (inCdata) {
@@ -292,22 +333,34 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                         
                     }
 
-                    skipUntil =
+                    final IAttoHandleResult result =
                             handler.handleStructure(buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
+                    if (result != null && result != AttoHandleResult.CONTINUE) {
+                        skipUntil = result.getParsingDisableLimit();
+                    }
+
                     inCdata = false;
                     
                 } else if (inDocType) {
                     // This is a DOCTYPE clause
 
-                    skipUntil =
+                    final IAttoHandleResult result =
                             handler.handleStructure(buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
+                    if (result != null && result != AttoHandleResult.CONTINUE) {
+                        skipUntil = result.getParsingDisableLimit();
+                    }
+
                     inDocType = false;
                     
                 } else if (inXmlDeclaration) {
                     // This is an XML Declaration
 
-                    skipUntil =
+                    final IAttoHandleResult result =
                             handler.handleStructure(buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
+                    if (result != null && result != AttoHandleResult.CONTINUE) {
+                        skipUntil = result.getParsingDisableLimit();
+                    }
+
                     inXmlDeclaration = false;
                     
                 } else if (inProcessingInstruction) {
@@ -326,8 +379,12 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                     }
 
 
-                    skipUntil =
+                    final IAttoHandleResult result =
                             handler.handleStructure(buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
+                    if (result != null && result != AttoHandleResult.CONTINUE) {
+                        skipUntil = result.getParsingDisableLimit();
+                    }
+
                     inProcessingInstruction = false;
                     
                 } else {

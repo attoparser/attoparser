@@ -20,7 +20,7 @@
 package org.attoparser.markup;
 
 import org.attoparser.AttoParseException;
-
+import org.attoparser.IAttoHandleResult;
 
 
 /**
@@ -49,17 +49,21 @@ public final class CdataMarkupParsingUtil {
     
     
     
-    public static void parseCdata(
+    public static IAttoHandleResult parseCdata(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col, 
             final ICDATASectionHandling handler)
             throws AttoParseException {
-        
-        if (!tryParseCdata(buffer, offset, len, line, col, handler)) {
+
+        final BestEffortParsingResult bestEffortParsingResult =
+                tryParseCdata(buffer, offset, len, line, col, handler);
+        if (bestEffortParsingResult == null) {
             throw new AttoParseException(
                     "Could not parse as markup CDATA: \"" + new String(buffer, offset, len) + "\"", line, col);
         }
+
+        return bestEffortParsingResult.getHandleResult();
         
     }
 
@@ -67,7 +71,7 @@ public final class CdataMarkupParsingUtil {
 
     
     
-    public static boolean tryParseCdata(
+    public static BestEffortParsingResult tryParseCdata(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col, 
@@ -79,11 +83,11 @@ public final class CdataMarkupParsingUtil {
                 buffer[offset + len - 3] == ']' &&
                 buffer[offset + len - 2] == ']' &&
                 buffer[offset + len - 1] == '>') {
-            handler.handleCDATASection(buffer, offset + 9, len - 12, offset, len, line, col);
-            return true;
+            return BestEffortParsingResult.forHandleResult(
+                    handler.handleCDATASection(buffer, offset + 9, len - 12, offset, len, line, col));
         }
         
-        return false;
+        return null;
         
     }
 
