@@ -1,9 +1,16 @@
+2.0.0
+=======
+- Refactored all handler interfaces so that event handling methods now return a result object capable of
+  giving information or instructions back to the parser (e.g. disabling parser for #CDATA sections).
+
+
 1.4.0
 =======
 - Added capability to disable parsing inside elements which contents should not be processed at all,
   e.g. <script> and <style> tags in HTML, which are CDATA and not PCDATA, and should allow markup significant
   characters in their contents (<,>,&,"). The whole contents of these elements are reported as a Text node.
 - Improved library metadata in META-INF/MANIFEST.MF and added OSGi metadata.
+
 
 1.3
 =======
