@@ -153,6 +153,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
     @Override
     public IAttoHandleResult handleStandaloneElementEnd(
+            final char[] buffer, final int offset, final int len,
             final int line, final int col) throws AttoParseException {
         
         try {
@@ -186,6 +187,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
     @Override
     public IAttoHandleResult handleOpenElementEnd(
+            final char[] buffer, final int offset, final int len,
             final int line, final int col) throws AttoParseException {
         
         try {
@@ -219,6 +221,7 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
     @Override
     public IAttoHandleResult handleCloseElementEnd(
+            final char[] buffer, final int offset, final int len,
             final int line, final int col) throws AttoParseException {
         
         try {
@@ -234,8 +237,23 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public IAttoHandleResult handleAutoCloseElementStart(final char[] buffer, final int offset, final int len, final int line,
-            final int col) throws AttoParseException {
+    public IAttoHandleResult handleAutoCloseElementStart(
+            final char[] buffer, final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException {
+        // Nothing to be done... balanced elements were not present at the original template!
+        return null;
+    }
+
+
+
+
+
+    @Override
+    public IAttoHandleResult handleAutoCloseElementEnd(
+            final char[] buffer, final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException {
         // Nothing to be done... balanced elements were not present at the original template!
         return null;
     }
@@ -244,17 +262,10 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public IAttoHandleResult handleAutoCloseElementEnd(final int line, final int col) throws AttoParseException {
-        // Nothing to be done... balanced elements were not present at the original template!
-        return null;
-    }
-
-
-
-
-    @Override
-    public IAttoHandleResult handleUnmatchedCloseElementStart(final char[] buffer, final int offset, final int len,
-            final int line, final int col) throws AttoParseException {
+    public IAttoHandleResult handleUnmatchedCloseElementStart(
+            final char[] buffer, final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException {
         // They were present at the original template, so simply output them.
         return handleCloseElementStart(buffer, offset, len, line, col);
     }
@@ -263,9 +274,12 @@ public final class DuplicatingDetailedMarkupAttoHandler extends AbstractDetailed
 
 
     @Override
-    public IAttoHandleResult handleUnmatchedCloseElementEnd(final int line, final int col) throws AttoParseException {
+    public IAttoHandleResult handleUnmatchedCloseElementEnd(
+            final char[] buffer, final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException {
         // They were present at the original template, so simply output them.
-        return handleCloseElementEnd(line, col);
+        return handleCloseElementEnd(buffer, offset, len, line, col);
     }
 
 

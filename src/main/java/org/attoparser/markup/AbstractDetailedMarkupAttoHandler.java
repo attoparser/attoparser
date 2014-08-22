@@ -167,7 +167,6 @@ public abstract class AbstractDetailedMarkupAttoHandler
             final int line, final int col) 
             throws AttoParseException {
 
-        super.handleStandaloneElement(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
         return ElementMarkupParsingUtil.parseDetailedStandaloneElement(buffer, outerOffset, outerLen, line, col, this.wrapper);
         
     }
@@ -181,7 +180,6 @@ public abstract class AbstractDetailedMarkupAttoHandler
             final int line, final int col) 
             throws AttoParseException {
 
-        super.handleOpenElement(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
         return ElementMarkupParsingUtil.parseDetailedOpenElement(buffer, outerOffset, outerLen, line, col, this.wrapper);
         
     }
@@ -195,7 +193,6 @@ public abstract class AbstractDetailedMarkupAttoHandler
             final int line, final int col)
             throws AttoParseException {
 
-        super.handleCloseElement(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
         return ElementMarkupParsingUtil.parseDetailedCloseElement(buffer, outerOffset, outerLen, line, col, this.wrapper);
 
     }
@@ -323,6 +320,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
     }
 
     public IAttoHandleResult handleStandaloneElementEnd(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
@@ -341,6 +340,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
     }
 
     public IAttoHandleResult handleOpenElementEnd(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
@@ -359,6 +360,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
     }
 
     public IAttoHandleResult handleCloseElementEnd(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
@@ -377,6 +380,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
     }
 
     public IAttoHandleResult handleAutoCloseElementEnd(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
@@ -396,6 +401,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
 
     public IAttoHandleResult handleUnmatchedCloseElementEnd(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
@@ -661,11 +668,13 @@ public abstract class AbstractDetailedMarkupAttoHandler
         }
 
         public IAttoHandleResult handleStandaloneElementEnd(
+                final char[] buffer,
+                final int nameOffset, final int nameLen,
                 final int line, final int col)
                 throws AttoParseException {
 
             final IAttoHandleResult result =
-                this.handler.handleStandaloneElementEnd(line, col);
+                this.handler.handleStandaloneElementEnd(buffer, nameOffset, nameLen, line, col);
             this.elementRead = true;
             return result;
 
@@ -697,11 +706,13 @@ public abstract class AbstractDetailedMarkupAttoHandler
         }
 
         public IAttoHandleResult handleOpenElementEnd(
+                final char[] buffer,
+                final int nameOffset, final int nameLen,
                 final int line, final int col)
                 throws AttoParseException {
 
             final IAttoHandleResult result =
-                this.handler.handleOpenElementEnd(line, col);
+                this.handler.handleOpenElementEnd(buffer, nameOffset, nameLen, line, col);
             
             this.elementRead = true;
 
@@ -733,14 +744,16 @@ public abstract class AbstractDetailedMarkupAttoHandler
         }
 
         public IAttoHandleResult handleCloseElementEnd(
+                final char[] buffer,
+                final int nameOffset, final int nameLen,
                 final int line, final int col)
                 throws AttoParseException {
 
             final IAttoHandleResult result;
             if (this.closeElementIsMatched) {
-                result = this.handler.handleCloseElementEnd(line, col);
+                result = this.handler.handleCloseElementEnd(buffer, nameOffset, nameLen, line, col);
             } else {
-                result = this.handler.handleUnmatchedCloseElementEnd(line, col);
+                result = this.handler.handleUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col);
             }
             
             this.elementRead = true;
@@ -971,7 +984,9 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
 
         public IAttoHandleResult handleUnmatchedCloseElementEnd(
-                final int line, final int col) 
+                final char[] buffer,
+                final int nameOffset, final int nameLen,
+                final int line, final int col)
                 throws AttoParseException {
             throw new UnsupportedOperationException(
                     "This method at the wrapper handler should never be called, it is just " +
@@ -991,6 +1006,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
 
         public IAttoHandleResult handleAutoCloseElementEnd(
+                final char[] buffer,
+                final int nameOffset, final int nameLen,
                 final int line, final int col)
                 throws AttoParseException {
             throw new UnsupportedOperationException(
@@ -1106,7 +1123,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
                 if (this.autoClose) {
                     this.handler.handleAutoCloseElementStart(popped, 0, popped.length, line, col);
-                    this.handler.handleAutoCloseElementEnd(line, col);
+                    this.handler.handleAutoCloseElementEnd(popped, 0, popped.length, line, col);
                 }
                 
                 popped = popFromStack();
@@ -1144,7 +1161,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
                     if (this.autoClose) {
                         this.handler.handleAutoCloseElementStart(popped, 0, popped.length, line, col);
-                        this.handler.handleAutoCloseElementEnd(line, col);
+                        this.handler.handleAutoCloseElementEnd(popped, 0, popped.length, line, col);
                     }
                     
                     popped = popFromStack();

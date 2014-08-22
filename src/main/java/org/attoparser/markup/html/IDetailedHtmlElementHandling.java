@@ -83,6 +83,9 @@ public interface IDetailedHtmlElementHandling extends IHtmlAttributeSequenceHand
      * 
      * @param element the {@link IHtmlElement} element object representing the corresponding HTML element.
      * @param minimized whether the tag representing this element is minimized (self-closed) or not.
+     * @param buffer the document buffer (not copied).
+     * @param nameOffset the offset (position in buffer) where the element name appears.
+     * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
      * @return the result of handling the event, or null if no relevant result has to be returned.
@@ -91,6 +94,8 @@ public interface IDetailedHtmlElementHandling extends IHtmlAttributeSequenceHand
     public IAttoHandleResult handleHtmlStandaloneElementEnd(
             final IHtmlElement element,
             final boolean minimized,
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException;
 
@@ -133,6 +138,9 @@ public interface IDetailedHtmlElementHandling extends IHtmlAttributeSequenceHand
      * </p>
      * 
      * @param element the {@link IHtmlElement} element object representing the corresponding HTML element.
+     * @param buffer the document buffer (not copied).
+     * @param nameOffset the offset (position in buffer) where the element name appears.
+     * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
      * @return the result of handling the event, or null if no relevant result has to be returned.
@@ -140,6 +148,8 @@ public interface IDetailedHtmlElementHandling extends IHtmlAttributeSequenceHand
      */
     public IAttoHandleResult handleHtmlOpenElementEnd(
             final IHtmlElement element,
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException;
 
@@ -184,6 +194,9 @@ public interface IDetailedHtmlElementHandling extends IHtmlAttributeSequenceHand
      * </p>
      * 
      * @param element the {@link IHtmlElement} element object representing the corresponding HTML element.
+     * @param buffer the document buffer (not copied).
+     * @param nameOffset the offset (position in buffer) where the element name appears.
+     * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
      * @return the result of handling the event, or null if no relevant result has to be returned.
@@ -191,6 +204,8 @@ public interface IDetailedHtmlElementHandling extends IHtmlAttributeSequenceHand
      */
     public IAttoHandleResult handleHtmlCloseElementEnd(
             final IHtmlElement element,
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException;
     

@@ -294,6 +294,8 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedNonValidatingHtm
     public IAttoHandleResult handleHtmlStandaloneElementEnd(
             final IHtmlElement element,
             final boolean minimized,
+            final char[] buffer,
+            final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         
@@ -339,7 +341,9 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedNonValidatingHtm
     @Override
     public IAttoHandleResult handleHtmlOpenElementEnd(
             final IHtmlElement element,
-            final int line, final int col) 
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
             throws AttoParseException {
         
         try {
@@ -384,7 +388,9 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedNonValidatingHtm
     @Override
     public IAttoHandleResult handleHtmlCloseElementEnd(
             final IHtmlElement element,
-            final int line, final int col) 
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
             throws AttoParseException {
         
         try {

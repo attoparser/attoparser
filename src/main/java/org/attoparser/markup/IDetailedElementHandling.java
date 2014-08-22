@@ -71,13 +71,18 @@ public interface IDetailedElementHandling extends IAttributeSequenceHandling {
      * <p>
      *   Called when the end of a standalone element (a <i>minimized tag</i>) is found
      * </p>
-     * 
+     *
+     * @param buffer the document buffer (not copied)
+     * @param nameOffset the offset (position in buffer) where the element name appears.
+     * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where the element ending structure appears.
      * @param col the column in the original document where the element ending structure appears.
      * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
     public IAttoHandleResult handleStandaloneElementEnd(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException;
 
@@ -118,13 +123,18 @@ public interface IDetailedElementHandling extends IAttributeSequenceHandling {
      * <p>
      *   Called when the end of an open element (an <i>open tag</i>) is found.
      * </p>
-     * 
+     *
+     * @param buffer the document buffer (not copied)
+     * @param nameOffset the offset (position in buffer) where the element name appears.
+     * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where the element ending structure appears.
      * @param col the column in the original document where the element ending structure appears.
      * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
     public IAttoHandleResult handleOpenElementEnd(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException;
 
@@ -166,13 +176,18 @@ public interface IDetailedElementHandling extends IAttributeSequenceHandling {
      * <p>
      *   Called when the end of a close element (a <i>close tag</i>) is found.
      * </p>
-     * 
+     *
+     * @param buffer the document buffer (not copied)
+     * @param nameOffset the offset (position in buffer) where the element name appears.
+     * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where the element ending structure appears.
      * @param col the column in the original document where the element ending structure appears.
      * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
     public IAttoHandleResult handleCloseElementEnd(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException;
 
@@ -209,13 +224,18 @@ public interface IDetailedElementHandling extends IAttributeSequenceHandling {
      * <p>
      *   Called when the end of an unmatched close element (<i>close tag</i>) is found.
      * </p>
-     * 
+     *
+     * @param buffer the document buffer (not copied)
+     * @param nameOffset the offset (position in buffer) where the element name appears.
+     * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where the element ending structure appears.
      * @param col the column in the original document where the element ending structure appears.
      * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
     public IAttoHandleResult handleUnmatchedCloseElementEnd(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException;
     
@@ -253,13 +273,18 @@ public interface IDetailedElementHandling extends IAttributeSequenceHandling {
      *   Called for signaling the end of an auto-close element, created for
      *   balancing an unclosed tag. 
      * </p>
-     * 
+     *
+     * @param buffer the document buffer (not copied)
+     * @param nameOffset the offset (position in buffer) where the element name appears.
+     * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where the element ending structure appears.
      * @param col the column in the original document where the element ending structure appears.
      * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
     public IAttoHandleResult handleAutoCloseElementEnd(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException;
 

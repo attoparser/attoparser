@@ -139,6 +139,8 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
     public IAttoHandleResult handleHtmlStandaloneElementEnd(
             final IHtmlElement element,
             final boolean minimized,
+            final char[] buffer,
+            final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         this.trace.add(
@@ -169,7 +171,9 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
     @Override
     public IAttoHandleResult handleHtmlOpenElementEnd(
             final IHtmlElement element,
-            final int line, final int col) 
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
             throws AttoParseException {
         this.trace.add(new TraceEvent(line, col, TRACE_TYPE_OPEN_ELEMENT_END, element.getName()));
         return null;
@@ -196,7 +200,9 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
     @Override
     public IAttoHandleResult handleHtmlCloseElementEnd(
             final IHtmlElement element,
-            final int line, final int col) 
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
             throws AttoParseException {
         this.trace.add(new TraceEvent(line, col, TRACE_TYPE_CLOSE_ELEMENT_END, element.getName()));
         return null;

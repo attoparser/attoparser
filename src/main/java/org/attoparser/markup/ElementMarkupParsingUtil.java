@@ -260,7 +260,8 @@ public final class ElementMarkupParsingUtil {
                             line, col);
                 final IAttoHandleResult handleResult2 =
                         handler.handleStandaloneElementEnd(
-                                locator[0], locator[1]);
+                            buffer, contentOffset, contentLen,
+                            locator[0], locator[1]);
 
                 return AttoHandleResultUtil.combinePriorityLast(handleResult1, handleResult2);
 
@@ -272,6 +273,7 @@ public final class ElementMarkupParsingUtil {
                                 line, col);
                 final IAttoHandleResult handleResult2 =
                         handler.handleOpenElementEnd(
+                                buffer, contentOffset, contentLen,
                                 locator[0], locator[1]);
 
                 return AttoHandleResultUtil.combinePriorityLast(handleResult1, handleResult2);
@@ -306,10 +308,12 @@ public final class ElementMarkupParsingUtil {
         if (isStandalone) {
             handleResult3 =
                     handler.handleStandaloneElementEnd(
+                            buffer, contentOffset, (elementNameEnd - contentOffset),
                             locator[0], locator[1]);
         } else {
             handleResult3 =
                     handler.handleOpenElementEnd(
+                            buffer, contentOffset, (elementNameEnd - contentOffset),
                             locator[0], locator[1]);
         }
 
@@ -352,6 +356,7 @@ public final class ElementMarkupParsingUtil {
                             line, col);
             final IAttoHandleResult handleResult2 =
                     handler.handleCloseElementEnd(
+                            buffer, contentOffset, contentLen,
                             locator[0], locator[1]);
             
             return AttoHandleResultUtil.combinePriorityLast(handleResult1,handleResult2);
@@ -392,6 +397,7 @@ public final class ElementMarkupParsingUtil {
 
         final IAttoHandleResult handleResult3 =
                 handler.handleCloseElementEnd(
+                        buffer, contentOffset, (elementNameEnd - contentOffset),
                         locator[0], locator[1]);
 
 

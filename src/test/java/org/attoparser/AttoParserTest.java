@@ -184,6 +184,66 @@ public class AttoParserTest extends TestCase {
             "[OES(STYLE){1,1}OEE{1,7}T( a = \"<div>\"\n\nif (a < 0)){1,8}CES(STYLE){3,11}CEE{3,18}]",
             HtmlParsing.htmlParsingConfiguration());
         testDoc(
+            "<script type=\"text/javascript\"> var a = \"<div>\" if (a < 0)</script>",
+            "[OES(script){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE{1,31}T( var a = \"){1,32}OES(div){1,42}OEE{1,46}T(\" if (a < 0)){1,47}CES(script){1,59}CEE{1,67}]",
+            "[OE(script[type='text/javascript']){1,1}T( var a = \"){1,32}OE(div){1,42}T(\" if (a < 0)){1,47}CE(script){1,59}]",
+            noRestrictions);
+        testDoc(
+            "<style type=\"text/css\"> a = \"<div>\" if (a < 0)</style>",
+            "[OES(style){1,1}IWS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE{1,23}T( a = \"){1,24}OES(div){1,30}OEE{1,34}T(\" if (a < 0)){1,35}CES(style){1,47}CEE{1,54}]",
+            "[OE(style[type='text/css']){1,1}T( a = \"){1,24}OE(div){1,30}T(\" if (a < 0)){1,35}CE(style){1,47}]",
+            noRestrictions);
+        testHtmlDoc(
+            "<script type=\"text/javascript\"> var a = \"<div>\" if (a < 0)</script>",
+            "[OES(script){1,1}AS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE{1,31}T( var a = \"<div>\" if (a < 0)){1,32}CES(script){1,59}CEE{1,67}]",
+            HtmlParsing.htmlParsingConfiguration());
+        testHtmlDoc(
+            "<style type=\"text/css\"> a = \"<div>\" if (a < 0)</style>",
+            "[OES(style){1,1}AS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE{1,23}T( a = \"<div>\" if (a < 0)){1,24}CES(style){1,47}CEE{1,54}]",
+            HtmlParsing.htmlParsingConfiguration());
+        testHtmlDoc(
+            "<script type=\"text/javascript\"> var a = \"<div>\"\n\nif (a < 0)</script>",
+            "[OES(script){1,1}AS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE{1,31}T( var a = \"<div>\"\n\nif (a < 0)){1,32}CES(script){3,11}CEE{3,19}]",
+            HtmlParsing.htmlParsingConfiguration());
+        testHtmlDoc(
+            "<style type=\"text/css\"> a = \"<div>\"\n\nif (a < 0)</style>",
+            "[OES(style){1,1}AS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE{1,23}T( a = \"<div>\"\n\nif (a < 0)){1,24}CES(style){3,11}CEE{3,18}]",
+            HtmlParsing.htmlParsingConfiguration());
+        testDoc(
+            "<SCRIPT type=\"text/javascript\"> var a = \"<div>\" if (a < 0)</SCRIPT>",
+            "[OES(SCRIPT){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE{1,31}T( var a = \"){1,32}OES(div){1,42}OEE{1,46}T(\" if (a < 0)){1,47}CES(SCRIPT){1,59}CEE{1,67}]",
+            "[OE(SCRIPT[type='text/javascript']){1,1}T( var a = \"){1,32}OE(div){1,42}T(\" if (a < 0)){1,47}CE(SCRIPT){1,59}]",
+            noRestrictions);
+        testDoc(
+            "<STYLE type=\"text/css\"> a = \"<div>\" if (a < 0)</STYLE>",
+            "[OES(STYLE){1,1}IWS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE{1,23}T( a = \"){1,24}OES(div){1,30}OEE{1,34}T(\" if (a < 0)){1,35}CES(STYLE){1,47}CEE{1,54}]",
+            "[OE(STYLE[type='text/css']){1,1}T( a = \"){1,24}OE(div){1,30}T(\" if (a < 0)){1,35}CE(STYLE){1,47}]",
+            noRestrictions);
+        testHtmlDoc(
+            "<SCRIPT type=\"text/javascript\"> var a = \"<div>\" if (a < 0)</SCRIPT>",
+            "[OES(SCRIPT){1,1}AS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE{1,31}T( var a = \"<div>\" if (a < 0)){1,32}CES(SCRIPT){1,59}CEE{1,67}]",
+            HtmlParsing.htmlParsingConfiguration());
+        testHtmlDoc(
+            "<STYLE type=\"text/css\"> a = \"<div>\" if (a < 0)</STYLE>",
+            "[OES(STYLE){1,1}AS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE{1,23}T( a = \"<div>\" if (a < 0)){1,24}CES(STYLE){1,47}CEE{1,54}]",
+            HtmlParsing.htmlParsingConfiguration());
+        testHtmlDoc(
+            "<SCRIPT type=\"text/javascript\"> var a = \"<div>\"\n\nif (a < 0)</SCRIPT>",
+            "[OES(SCRIPT){1,1}AS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE{1,31}T( var a = \"<div>\"\n\nif (a < 0)){1,32}CES(SCRIPT){3,11}CEE{3,19}]",
+            HtmlParsing.htmlParsingConfiguration());
+        testHtmlDoc(
+            "<STYLE type=\"text/css\"> a = \"<div>\"\n\nif (a < 0)</STYLE>",
+            "[OES(STYLE){1,1}AS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE{1,23}T( a = \"<div>\"\n\nif (a < 0)){1,24}CES(STYLE){3,11}CEE{3,18}]",
+            HtmlParsing.htmlParsingConfiguration());
+        testHtmlDoc(
+            "<ScripT type=\"text/javascript\"> var a = \"<div>\" if (a < 0)</ScripT>",
+            "[OES(ScripT){1,1}AS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE{1,31}T( var a = \"<div>\" if (a < 0)){1,32}CES(ScripT){1,59}CEE{1,67}]",
+            HtmlParsing.htmlParsingConfiguration());
+        testHtmlDoc(
+            "<StylE type=\"text/css\"> a = \"<div>\" if (a < 0)</StylE>",
+            "[OES(StylE){1,1}AS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE{1,23}T( a = \"<div>\" if (a < 0)){1,24}CES(StylE){1,47}CEE{1,54}]",
+            HtmlParsing.htmlParsingConfiguration());
+        testDoc(
             "<h1 a=\"if (a < 0)\">Hello</ h1>",
             "[OES(h1){1,1}IWS( ){1,4}A(a){1,5}(=){1,6}(\"if (a < 0)\"){1,7}OEE{1,19}T(Hello</ h1>){1,20}ACES(h1){1,31}ACEE{1,31}]",
             "[OE(h1[a='if (a < 0)']){1,1}T(Hello</ h1>){1,20}ACE(h1){1,31}]",

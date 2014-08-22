@@ -89,6 +89,8 @@ public abstract class AbstractStandardMarkupAttoHandler
     
     @Override
     public final IAttoHandleResult handleStandaloneElementEnd(
+            final char[] buffer,
+            final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         
@@ -118,7 +120,9 @@ public abstract class AbstractStandardMarkupAttoHandler
     
     @Override
     public final IAttoHandleResult handleOpenElementEnd(
-            final int line, final int col) 
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
             throws AttoParseException {
 
         return handleOpenElement(this.currentElementName, this.currentElementAttributes, this.currentElementLine, this.currentElementCol);
@@ -147,7 +151,9 @@ public abstract class AbstractStandardMarkupAttoHandler
     
     @Override
     public final IAttoHandleResult handleCloseElementEnd(
-            final int line, final int col) 
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
             throws AttoParseException {
 
         return handleCloseElement(this.currentElementName, this.currentElementLine, this.currentElementCol);
@@ -177,7 +183,9 @@ public abstract class AbstractStandardMarkupAttoHandler
     
     @Override
     public final IAttoHandleResult handleAutoCloseElementEnd(
-            final int line, final int col) 
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
             throws AttoParseException {
 
         return handleAutoClosedElement(this.currentElementName, this.currentElementLine, this.currentElementCol);
@@ -207,7 +215,9 @@ public abstract class AbstractStandardMarkupAttoHandler
     
     @Override
     public final IAttoHandleResult handleUnmatchedCloseElementEnd(
-            final int line, final int col) 
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
             throws AttoParseException {
 
         return handleUnmatchedClosedElement(this.currentElementName, this.currentElementLine, this.currentElementCol);

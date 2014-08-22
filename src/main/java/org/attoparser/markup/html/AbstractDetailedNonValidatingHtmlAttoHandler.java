@@ -112,7 +112,9 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
 
     @Override
     public final IAttoHandleResult handleStandaloneElementEnd(
-            final int line, final int col) 
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
             throws AttoParseException {
         
         if (this.currentElement == null) {
@@ -120,7 +122,7 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
         }
 
         final IAttoHandleResult result =
-            this.currentElement.handleStandaloneElementEnd(line, col, this.stack, this);
+            this.currentElement.handleStandaloneElementEnd(buffer, offset, len, line, col, this.stack, this);
         this.currentElement = null;
 
         return result;
@@ -144,7 +146,9 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
 
     @Override
     public final IAttoHandleResult handleOpenElementEnd(
-            final int line, final int col) 
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
             throws AttoParseException {
 
         if (this.currentElement == null) {
@@ -152,7 +156,7 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
         }
 
         final IAttoHandleResult result =
-            this.currentElement.handleOpenElementEnd(line, col, this.stack, this);
+            this.currentElement.handleOpenElementEnd(buffer, offset, len, line, col, this.stack, this);
         this.currentElement = null;
 
         return result;
@@ -176,6 +180,8 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
 
     @Override
     public final IAttoHandleResult handleCloseElementEnd(
+            final char[] buffer,
+            final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
 
@@ -184,7 +190,7 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
         }
 
         final IAttoHandleResult result =
-            this.currentElement.handleCloseElementEnd(line, col, this.stack, this);
+            this.currentElement.handleCloseElementEnd(buffer, offset, len, line, col, this.stack, this);
         this.currentElement = null;
 
         return result;
@@ -208,7 +214,9 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
 
     @Override
     public final IAttoHandleResult handleAutoCloseElementEnd(
-            final int line, final int col) 
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
             throws AttoParseException {
 
         if (this.currentElement == null) {
@@ -216,7 +224,7 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
         }
 
         final IAttoHandleResult result =
-            this.currentElement.handleAutoCloseElementEnd(line, col, this.stack, this);
+            this.currentElement.handleAutoCloseElementEnd(buffer, offset, len, line, col, this.stack, this);
         this.currentElement = null;
 
         return result;
@@ -240,7 +248,9 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
 
     @Override
     public final IAttoHandleResult handleUnmatchedCloseElementEnd(
-            final int line, final int col) 
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
             throws AttoParseException {
 
         if (this.currentElement == null) {
@@ -248,7 +258,7 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
         }
 
         final IAttoHandleResult result =
-            this.currentElement.handleUnmatchedCloseElementEnd(line, col, this.stack, this);
+            this.currentElement.handleUnmatchedCloseElementEnd(buffer, offset, len, line, col, this.stack, this);
         this.currentElement = null;
 
         return result;
@@ -366,6 +376,8 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
     public IAttoHandleResult handleHtmlStandaloneElementEnd(
             final IHtmlElement element,
             final boolean minimized,
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
@@ -391,6 +403,8 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
 
     public IAttoHandleResult handleHtmlOpenElementEnd(
             final IHtmlElement element,
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
@@ -416,7 +430,9 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
 
     public IAttoHandleResult handleHtmlCloseElementEnd(
             final IHtmlElement element,
-            final int line, final int col) 
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
         return null;

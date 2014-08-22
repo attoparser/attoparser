@@ -34,6 +34,11 @@ package org.attoparser;
 public final class AttoHandleResultUtil {
 
 
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
     /**
      * <p>
      *     Combines both instances of {@link org.attoparser.IAttoHandleResult}, giving priority to the data contained
@@ -59,8 +64,7 @@ public final class AttoHandleResultUtil {
         }
 
         return new AttoHandleResult(
-                last.getParsingDisableLimit() != null? last.getParsingDisableLimit() : first.getParsingDisableLimit(),
-                last.getPushBackSequence() != null? last.getPushBackSequence() : first.getPushBackSequence()
+                last.getParsingDisableLimit() != null? last.getParsingDisableLimit() : first.getParsingDisableLimit()
         );
 
     }
@@ -95,8 +99,7 @@ public final class AttoHandleResultUtil {
         }
 
         return new AttoHandleResult(
-                first.getParsingDisableLimit() != null? first.getParsingDisableLimit() : last.getParsingDisableLimit(),
-                first.getPushBackSequence() != null? first.getPushBackSequence() : last.getPushBackSequence()
+                first.getParsingDisableLimit() != null? first.getParsingDisableLimit() : last.getParsingDisableLimit()
         );
 
     }

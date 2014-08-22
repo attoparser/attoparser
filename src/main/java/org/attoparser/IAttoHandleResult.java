@@ -60,22 +60,4 @@ public interface IAttoHandleResult {
      */
     public char[] getParsingDisableLimit();
 
-
-    /**
-     * <p>
-     *   Return the char sequence until which parsing should be disabled (if applies).
-     * </p>
-     * <p>
-     *   This method will return a <kbd>char[]</kbd> if, as a result of handling this structure, parsing
-     *   should be disabled until the returned char sequence is found in input. This allows
-     *   e.g. ignoring the contents of non-processable elements like HTML's <kbd>&lt;script&gt;</kbd>
-     *   or <kbd>&lt;style&gt;</kbd>.
-     * </p>
-     *
-     * @return a char[] if, as a result of handling this structure, parsing should
-     *         be disabled until the returned char sequence is found in input. Will return
-     *         <kbd>null</kbd> if parsing should not be disabled (most common case).
-     */
-    public char[] getPushBackSequence();
-    
 }

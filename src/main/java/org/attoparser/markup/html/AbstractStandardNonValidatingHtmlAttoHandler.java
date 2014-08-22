@@ -95,7 +95,9 @@ public abstract class AbstractStandardNonValidatingHtmlAttoHandler
     public final IAttoHandleResult handleHtmlStandaloneElementEnd(
             final IHtmlElement element,
             final boolean minimized,
-            final int line, final int col) 
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
             throws AttoParseException {
 
         return handleHtmlStandaloneElement(
@@ -129,6 +131,8 @@ public abstract class AbstractStandardNonValidatingHtmlAttoHandler
     @Override
     public final IAttoHandleResult handleHtmlOpenElementEnd(
             final IHtmlElement element,
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
 
@@ -163,6 +167,8 @@ public abstract class AbstractStandardNonValidatingHtmlAttoHandler
     @Override
     public final IAttoHandleResult handleHtmlCloseElementEnd(
             final IHtmlElement element,
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
             int line, int col)
             throws AttoParseException {
 

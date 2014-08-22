@@ -127,7 +127,9 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
 
     @Override
     public IAttoHandleResult handleStandaloneElementEnd(
-            final int line, final int col) 
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
             throws AttoParseException {
         this.trace.add(new TraceEvent(line, col, TRACE_TYPE_STANDALONE_ELEMENT_END));
         return null;
@@ -154,6 +156,8 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
     
     @Override
     public IAttoHandleResult handleOpenElementEnd(
+            final char[] buffer,
+            final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         this.trace.add(new TraceEvent(line, col, TRACE_TYPE_OPEN_ELEMENT_END));
@@ -181,6 +185,8 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
     
     @Override
     public IAttoHandleResult handleCloseElementEnd(
+            final char[] buffer,
+            final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         this.trace.add(new TraceEvent(line, col, TRACE_TYPE_CLOSE_ELEMENT_END));
@@ -208,6 +214,8 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
     
     @Override
     public IAttoHandleResult handleAutoCloseElementEnd(
+            final char[] buffer,
+            final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         this.trace.add(new TraceEvent(line, col, TRACE_TYPE_AUTOCLOSE_ELEMENT_END));
@@ -235,6 +243,8 @@ public final class TracingDetailedMarkupAttoHandler extends AbstractDetailedMark
     
     @Override
     public IAttoHandleResult handleUnmatchedCloseElementEnd(
+            final char[] buffer,
+            final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         this.trace.add(new TraceEvent(line, col, TRACE_TYPE_UNMATCHEDCLOSE_ELEMENT_END));

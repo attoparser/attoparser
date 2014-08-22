@@ -43,25 +43,19 @@ public final class AttoHandleResult implements IAttoHandleResult {
      *   an option in case code guidelines don't allow returning <kbd>null</kbd> for <em>OK</em>.
      * </p>
      */
-    public static final AttoHandleResult CONTINUE = new AttoHandleResult(null, null);
+    public static final AttoHandleResult CONTINUE = new AttoHandleResult(null);
 
     private final char[] parsingDisableLimit;
-    private final char[] pushBackSequence;
 
 
-    public AttoHandleResult(final char[] parsingDisableLimit, final char[] pushBackSequence) {
+    public AttoHandleResult(final char[] parsingDisableLimit) {
         super();
         this.parsingDisableLimit = parsingDisableLimit;
-        this.pushBackSequence = pushBackSequence;
     }
 
 
     public char[] getParsingDisableLimit() {
         return this.parsingDisableLimit;
-    }
-
-    public char[] getPushBackSequence() {
-        return this.pushBackSequence;
     }
 
 }

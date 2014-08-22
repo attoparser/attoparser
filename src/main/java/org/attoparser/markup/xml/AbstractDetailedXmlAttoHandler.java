@@ -81,6 +81,8 @@ public abstract class AbstractDetailedXmlAttoHandler
 
     @Override
     public final IAttoHandleResult handleStandaloneElementEnd(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
         return handleXmlStandaloneElementEnd(line, col);
@@ -99,6 +101,8 @@ public abstract class AbstractDetailedXmlAttoHandler
 
     @Override
     public final IAttoHandleResult handleOpenElementEnd(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
         return handleXmlOpenElementEnd(line, col);
@@ -117,6 +121,8 @@ public abstract class AbstractDetailedXmlAttoHandler
 
     @Override
     public final IAttoHandleResult handleCloseElementEnd(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
         return handleXmlCloseElementEnd(line, col);
@@ -139,6 +145,8 @@ public abstract class AbstractDetailedXmlAttoHandler
     
     @Override
     public final IAttoHandleResult handleAutoCloseElementEnd(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
         // Auto closing is disabled (markup has to be completely balanced).

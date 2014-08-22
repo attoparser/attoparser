@@ -53,7 +53,7 @@ public interface IHtmlElement {
             throws AttoParseException;
     
     public IAttoHandleResult handleStandaloneElementEnd(
-            final int line, final int col, 
+            final char[] buffer, final int offset, final int len, final int line, final int col,
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException;
 
@@ -65,7 +65,7 @@ public interface IHtmlElement {
             throws AttoParseException;
 
     public IAttoHandleResult handleOpenElementEnd(
-            final int line, final int col, 
+            final char[] buffer, final int offset, final int len, final int line, final int col,
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException;
 
@@ -77,7 +77,7 @@ public interface IHtmlElement {
             throws AttoParseException;
 
     public IAttoHandleResult handleCloseElementEnd(
-            final int line, final int col,
+            final char[] buffer, final int offset, final int len, final int line, final int col,
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException;
 
@@ -89,7 +89,7 @@ public interface IHtmlElement {
             throws AttoParseException;
 
     public IAttoHandleResult handleAutoCloseElementEnd(
-            final int line, final int col, 
+            final char[] buffer, final int offset, final int len, final int line, final int col,
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException;
     
@@ -101,7 +101,7 @@ public interface IHtmlElement {
             throws AttoParseException;
 
     public IAttoHandleResult handleUnmatchedCloseElementEnd(
-            final int line, final int col,
+            final char[] buffer, final int offset, final int len, final int line, final int col,
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException;
     

@@ -66,11 +66,13 @@ public class StandaloneHtmlElement extends BasicHtmlElement {
     
     @Override
     public IAttoHandleResult handleOpenElementEnd(
-            final int line, final int col, 
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col,
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException {
 
-        return handler.handleHtmlStandaloneElementEnd(this, false, line, col);
+        return handler.handleHtmlStandaloneElementEnd(this, false, buffer, nameOffset, nameLen, line, col);
         
     }
 
@@ -92,12 +94,14 @@ public class StandaloneHtmlElement extends BasicHtmlElement {
     
     @Override
     public IAttoHandleResult handleCloseElementEnd(
-            final int line, final int col, 
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col,
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException {
 
         final IAttoHandleResult result =
-            handler.handleHtmlCloseElementEnd(this, line, col);
+            handler.handleHtmlCloseElementEnd(this, buffer, nameOffset, nameLen, line, col);
 
         stack.closeElement();
 

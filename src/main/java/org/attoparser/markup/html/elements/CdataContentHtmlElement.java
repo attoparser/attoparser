@@ -36,30 +36,83 @@ import org.attoparser.markup.html.IDetailedHtmlElementHandling;
 public class CdataContentHtmlElement extends BasicHtmlElement {
 
 
-    private final IAttoHandleResult openElementEndResult;
+    private final char[] nameLower;
+    private final char[] nameUpper;
+    private final IAttoHandleResult openElementEndResultLower;
+    private final IAttoHandleResult openElementEndResultUpper;
 
 
     public CdataContentHtmlElement(final String name) {
+
         super(name);
+
         // This result will mean parsing will be disabled until we find the closing tag for this element.
-        this.openElementEndResult = new AttoHandleResult(("</" + name + ">").toCharArray(), null);
+        final String nameLower = name.toLowerCase();
+        final String nameUppoer = name.toUpperCase();
+
+        this.nameLower = nameLower.toCharArray();
+        this.nameUpper = nameUppoer.toCharArray();
+
+        this.openElementEndResultLower = new AttoHandleResult(("</" + nameLower + ">").toCharArray());
+        this.openElementEndResultUpper = new AttoHandleResult(("</" + nameUppoer + ">").toCharArray());
+
     }
 
 
     
     @Override
     public IAttoHandleResult handleOpenElementEnd(
-            final int line, final int col, 
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col,
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException {
 
 
-        final IAttoHandleResult result1 = handler.handleHtmlOpenElementEnd(this, line, col);
+        final IAttoHandleResult result1 =
+                handler.handleHtmlOpenElementEnd(this, buffer, nameOffset, nameLen, line, col);
+
+        final IAttoHandleResult result2 = computeResult(buffer, nameOffset, nameLen);
 
         // Disable parsing until the closing element is found (this element's content is #CDATA, not #PCDATA)
-        return AttoHandleResultUtil.combinePriorityLast(result1, this.openElementEndResult);
+        return AttoHandleResultUtil.combinePriorityLast(result1, result2);
         
     }
+
+
+
+    private final IAttoHandleResult computeResult(final char[] buffer, final int nameOffset, final int nameLen) {
+
+        if (nameEquals(buffer, nameOffset, nameLen, this.nameLower)) {
+            return this.openElementEndResultLower;
+        }
+
+        if (nameEquals(buffer, nameOffset, nameLen, this.nameUpper)) {
+            return this.openElementEndResultUpper;
+        }
+
+        final char[] limit = new char[nameLen + 3];
+        limit[0] = '<';
+        limit[1] = '/';
+        System.arraycopy(buffer,nameOffset,limit,2,nameLen);
+        limit[nameLen + 2] = '>';
+        return new AttoHandleResult(limit);
+
+    }
+
+
+    private static final boolean nameEquals(final char[] buffer, final int nameOffset, final int nameLen, final char[] comparedTo) {
+        if (nameLen != comparedTo.length) {
+            return false;
+        }
+        for (int i = 0; i < nameLen; i++) {
+            if (buffer[i + nameOffset] != comparedTo[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     
 }
