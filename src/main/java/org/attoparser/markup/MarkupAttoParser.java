@@ -144,8 +144,23 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                     return new BufferParseResult(current, currentLine, currentCol, false, skipUntil);
 
                 }
-                i = sequenceIndex;
-                skipUntil = null;
+
+                // Return the unparsed text sequence (even if more text comes afterwards, this unparsed sequence
+                // should be returned now so that the 'skipUntil' sequence is not included in the middle of
+                // a returned Text event (if parsing is not re-enabled with a structure). Parsing-disabled and
+                // parsing-enabled events should not be mixed in order to improve event handling.
+
+                final IAttoHandleResult result =
+                        handler.handleText(buffer, current, sequenceIndex - current, currentLine, currentCol);
+                if (result != null && result != AttoHandleResult.CONTINUE) {
+                    skipUntil = result.getParsingDisableLimit();
+                } else {
+                    skipUntil = null;
+                }
+
+                current = sequenceIndex;
+                i = current;
+
             }
 
             inStructure =
