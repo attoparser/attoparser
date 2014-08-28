@@ -19,6 +19,11 @@
  */
 package org.attoparser.markup.html.elements;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.attoparser.util.SegmentedArray;
 import org.attoparser.util.SegmentedArray.IValueHandler;
 
@@ -42,8 +47,10 @@ public final class HtmlElements {
     private static final int ELEMENTS_SEGMENT_SIZE = (('z' - 'a') + 1);
     private static final SegmentedArray<IHtmlElement, String> ELEMENTS =
             new SegmentedArray<IHtmlElement, String>(IHtmlElement.class, new ElementValueHandler(), ELEMENTS_SEGMENT_SIZE);
-            
-    
+
+
+    // Array containing all the element names, for posible external reference
+    public static final Set<String> ALL_ELEMENT_NAMES;
 
 
     // Root
@@ -178,9 +185,35 @@ public final class HtmlElements {
     public static final IHtmlElement DIALOG = new BasicHtmlElement("dialog");
     
     
-    
-    
-    
+
+    static {
+
+        ALL_ELEMENT_NAMES =
+                Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+                new String[] {
+                    HTML.getName(), HEAD.getName(), TITLE.getName(), BASE.getName(), LINK.getName(), META.getName(),
+                    STYLE.getName(), SCRIPT.getName(), NOSCRIPT.getName(), BODY.getName(), ARTICLE.getName(),
+                    SECTION.getName(), NAV.getName(), ASIDE.getName(), H1.getName(), H2.getName(), H3.getName(),
+                    H4.getName(), H5.getName(), H6.getName(), HGROUP.getName(), HEADER.getName(), FOOTER.getName(),
+                    ADDRESS.getName(), P.getName(), HR.getName(), PRE.getName(), BLOCKQUOTE.getName(), OL.getName(),
+                    UL.getName(), LI.getName(), DL.getName(), DT.getName(), DD.getName(), FIGURE.getName(),
+                    FIGCAPTION.getName(), DIV.getName(), A.getName(), EM.getName(), STRONG.getName(), SMALL.getName(),
+                    S.getName(), CITE.getName(), G.getName(), DFN.getName(), ABBR.getName(), TIME.getName(),
+                    CODE.getName(), VAR.getName(), SAMP.getName(), KBD.getName(), SUB.getName(), SUP.getName(),
+                    I.getName(), B.getName(), U.getName(), MARK.getName(), RUBY.getName(), RT.getName(),
+                    RP.getName(), BDI.getName(), BDO.getName(), SPAN.getName(), BR.getName(), WBR.getName(),
+                    INS.getName(), DEL.getName(), IMG.getName(), IFRAME.getName(), EMBED.getName(), OBJECT.getName(),
+                    PARAM.getName(), VIDEO.getName(), AUDIO.getName(), SOURCE.getName(), TRACK.getName(),
+                    CANVAS.getName(), MAP.getName(), AREA.getName(), TABLE.getName(), CAPTION.getName(),
+                    COLGROUP.getName(), COL.getName(), TBODY.getName(), THEAD.getName(), TFOOT.getName(), TR.getName(),
+                    TD.getName(), TH.getName(), FORM.getName(), FIELDSET.getName(), LEGEND.getName(), LABEL.getName(),
+                    INPUT.getName(), BUTTON.getName(), SELECT.getName(), DATALIST.getName(), OPTGROUP.getName(),
+                    OPTION.getName(), TEXTAREA.getName(), KEYGEN.getName(), OUTPUT.getName(), PROGRESS.getName(),
+                    METER.getName(), DETAILS.getName(), SUMMARY.getName(), COMMAND.getName(), MENU.getName(),
+                    DIALOG.getName()
+                })));
+
+    }
     
     
     public static IHtmlElement lookFor(final String elementName) {
