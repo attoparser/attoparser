@@ -817,8 +817,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
                         this.elementAttributeNames.searchByText(buffer, nameOffset, nameLen);
                 
                 if (cachedAttributeName == null) {
-                    this.currentElementAttributeNames[this.currentElementAttributeNamesSize] = new char[nameLen];
-                    System.arraycopy(buffer, nameOffset, this.currentElementAttributeNames[this.currentElementAttributeNamesSize], 0, nameLen);
+                    this.currentElementAttributeNames[this.currentElementAttributeNamesSize] =
+                            MarkupStructureNameRepository.getStructureName(buffer, nameOffset, nameLen);
                     this.elementAttributeNames.registerValue(this.currentElementAttributeNames[this.currentElementAttributeNamesSize]);
                 } else {
                     this.currentElementAttributeNames[this.currentElementAttributeNamesSize] = cachedAttributeName; 
@@ -945,8 +945,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
                     this.elementAttributeNames.searchByText(buffer, elementNameOffset, elementNameLen);
             
             if (cachedElementName == null) {
-                this.rootElementName = new char[elementNameLen];
-                System.arraycopy(buffer, elementNameOffset, this.rootElementName, 0, elementNameLen);
+                this.rootElementName =
+                        MarkupStructureNameRepository.getStructureName(buffer, elementNameOffset, elementNameLen);
                 this.elementAttributeNames.registerValue(this.rootElementName);
             } else {
                 this.rootElementName = cachedElementName;
@@ -1185,8 +1185,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
                     this.elementAttributeNames.searchByText(buffer, offset, len);
             
             if (cachedElementName == null) {
-                this.elementStack[this.elementStackSize] = new char[len];
-                System.arraycopy(buffer, offset, this.elementStack[this.elementStackSize], 0, len);
+                this.elementStack[this.elementStackSize] =
+                        MarkupStructureNameRepository.getStructureName(buffer, offset, len);
                 this.elementAttributeNames.registerValue(this.elementStack[this.elementStackSize]);
             } else {
                 this.elementStack[this.elementStackSize] = cachedElementName;
@@ -1294,8 +1294,6 @@ public abstract class AbstractDetailedMarkupAttoHandler
         
         
     }
-    
-    
-    
-    
+
+
 }

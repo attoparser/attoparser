@@ -51,6 +51,8 @@ public final class HtmlElements {
 
     // Set containing all the standard element names, for posible external reference
     public static final Set<String> ALL_ELEMENT_NAMES;
+    // Set containing all the standard attribute names, for posible external reference
+    public static final Set<String> ALL_ATTRIBUTE_NAMES;
 
 
     // Root
@@ -214,6 +216,41 @@ public final class HtmlElements {
                     METER.getName(), DETAILS.getName(), SUMMARY.getName(), COMMAND.getName(), MENU.getName(),
                     MENUITEM.getName(), DIALOG.getName(), MAIN.getName()
                 })));
+
+
+        ALL_ATTRIBUTE_NAMES =
+                Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+                new String[] {
+                        "abbr", "accept", "accept-charset", "accesskey", "action", "align", "alt", "archive",
+                        "autocomplete", "autofocus", "autoplay", "axis", "border", "cellpadding", "cellspacing",
+                        "challenge", "char", "charoff", "charset", "checked", "cite", "class", "classid",
+                        "codebase", "codetype", "cols", "colspan", "command", "content", "contenteditable",
+                        "contextmenu", "controls", "coords", "data", "datetime", "declare", "default",
+                        "defer", "dir", "disabled", "draggable", "dropzone", "enctype", "for", "form",
+                        "formaction", "formenctype", "formmethod", "formnovalidate", "formtarget",
+                        "frame", "headers", "height", "hidden", "high", "href", "hreflang", "http-equiv",
+                        "icon", "id", "ismap", "keytype", "kind", "label", "lang", "list", "longdesc",
+                        "loop", "low", "max", "maxlength", "media", "method", "min", "multiple", "muted",
+                        "name", "nohref", "novalidate", "onabort", "onafterprint", "onbeforeprint",
+                        "onbeforeunload", "onblur", "oncanplay", "oncanplaythrough", "onchange",
+                        "onclick", "oncontextmenu", "oncuechange", "ondblclick", "ondrag", "ondragend",
+                        "ondragenter", "ondragleave", "ondragover", "ondragstart", "ondrop",
+                        "ondurationchange", "onemptied", "onended", "onerror", "onfocus",
+                        "onformchange", "onforminput", "onhaschange", "oninput", "oninvalid", "onkeydown",
+                        "onkeypress", "onkeyup", "onload", "onloadeddata", "onloadedmetadata",
+                        "onloadstart", "onmessage", "onmousedown", "onmousemove", "onmouseout", "onmouseover",
+                        "onmouseup", "onmousewheel", "onoffline", "ononline", "onpagehide", "onpageshow",
+                        "onpause", "onplay", "onplaying", "onpopstate", "onprogress", "onratechange",
+                        "onredo", "onreset", "onresize", "onscroll", "onseeked", "onseeking",
+                        "onselect", "onstalled", "onstorage", "onsubmit", "onsuspend", "ontimeupdate",
+                        "onundo", "onunload", "onvolumechange", "onwaiting", "open", "optimum", "pattern",
+                        "placeholder", "poster", "preload", "profile", "radiogroup", "readonly", "rel",
+                        "required", "rev", "rows", "rowspan", "rules", "scheme", "scope", "selected",
+                        "shape", "size", "span", "spellcheck", "src", "srclang", "standby", "style", "summary",
+                        "tabindex", "title", "translate", "type", "usemap", "valign", "value", "valuetype",
+                        "width", "xml:lang", "xml:space", "xmlns"
+                })));
+
 
     }
     
