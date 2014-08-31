@@ -49,7 +49,7 @@ public final class HtmlElements {
             new SegmentedArray<IHtmlElement, String>(IHtmlElement.class, new ElementValueHandler(), ELEMENTS_SEGMENT_SIZE);
 
 
-    // Array containing all the element names, for posible external reference
+    // Set containing all the standard element names, for posible external reference
     public static final Set<String> ALL_ELEMENT_NAMES;
 
 
@@ -84,7 +84,8 @@ public final class HtmlElements {
     public static final IHtmlElement HEADER = new BasicHtmlElement("header");
     public static final IHtmlElement FOOTER = new BasicHtmlElement("footer");
     public static final IHtmlElement ADDRESS = new BasicHtmlElement("address");
-    
+    public static final IHtmlElement MAIN = new BasicHtmlElement("main");
+
     // Grouping content
     public static final IHtmlElement P = new BasicHtmlElement("p");
     public static final IHtmlElement HR = new StandaloneHtmlElement("hr");
@@ -182,6 +183,7 @@ public final class HtmlElements {
     public static final IHtmlElement SUMMARY = new BasicHtmlElement("summary");
     public static final IHtmlElement COMMAND = new BasicHtmlElement("command");
     public static final IHtmlElement MENU = new BasicHtmlElement("menu");
+    public static final IHtmlElement MENUITEM = new BasicHtmlElement("menuitem");
     public static final IHtmlElement DIALOG = new BasicHtmlElement("dialog");
     
     
@@ -210,7 +212,7 @@ public final class HtmlElements {
                     INPUT.getName(), BUTTON.getName(), SELECT.getName(), DATALIST.getName(), OPTGROUP.getName(),
                     OPTION.getName(), TEXTAREA.getName(), KEYGEN.getName(), OUTPUT.getName(), PROGRESS.getName(),
                     METER.getName(), DETAILS.getName(), SUMMARY.getName(), COMMAND.getName(), MENU.getName(),
-                    DIALOG.getName()
+                    MENUITEM.getName(), DIALOG.getName(), MAIN.getName()
                 })));
 
     }
