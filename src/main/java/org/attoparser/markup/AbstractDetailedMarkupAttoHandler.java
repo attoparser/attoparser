@@ -478,6 +478,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
         private final MarkupParsingConfiguration markupParsingConfiguration;
 
+        private final boolean useStack;
+
         private final boolean autoClose;
         private final boolean requireBalancedElements;
         private final boolean requireNoUnmatchedCloseElements;
@@ -517,46 +519,60 @@ public abstract class AbstractDetailedMarkupAttoHandler
         
         
         StackAwareWrapper(final AbstractDetailedMarkupAttoHandler handler, final MarkupParsingConfiguration markupParsingConfiguration) {
-            
+
             super();
-            
+
             this.handler = handler;
 
             this.caseSensitive = markupParsingConfiguration.isCaseSensitive();
             this.markupParsingConfiguration = markupParsingConfiguration;
-            
+
+            this.useStack = (!ElementBalancing.NO_BALANCING.equals(markupParsingConfiguration.getElementBalancing()) ||
+                             markupParsingConfiguration.getRequireUniqueAttributesInElement() ||
+                             !UniqueRootElementPresence.NOT_VALIDATED.equals(markupParsingConfiguration.getUniqueRootElementPresence()));
+
             this.autoClose =
                     (ElementBalancing.AUTO_CLOSE.equals(markupParsingConfiguration.getElementBalancing()) ||
-                     ElementBalancing.AUTO_CLOSE_REQUIRE_NO_UNMATCHED_CLOSE.equals(markupParsingConfiguration.getElementBalancing()));
-            this.requireBalancedElements = 
+                            ElementBalancing.AUTO_CLOSE_REQUIRE_NO_UNMATCHED_CLOSE.equals(markupParsingConfiguration.getElementBalancing()));
+            this.requireBalancedElements =
                     ElementBalancing.REQUIRE_BALANCED.equals(markupParsingConfiguration.getElementBalancing());
-            this.requireNoUnmatchedCloseElements = 
-                    (this.requireBalancedElements || 
-                     ElementBalancing.AUTO_CLOSE_REQUIRE_NO_UNMATCHED_CLOSE.equals(markupParsingConfiguration.getElementBalancing()) ||
-                     ElementBalancing.REQUIRE_NO_UNMATCHED_CLOSE.equals(markupParsingConfiguration.getElementBalancing()));
-            
+            this.requireNoUnmatchedCloseElements =
+                    (this.requireBalancedElements ||
+                            ElementBalancing.AUTO_CLOSE_REQUIRE_NO_UNMATCHED_CLOSE.equals(markupParsingConfiguration.getElementBalancing()) ||
+                            ElementBalancing.REQUIRE_NO_UNMATCHED_CLOSE.equals(markupParsingConfiguration.getElementBalancing()));
+
             this.prologParsingConfiguration = markupParsingConfiguration.getPrologParsingConfiguration();
-            
+
             this.prologParsingConfiguration.validateConfiguration();
-            
+
             this.uniqueRootElementPresence = markupParsingConfiguration.getUniqueRootElementPresence();
             this.requireWellFormedAttributeValues = markupParsingConfiguration.getRequireXmlWellFormedAttributeValues();
             this.requireUniqueAttributesInElement = markupParsingConfiguration.getRequireUniqueAttributesInElement();
-            
+
             this.validateProlog = this.prologParsingConfiguration.isValidateProlog();
             this.prologPresenceForbidden = this.prologParsingConfiguration.getPrologPresence().isForbidden();
             this.xmlDeclarationPresenceForbidden = this.prologParsingConfiguration.getXmlDeclarationPresence().isRequired();
             this.doctypePresenceForbidden = this.prologParsingConfiguration.getDoctypePresence().isRequired();
-            
-            this.elementStack = new char[DEFAULT_STACK_SIZE][];
-            this.elementStackSize = 0;
 
-            this.elementAttributeNames = 
-                    new SegmentedArray<char[],char[]>(
-                            char[].class, 
-                            new ElementNameValueHandler(), 
-                            ELEMENT_ATTRIBUTE_NAMES_NUM_SEGMENTS, 
-                            ELEMENT_ATTRIBUTE_NAMES_MAX_SEGMENT_SIZE);
+            if (this.useStack) {
+
+                this.elementStack = new char[DEFAULT_STACK_SIZE][];
+                this.elementStackSize = 0;
+
+                this.elementAttributeNames =
+                        new SegmentedArray<char[], char[]>(
+                                char[].class,
+                                new ElementNameValueHandler(),
+                                ELEMENT_ATTRIBUTE_NAMES_NUM_SEGMENTS,
+                                ELEMENT_ATTRIBUTE_NAMES_MAX_SEGMENT_SIZE);
+
+            } else {
+
+                this.elementStack = null;
+                this.elementStackSize = 0;
+                this.elementAttributeNames = null;
+
+            }
             
         }
 
@@ -579,12 +595,16 @@ public abstract class AbstractDetailedMarkupAttoHandler
                     " is never closed (no closing tag at the end of document)");
             }
             
-            if (!this.elementRead && (this.validPrologDocTypeRead || this.uniqueRootElementPresence.isRequiredAlways())) {
+            if (!this.elementRead && (
+                    (this.validPrologDocTypeRead && this.uniqueRootElementPresence.isDependsOnPrologDoctype()) ||
+                    this.uniqueRootElementPresence.isRequiredAlways())) {
                 throw new AttoParseException(
                         "Malformed markup: no root element present");
             }
-            
-            cleanStack(line, col);
+
+            if (this.useStack) {
+                cleanStack(line, col);
+            }
             
             return this.handler.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col, this.markupParsingConfiguration);
 
@@ -653,16 +673,20 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int nameOffset, final int nameLen,
                 final int line, final int col)
                 throws AttoParseException {
-            
-            if (this.elementStackSize == 0) {
-                checkValidRootElement(buffer, nameOffset, nameLen, line, col);
+
+            if (this.useStack) {
+
+                if (this.elementStackSize == 0) {
+                    checkValidRootElement(buffer, nameOffset, nameLen, line, col);
+                }
+
+                if (this.requireUniqueAttributesInElement) {
+                    this.currentElementAttributeNames = null;
+                    this.currentElementAttributeNamesSize = 0;
+                }
+
             }
 
-            if (this.requireUniqueAttributesInElement) {
-                this.currentElementAttributeNames = null;
-                this.currentElementAttributeNamesSize = 0;
-            }
-            
             return this.handler.handleStandaloneElementStart(buffer, nameOffset, nameLen, line, col);
             
         }
@@ -686,20 +710,26 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int nameOffset, final int nameLen, 
                 final int line, final int col)
                 throws AttoParseException {
-            
-            if (this.elementStackSize == 0) {
-                checkValidRootElement(buffer, nameOffset, nameLen, line, col);
-            }
 
-            if (this.requireUniqueAttributesInElement) {
-                this.currentElementAttributeNames = null;
-                this.currentElementAttributeNamesSize = 0;
+            if (this.useStack) {
+
+                if (this.elementStackSize == 0) {
+                    checkValidRootElement(buffer, nameOffset, nameLen, line, col);
+                }
+
+                if (this.requireUniqueAttributesInElement) {
+                    this.currentElementAttributeNames = null;
+                    this.currentElementAttributeNamesSize = 0;
+                }
+
             }
 
             final IAttoHandleResult result =
                 this.handler.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
-            
-            addToStack(buffer, nameOffset, nameLen);
+
+            if (this.useStack) {
+                addToStack(buffer, nameOffset, nameLen);
+            }
 
             return result;
 
@@ -726,21 +756,30 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int nameOffset, final int nameLen, 
                 final int line, final int col)
                 throws AttoParseException {
-            
-            this.closeElementIsMatched = 
-                    checkStackForElement(buffer, nameOffset, nameLen, line, col);
-            
-            if (this.requireUniqueAttributesInElement) {
-                this.currentElementAttributeNames = null;
-                this.currentElementAttributeNamesSize = 0;
+
+            if (this.useStack) {
+
+                this.closeElementIsMatched =
+                        checkStackForElement(buffer, nameOffset, nameLen, line, col);
+
+                if (this.requireUniqueAttributesInElement) {
+                    this.currentElementAttributeNames = null;
+                    this.currentElementAttributeNamesSize = 0;
+                }
+
+                if (this.closeElementIsMatched) {
+                    return this.handler.handleCloseElementStart(buffer, nameOffset, nameLen, line, col);
+                } else {
+                    return this.handler.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col);
+                }
+
+            } else {
+
+                return this.handler.handleCloseElementStart(buffer, nameOffset, nameLen, line, col);
+
             }
 
-            if (this.closeElementIsMatched) {
-                return this.handler.handleCloseElementStart(buffer, nameOffset, nameLen, line, col);
-            } else {
-                return this.handler.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col);
-            }
-            
+
         }
 
         public IAttoHandleResult handleCloseElementEnd(
@@ -750,7 +789,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 throws AttoParseException {
 
             final IAttoHandleResult result;
-            if (this.closeElementIsMatched) {
+            if (!this.useStack || this.closeElementIsMatched) {
                 result = this.handler.handleCloseElementEnd(buffer, nameOffset, nameLen, line, col);
             } else {
                 result = this.handler.handleUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col);
@@ -774,7 +813,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int valueLine, final int valueCol)
                 throws AttoParseException {
             
-            if (this.requireUniqueAttributesInElement) {
+            if (this.useStack && this.requireUniqueAttributesInElement) {
                 
                 // Check attribute name is unique in this element
                 if (this.currentElementAttributeNames == null) {
@@ -940,16 +979,20 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 }
                 
             }
-            
-            final char[] cachedElementName = 
-                    this.elementAttributeNames.searchByText(buffer, elementNameOffset, elementNameLen);
-            
-            if (cachedElementName == null) {
-                this.rootElementName =
-                        MarkupStructureNameRepository.getStructureName(buffer, elementNameOffset, elementNameLen);
-                this.elementAttributeNames.registerValue(this.rootElementName);
-            } else {
-                this.rootElementName = cachedElementName;
+
+            if (this.useStack) {
+
+                final char[] cachedElementName =
+                        this.elementAttributeNames.searchByText(buffer, elementNameOffset, elementNameLen);
+
+                if (cachedElementName == null) {
+                    this.rootElementName =
+                            MarkupStructureNameRepository.getStructureName(buffer, elementNameOffset, elementNameLen);
+                    this.elementAttributeNames.registerValue(this.rootElementName);
+                } else {
+                    this.rootElementName = cachedElementName;
+                }
+
             }
 
             final IAttoHandleResult result =

@@ -257,6 +257,10 @@ public final class MarkupParsingConfiguration implements Serializable {
      *   </li>
      * </ul>
      * <p>
+     *   If set to {@link UniqueRootElementPresence#NOT_VALIDATED}, then nothing will be checked
+     *   regarding the name of the root element/s.
+     * </p>
+     * <p>
      *   Default value is <b>{@link UniqueRootElementPresence#DEPENDS_ON_PROLOG_DOCTYPE}</b>.
      * </p>
      * 
@@ -332,8 +336,9 @@ public final class MarkupParsingConfiguration implements Serializable {
     public static enum UniqueRootElementPresence { 
         
         REQUIRED_ALWAYS(true, false), 
-        DEPENDS_ON_PROLOG_DOCTYPE(false, true);
-        
+        DEPENDS_ON_PROLOG_DOCTYPE(false, true),
+        NOT_VALIDATED(false, false);
+
         private final boolean requiredAlways;
         private final boolean dependsOnPrologDoctype;
     
