@@ -67,19 +67,47 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
         this(false);
     }
 
+
     /**
      * <p>
      *   Creates a new instance of this parser.
      * </p>
      *
      * @param canSplitText if {@code true}, text nodes may be split and sent to the handler as multiple text nodes.  The
-     *                  default is {@code false}.
+     *                     default is {@code false}.
      */
     public MarkupAttoParser(final boolean canSplitText) {
-        super();
+        this(canSplitText, AbstractBufferedAttoParser.DEFAULT_POOL_SIZE, AbstractBufferedAttoParser.DEFAULT_BUFFER_SIZE);
+    }
+
+
+    /**
+     * <p>
+     *   Creates a new instance of this parser, specifying the pool and buffer size.
+     * </p>
+     * <p>
+     *   Buffer size (in char's) will be the size of the <kbd>char[]</kbd> structures used as buffers for parsing,
+     *   which might grow if a certain markup structure does not fit inside (e.g. a text). Default size is
+     *   {@link org.attoparser.AbstractBufferedAttoParser#DEFAULT_BUFFER_SIZE}.
+     * </p>
+     * <p>
+     *   Pool size is the size of the pool of <kbd>char[]</kbd> buffers that will be kept in memory in order to
+     *   allow their reuse. This pool works in a non-exclusive mode, so that if pool size is 3 and a 4th request
+     *   arrives, it is served a new non-pooled buffer without the need to block waiting for one of the pooled
+     *   instances. Default size is {@link org.attoparser.AbstractBufferedAttoParser#DEFAULT_POOL_SIZE}.
+     * </p>
+     *
+     * @since 2.0.0
+     * @param canSplitText if {@code true}, text nodes may be split and sent to the handler as multiple text nodes.  The
+     *                     default is {@code false}.
+     * @param poolSize the size of the pool of buffers to be used.
+     * @param bufferSize the default size of the buffers to be instanced for this parser.
+     */
+    public MarkupAttoParser(final boolean canSplitText, final int poolSize, final int bufferSize) {
+        super(poolSize, bufferSize);
         this.canSplitText = canSplitText;
     }
-    
+
 
     
     

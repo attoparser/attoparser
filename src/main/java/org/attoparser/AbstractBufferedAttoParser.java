@@ -20,8 +20,7 @@
 package org.attoparser;
 
 import java.io.Reader;
-
-
+import java.util.Arrays;
 
 
 /**
@@ -49,24 +48,46 @@ public abstract class AbstractBufferedAttoParser extends AbstractAttoParser {
      * <p>
      *   Default buffer size to be used (buffer size will grow at runtime if 
      *   an artifact (structure or text) is bigger than the whole buffer). 
-     *   Value: 4096 chars.
+     *   Value: 4096 chars (= 8192 bytes).
      * </p>
      */
-    public static final int BUFFER_SIZE = 8192;
+    public static final int DEFAULT_BUFFER_SIZE = 4096;
+
+    /**
+     * <p>
+     *   Default pool size to be used. Buffers will be kept in a pool and
+     *   reused in order to increase performance. Pool will be non-exclusive
+     *   so that if pool size = 3 and a 4th request arrives, it is assigned
+     *   a new buffer object (not linked to the pool, and therefore GC-ed
+     *   at the end).
+     * </p>
+     *
+     * @since 2.0.0
+     */
+    public static final int DEFAULT_POOL_SIZE = 2;
 
 
-    
+    private final BufferPool pool;
+
+
+
     protected AbstractBufferedAttoParser() {
-        super();
+        this(DEFAULT_POOL_SIZE, DEFAULT_BUFFER_SIZE);
     }
-    
+
+    protected AbstractBufferedAttoParser(final int poolSize, final int bufferSize) {
+        super();
+        this.pool = new BufferPool(poolSize, bufferSize);
+    }
+
+
 
     
     @Override
     protected final void parseDocument(
             final Reader reader, final IAttoHandler handler) 
             throws AttoParseException {
-        parseDocument(reader, handler, BUFFER_SIZE);
+        parseDocument(reader, handler, this.pool.defaultBufferSize);
     }
 
 
@@ -81,12 +102,14 @@ public abstract class AbstractBufferedAttoParser extends AbstractAttoParser {
             throws AttoParseException {
 
 
+        char[] buffer = null;
+
         try {
 
             handler.handleDocumentStart(1, 1);
             
             int bufferSize = initialBufferSize;
-            char[] buffer = new char[bufferSize];
+            buffer = this.pool.allocateBuffer(bufferSize);
             
             int bufferContentSize = reader.read(buffer);
             boolean cont = (bufferContentSize != -1);
@@ -116,11 +139,22 @@ public abstract class AbstractBufferedAttoParser extends AbstractAttoParser {
                     
                     if (bufferContentSize == bufferSize) {
                         // Buffer is not big enough, double it! 
-                        
-                        bufferSize *= 2;
-                        final char[] newBuffer = new char[bufferSize];
-                        System.arraycopy(buffer, 0, newBuffer, 0, bufferContentSize);
-                        buffer = newBuffer;
+
+                        char[] newBuffer = null;
+                        try {
+
+                            bufferSize *= 2;
+
+                            newBuffer = this.pool.allocateBuffer(bufferSize);
+                            System.arraycopy(buffer, 0, newBuffer, 0, bufferContentSize);
+
+                            this.pool.releaseBuffer(buffer);
+
+                            buffer = newBuffer;
+
+                        } catch (final Exception e) {
+                            this.pool.releaseBuffer(newBuffer);
+                        }
 
                     }
 
@@ -187,6 +221,7 @@ public abstract class AbstractBufferedAttoParser extends AbstractAttoParser {
         } catch (final Exception e) {
             throw new AttoParseException(e);
         } finally {
+            this.pool.releaseBuffer(buffer);
             try {
                 reader.close();
             } catch (final Throwable t) {
@@ -303,5 +338,65 @@ public abstract class AbstractBufferedAttoParser extends AbstractAttoParser {
         }
 
     }
-    
+
+
+
+    static final class BufferPool {
+
+        private char[][] pool;
+        private boolean[] allocated;
+        private int defaultBufferSize;
+
+        private BufferPool(final int poolSize, final int defaultBufferSize) {
+
+            super();
+
+            this.pool = new char[poolSize][];
+            this.allocated = new boolean[poolSize];
+            this.defaultBufferSize = defaultBufferSize;
+
+            for (int i = 0; i < this.pool.length; i++) {
+                this.pool[i] = new char[this.defaultBufferSize];
+            }
+            Arrays.fill(this.allocated, false);
+
+        }
+
+        private synchronized char[] allocateBuffer(final int bufferSize) {
+            if (bufferSize != this.defaultBufferSize) {
+                // We will only allocate buffers of the default size
+                return new char[bufferSize];
+            }
+            for (int i = 0; i < this.pool.length; i++) {
+                if (!this.allocated[i]) {
+                    this.allocated[i] = true;
+                    return this.pool[i];
+                }
+            }
+            return new char[bufferSize];
+        }
+
+        private synchronized void releaseBuffer(final char[] buffer) {
+            if (buffer == null) {
+                return;
+            }
+            if (buffer.length != this.defaultBufferSize) {
+                // This buffer is not part of the pool
+                return;
+            }
+            for (int i = 0; i < this.pool.length; i++) {
+                if (this.pool[i] == buffer) {
+                    // Found it. Mark it as non-allocated
+                    this.allocated[i] = false;
+                    return;
+                }
+            }
+            // The buffer wasn't part of our pool
+            return;
+        }
+
+
+    }
+
+
 }
