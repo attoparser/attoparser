@@ -61,7 +61,7 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
     
     
     private static IHtmlElement getElementByName(final char[] buffer, final int offset, final int len) {
-        final IHtmlElement element = HtmlElements.lookFor(buffer, offset, len);
+        final IHtmlElement element = HtmlElements.forName(buffer, offset, len);
         if (element == null) {
             return new BasicHtmlElement(new String(buffer, offset, len));
         }

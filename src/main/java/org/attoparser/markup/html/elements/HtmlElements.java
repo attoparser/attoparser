@@ -19,18 +19,17 @@
  */
 package org.attoparser.markup.html.elements;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
-
-import org.attoparser.util.SegmentedArray;
-import org.attoparser.util.SegmentedArray.IValueHandler;
-
-
-
-
-
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
 /**
@@ -44,15 +43,15 @@ public final class HtmlElements {
 
     static final int CASE_DIFF = ('a' - 'A');
 
-    private static final int ELEMENTS_SEGMENT_SIZE = (('z' - 'a') + 1);
-    private static final SegmentedArray<IHtmlElement, String> ELEMENTS =
-            new SegmentedArray<IHtmlElement, String>(IHtmlElement.class, new ElementValueHandler(), ELEMENTS_SEGMENT_SIZE);
+    private static final ElementRepository ELEMENTS = new ElementRepository();
 
 
+    // Set containing all the standard elements, for posible external reference
+    public static final Set<IHtmlElement> ALL_STANDARD_ELEMENTS;
     // Set containing all the standard element names, for posible external reference
-    public static final Set<String> ALL_ELEMENT_NAMES;
+    public static final Set<String> ALL_STANDARD_ELEMENT_NAMES;
     // Set containing all the standard attribute names, for posible external reference
-    public static final Set<String> ALL_ATTRIBUTE_NAMES;
+    public static final Set<String> ALL_STANDARD_ATTRIBUTE_NAMES;
 
 
     // Root
@@ -192,33 +191,37 @@ public final class HtmlElements {
 
     static {
 
-        ALL_ELEMENT_NAMES =
-                Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
-                new String[] {
-                    HTML.getName(), HEAD.getName(), TITLE.getName(), BASE.getName(), LINK.getName(), META.getName(),
-                    STYLE.getName(), SCRIPT.getName(), NOSCRIPT.getName(), BODY.getName(), ARTICLE.getName(),
-                    SECTION.getName(), NAV.getName(), ASIDE.getName(), H1.getName(), H2.getName(), H3.getName(),
-                    H4.getName(), H5.getName(), H6.getName(), HGROUP.getName(), HEADER.getName(), FOOTER.getName(),
-                    ADDRESS.getName(), P.getName(), HR.getName(), PRE.getName(), BLOCKQUOTE.getName(), OL.getName(),
-                    UL.getName(), LI.getName(), DL.getName(), DT.getName(), DD.getName(), FIGURE.getName(),
-                    FIGCAPTION.getName(), DIV.getName(), A.getName(), EM.getName(), STRONG.getName(), SMALL.getName(),
-                    S.getName(), CITE.getName(), G.getName(), DFN.getName(), ABBR.getName(), TIME.getName(),
-                    CODE.getName(), VAR.getName(), SAMP.getName(), KBD.getName(), SUB.getName(), SUP.getName(),
-                    I.getName(), B.getName(), U.getName(), MARK.getName(), RUBY.getName(), RT.getName(),
-                    RP.getName(), BDI.getName(), BDO.getName(), SPAN.getName(), BR.getName(), WBR.getName(),
-                    INS.getName(), DEL.getName(), IMG.getName(), IFRAME.getName(), EMBED.getName(), OBJECT.getName(),
-                    PARAM.getName(), VIDEO.getName(), AUDIO.getName(), SOURCE.getName(), TRACK.getName(),
-                    CANVAS.getName(), MAP.getName(), AREA.getName(), TABLE.getName(), CAPTION.getName(),
-                    COLGROUP.getName(), COL.getName(), TBODY.getName(), THEAD.getName(), TFOOT.getName(), TR.getName(),
-                    TD.getName(), TH.getName(), FORM.getName(), FIELDSET.getName(), LEGEND.getName(), LABEL.getName(),
-                    INPUT.getName(), BUTTON.getName(), SELECT.getName(), DATALIST.getName(), OPTGROUP.getName(),
-                    OPTION.getName(), TEXTAREA.getName(), KEYGEN.getName(), OUTPUT.getName(), PROGRESS.getName(),
-                    METER.getName(), DETAILS.getName(), SUMMARY.getName(), COMMAND.getName(), MENU.getName(),
-                    MENUITEM.getName(), DIALOG.getName(), MAIN.getName()
-                })));
+        ALL_STANDARD_ELEMENTS =
+                Collections.unmodifiableSet(new LinkedHashSet<IHtmlElement>(Arrays.asList(
+                        new IHtmlElement[] {
+                                HTML, HEAD, TITLE, BASE, LINK, META, STYLE, SCRIPT, NOSCRIPT, BODY, ARTICLE,
+                                SECTION, NAV, ASIDE, H1, H2, H3, H4, H5, H6, HGROUP, HEADER, FOOTER,
+                                ADDRESS, P, HR, PRE, BLOCKQUOTE, OL, UL, LI, DL, DT, DD, FIGURE,
+                                FIGCAPTION, DIV, A, EM, STRONG, SMALL, S, CITE, G, DFN, ABBR, TIME,
+                                CODE, VAR, SAMP, KBD, SUB, SUP, I, B, U, MARK, RUBY, RT,
+                                RP, BDI, BDO, SPAN, BR, WBR, INS, DEL, IMG, IFRAME, EMBED, OBJECT,
+                                PARAM, VIDEO, AUDIO, SOURCE, TRACK, CANVAS, MAP, AREA, TABLE, CAPTION,
+                                COLGROUP, COL, TBODY, THEAD, TFOOT, TR, TD, TH, FORM, FIELDSET, LEGEND, LABEL,
+                                INPUT, BUTTON, SELECT, DATALIST, OPTGROUP, OPTION, TEXTAREA, KEYGEN, OUTPUT, PROGRESS,
+                                METER, DETAILS, SUMMARY, COMMAND, MENU, MENUITEM, DIALOG, MAIN
+                        })));
+
+        /*
+         * Register the standard elements at the element repository, in order to initialize it
+         */
+        for (final IHtmlElement element : ALL_STANDARD_ELEMENTS) {
+            ELEMENTS.storeElement(element);
+        }
 
 
-        ALL_ATTRIBUTE_NAMES =
+        final Set<String> allStandardElementNamesAux = new LinkedHashSet<String>(ALL_STANDARD_ELEMENTS.size() + 3);
+        for (final IHtmlElement element : ALL_STANDARD_ELEMENTS) {
+            allStandardElementNamesAux.add(element.getName());
+        }
+        ALL_STANDARD_ELEMENT_NAMES = Collections.unmodifiableSet(allStandardElementNamesAux);
+
+
+        ALL_STANDARD_ATTRIBUTE_NAMES =
                 Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
                 new String[] {
                         "abbr", "accept", "accept-charset", "accesskey", "action", "align", "alt", "archive",
@@ -253,35 +256,22 @@ public final class HtmlElements {
 
 
     }
-    
-    
-    public static IHtmlElement lookFor(final String elementName) {
-        if (elementName == null) {
-            throw new IllegalArgumentException("Element name cannot be null");
-        }
-        return ELEMENTS.searchByText(elementName);
-    }
-    
-    
-    public static IHtmlElement lookFor(final char[] elementName) {
-        if (elementName == null) {
-            throw new IllegalArgumentException("Element name cannot be null");
-        }
-        return lookFor(elementName, 0, elementName.length);
-    }
-    
-    
-    public static IHtmlElement lookFor(final char[] elementNameBuffer, final int offset, final int len) {
+
+
+
+    public static IHtmlElement forName(final char[] elementNameBuffer, final int offset, final int len) {
         if (elementNameBuffer == null) {
             throw new IllegalArgumentException("Buffer cannot be null");
         }
-        return ELEMENTS.searchByText(elementNameBuffer, offset, len);
+        return ELEMENTS.getElement(elementNameBuffer, offset, len);
     }
-    
-    
-    
-    static void registerElement(final IHtmlElement element) {
-        ELEMENTS.registerValue(element);
+
+
+    public static IHtmlElement forName(final String name) {
+        if (name == null) {
+            throw new IllegalArgumentException("Name cannot be null");
+        }
+        return ELEMENTS.getElement(name);
     }
 
     
@@ -295,65 +285,230 @@ public final class HtmlElements {
     
     
 
-    
-    private static final class ElementValueHandler implements IValueHandler<IHtmlElement, String> {
-        
-        /*
-         * Class is private, only used here. No need to validate arguments.
-         */
-        
-        ElementValueHandler() {
-            super();
-        }
-        
-        
-        public String getKey(final IHtmlElement value) {
-            return value.getName();
-        }
+    /*
+     * <p>
+     *     This class is <strong>thread-safe</strong>. The reason for this is that it not only contains the
+     *     standard elements, but will also contain new instances of IHtmlElement created during parsing (created
+     *     when asking the repository for them when they do not exist yet. As any thread can create a new element,
+     *     this has to be lock-protected.
+     * </p>
+     */
+    static final class ElementRepository {
+
+        private final List<IHtmlElement> repository;
+
+        private final ReadWriteLock lock = new ReentrantReadWriteLock(true);
+        private final Lock readLock = this.lock.readLock();
+        private final Lock writeLock = this.lock.writeLock();
 
 
-        public int getSegment(final IHtmlElement value) {
-            return getSegmentByKey(getKey(value));
-        }
-
-        public int getSegmentByKey(final String key) {
-            return getSegmentByText(key);
-        }
-
-        public int getSegmentByText(final String text) {
-            return getSegmentByChar(text.charAt(0));
-        }
-
-        public int getSegmentByText(final char[] textBuffer, final int textOffset, final int textLen) {
-            return getSegmentByChar(textBuffer[textOffset]);
+        ElementRepository() {
+            this.repository = new ArrayList<IHtmlElement>(40);
         }
 
 
-        private int getSegmentByChar(final char c) {
-            if (c >= 'A' && c <= 'Z') {
-                // We want lower- and upper-case to be together in the same segment in order
-                // to implement case-insensitivity
-                return c + CASE_DIFF;
+
+        IHtmlElement getElement(final char[] text, final int offset, final int len) {
+
+            this.readLock.lock();
+            try {
+
+                final int index = binarySearch(this.repository, text, offset, len);
+
+                if (index != -1) {
+                    return this.repository.get(index);
+                }
+
+            } finally {
+                this.readLock.unlock();
             }
-            return c;
-        }
-        
-        public boolean matchesByKey(final IHtmlElement value, final String key) {
-            return matchesByText(value, key);
+
+
+            /*
+             * NOT FOUND. We need to obtain a write lock and store the text
+             */
+            this.writeLock.lock();
+            try {
+                return storeElement(text, offset, len);
+            } finally {
+                this.writeLock.unlock();
+            }
+
         }
 
-        public boolean matchesByText(final IHtmlElement value, final String text) {
-            return value.matches(text);
+
+        IHtmlElement getElement(final String text) {
+
+            final String normalizedText = text.toLowerCase();
+
+            this.readLock.lock();
+            try {
+
+                final int index = binarySearch(this.repository, normalizedText);
+
+                if (index != -1) {
+                    return this.repository.get(index);
+                }
+
+            } finally {
+                this.readLock.unlock();
+            }
+
+
+            /*
+             * NOT FOUND. We need to obtain a write lock and store the text
+             */
+            this.writeLock.lock();
+            try {
+                return storeElement(normalizedText);
+            } finally {
+                this.writeLock.unlock();
+            }
+
         }
 
-        public boolean matchesByText(final IHtmlElement value, final char[] textBuffer,
-                final int textOffset, final int textLen) {
-            return value.matches(textBuffer, textOffset, textLen);
+
+        private IHtmlElement storeElement(final char[] text, final int offset, final int len) {
+
+            final int index = binarySearch(this.repository, text, offset, len);
+            if (index != -1) {
+                // It was already added while we were waiting for the lock!
+                return this.repository.get(index);
+            }
+
+            final IHtmlElement element = new BasicHtmlElement(new String(text, offset, len).toLowerCase());
+
+            this.repository.add(element);
+            Collections.sort(this.repository, ElementComparator.INSTANCE);
+
+            return element;
+
         }
-        
+
+
+        private IHtmlElement storeElement(final String text) {
+
+            final int index = binarySearch(this.repository, text);
+            if (index != -1) {
+                // It was already added while we were waiting for the lock!
+                return this.repository.get(index);
+            }
+
+            final IHtmlElement element = new BasicHtmlElement(text); // Has already been lower-cased at getElement()
+
+            this.repository.add(element);
+            Collections.sort(this.repository,ElementComparator.INSTANCE);
+
+            return element;
+
+        }
+
+
+        private IHtmlElement storeElement(final IHtmlElement element) {
+
+            // This method will only be called from within the HtmlElements class itself, during initialization of
+            // standard elements.
+
+            this.repository.add(element);
+            Collections.sort(this.repository,ElementComparator.INSTANCE);
+
+            return element;
+
+        }
+
+
+
+        private static int binarySearch(final List<IHtmlElement> values,
+                                        final String text) {
+
+            int low = 0;
+            int high = values.size() - 1;
+
+            while (low <= high) {
+
+                final int mid = (low + high) >>> 1;
+                final String midVal = values.get(mid).getName();
+
+                final int cmp = midVal.compareTo(text);
+
+                if (cmp < 0) {
+                    low = mid + 1;
+                } else if (cmp > 0) {
+                    high = mid - 1;
+                } else {
+                    // Found!!
+                    return mid;
+                }
+
+            }
+
+            return -1;  // Not Found!!
+
+        }
+
+
+        private static int binarySearch(final List<IHtmlElement> values,
+                                        final char[] text, final int offset, final int len) {
+
+            int low = 0;
+            int high = values.size() - 1;
+
+            while (low <= high) {
+
+                final int mid = (low + high) >>> 1;
+                final String midVal = values.get(mid).getName();
+
+                final int cmp = compare(midVal, text, offset, len);
+
+                if (cmp < 0) {
+                    low = mid + 1;
+                } else if (cmp > 0) {
+                    high = mid - 1;
+                } else {
+                    // Found!!
+                    return mid;
+                }
+
+            }
+
+            return -1;  // Not Found!!
+
+        }
+
+
+        private static int compare(final String ncr, final char[] text, final int offset, final int len) {
+            final int maxCommon = Math.min(ncr.length(), len);
+            int i;
+            for (i = 0; i < maxCommon; i++) {
+                final char tc = Character.toLowerCase(text[offset + i]);
+                if (ncr.charAt(i) < tc) {
+                    return -1;
+                } else if (ncr.charAt(i) > tc) {
+                    return 1;
+                }
+            }
+            if (ncr.length() > i) {
+                return 1;
+            }
+            if (len > i) {
+                return -1;
+            }
+            return 0;
+        }
+
+
+        private static class ElementComparator implements Comparator<IHtmlElement> {
+
+            private static ElementComparator INSTANCE = new ElementComparator();
+
+            public int compare(final IHtmlElement o1, final IHtmlElement o2) {
+                return o1.getName().compareTo(o2.getName());
+            }
+        }
+
     }
-    
-    
-    
-    
+
+
+
+
 }

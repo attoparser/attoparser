@@ -65,8 +65,6 @@ public abstract class AbstractHtmlElement implements IHtmlElement {
             }
         }
 
-        HtmlElements.registerElement(this);
-        
     }
 
     

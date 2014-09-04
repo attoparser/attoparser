@@ -54,8 +54,8 @@ public final class MarkupStructureNameRepository {
     static {
 
         final List<String> names = new ArrayList<String>();
-        names.addAll(HtmlElements.ALL_ELEMENT_NAMES);
-        names.addAll(HtmlElements.ALL_ATTRIBUTE_NAMES);
+        names.addAll(HtmlElements.ALL_STANDARD_ELEMENT_NAMES);
+        names.addAll(HtmlElements.ALL_STANDARD_ATTRIBUTE_NAMES);
         Collections.sort(names);
 
         REPOSITORY = new char[names.size()][];

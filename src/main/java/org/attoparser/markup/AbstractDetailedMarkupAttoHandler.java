@@ -19,19 +19,16 @@
  */
 package org.attoparser.markup;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import org.attoparser.AttoParseException;
 import org.attoparser.IAttoHandleResult;
 import org.attoparser.markup.MarkupParsingConfiguration.ElementBalancing;
 import org.attoparser.markup.MarkupParsingConfiguration.PrologParsingConfiguration;
 import org.attoparser.markup.MarkupParsingConfiguration.UniqueRootElementPresence;
-import org.attoparser.util.SegmentedArray;
-import org.attoparser.util.SegmentedArray.IValueHandler;
-
-
-
-
 
 
 /**
@@ -500,10 +497,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
         // Will be used as an element name cache in order to avoid creating a new
         // char[] object each time an element is pushed into the stack or an attribute
         // is processed to check its uniqueness.
-        private final SegmentedArray<char[], char[]> elementAttributeNames;
-        private static final int ELEMENT_ATTRIBUTE_NAMES_NUM_SEGMENTS = 20;
-        private static final int ELEMENT_ATTRIBUTE_NAMES_MAX_SEGMENT_SIZE = 20;
-        
+        private final StructureNamesRepository structureNamesRepository;
+
         private char[][] elementStack;
         private int elementStackSize;
         
@@ -559,18 +554,13 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 this.elementStack = new char[DEFAULT_STACK_SIZE][];
                 this.elementStackSize = 0;
 
-                this.elementAttributeNames =
-                        new SegmentedArray<char[], char[]>(
-                                char[].class,
-                                new ElementNameValueHandler(),
-                                ELEMENT_ATTRIBUTE_NAMES_NUM_SEGMENTS,
-                                ELEMENT_ATTRIBUTE_NAMES_MAX_SEGMENT_SIZE);
+                this.structureNamesRepository = new StructureNamesRepository();
 
             } else {
 
                 this.elementStack = null;
                 this.elementStackSize = 0;
-                this.elementAttributeNames = null;
+                this.structureNamesRepository = null;
 
             }
             
@@ -852,17 +842,9 @@ public abstract class AbstractDetailedMarkupAttoHandler
                     this.currentElementAttributeNames = newCurrentElementAttributeNames;
                 }
 
-                final char[] cachedAttributeName =
-                        this.elementAttributeNames.searchByText(buffer, nameOffset, nameLen);
-                
-                if (cachedAttributeName == null) {
-                    this.currentElementAttributeNames[this.currentElementAttributeNamesSize] =
-                            MarkupStructureNameRepository.getStructureName(buffer, nameOffset, nameLen);
-                    this.elementAttributeNames.registerValue(this.currentElementAttributeNames[this.currentElementAttributeNamesSize]);
-                } else {
-                    this.currentElementAttributeNames[this.currentElementAttributeNamesSize] = cachedAttributeName; 
-                }
-                    
+                this.currentElementAttributeNames[this.currentElementAttributeNamesSize] =
+                        this.structureNamesRepository.getStructureName(buffer, nameOffset, nameLen);
+
                 this.currentElementAttributeNamesSize++;
                 
             }
@@ -982,16 +964,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
             if (this.useStack) {
 
-                final char[] cachedElementName =
-                        this.elementAttributeNames.searchByText(buffer, elementNameOffset, elementNameLen);
-
-                if (cachedElementName == null) {
-                    this.rootElementName =
-                            MarkupStructureNameRepository.getStructureName(buffer, elementNameOffset, elementNameLen);
-                    this.elementAttributeNames.registerValue(this.rootElementName);
-                } else {
-                    this.rootElementName = cachedElementName;
-                }
+                this.rootElementName =
+                        this.structureNamesRepository.getStructureName(buffer, elementNameOffset, elementNameLen);
 
             }
 
@@ -1223,17 +1197,10 @@ public abstract class AbstractDetailedMarkupAttoHandler
             if (this.elementStackSize == this.elementStack.length) {
                 growStack();
             }
-            
-            final char[] cachedElementName = 
-                    this.elementAttributeNames.searchByText(buffer, offset, len);
-            
-            if (cachedElementName == null) {
-                this.elementStack[this.elementStackSize] =
-                        MarkupStructureNameRepository.getStructureName(buffer, offset, len);
-                this.elementAttributeNames.registerValue(this.elementStack[this.elementStackSize]);
-            } else {
-                this.elementStack[this.elementStackSize] = cachedElementName;
-            }
+
+
+            this.elementStack[this.elementStackSize] =
+                    this.structureNamesRepository.getStructureName(buffer, offset, len);
             
             this.elementStackSize++;
             
@@ -1267,76 +1234,126 @@ public abstract class AbstractDetailedMarkupAttoHandler
             this.elementStack = newStack;
             
         }
-        
-        
-        private static final class ElementNameValueHandler implements IValueHandler<char[], char[]> {
-            
-            /*
-             * Class is private, only used here. No need to validate arguments.
-             */
-            
-            ElementNameValueHandler() {
-                super();
-            }
-            
-            
-            public char[] getKey(final char[] value) {
-                return value;
-            }
 
-
-            public int getSegment(final char[] value) {
-                return getSegmentByKey(getKey(value));
-            }
-
-            public int getSegmentByKey(final char[] key) {
-                final int keyLen = key.length;
-                if (keyLen == 0) {
-                    return 0;
-                }
-                return key[0] + key[keyLen - 1];
-            }
-
-            public int getSegmentByText(final String text) {
-                throw new UnsupportedOperationException();
-            }
-
-            public int getSegmentByText(final char[] textBuffer, final int textOffset, final int textLen) {
-                if (textLen == 0) {
-                    return 0;
-                }
-                return textBuffer[textOffset] + textBuffer[textOffset + (textLen - 1)];
-            }
-            
-            public boolean matchesByKey(final char[] value, final char[] key) {
-                return Arrays.equals(value, key);
-            }
-
-            public boolean matchesByText(final char[] value, final String text) {
-                throw new UnsupportedOperationException();
-            }
-
-            public boolean matchesByText(final char[] value, final char[] textBuffer,
-                    final int textOffset, final int textLen) {
-                
-                final int valueLen = value.length;
-                if (valueLen != textLen) {
-                    return false;
-                }
-                for (int i = 0; i < valueLen; i++) {
-                    if (value[i] != textBuffer[i + textOffset]) {
-                        return false;
-                    }
-                }
-                
-                return true;
-                
-            }
-            
-        }
-        
-        
     }
+
+
+    /*
+     * <p>
+     *     This class is <strong>NOT thread-safe</strong>. Should only be used inside a specific handler
+     *     instance/thread and only during a single execution.
+     * </p>
+     */
+    static final class StructureNamesRepository {
+
+        private final List<char[]> repository;
+
+
+        StructureNamesRepository() {
+            this.repository = new ArrayList<char[]>(5);
+        }
+
+
+
+        char[] getStructureName(final char[] text, final int offset, final int len) {
+
+            final int index = binarySearch(this.repository, text, offset, len);
+
+            if (index != -1) {
+                return this.repository.get(index);
+            }
+
+
+            /*
+             * NOT FOUND. We need to store the text
+             */
+            return storeStructureName(text, offset, len);
+
+        }
+
+
+        private char[] storeStructureName(final char[] text, final int offset, final int len) {
+
+            final int index = binarySearch(this.repository, text, offset, len);
+            if (index != -1) {
+                // It was already added while we were waiting for the lock!
+                return this.repository.get(index);
+            }
+
+            // We rely on the static structure name cache, just in case it is a standard HTML structure name
+            final char[] structureName = MarkupStructureNameRepository.getStructureName(text, offset, len);
+
+            this.repository.add(structureName);
+            Collections.sort(this.repository, CharArrayComparator.INSTANCE);
+
+            return structureName;
+
+        }
+
+
+
+
+        private static int binarySearch(final List<char[]> values,
+                                        final char[] text, final int offset, final int len) {
+
+            int low = 0;
+            int high = values.size() - 1;
+
+            while (low <= high) {
+
+                final int mid = (low + high) >>> 1;
+                final char[] midVal = values.get(mid);
+
+                final int cmp = compare(midVal, text, offset, len);
+
+                if (cmp < 0) {
+                    low = mid + 1;
+                } else if (cmp > 0) {
+                    high = mid - 1;
+                } else {
+                    // Found!!
+                    return mid;
+                }
+
+            }
+
+            return -1;  // Not Found!!
+
+        }
+
+
+        private static int compare(final char[] ncr, final char[] text, final int offset, final int len) {
+            final int maxCommon = Math.min(ncr.length, len);
+            int i;
+            for (i = 0; i < maxCommon; i++) {
+                final char tc = text[offset + i];
+                if (ncr[i] < tc) {
+                    return -1;
+                } else if (ncr[i] > tc) {
+                    return 1;
+                }
+            }
+            if (ncr.length > i) {
+                return 1;
+            }
+            if (len > i) {
+                return -1;
+            }
+            return 0;
+        }
+
+
+        private static class CharArrayComparator implements Comparator<char[]> {
+
+            private static CharArrayComparator INSTANCE = new CharArrayComparator();
+
+            public int compare(final char[] o1, final char[] o2) {
+                return StructureNamesRepository.compare(o1, o2, 0, o2.length);
+            }
+        }
+
+    }
+
 
 
 }
