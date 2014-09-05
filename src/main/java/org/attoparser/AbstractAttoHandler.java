@@ -70,7 +70,8 @@ public abstract class AbstractAttoHandler
         return null;
     }
 
-    public IAttoHandleResult handleStructure(final char[] buffer, final int offset, final int len,
+    public IAttoHandleResult handleStructure(final StructureType structureType,
+            final char[] buffer, final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here

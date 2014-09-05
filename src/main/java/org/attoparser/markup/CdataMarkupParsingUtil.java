@@ -71,7 +71,7 @@ public final class CdataMarkupParsingUtil {
 
     
     
-    public static BestEffortParsingResult tryParseCdata(
+    static BestEffortParsingResult tryParseCdata(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col, 

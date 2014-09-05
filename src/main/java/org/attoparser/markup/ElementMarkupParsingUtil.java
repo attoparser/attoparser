@@ -70,7 +70,7 @@ public final class ElementMarkupParsingUtil {
 
 
 
-    public static BestEffortParsingResult tryParseElement(
+    static BestEffortParsingResult tryParseElement(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col,
@@ -167,7 +167,7 @@ public final class ElementMarkupParsingUtil {
     
     
 
-    public static BestEffortParsingResult tryParseDetailedStandaloneElement(
+    static BestEffortParsingResult tryParseDetailedStandaloneElement(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col, 
@@ -187,7 +187,7 @@ public final class ElementMarkupParsingUtil {
     }
     
     
-    public static BestEffortParsingResult tryParseDetailedOpenElement(
+    static BestEffortParsingResult tryParseDetailedOpenElement(
             final char[] buffer,
             final int offset, final int len, 
             final int line, final int col, 
@@ -206,7 +206,7 @@ public final class ElementMarkupParsingUtil {
     }
     
     
-    public static BestEffortParsingResult tryParseDetailedCloseElement(
+    static BestEffortParsingResult tryParseDetailedCloseElement(
             final char[] buffer,
             final int offset, final int len, 
             final int line, final int col, 

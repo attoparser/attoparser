@@ -70,7 +70,7 @@ public final class CommentMarkupParsingUtil {
     
     
     
-    public static BestEffortParsingResult tryParseComment(
+    static BestEffortParsingResult tryParseComment(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col, 

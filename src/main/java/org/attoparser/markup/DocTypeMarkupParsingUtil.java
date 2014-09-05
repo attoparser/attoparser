@@ -74,7 +74,7 @@ public final class DocTypeMarkupParsingUtil {
     
     
     
-    public static BestEffortParsingResult tryParseDocType(
+    static BestEffortParsingResult tryParseDocType(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col, 
@@ -113,7 +113,7 @@ public final class DocTypeMarkupParsingUtil {
                 tryParseDetailedDocType(buffer, offset, len, line, col, handler);
         if (bestEffortParsingResult == null) {
             throw new AttoParseException(
-                    "Could not parse as a broken down DOCTYPE clause: \"" + new String(buffer, offset, len) + "\"", line, col);
+                    "Could not parse as a well-formed DOCTYPE clause: \"" + new String(buffer, offset, len) + "\"", line, col);
         }
 
         return bestEffortParsingResult.getHandleResult();
@@ -127,7 +127,7 @@ public final class DocTypeMarkupParsingUtil {
 
     
     
-    public static BestEffortParsingResult tryParseDetailedDocType(
+    static BestEffortParsingResult tryParseDetailedDocType(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col, 

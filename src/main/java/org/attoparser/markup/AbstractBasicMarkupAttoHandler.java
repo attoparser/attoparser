@@ -22,6 +22,7 @@ package org.attoparser.markup;
 import org.attoparser.AbstractAttoHandler;
 import org.attoparser.AttoParseException;
 import org.attoparser.IAttoHandleResult;
+import org.attoparser.StructureType;
 
 
 /**
@@ -68,45 +69,34 @@ public abstract class AbstractBasicMarkupAttoHandler
 
     @Override
     public final IAttoHandleResult handleStructure(
+            final StructureType structureType,
             final char[] buffer,
             final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
 
-        final BestEffortParsingResult elementBestEffortParsingResult =
-                ElementMarkupParsingUtil.tryParseElement(buffer, offset, len, line, col, this);
-        if (elementBestEffortParsingResult != null) {
-            return elementBestEffortParsingResult.getHandleResult();
-        }
-
-        final BestEffortParsingResult commentBestEffortParsingResult =
-                CommentMarkupParsingUtil.tryParseComment(buffer, offset, len, line, col, this);
-        if (commentBestEffortParsingResult != null) {
-            return commentBestEffortParsingResult.getHandleResult();
-        }
-
-        final BestEffortParsingResult cdataBestEffortParsingResult =
-                CdataMarkupParsingUtil.tryParseCdata(buffer, offset, len, line, col, this);
-        if (cdataBestEffortParsingResult != null) {
-            return cdataBestEffortParsingResult.getHandleResult();
-        }
-
-        final BestEffortParsingResult docTypeBestEffortParsingResult =
-                DocTypeMarkupParsingUtil.tryParseDocType(buffer, offset, len, line, col, this);
-        if (docTypeBestEffortParsingResult != null) {
-            return docTypeBestEffortParsingResult.getHandleResult();
-        }
-
-        final BestEffortParsingResult xmlDeclarationBestEffortParsingResult =
-                XmlDeclarationMarkupParsingUtil.tryParseXmlDeclaration(buffer, offset, len, line, col, this);
-        if (xmlDeclarationBestEffortParsingResult != null) {
-            return xmlDeclarationBestEffortParsingResult.getHandleResult();
-        }
-
-        final BestEffortParsingResult processingInstructionBestEffortParsingResult =
-                ProcessingInstructionMarkupParsingUtil.tryParseProcessingInstruction(buffer, offset, len, line, col, this);
-        if (processingInstructionBestEffortParsingResult != null) {
-            return processingInstructionBestEffortParsingResult.getHandleResult();
+        switch (structureType) {
+            case OPEN_ELEMENT:
+                return handleOpenElement(buffer, offset + 1, len - 2, offset, len, line, col);
+            case CLOSE_ELEMENT:
+                return handleCloseElement(buffer, offset + 2, len - 3, offset, len, line, col);
+            case STANDALONE_ELEMENT:
+                return handleStandaloneElement(buffer, offset + 1, len - 3, offset, len, line, col);
+            case COMMENT:
+                return handleComment(buffer, offset + 4, len - 7, offset, len, line, col);
+            case CDATA:
+                return handleCDATASection(buffer, offset + 9, len - 12, offset, len, line, col);
+            case DOCTYPE:
+                final char c9 = buffer[offset + 9];
+                final int contentOffset =
+                        ((c9 == ' ' || Character.isWhitespace(c9))? 10 : 9);
+                return handleDocType(buffer, offset + contentOffset, (len - contentOffset) - 1, offset, len, line, col);
+            case XML_DECLARATION:
+                return XmlDeclarationMarkupParsingUtil.doParseXmlDeclarationContent(
+                        buffer, offset + 2, len - 4, offset, len, line, col, this);
+            case PROCESSING_INSTRUCTION:
+                return ProcessingInstructionMarkupParsingUtil.doParseProcessingInstruction(
+                        buffer, offset + 2, len - 4, offset, len, line, col, this);
         }
 
         throw new AttoParseException(

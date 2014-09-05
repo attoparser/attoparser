@@ -71,14 +71,14 @@ public final class ProcessingInstructionMarkupParsingUtil {
 
     
     
-    public static BestEffortParsingResult tryParseProcessingInstruction(
-            final char[] buffer, 
-            final int offset, final int len, 
-            final int line, final int col, 
+    static BestEffortParsingResult tryParseProcessingInstruction(
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col,
             final IProcessingInstructionHandling handler)
             throws AttoParseException {
 
-        if (len >= 5 && 
+        if (len >= 5 &&
                 isProcessingInstructionStart(buffer, offset, (offset + len)) &&
                 buffer[offset + len - 2] == '?' &&
                 buffer[offset + len - 1] == '>') {
@@ -88,14 +88,14 @@ public final class ProcessingInstructionMarkupParsingUtil {
                         buffer, offset + 2, len - 4, offset, len, line, col, handler));
 
         }
-        
+
         return null;
-        
+
     }
 
 
-    
-    private static IAttoHandleResult doParseProcessingInstruction(
+
+    static IAttoHandleResult doParseProcessingInstruction(
             final char[] buffer, 
             final int internalOffset, final int internalLen, 
             final int outerOffset, final int outerLen,

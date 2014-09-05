@@ -206,7 +206,8 @@ public interface IAttoHandler {
      * <p>
      *   <b>Implementations of this handler should never modify the document buffer.</b> 
      * </p>
-     * 
+     *
+     * @param structureType the type of structure that the parser thinks this is (might be corrected if needed)
      * @param buffer the document buffer (not copied)
      * @param offset the offset (position in buffer) where the structure artifact starts.
      * @param len the length (in chars) of the structure artifact, starting in offset.
@@ -215,7 +216,9 @@ public interface IAttoHandler {
      * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public IAttoHandleResult handleStructure(final char[] buffer, final int offset, final int len,
+    public IAttoHandleResult handleStructure(
+            final StructureType structureType,
+            final char[] buffer, final int offset, final int len,
             final int line, final int col)
             throws AttoParseException;
     

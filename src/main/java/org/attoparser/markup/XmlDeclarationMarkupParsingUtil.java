@@ -74,7 +74,7 @@ public final class XmlDeclarationMarkupParsingUtil {
 
     
     
-    public static BestEffortParsingResult tryParseXmlDeclaration(
+    static BestEffortParsingResult tryParseXmlDeclaration(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col, 
@@ -98,7 +98,7 @@ public final class XmlDeclarationMarkupParsingUtil {
 
 
     
-    private static IAttoHandleResult doParseXmlDeclarationContent(
+    static IAttoHandleResult doParseXmlDeclarationContent(
             final char[] buffer, 
             final int internalOffset, final int internalLen, 
             final int outerOffset, final int outerLen,
