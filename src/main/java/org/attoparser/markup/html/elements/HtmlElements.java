@@ -130,8 +130,8 @@ public final class HtmlElements {
     public static final IHtmlElement BDO = new BasicHtmlElement("bdo");
     public static final IHtmlElement SPAN = new BasicHtmlElement("span");
     public static final IHtmlElement BR = new StandaloneHtmlElement("br");
-    public static final IHtmlElement WBR = new BasicHtmlElement("wbr");
-    
+    public static final IHtmlElement WBR = new StandaloneHtmlElement("wbr");
+
     // Edits
     public static final IHtmlElement INS = new BasicHtmlElement("ins");
     public static final IHtmlElement DEL = new BasicHtmlElement("del");
@@ -139,13 +139,13 @@ public final class HtmlElements {
     // Embedded content
     public static final IHtmlElement IMG = new StandaloneHtmlElement("img");
     public static final IHtmlElement IFRAME = new BasicHtmlElement("iframe");
-    public static final IHtmlElement EMBED = new BasicHtmlElement("embed");
+    public static final IHtmlElement EMBED = new StandaloneHtmlElement("embed");
     public static final IHtmlElement OBJECT = new BasicHtmlElement("object");
     public static final IHtmlElement PARAM = new StandaloneHtmlElement("param");
     public static final IHtmlElement VIDEO = new BasicHtmlElement("video");
     public static final IHtmlElement AUDIO = new BasicHtmlElement("audio");
-    public static final IHtmlElement SOURCE = new BasicHtmlElement("source");
-    public static final IHtmlElement TRACK = new BasicHtmlElement("track");
+    public static final IHtmlElement SOURCE = new StandaloneHtmlElement("source");
+    public static final IHtmlElement TRACK = new StandaloneHtmlElement("track");
     public static final IHtmlElement CANVAS = new BasicHtmlElement("canvas");
     public static final IHtmlElement MAP = new BasicHtmlElement("map");
     public static final IHtmlElement AREA = new StandaloneHtmlElement("area");
@@ -174,7 +174,7 @@ public final class HtmlElements {
     public static final IHtmlElement OPTGROUP = new BasicHtmlElement("optgroup");
     public static final IHtmlElement OPTION = new BasicHtmlElement("option");
     public static final IHtmlElement TEXTAREA = new BasicHtmlElement("textarea");
-    public static final IHtmlElement KEYGEN = new BasicHtmlElement("keygen");
+    public static final IHtmlElement KEYGEN = new StandaloneHtmlElement("keygen");
     public static final IHtmlElement OUTPUT = new BasicHtmlElement("output");
     public static final IHtmlElement PROGRESS = new BasicHtmlElement("progress");
     public static final IHtmlElement METER = new BasicHtmlElement("meter");
@@ -184,7 +184,7 @@ public final class HtmlElements {
     public static final IHtmlElement SUMMARY = new BasicHtmlElement("summary");
     public static final IHtmlElement COMMAND = new BasicHtmlElement("command");
     public static final IHtmlElement MENU = new BasicHtmlElement("menu");
-    public static final IHtmlElement MENUITEM = new BasicHtmlElement("menuitem");
+    public static final IHtmlElement MENUITEM = new StandaloneHtmlElement("menuitem");
     public static final IHtmlElement DIALOG = new BasicHtmlElement("dialog");
     
     
