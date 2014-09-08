@@ -24,8 +24,9 @@ import java.io.Writer;
 
 import org.attoparser.AttoParseException;
 import org.attoparser.IAttoHandleResult;
+import org.attoparser.markup.MarkupParsingConfiguration;
 import org.attoparser.markup.html.AbstractDetailedNonValidatingHtmlAttoHandler;
-import org.attoparser.markup.html.HtmlParsingConfiguration;
+import org.attoparser.markup.html.HtmlParsing;
 import org.attoparser.markup.html.elements.IHtmlElement;
 
 
@@ -48,12 +49,12 @@ public class TextTracingDetailedHtmlAttoHandler extends AbstractDetailedNonValid
     
     
     public TextTracingDetailedHtmlAttoHandler(final Writer writer) {
-        super(new HtmlParsingConfiguration());
+        super(HtmlParsing.baseHtmlMarkupParsingConfiguration());
         this.writer = writer;
     }
 
     
-    public TextTracingDetailedHtmlAttoHandler(final Writer writer, final HtmlParsingConfiguration configuration) {
+    public TextTracingDetailedHtmlAttoHandler(final Writer writer, final MarkupParsingConfiguration configuration) {
         super(configuration);
         this.writer = writer;
     }
@@ -66,7 +67,7 @@ public class TextTracingDetailedHtmlAttoHandler extends AbstractDetailedNonValid
     @Override
     public IAttoHandleResult handleDocumentStart(final long startTimeNanos,
             final int line, final int col,
-            final HtmlParsingConfiguration configuration)
+            final MarkupParsingConfiguration configuration)
             throws AttoParseException {
         try {
             this.writer.write('[');
@@ -81,7 +82,7 @@ public class TextTracingDetailedHtmlAttoHandler extends AbstractDetailedNonValid
     @Override
     public IAttoHandleResult handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos,
             final int line, final int col, 
-            final HtmlParsingConfiguration configuration)
+            final MarkupParsingConfiguration configuration)
             throws AttoParseException {
         try {
             this.writer.write(']');
@@ -255,6 +256,110 @@ public class TextTracingDetailedHtmlAttoHandler extends AbstractDetailedNonValid
     }
 
 
+    @Override
+    public IAttoHandleResult handleHtmlAutoCloseElementStart(
+            final IHtmlElement element,
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException {
+
+        try {
+
+            this.writer.write('A');
+            this.writer.write('C');
+            this.writer.write('E');
+            this.writer.write('S');
+            this.writer.write('(');
+            this.writer.write(buffer, offset, len);
+            this.writer.write(')');
+            writePosition(this.writer, line, col);
+
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        }
+
+        return null;
+
+    }
+
+
+    @Override
+    public IAttoHandleResult handleHtmlAutoCloseElementEnd(
+            final IHtmlElement element,
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException {
+
+        try {
+
+            this.writer.write('A');
+            this.writer.write('C');
+            this.writer.write('E');
+            this.writer.write('E');
+            writePosition(this.writer, line, col);
+
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        }
+
+        return null;
+
+    }
+
+
+    @Override
+    public IAttoHandleResult handleHtmlUnmatchedCloseElementStart(
+            final IHtmlElement element,
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException {
+
+        try {
+
+            this.writer.write('U');
+            this.writer.write('C');
+            this.writer.write('E');
+            this.writer.write('S');
+            this.writer.write('(');
+            this.writer.write(buffer, offset, len);
+            this.writer.write(')');
+            writePosition(this.writer, line, col);
+
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        }
+
+        return null;
+
+    }
+
+
+    @Override
+    public IAttoHandleResult handleHtmlUnmatchedCloseElementEnd(
+            final IHtmlElement element,
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException {
+
+        try {
+
+            this.writer.write('U');
+            this.writer.write('C');
+            this.writer.write('E');
+            this.writer.write('E');
+            writePosition(this.writer, line, col);
+
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        }
+
+        return null;
+
+    }
 
 
     @Override

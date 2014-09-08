@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.attoparser.AttoParseException;
 import org.attoparser.IAttoHandleResult;
+import org.attoparser.markup.MarkupParsingConfiguration;
 import org.attoparser.markup.html.elements.IHtmlElement;
 
 
@@ -49,7 +50,7 @@ public abstract class AbstractStandardNonValidatingHtmlAttoHandler
     
 
 
-    protected AbstractStandardNonValidatingHtmlAttoHandler(final HtmlParsingConfiguration configuration) {
+    protected AbstractStandardNonValidatingHtmlAttoHandler(final MarkupParsingConfiguration configuration) {
         super(configuration);
     }
 

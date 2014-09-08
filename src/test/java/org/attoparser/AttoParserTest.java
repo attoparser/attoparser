@@ -32,7 +32,6 @@ import org.attoparser.markup.MarkupParsingConfiguration.UniqueRootElementPresenc
 import org.attoparser.markup.duplicate.DuplicatingBasicMarkupAttoHandler;
 import org.attoparser.markup.duplicate.DuplicatingDetailedMarkupAttoHandler;
 import org.attoparser.markup.html.HtmlParsing;
-import org.attoparser.markup.html.HtmlParsingConfiguration;
 import org.attoparser.markup.html.trace.TextTracingDetailedHtmlAttoHandler;
 import org.attoparser.markup.trace.TextTracingBasicMarkupAttoHandler;
 import org.attoparser.markup.trace.TextTracingDetailedMarkupAttoHandler;
@@ -79,8 +78,7 @@ public class AttoParserTest extends TestCase {
         
         final MarkupParsingConfiguration wellFormedXmlCaseInsensitive = wellFormedXml.clone();
         wellFormedXmlCaseInsensitive.setCaseSensitive(false);
-        
-        
+
         
         final String dt1 = "<!DOCTYPE>"; 
         final String dt2 = "<!DOCTYPE html>"; 
@@ -110,6 +108,15 @@ public class AttoParserTest extends TestCase {
         assertEquals("[DT(html public \"aaa\" [<!ELEMENT>]){1,1}]", sw4.toString());
 
 
+
+        testHtmlDoc(
+            "<img src=\"hello\">Something",
+            "[USES(img){1,1}AS( ){1,5}A(src){1,6}(=){1,9}(\"hello\"){1,10}USEE{1,17}T(Something){1,18}]",
+            noRestrictionsAutoClose);
+        testHtmlDoc(
+            "<p><img src=\"hello\">Something</p>",
+            "[OES(p){1,1}OEE{1,3}USES(img){1,4}AS( ){1,8}A(src){1,9}(=){1,12}(\"hello\"){1,13}USEE{1,20}T(Something){1,21}CES(p){1,30}CEE{1,33}]",
+            noRestrictionsAutoClose);
         testDoc(
             "<br a>Hello",
             "[OES(br){1,1}IWS( ){1,4}A(a){1,5}(){1,6}(){1,6}OEE{1,6}T(Hello){1,7}]",
@@ -144,19 +151,19 @@ public class AttoParserTest extends TestCase {
         testHtmlDoc(
             "<script> var a = \"<div>\" if (a < 0)</script>",
             "[OES(script){1,1}OEE{1,8}T( var a = \"<div>\" if (a < 0)){1,9}CES(script){1,36}CEE{1,44}]",
-            HtmlParsing.htmlParsingConfiguration());
+            HtmlParsing.baseHtmlMarkupParsingConfiguration());
         testHtmlDoc(
             "<style> a = \"<div>\" if (a < 0)</style>",
             "[OES(style){1,1}OEE{1,7}T( a = \"<div>\" if (a < 0)){1,8}CES(style){1,31}CEE{1,38}]",
-            HtmlParsing.htmlParsingConfiguration());
+            HtmlParsing.baseHtmlMarkupParsingConfiguration());
         testHtmlDoc(
             "<script> var a = \"<div>\"\n\nif (a < 0)</script>",
             "[OES(script){1,1}OEE{1,8}T( var a = \"<div>\"\n\nif (a < 0)){1,9}CES(script){3,11}CEE{3,19}]",
-            HtmlParsing.htmlParsingConfiguration());
+            HtmlParsing.baseHtmlMarkupParsingConfiguration());
         testHtmlDoc(
             "<style> a = \"<div>\"\n\nif (a < 0)</style>",
             "[OES(style){1,1}OEE{1,7}T( a = \"<div>\"\n\nif (a < 0)){1,8}CES(style){3,11}CEE{3,18}]",
-            HtmlParsing.htmlParsingConfiguration());
+            HtmlParsing.baseHtmlMarkupParsingConfiguration());
         testDoc(
             "<SCRIPT> var a = \"<div>\" if (a < 0)</SCRIPT>",
             "[OES(SCRIPT){1,1}OEE{1,8}T( var a = \"){1,9}OES(div){1,19}OEE{1,23}T(\" if (a < 0)){1,24}CES(SCRIPT){1,36}CEE{1,44}]",
@@ -170,19 +177,19 @@ public class AttoParserTest extends TestCase {
         testHtmlDoc(
             "<SCRIPT> var a = \"<div>\" if (a < 0)</SCRIPT>",
             "[OES(SCRIPT){1,1}OEE{1,8}T( var a = \"<div>\" if (a < 0)){1,9}CES(SCRIPT){1,36}CEE{1,44}]",
-            HtmlParsing.htmlParsingConfiguration());
+            HtmlParsing.baseHtmlMarkupParsingConfiguration());
         testHtmlDoc(
             "<STYLE> a = \"<div>\" if (a < 0)</STYLE>",
             "[OES(STYLE){1,1}OEE{1,7}T( a = \"<div>\" if (a < 0)){1,8}CES(STYLE){1,31}CEE{1,38}]",
-            HtmlParsing.htmlParsingConfiguration());
+            HtmlParsing.baseHtmlMarkupParsingConfiguration());
         testHtmlDoc(
             "<SCRIPT> var a = \"<div>\"\n\nif (a < 0)</SCRIPT>",
             "[OES(SCRIPT){1,1}OEE{1,8}T( var a = \"<div>\"\n\nif (a < 0)){1,9}CES(SCRIPT){3,11}CEE{3,19}]",
-            HtmlParsing.htmlParsingConfiguration());
+            HtmlParsing.baseHtmlMarkupParsingConfiguration());
         testHtmlDoc(
             "<STYLE> a = \"<div>\"\n\nif (a < 0)</STYLE>",
             "[OES(STYLE){1,1}OEE{1,7}T( a = \"<div>\"\n\nif (a < 0)){1,8}CES(STYLE){3,11}CEE{3,18}]",
-            HtmlParsing.htmlParsingConfiguration());
+            HtmlParsing.baseHtmlMarkupParsingConfiguration());
         testDoc(
             "<script type=\"text/javascript\"> var a = \"<div>\" if (a < 0)</script>",
             "[OES(script){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE{1,31}T( var a = \"){1,32}OES(div){1,42}OEE{1,46}T(\" if (a < 0)){1,47}CES(script){1,59}CEE{1,67}]",
@@ -196,19 +203,19 @@ public class AttoParserTest extends TestCase {
         testHtmlDoc(
             "<script type=\"text/javascript\"> var a = \"<div>\" if (a < 0)</script>",
             "[OES(script){1,1}AS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE{1,31}T( var a = \"<div>\" if (a < 0)){1,32}CES(script){1,59}CEE{1,67}]",
-            HtmlParsing.htmlParsingConfiguration());
+            HtmlParsing.baseHtmlMarkupParsingConfiguration());
         testHtmlDoc(
             "<style type=\"text/css\"> a = \"<div>\" if (a < 0)</style>",
             "[OES(style){1,1}AS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE{1,23}T( a = \"<div>\" if (a < 0)){1,24}CES(style){1,47}CEE{1,54}]",
-            HtmlParsing.htmlParsingConfiguration());
+            HtmlParsing.baseHtmlMarkupParsingConfiguration());
         testHtmlDoc(
             "<script type=\"text/javascript\"> var a = \"<div>\"\n\nif (a < 0)</script>",
             "[OES(script){1,1}AS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE{1,31}T( var a = \"<div>\"\n\nif (a < 0)){1,32}CES(script){3,11}CEE{3,19}]",
-            HtmlParsing.htmlParsingConfiguration());
+            HtmlParsing.baseHtmlMarkupParsingConfiguration());
         testHtmlDoc(
             "<style type=\"text/css\"> a = \"<div>\"\n\nif (a < 0)</style>",
             "[OES(style){1,1}AS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE{1,23}T( a = \"<div>\"\n\nif (a < 0)){1,24}CES(style){3,11}CEE{3,18}]",
-            HtmlParsing.htmlParsingConfiguration());
+            HtmlParsing.baseHtmlMarkupParsingConfiguration());
         testDoc(
             "<SCRIPT type=\"text/javascript\"> var a = \"<div>\" if (a < 0)</SCRIPT>",
             "[OES(SCRIPT){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE{1,31}T( var a = \"){1,32}OES(div){1,42}OEE{1,46}T(\" if (a < 0)){1,47}CES(SCRIPT){1,59}CEE{1,67}]",
@@ -222,27 +229,27 @@ public class AttoParserTest extends TestCase {
         testHtmlDoc(
             "<SCRIPT type=\"text/javascript\"> var a = \"<div>\" if (a < 0)</SCRIPT>",
             "[OES(SCRIPT){1,1}AS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE{1,31}T( var a = \"<div>\" if (a < 0)){1,32}CES(SCRIPT){1,59}CEE{1,67}]",
-            HtmlParsing.htmlParsingConfiguration());
+            HtmlParsing.baseHtmlMarkupParsingConfiguration());
         testHtmlDoc(
             "<STYLE type=\"text/css\"> a = \"<div>\" if (a < 0)</STYLE>",
             "[OES(STYLE){1,1}AS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE{1,23}T( a = \"<div>\" if (a < 0)){1,24}CES(STYLE){1,47}CEE{1,54}]",
-            HtmlParsing.htmlParsingConfiguration());
+            HtmlParsing.baseHtmlMarkupParsingConfiguration());
         testHtmlDoc(
             "<SCRIPT type=\"text/javascript\"> var a = \"<div>\"\n\nif (a < 0)</SCRIPT>",
             "[OES(SCRIPT){1,1}AS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE{1,31}T( var a = \"<div>\"\n\nif (a < 0)){1,32}CES(SCRIPT){3,11}CEE{3,19}]",
-            HtmlParsing.htmlParsingConfiguration());
+            HtmlParsing.baseHtmlMarkupParsingConfiguration());
         testHtmlDoc(
             "<STYLE type=\"text/css\"> a = \"<div>\"\n\nif (a < 0)</STYLE>",
             "[OES(STYLE){1,1}AS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE{1,23}T( a = \"<div>\"\n\nif (a < 0)){1,24}CES(STYLE){3,11}CEE{3,18}]",
-            HtmlParsing.htmlParsingConfiguration());
+            HtmlParsing.baseHtmlMarkupParsingConfiguration());
         testHtmlDoc(
             "<ScripT type=\"text/javascript\"> var a = \"<div>\" if (a < 0)</ScripT>",
             "[OES(ScripT){1,1}AS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE{1,31}T( var a = \"<div>\" if (a < 0)){1,32}CES(ScripT){1,59}CEE{1,67}]",
-            HtmlParsing.htmlParsingConfiguration());
+            HtmlParsing.baseHtmlMarkupParsingConfiguration());
         testHtmlDoc(
             "<StylE type=\"text/css\"> a = \"<div>\" if (a < 0)</StylE>",
             "[OES(StylE){1,1}AS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE{1,23}T( a = \"<div>\" if (a < 0)){1,24}CES(StylE){1,47}CEE{1,54}]",
-            HtmlParsing.htmlParsingConfiguration());
+            HtmlParsing.baseHtmlMarkupParsingConfiguration());
         testDoc(
             "<h1 a=\"if (a < 0)\">Hello</ h1>",
             "[OES(h1){1,1}IWS( ){1,4}A(a){1,5}(=){1,6}(\"if (a < 0)\"){1,7}OEE{1,19}T(Hello</ h1>){1,20}ACES(h1){1,31}ACEE{1,31}]",
@@ -1540,19 +1547,19 @@ public class AttoParserTest extends TestCase {
 
 
 
-    static void testHtmlDoc(final String input, final String outputBreakDown, final HtmlParsingConfiguration parsingConfiguration) throws AttoParseException {
+    static void testHtmlDoc(final String input, final String outputBreakDown, final MarkupParsingConfiguration parsingConfiguration) throws AttoParseException {
         testHtmlDoc(input.toCharArray(), outputBreakDown, 0, input.length(), parsingConfiguration);
     }
 
-    static void testHtmlDoc(String input, final String outputBreakDown, final int offset, final int len, final HtmlParsingConfiguration parsingConfiguration) throws AttoParseException {
+    static void testHtmlDoc(String input, final String outputBreakDown, final int offset, final int len, final MarkupParsingConfiguration parsingConfiguration) throws AttoParseException {
         testHtmlDoc(input.toCharArray(), outputBreakDown, offset, len, parsingConfiguration);
     }
 
-    static void testHtmlDoc(final String input, final String outputBreakDown, final int bufferSize, final HtmlParsingConfiguration parsingConfiguration) throws AttoParseException {
+    static void testHtmlDoc(final String input, final String outputBreakDown, final int bufferSize, final MarkupParsingConfiguration parsingConfiguration) throws AttoParseException {
         testHtmlDoc(input.toCharArray(), outputBreakDown, 0, input.length(), bufferSize, parsingConfiguration);
     }
 
-    static void testHtmlDoc(String input, final String outputBreakDown, final int offset, final int len, final int bufferSize, final HtmlParsingConfiguration parsingConfiguration) throws AttoParseException {
+    static void testHtmlDoc(String input, final String outputBreakDown, final int offset, final int len, final int bufferSize, final MarkupParsingConfiguration parsingConfiguration) throws AttoParseException {
         testHtmlDoc(input.toCharArray(), outputBreakDown, offset, len, bufferSize, parsingConfiguration);
     }
 
@@ -1560,7 +1567,7 @@ public class AttoParserTest extends TestCase {
 
 
     static void testHtmlDoc(final char[] input, final String outputBreakDown,
-                        final int offset, final int len, final HtmlParsingConfiguration parsingConfiguration) throws AttoParseException {
+                        final int offset, final int len, final MarkupParsingConfiguration parsingConfiguration) throws AttoParseException {
 
         final int maxBufferSize = 16384;
         for (int bufferSize = 1; bufferSize <= maxBufferSize; bufferSize++) {
@@ -1574,7 +1581,7 @@ public class AttoParserTest extends TestCase {
             final char[] input,
             final String outputBreakDown,
             final int offset, final int len, final int bufferSize,
-            final HtmlParsingConfiguration parsingConfiguration)
+            final MarkupParsingConfiguration parsingConfiguration)
             throws AttoParseException {
 
         try {

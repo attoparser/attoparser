@@ -229,7 +229,7 @@ public final class ElementMarkupParsingUtil {
 
     
     
-    private static IAttoHandleResult doTryParseDetailedOpenOrStandaloneElement(
+    static IAttoHandleResult doTryParseDetailedOpenOrStandaloneElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen, 
             @SuppressWarnings("unused") final int outerOffset, @SuppressWarnings("unused") final int outerLen, 
@@ -328,7 +328,7 @@ public final class ElementMarkupParsingUtil {
 
     
     
-    private static IAttoHandleResult doTryParseDetailedCloseElement(
+    static IAttoHandleResult doTryParseDetailedCloseElement(
             final char[] buffer, 
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 

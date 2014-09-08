@@ -147,9 +147,8 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException {
 
-        throw new IllegalStateException(
-                "Parsing error: no Autobalancing should be performed during HTML parsing");
-        
+        return handler.handleHtmlAutoCloseElementStart(this, buffer, nameOffset, nameLen, line, col);
+
     }
     
     
@@ -160,9 +159,13 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException {
 
-        throw new IllegalStateException(
-                "Parsing error: no Autobalancing should be performed during HTML parsing");
-        
+        final IAttoHandleResult result =
+                handler.handleHtmlAutoCloseElementEnd(this, buffer, nameOffset, nameLen, line, col);
+
+        stack.closeElement();
+
+        return result;
+
     }
 
     
@@ -176,7 +179,7 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             throws AttoParseException {
         
         // Stack should not be affected by this, simply delegate the event
-        return handler.handleHtmlCloseElementStart(this, buffer, nameOffset, nameLen, line, col);
+        return handler.handleHtmlUnmatchedCloseElementStart(this, buffer, nameOffset, nameLen, line, col);
         
     }
 
@@ -189,7 +192,7 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             throws AttoParseException {
         
         // Stack should not be affected by this, simply delegate the event
-        return handler.handleHtmlCloseElementEnd(this, buffer, nameOffset, nameLen, line, col);
+        return handler.handleHtmlUnmatchedCloseElementEnd(this, buffer, nameOffset, nameLen, line, col);
         
     }
 

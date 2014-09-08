@@ -60,9 +60,9 @@ public final class HtmlElements {
     // Document metadata
     public static final IHtmlElement HEAD = new BasicHtmlElement("head");
     public static final IHtmlElement TITLE = new BasicHtmlElement("title");
-    public static final IHtmlElement BASE = new StandaloneHtmlElement("base");
-    public static final IHtmlElement LINK = new StandaloneHtmlElement("link");
-    public static final IHtmlElement META = new StandaloneHtmlElement("meta");
+    public static final IHtmlElement BASE = new VoidHtmlElement("base");
+    public static final IHtmlElement LINK = new VoidHtmlElement("link");
+    public static final IHtmlElement META = new VoidHtmlElement("meta");
     public static final IHtmlElement STYLE = new CdataContentHtmlElement("style");
     
     // Scripting
@@ -89,7 +89,7 @@ public final class HtmlElements {
 
     // Grouping content
     public static final IHtmlElement P = new BasicHtmlElement("p");
-    public static final IHtmlElement HR = new StandaloneHtmlElement("hr");
+    public static final IHtmlElement HR = new VoidHtmlElement("hr");
     public static final IHtmlElement PRE = new BasicHtmlElement("pre");
     public static final IHtmlElement BLOCKQUOTE = new BasicHtmlElement("blockquote");
     public static final IHtmlElement OL = new BasicHtmlElement("ol");
@@ -129,32 +129,32 @@ public final class HtmlElements {
     public static final IHtmlElement BDI = new BasicHtmlElement("bdi");
     public static final IHtmlElement BDO = new BasicHtmlElement("bdo");
     public static final IHtmlElement SPAN = new BasicHtmlElement("span");
-    public static final IHtmlElement BR = new StandaloneHtmlElement("br");
-    public static final IHtmlElement WBR = new StandaloneHtmlElement("wbr");
+    public static final IHtmlElement BR = new VoidHtmlElement("br");
+    public static final IHtmlElement WBR = new VoidHtmlElement("wbr");
 
     // Edits
     public static final IHtmlElement INS = new BasicHtmlElement("ins");
     public static final IHtmlElement DEL = new BasicHtmlElement("del");
     
     // Embedded content
-    public static final IHtmlElement IMG = new StandaloneHtmlElement("img");
+    public static final IHtmlElement IMG = new VoidHtmlElement("img");
     public static final IHtmlElement IFRAME = new BasicHtmlElement("iframe");
-    public static final IHtmlElement EMBED = new StandaloneHtmlElement("embed");
+    public static final IHtmlElement EMBED = new VoidHtmlElement("embed");
     public static final IHtmlElement OBJECT = new BasicHtmlElement("object");
-    public static final IHtmlElement PARAM = new StandaloneHtmlElement("param");
+    public static final IHtmlElement PARAM = new VoidHtmlElement("param");
     public static final IHtmlElement VIDEO = new BasicHtmlElement("video");
     public static final IHtmlElement AUDIO = new BasicHtmlElement("audio");
-    public static final IHtmlElement SOURCE = new StandaloneHtmlElement("source");
-    public static final IHtmlElement TRACK = new StandaloneHtmlElement("track");
+    public static final IHtmlElement SOURCE = new VoidHtmlElement("source");
+    public static final IHtmlElement TRACK = new VoidHtmlElement("track");
     public static final IHtmlElement CANVAS = new BasicHtmlElement("canvas");
     public static final IHtmlElement MAP = new BasicHtmlElement("map");
-    public static final IHtmlElement AREA = new StandaloneHtmlElement("area");
+    public static final IHtmlElement AREA = new VoidHtmlElement("area");
     
     // Tabular data
     public static final IHtmlElement TABLE = new BasicHtmlElement("table");
     public static final IHtmlElement CAPTION = new BasicHtmlElement("caption");
     public static final IHtmlElement COLGROUP = new BasicHtmlElement("colgroup");
-    public static final IHtmlElement COL = new StandaloneHtmlElement("col");
+    public static final IHtmlElement COL = new VoidHtmlElement("col");
     public static final IHtmlElement TBODY = new BasicHtmlElement("tbody");
     public static final IHtmlElement THEAD = new BasicHtmlElement("thead");
     public static final IHtmlElement TFOOT = new BasicHtmlElement("tfoot");
@@ -167,14 +167,14 @@ public final class HtmlElements {
     public static final IHtmlElement FIELDSET = new BasicHtmlElement("fieldset");
     public static final IHtmlElement LEGEND = new BasicHtmlElement("legend");
     public static final IHtmlElement LABEL = new BasicHtmlElement("label");
-    public static final IHtmlElement INPUT = new StandaloneHtmlElement("input");
+    public static final IHtmlElement INPUT = new VoidHtmlElement("input");
     public static final IHtmlElement BUTTON = new BasicHtmlElement("button");
     public static final IHtmlElement SELECT = new BasicHtmlElement("select");
     public static final IHtmlElement DATALIST = new BasicHtmlElement("datalist");
     public static final IHtmlElement OPTGROUP = new BasicHtmlElement("optgroup");
     public static final IHtmlElement OPTION = new BasicHtmlElement("option");
     public static final IHtmlElement TEXTAREA = new BasicHtmlElement("textarea");
-    public static final IHtmlElement KEYGEN = new StandaloneHtmlElement("keygen");
+    public static final IHtmlElement KEYGEN = new VoidHtmlElement("keygen");
     public static final IHtmlElement OUTPUT = new BasicHtmlElement("output");
     public static final IHtmlElement PROGRESS = new BasicHtmlElement("progress");
     public static final IHtmlElement METER = new BasicHtmlElement("meter");
@@ -184,7 +184,7 @@ public final class HtmlElements {
     public static final IHtmlElement SUMMARY = new BasicHtmlElement("summary");
     public static final IHtmlElement COMMAND = new BasicHtmlElement("command");
     public static final IHtmlElement MENU = new BasicHtmlElement("menu");
-    public static final IHtmlElement MENUITEM = new StandaloneHtmlElement("menuitem");
+    public static final IHtmlElement MENUITEM = new VoidHtmlElement("menuitem");
     public static final IHtmlElement DIALOG = new BasicHtmlElement("dialog");
     
     

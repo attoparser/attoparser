@@ -86,7 +86,9 @@ public final class HtmlElementStack {
         // New "open" element will be the old open one's parent.
         
         if (this.size == 0 || this.openIndex == NO_PARENT) {
-            throw new IllegalStateException("Cannot close element: no element is currently open!");
+            // An "unmatched close" event will be probably generated somewhere. But anyway, we cannot
+            // close any elements here, so just return.
+            return;
         }
         
         int i = this.size - 1;

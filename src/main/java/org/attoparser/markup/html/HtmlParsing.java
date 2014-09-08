@@ -41,9 +41,6 @@ public class HtmlParsing {
     // Cannot make public because it's mutable
     private static final MarkupParsingConfiguration BASE_HTML_MARKUP_PARSING_CONFIGURATION;
 
-    // Cannot make public because it's mutable
-    private static final HtmlParsingConfiguration HTML_PARSING_CONFIGURATION;
-
     
     
     static {
@@ -59,43 +56,14 @@ public class HtmlParsing {
         BASE_HTML_MARKUP_PARSING_CONFIGURATION.getPrologParsingConfiguration().setXmlDeclarationPresence(PrologPresence.ALLOWED);
         BASE_HTML_MARKUP_PARSING_CONFIGURATION.getPrologParsingConfiguration().setDoctypePresence(PrologPresence.ALLOWED);
         BASE_HTML_MARKUP_PARSING_CONFIGURATION.getPrologParsingConfiguration().setRequireDoctypeKeywordsUpperCase(false);
-        
-        HTML_PARSING_CONFIGURATION = new HtmlParsingConfiguration();
-        HTML_PARSING_CONFIGURATION.setCaseSensitive(false);
-        HTML_PARSING_CONFIGURATION.setRequireUniqueAttributesInElement(true);
-        HTML_PARSING_CONFIGURATION.setRequireXmlWellFormedAttributeValues(false);
-        HTML_PARSING_CONFIGURATION.setUniqueRootElementPresence(UniqueRootElementPresence.DEPENDS_ON_PROLOG_DOCTYPE);
-        
+
     }
 
     
 
-    private static MarkupParsingConfiguration baseMarkupParsingConfiguration() {
+    public static MarkupParsingConfiguration baseHtmlMarkupParsingConfiguration() {
         try {
             return BASE_HTML_MARKUP_PARSING_CONFIGURATION.clone();
-        } catch (final CloneNotSupportedException e) {
-            // Will never be thrown
-            throw new IllegalStateException(e);
-        }
-    }
-
-    
-
-    public static MarkupParsingConfiguration markupParsingConfiguration(final HtmlParsingConfiguration htmlParsingConfiguration) {
-        
-        final MarkupParsingConfiguration markupParsingConfiguration = baseMarkupParsingConfiguration();
-        markupParsingConfiguration.setCaseSensitive(htmlParsingConfiguration.isCaseSensitive());
-        markupParsingConfiguration.setRequireUniqueAttributesInElement(htmlParsingConfiguration.getRequireUniqueAttributesInElement());
-        markupParsingConfiguration.setRequireXmlWellFormedAttributeValues(htmlParsingConfiguration.getRequireXmlWellFormedAttributeValues());
-        markupParsingConfiguration.setUniqueRootElementPresence(htmlParsingConfiguration.getUniqueRootElementPresence());
-        return markupParsingConfiguration;
-                
-    }
-
-
-    public static HtmlParsingConfiguration htmlParsingConfiguration() {
-        try {
-            return HTML_PARSING_CONFIGURATION.clone();
         } catch (final CloneNotSupportedException e) {
             // Will never be thrown
             throw new IllegalStateException(e);

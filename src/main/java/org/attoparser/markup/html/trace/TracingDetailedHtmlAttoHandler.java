@@ -25,8 +25,9 @@ import java.util.List;
 
 import org.attoparser.AttoParseException;
 import org.attoparser.IAttoHandleResult;
+import org.attoparser.markup.MarkupParsingConfiguration;
 import org.attoparser.markup.html.AbstractDetailedNonValidatingHtmlAttoHandler;
-import org.attoparser.markup.html.HtmlParsingConfiguration;
+import org.attoparser.markup.html.HtmlParsing;
 import org.attoparser.markup.html.elements.IHtmlElement;
 import org.attoparser.markup.trace.TraceEvent;
 
@@ -58,6 +59,12 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
     public static final String TRACE_TYPE_CLOSE_ELEMENT_START = "CES";
     public static final String TRACE_TYPE_CLOSE_ELEMENT_END = "CEE";
 
+    public static final String TRACE_TYPE_AUTO_CLOSE_ELEMENT_START = "ACES";
+    public static final String TRACE_TYPE_AUTO_CLOSE_ELEMENT_END = "ACEE";
+
+    public static final String TRACE_TYPE_UNMATCHED_CLOSE_ELEMENT_START = "UCES";
+    public static final String TRACE_TYPE_UNMATCHED_CLOSE_ELEMENT_END = "UCEE";
+
     public static final String TRACE_TYPE_ATTRIBUTE = "A";
     public static final String TRACE_TYPE_TEXT = "T";
     public static final String TRACE_TYPE_COMMENT = "C";
@@ -75,11 +82,11 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
     
     
     public TracingDetailedHtmlAttoHandler() {
-        super(new HtmlParsingConfiguration());
+        super(HtmlParsing.baseHtmlMarkupParsingConfiguration());
     }
 
     
-    public TracingDetailedHtmlAttoHandler(final HtmlParsingConfiguration configuration) {
+    public TracingDetailedHtmlAttoHandler(final MarkupParsingConfiguration configuration) {
         super(configuration);
     }
     
@@ -99,7 +106,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
     @Override
     public IAttoHandleResult handleDocumentStart(final long startTimeNanos,
             final int line, final int col,
-            final HtmlParsingConfiguration configuration)
+            final MarkupParsingConfiguration configuration)
             throws AttoParseException {
         this.trace.add(new TraceEvent(line, col, TRACE_TYPE_DOCUMENT_START));
         return null;
@@ -110,7 +117,7 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
     @Override
     public IAttoHandleResult handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos,
             final int line, final int col, 
-            final HtmlParsingConfiguration configuration)
+            final MarkupParsingConfiguration configuration)
             throws AttoParseException {
         this.trace.add(new TraceEvent(line, col, TRACE_TYPE_DOCUMENT_END));
         return null;
@@ -205,6 +212,64 @@ public class TracingDetailedHtmlAttoHandler extends AbstractDetailedNonValidatin
             final int line, final int col)
             throws AttoParseException {
         this.trace.add(new TraceEvent(line, col, TRACE_TYPE_CLOSE_ELEMENT_END, element.getName()));
+        return null;
+    }
+
+
+
+
+    @Override
+    public IAttoHandleResult handleHtmlAutoCloseElementStart(
+            final IHtmlElement element,
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException {
+        this.trace.add(
+                new TraceEvent(
+                        line, col, TRACE_TYPE_AUTO_CLOSE_ELEMENT_START,
+                        element.getName(), new String(buffer, offset, len)));
+        return null;
+    }
+
+
+    @Override
+    public IAttoHandleResult handleHtmlAutoCloseElementEnd(
+            final IHtmlElement element,
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException {
+        this.trace.add(new TraceEvent(line, col, TRACE_TYPE_AUTO_CLOSE_ELEMENT_END, element.getName()));
+        return null;
+    }
+
+
+
+
+    @Override
+    public IAttoHandleResult handleHtmlUnmatchedCloseElementStart(
+            final IHtmlElement element,
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException {
+        this.trace.add(
+                new TraceEvent(
+                        line, col, TRACE_TYPE_UNMATCHED_CLOSE_ELEMENT_START,
+                        element.getName(), new String(buffer, offset, len)));
+        return null;
+    }
+
+
+    @Override
+    public IAttoHandleResult handleHtmlUnmatchedCloseElementEnd(
+            final IHtmlElement element,
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException {
+        this.trace.add(new TraceEvent(line, col, TRACE_TYPE_UNMATCHED_CLOSE_ELEMENT_END, element.getName()));
         return null;
     }
 

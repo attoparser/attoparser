@@ -28,10 +28,10 @@ package org.attoparser;
  *
  * @author Daniel Fern&aacute;ndez
  *
- * @since 1.5.0
+ * @since 2.0.0
  *
  */
-public final class AttoHandleResult implements IAttoHandleResult {
+public class AttoHandleResult implements IAttoHandleResult {
 
     /**
      * <p>
@@ -54,7 +54,7 @@ public final class AttoHandleResult implements IAttoHandleResult {
     }
 
 
-    public char[] getParsingDisableLimit() {
+    public final char[] getParsingDisableLimit() {
         return this.parsingDisableLimit;
     }
 

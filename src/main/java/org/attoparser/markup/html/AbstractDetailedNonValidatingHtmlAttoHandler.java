@@ -45,16 +45,14 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
 
 
 
-    private final HtmlParsingConfiguration configuration;
     private final HtmlElementStack stack;
     private IHtmlElement currentElement = null;
 
     
     
-    protected AbstractDetailedNonValidatingHtmlAttoHandler(final HtmlParsingConfiguration configuration) {
-        super(HtmlParsing.markupParsingConfiguration(configuration));
+    protected AbstractDetailedNonValidatingHtmlAttoHandler(final MarkupParsingConfiguration configuration) {
+        super(configuration);
         this.stack = new HtmlElementStack();
-        this.configuration = configuration;
     }
 
     
@@ -74,25 +72,15 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
 
     
     
-    
-    @Override
-    public final IAttoHandleResult handleDocumentStart(final long startTimeNanos,
-            final int line, final int col,
-            final MarkupParsingConfiguration markupParsingConfiguration)
-            throws AttoParseException {
-        return handleDocumentStart(startTimeNanos, line, col, this.configuration);
-    }
 
-    
-    
-    @Override
-    public final IAttoHandleResult handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos,
-            final int line, final int col, 
-            final MarkupParsingConfiguration markupParsingConfiguration)
-            throws AttoParseException {
-        return handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col, this.configuration);
-    }
-    
+    /*
+     * ----------------------------------------------------------------------
+     * NOTE no implementation is needed at this level of:
+     *   handleDocumentStart(long, int, int, MarkupParsingConfiguration)
+     *   handleDocumentEnd(long, long, int, int, MarkupParsingConfiguration)
+     * ----------------------------------------------------------------------
+     */
+
     
     
     
@@ -312,40 +300,9 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
     
     
     
-    
-    
-    /*
-     * *********************
-     * *                   *
-     * * DOCUMENT HANDLING *
-     * *                   *
-     * *********************
-     */
 
 
-    @SuppressWarnings("unused")
-    public IAttoHandleResult handleDocumentStart(
-            final long startTimeNanos, 
-            final int line, final int col,
-            final HtmlParsingConfiguration parsingConfiguration)
-            throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
-        return null;
-    }
 
-    
-    @SuppressWarnings("unused")
-    public IAttoHandleResult handleDocumentEnd(
-            final long endTimeNanos, final long totalTimeNanos, 
-            final int line, final int col, 
-            final HtmlParsingConfiguration parsingConfiguration)
-            throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
-        return null;
-    }
-    
-
-    
     
     /*
      * ************************************************************
@@ -429,6 +386,60 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
     }
 
     public IAttoHandleResult handleHtmlCloseElementEnd(
+            final IHtmlElement element,
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
+        return null;
+    }
+
+
+    /*
+     * ------------------------------------------
+     * AUTO CLOSE ELEMENTS (because of balancing)
+     * ------------------------------------------
+     */
+
+    public IAttoHandleResult handleHtmlAutoCloseElementStart(
+            final IHtmlElement element,
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
+        return null;
+    }
+
+    public IAttoHandleResult handleHtmlAutoCloseElementEnd(
+            final IHtmlElement element,
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
+        return null;
+    }
+
+
+    /*
+     * ------------------------------------------------
+     * UNMATCHED CLOSE ELEMENTS: </div> without a <div>
+     * ------------------------------------------------
+     */
+
+    public IAttoHandleResult handleHtmlUnmatchedCloseElementStart(
+            final IHtmlElement element,
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
+        return null;
+    }
+
+    public IAttoHandleResult handleHtmlUnmatchedCloseElementEnd(
             final IHtmlElement element,
             final char[] buffer,
             final int nameOffset, final int nameLen,

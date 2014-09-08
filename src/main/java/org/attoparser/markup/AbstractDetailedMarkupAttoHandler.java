@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.attoparser.AttoParseException;
 import org.attoparser.IAttoHandleResult;
+import org.attoparser.StackableElementAttoHandleResult;
 import org.attoparser.markup.MarkupParsingConfiguration.ElementBalancing;
 import org.attoparser.markup.MarkupParsingConfiguration.PrologParsingConfiguration;
 import org.attoparser.markup.MarkupParsingConfiguration.UniqueRootElementPresence;
@@ -164,8 +165,10 @@ public abstract class AbstractDetailedMarkupAttoHandler
             final int line, final int col) 
             throws AttoParseException {
 
-        return ElementMarkupParsingUtil.parseDetailedStandaloneElement(buffer, outerOffset, outerLen, line, col, this.wrapper);
-        
+        return ElementMarkupParsingUtil.
+                    doTryParseDetailedOpenOrStandaloneElement(
+                            buffer, contentOffset, contentLen, outerOffset, outerLen, line, col, this.wrapper, true);
+
     }
 
     
@@ -177,8 +180,10 @@ public abstract class AbstractDetailedMarkupAttoHandler
             final int line, final int col) 
             throws AttoParseException {
 
-        return ElementMarkupParsingUtil.parseDetailedOpenElement(buffer, outerOffset, outerLen, line, col, this.wrapper);
-        
+        return ElementMarkupParsingUtil.
+                    doTryParseDetailedOpenOrStandaloneElement(
+                            buffer, contentOffset, contentLen, outerOffset, outerLen, line, col, this.wrapper, false);
+
     }
 
     
@@ -190,7 +195,9 @@ public abstract class AbstractDetailedMarkupAttoHandler
             final int line, final int col)
             throws AttoParseException {
 
-        return ElementMarkupParsingUtil.parseDetailedCloseElement(buffer, outerOffset, outerLen, line, col, this.wrapper);
+        return ElementMarkupParsingUtil.
+                    doTryParseDetailedCloseElement(
+                            buffer, contentOffset, contentLen, outerOffset, outerLen, line, col, this.wrapper);
 
     }
     
@@ -468,8 +475,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
     static final class StackAwareWrapper
             implements IDetailedElementHandling, IDetailedDocTypeHandling {
 
-        private static final int DEFAULT_STACK_SIZE = 20;
-        private static final int DEFAULT_ATTRIBUTE_NAMES_SIZE = 5;
+        private static final int DEFAULT_STACK_LEN = 10;
+        private static final int DEFAULT_ATTRIBUTE_NAMES_LEN = 3;
         
         private final AbstractDetailedMarkupAttoHandler handler;
 
@@ -551,7 +558,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
             if (this.useStack) {
 
-                this.elementStack = new char[DEFAULT_STACK_SIZE][];
+                this.elementStack = new char[DEFAULT_STACK_LEN][];
                 this.elementStackSize = 0;
 
                 this.structureNamesRepository = new StructureNamesRepository();
@@ -675,6 +682,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
                     this.currentElementAttributeNamesSize = 0;
                 }
 
+                // This is a standalone element, no need to put into stack
+
             }
 
             return this.handler.handleStandaloneElementStart(buffer, nameOffset, nameLen, line, col);
@@ -715,10 +724,20 @@ public abstract class AbstractDetailedMarkupAttoHandler
             }
 
             final IAttoHandleResult result =
-                this.handler.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
+                    this.handler.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
 
-            if (this.useStack) {
+            if (result instanceof StackableElementAttoHandleResult) {
+
+                final StackableElementAttoHandleResult stackableResult = (StackableElementAttoHandleResult) result;
+
+                if (stackableResult.getShouldStack()) {
+                    addToStack(buffer, nameOffset, nameLen);
+                }
+
+            } else {
+
                 addToStack(buffer, nameOffset, nameLen);
+
             }
 
             return result;
@@ -733,7 +752,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
             final IAttoHandleResult result =
                 this.handler.handleOpenElementEnd(buffer, nameOffset, nameLen, line, col);
-            
+
             this.elementRead = true;
 
             return result;
@@ -808,7 +827,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 // Check attribute name is unique in this element
                 if (this.currentElementAttributeNames == null) {
                     // we only create this structure if there is at least one attribute
-                    this.currentElementAttributeNames = new char[DEFAULT_ATTRIBUTE_NAMES_SIZE][];
+                    this.currentElementAttributeNames = new char[DEFAULT_ATTRIBUTE_NAMES_LEN][];
                 }
                 for (int i = 0; i < this.currentElementAttributeNamesSize; i++) {
                     if (this.currentElementAttributeNames[i].length != nameLen) {
@@ -837,7 +856,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 }
                 if (this.currentElementAttributeNamesSize == this.currentElementAttributeNames.length) {
                     // we need to grow the array!
-                    final char[][] newCurrentElementAttributeNames = new char[this.currentElementAttributeNames.length + DEFAULT_ATTRIBUTE_NAMES_SIZE][];
+                    final char[][] newCurrentElementAttributeNames = new char[this.currentElementAttributeNames.length + DEFAULT_ATTRIBUTE_NAMES_LEN][];
                     System.arraycopy(this.currentElementAttributeNames, 0, newCurrentElementAttributeNames, 0, this.currentElementAttributeNames.length);
                     this.currentElementAttributeNames = newCurrentElementAttributeNames;
                 }
@@ -1101,6 +1120,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
             final int initialStackSize = this.elementStackSize;
             char[] popped = popFromStack();
+            int poppedCount = 1;
 
             while (popped != null) {
 
@@ -1122,11 +1142,26 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 }
     
                 if (matches) {
-                    // We found the corresponding opening element, so
-                    // we return true (meaning the close element has a matching
-                    // open element).
+
+                    // We found the corresponding opening element, so we execute all pending auto-close events
+                    // (if needed) and return true (meaning the close element has a matching open element).
+
+                    if (this.autoClose) {
+                        if (poppedCount > 1) {
+                            rollbackPopFromStack(initialStackSize); // we reinitialize the stack to its original state
+                            for (int i = 0; i < poppedCount - 1; i++) { // We don't report the last one as auto-close, because it's the matched one
+                                popped = popFromStack();
+                                this.handler.handleAutoCloseElementStart(popped, 0, popped.length, line, col);
+                                this.handler.handleAutoCloseElementEnd(popped, 0, popped.length, line, col);
+                            }
+                            popFromStack(); // this is the matched one, just pop and don't report as auto-close
+                        }
+                    }
+
                     commitPopFromStack(initialStackSize);
+
                     return true;
+
                 }
                 
                 // does not match...
@@ -1138,12 +1173,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
                             " is never closed", line, col);
                 }
 
-                if (this.autoClose) {
-                    this.handler.handleAutoCloseElementStart(popped, 0, popped.length, line, col);
-                    this.handler.handleAutoCloseElementEnd(popped, 0, popped.length, line, col);
-                }
-                
                 popped = popFromStack();
+                poppedCount++;
                 
             }
 
@@ -1228,8 +1259,8 @@ public abstract class AbstractDetailedMarkupAttoHandler
         
         private void growStack() {
             
-            final int newStackSize = this.elementStack.length + DEFAULT_STACK_SIZE;
-            final char[][] newStack = new char[newStackSize][];
+            final int newStackLen = this.elementStack.length + DEFAULT_STACK_LEN;
+            final char[][] newStack = new char[newStackLen][];
             System.arraycopy(this.elementStack, 0, newStack, 0, this.elementStack.length);
             this.elementStack = newStack;
             

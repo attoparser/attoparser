@@ -37,7 +37,7 @@ package org.attoparser;
  *
  * @author Daniel Fern&aacute;ndez
  *
- * @since 1.5.0
+ * @since 2.0.0
  *
  */
 public interface IAttoHandleResult {
@@ -59,5 +59,6 @@ public interface IAttoHandleResult {
      *         <kbd>null</kbd> if parsing should not be disabled (most common case).
      */
     public char[] getParsingDisableLimit();
+
 
 }

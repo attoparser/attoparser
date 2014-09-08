@@ -54,6 +54,7 @@ public final class AttoHandleResultUtil {
     public static IAttoHandleResult combinePriorityLast(final IAttoHandleResult first, final IAttoHandleResult last) {
 
         if (first == null && last == null) {
+            // Just a fail-fast -- This will be by very far the most common case, so we want to simplify it to the max
             return null;
         }
         if (first == null) {
@@ -63,43 +64,40 @@ public final class AttoHandleResultUtil {
             return first;
         }
 
-        return new AttoHandleResult(
-                last.getParsingDisableLimit() != null? last.getParsingDisableLimit() : first.getParsingDisableLimit()
-        );
+        final boolean firstIsStackable = (first instanceof StackableElementAttoHandleResult);
+        final boolean lastIsStackable = (last instanceof StackableElementAttoHandleResult);
 
-    }
-
-
-    /**
-     * <p>
-     *     Combines both instances of {@link org.attoparser.IAttoHandleResult}, giving priority to the data contained
-     *     in the <kbd>first</kbd> instance.
-     * </p>
-     * <p>
-     *     If any of the instances is null, the other one will be returned. If both are, null will be returned.
-     * </p>
-     * @param first the first instance to be combined.
-     * @param last the last instance to be combined.
-     * @return the result of combining both instances.
-     */
-    public static IAttoHandleResult combinePriorityFirst(final IAttoHandleResult first, final IAttoHandleResult last) {
-
-        if (first == null && last == null) {
-            // Just a fail-fast -- This will be by very far the most common case, so we want to simplify it to the max
-            return null;
-        }
-        if ((first == null || first == AttoHandleResult.CONTINUE) && (last == null || last == AttoHandleResult.CONTINUE)) {
-            return null;
-        }
-        if (first == null || first == AttoHandleResult.CONTINUE) {
-            return last;
-        }
-        if (last == null || last == AttoHandleResult.CONTINUE) {
-            return first;
+        if (!lastIsStackable && !firstIsStackable) {
+            return new AttoHandleResult(
+                    last.getParsingDisableLimit() != null? last.getParsingDisableLimit() : first.getParsingDisableLimit()
+            );
         }
 
-        return new AttoHandleResult(
-                first.getParsingDisableLimit() != null? first.getParsingDisableLimit() : last.getParsingDisableLimit()
+        if (lastIsStackable && firstIsStackable) {
+            final StackableElementAttoHandleResult stackableLast = (StackableElementAttoHandleResult) last;
+            final StackableElementAttoHandleResult stackableFirst = (StackableElementAttoHandleResult) first;
+            return new StackableElementAttoHandleResult(
+                    last.getParsingDisableLimit() != null? last.getParsingDisableLimit() : first.getParsingDisableLimit(),
+                    (stackableLast.getUnstackUntil() != null? stackableLast.getUnstackUntil() : stackableFirst.getUnstackUntil()),
+                    (!stackableLast.getShouldStack()? stackableLast.getShouldStack() : stackableFirst.getShouldStack())
+            );
+        }
+
+        if (lastIsStackable) {
+            final StackableElementAttoHandleResult stackableLast = (StackableElementAttoHandleResult) last;
+            return new StackableElementAttoHandleResult(
+                    last.getParsingDisableLimit() != null? last.getParsingDisableLimit() : first.getParsingDisableLimit(),
+                    stackableLast.getUnstackUntil(),
+                    stackableLast.getShouldStack()
+            );
+        }
+
+        // Then first is stackable, last is not
+        final StackableElementAttoHandleResult stackableFirst = (StackableElementAttoHandleResult) first;
+        return new StackableElementAttoHandleResult(
+                last.getParsingDisableLimit() != null? last.getParsingDisableLimit() : first.getParsingDisableLimit(),
+                stackableFirst.getUnstackUntil(),
+                stackableFirst.getShouldStack()
         );
 
     }

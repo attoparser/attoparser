@@ -27,8 +27,9 @@ import java.util.List;
 
 import org.attoparser.AttoParseException;
 import org.attoparser.IAttoHandleResult;
+import org.attoparser.markup.MarkupParsingConfiguration;
 import org.attoparser.markup.html.AbstractDetailedNonValidatingHtmlAttoHandler;
-import org.attoparser.markup.html.HtmlParsingConfiguration;
+import org.attoparser.markup.html.HtmlParsing;
 import org.attoparser.markup.html.elements.IHtmlElement;
 
 
@@ -64,6 +65,15 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedNonValidatingHtm
             "@@ .element {\n" +
             "    font-weight: bold;\n" + 
             "    color: black;\n" + 
+            "}\n" +
+            "@@ .element-auto {\n" +
+            "    font-weight: bold;\n" +
+            "    color: #555;\n" +
+            "}\n" +
+            "@@ .element-unmatched {\n" +
+            "    font-weight: bold;\n" +
+            "    color: white;\n" +
+            "    background: orange;\n" +
             "}\n" +
             "@@ .attr-name {\n" +
             "    font-weight: normal;\n" + 
@@ -104,6 +114,8 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedNonValidatingHtm
     private static final String STYLE_XML_DECLARATION = "xml-declaration";
     private static final String STYLE_PROCESSING_INSTRUCTION = "processing-instruction";
     private static final String STYLE_ELEMENT = "element";
+    private static final String STYLE_ELEMENT_AUTO = "element-auto";
+    private static final String STYLE_ELEMENT_UNMATCHED = "element-unmatched";
     private static final String STYLE_ATTR_NAME = "attr-name";
     private static final String STYLE_ATTR_VALUE = "attr-value";
     private static final String STYLE_TEXT = "text";
@@ -118,11 +130,11 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedNonValidatingHtm
     private final Writer writer;
     private final boolean createHtmlAsFragment;
     
-    
+
     
     
     public HtmlCodeDisplayAttoHandler(final String documentName, final Writer writer, final boolean createHtmlAsFragment) {
-        super(new HtmlParsingConfiguration());
+        super(HtmlParsing.baseHtmlMarkupParsingConfiguration());
         this.documentName = documentName;
         this.documentId = tokenify(this.documentName);
         this.writer = writer;
@@ -130,7 +142,7 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedNonValidatingHtm
     }
 
     
-    public HtmlCodeDisplayAttoHandler(final String documentName, final Writer writer, final HtmlParsingConfiguration configuration, final boolean createHtmlFragment) {
+    public HtmlCodeDisplayAttoHandler(final String documentName, final Writer writer, final MarkupParsingConfiguration configuration, final boolean createHtmlFragment) {
         super(configuration);
         this.documentName = documentName;
         this.documentId = tokenify(this.documentName);
@@ -211,7 +223,7 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedNonValidatingHtm
     @Override
     public IAttoHandleResult handleDocumentStart(final long startTimeNanos,
             final int line, final int col,
-            final HtmlParsingConfiguration configuration)
+            final MarkupParsingConfiguration configuration)
             throws AttoParseException {
         
         try {
@@ -243,7 +255,7 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedNonValidatingHtm
     @Override
     public IAttoHandleResult handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos,
             final int line, final int col, 
-            final HtmlParsingConfiguration configuration)
+            final MarkupParsingConfiguration configuration)
             throws AttoParseException {
         
         try {
@@ -398,6 +410,100 @@ public class HtmlCodeDisplayAttoHandler extends AbstractDetailedNonValidatingHtm
             this.writer.write(CLOSE_TAG_END);
             closeStyle();
             
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        }
+
+        return null;
+
+    }
+
+
+
+
+    @Override
+    public IAttoHandleResult handleHtmlAutoCloseElementStart(
+            final IHtmlElement element,
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException {
+
+        try {
+
+            openStyle(STYLE_ELEMENT_AUTO);
+            this.writer.write(CLOSE_TAG_START);
+            this.writer.write(buffer, offset, len);
+
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        }
+
+        return null;
+
+    }
+
+
+    @Override
+    public IAttoHandleResult handleHtmlAutoCloseElementEnd(
+            final IHtmlElement element,
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException {
+
+        try {
+
+            this.writer.write(CLOSE_TAG_END);
+            closeStyle();
+
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        }
+
+        return null;
+
+    }
+
+
+
+
+    @Override
+    public IAttoHandleResult handleHtmlUnmatchedCloseElementStart(
+            final IHtmlElement element,
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException {
+
+        try {
+
+            openStyle(STYLE_ELEMENT_UNMATCHED);
+            this.writer.write(CLOSE_TAG_START);
+            this.writer.write(buffer, offset, len);
+
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        }
+
+        return null;
+
+    }
+
+
+    @Override
+    public IAttoHandleResult handleHtmlUnmatchedCloseElementEnd(
+            final IHtmlElement element,
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException {
+
+        try {
+
+            this.writer.write(CLOSE_TAG_END);
+            closeStyle();
+
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
