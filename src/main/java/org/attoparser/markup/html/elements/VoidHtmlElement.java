@@ -19,10 +19,10 @@
  */
 package org.attoparser.markup.html.elements;
 
-import org.attoparser.AttoHandleResultUtil;
 import org.attoparser.AttoParseException;
 import org.attoparser.IAttoHandleResult;
-import org.attoparser.StackableElementAttoHandleResult;
+import org.attoparser.markup.ElementPreparationResult;
+import org.attoparser.markup.IElementPreparationResult;
 import org.attoparser.markup.html.IDetailedHtmlElementHandling;
 
 
@@ -47,25 +47,29 @@ public class VoidHtmlElement extends BasicHtmlElement {
         super(name);
     }
 
-    
-    
-    
-    
+
+    @Override
+    public IElementPreparationResult prepareForElement(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col,
+            final IDetailedHtmlElementHandling handler)
+            throws AttoParseException {
+
+        return ElementPreparationResult.DONT_STACK;
+
+    }
+
+
     @Override
     public IAttoHandleResult handleOpenElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen, 
             final int line, final int col, 
-            final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
+            final IDetailedHtmlElementHandling handler)
             throws AttoParseException {
 
-        final IAttoHandleResult result1 =
-                handler.handleHtmlStandaloneElementStart(this, false, buffer, nameOffset, nameLen, line, col);
-
-        // Unstack one (besides doing anything else)
-        final IAttoHandleResult result2 = StackableElementAttoHandleResult.DONT_STACK;
-
-        return AttoHandleResultUtil.combinePriorityLast(result1, result2);
+        return handler.handleHtmlStandaloneElementStart(this, false, buffer, nameOffset, nameLen, line, col);
 
     }
 
@@ -75,7 +79,7 @@ public class VoidHtmlElement extends BasicHtmlElement {
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col,
-            final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
+            final IDetailedHtmlElementHandling handler)
             throws AttoParseException {
 
         return handler.handleHtmlStandaloneElementEnd(this, false, buffer, nameOffset, nameLen, line, col);
@@ -90,7 +94,7 @@ public class VoidHtmlElement extends BasicHtmlElement {
             final char[] buffer, 
             final int nameOffset, final int nameLen, 
             final int line, final int col, 
-            final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
+            final IDetailedHtmlElementHandling handler)
             throws AttoParseException {
 
         return handler.handleHtmlUnmatchedCloseElementStart(this, buffer, nameOffset, nameLen, line, col);
@@ -103,7 +107,7 @@ public class VoidHtmlElement extends BasicHtmlElement {
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col,
-            final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
+            final IDetailedHtmlElementHandling handler)
             throws AttoParseException {
 
         return handler.handleHtmlUnmatchedCloseElementEnd(this, buffer, nameOffset, nameLen, line, col);

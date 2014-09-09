@@ -26,10 +26,10 @@ import java.util.List;
 
 import org.attoparser.AttoParseException;
 import org.attoparser.IAttoHandleResult;
-import org.attoparser.StackableElementAttoHandleResult;
 import org.attoparser.markup.MarkupParsingConfiguration.ElementBalancing;
 import org.attoparser.markup.MarkupParsingConfiguration.PrologParsingConfiguration;
 import org.attoparser.markup.MarkupParsingConfiguration.UniqueRootElementPresence;
+import org.attoparser.util.TextUtil;
 
 
 /**
@@ -310,9 +310,17 @@ public abstract class AbstractDetailedMarkupAttoHandler
         // Nothing to be done here, meant to be overridden if required
         return null;
     }
-    
 
-    
+
+    public IElementPreparationResult prepareForElement(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
+        return null;
+    }
+
     
     public IAttoHandleResult handleStandaloneElementStart(
             final char[] buffer, 
@@ -686,6 +694,29 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
             }
 
+            /*
+             * Prepare for element (maybe perform stack operations)
+             */
+            final IElementPreparationResult preparationResult =
+                    this.handler.prepareForElement(buffer, nameOffset, nameLen, line, col);
+            if (preparationResult != null) {
+
+                if (this.useStack) {
+
+                    if (preparationResult.getUnstackElements() != null) {
+                        // We should first rearrange the stack
+                        unstack(preparationResult.getUnstackElements(), preparationResult.getUnstackLimits(), line, col);
+                    }
+
+                    if (preparationResult.getShouldStack() != null && preparationResult.getShouldStack().booleanValue()) {
+                        // We will NOT push if null, because pushing is NOT the default behaviour for standalone elements
+                        pushToStack(buffer, nameOffset, nameLen);
+                    }
+
+                }
+
+            }
+
             return this.handler.handleStandaloneElementStart(buffer, nameOffset, nameLen, line, col);
             
         }
@@ -723,31 +754,38 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
             }
 
-            IAttoHandleResult result =
-                    this.handler.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
+            /*
+             * Prepare for element (maybe perform stack operations)
+             */
+            final IElementPreparationResult preparationResult =
+                    this.handler.prepareForElement(buffer, nameOffset, nameLen, line, col);
+            if (preparationResult != null) {
 
-            if (result instanceof StackableElementAttoHandleResult) {
+                if (this.useStack) {
 
-                final StackableElementAttoHandleResult stackableResult = (StackableElementAttoHandleResult) result;
-
-                if (stackableResult.getUnstackUntil() != null) {
-                    // We should first rearrange the stack, then re-execute the handler
-                    if (unstackUntil(stackableResult.getUnstackUntil(), line, col)) {
-                        return handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
+                    if (preparationResult.getUnstackElements() != null) {
+                        // We should first rearrange the stack
+                        unstack(preparationResult.getUnstackElements(), preparationResult.getUnstackLimits(), line, col);
                     }
+
+                    if (preparationResult.getShouldStack() == null || preparationResult.getShouldStack().booleanValue()) {
+                        // We will push if null, because it is the default behaviour for open elements
+                        pushToStack(buffer, nameOffset, nameLen);
+                    }
+
                 }
 
-                if (stackableResult.getShouldStack()) {
-                    pushToStack(buffer, nameOffset, nameLen);
-                }
+            } else if (this.useStack) {
 
-            } else {
-
+                // Pushing into the stack is the default behaviour for open elements
                 pushToStack(buffer, nameOffset, nameLen);
 
             }
 
-            return result;
+            /*
+             * Actually perform the handling of the open element start
+             */
+            return this.handler.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
 
         }
 
@@ -881,29 +919,19 @@ public abstract class AbstractDetailedMarkupAttoHandler
                     this.currentElementAttributeNames = new char[DEFAULT_ATTRIBUTE_NAMES_LEN][];
                 }
                 for (int i = 0; i < this.currentElementAttributeNamesSize; i++) {
-                    if (this.currentElementAttributeNames[i].length != nameLen) {
-                        continue;
-                    }
-                    int j;
-                    if (this.caseSensitive) {
-                        for (j = 0; j < nameLen; j++) {
-                            if (this.currentElementAttributeNames[i][j] != buffer[nameOffset + j]) {
-                                break;
-                            }
-                        }
-                    } else {
-                        for (j = 0; j < nameLen; j++) {
-                            if (Character.toLowerCase(this.currentElementAttributeNames[i][j]) != Character.toLowerCase(buffer[nameOffset + j])) {
-                                break;
-                            }
-                        }
-                    }
-                    if (j == nameLen) {
+
+                    if (TextUtil.equals(
+                            this.caseSensitive,
+                            this.currentElementAttributeNames[i], 0, this.currentElementAttributeNames[i].length,
+                            buffer, nameOffset, nameLen)) {
+
                         throw new AttoParseException(
-                            "Malformed markup: Attribute \"" + new String(buffer, nameOffset, nameLen) + "\" " +
-                            "appears more than once in element", 
-                            nameLine, nameCol);
+                                "Malformed markup: Attribute \"" + new String(buffer, nameOffset, nameLen) + "\" " +
+                                "appears more than once in element",
+                                nameLine, nameCol);
+
                     }
+
                 }
                 if (this.currentElementAttributeNamesSize == this.currentElementAttributeNames.length) {
                     // we need to grow the array!
@@ -1094,21 +1122,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
                             line, col);
                 }
                 
-                boolean matches = (this.rootElementName.length == len);
-                if (this.caseSensitive) {
-                    for (int i = 0; matches && i < len; i++) {
-                        if (buffer[offset + i] != this.rootElementName[i]) {
-                            matches = false;
-                        }
-                    }
-                } else {
-                    for (int i = 0; matches && i < len; i++) {
-                        if (Character.toLowerCase(buffer[offset + i]) != Character.toLowerCase(this.rootElementName[i])) {
-                            matches = false;
-                        }
-                    }
-                }
-                if (!matches) {
+                if (!TextUtil.equals(this.caseSensitive, this.rootElementName, 0, this.rootElementName.length, buffer, offset, len)) {
                     throw new AttoParseException(
                         "Malformed markup: Root element should be \"" + new String(this.rootElementName) + "\", " +
                         "but \"" + new String(buffer, offset, len) + "\" has been found",
@@ -1130,24 +1144,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
             while (peek != null) {
 
-                boolean matches = (len == peek.length);
-            
-                final int maxi = offset + len;
-                if (this.caseSensitive) {
-                    for (int i = offset; matches && i < maxi; i++) {
-                        if (buffer[i] != peek[i - offset]) {
-                            matches = false;
-                        }
-                    }
-                } else {
-                    for (int i = offset; matches && i < maxi; i++) {
-                        if (Character.toLowerCase(buffer[i]) != Character.toLowerCase(peek[i - offset])) {
-                            matches = false;
-                        }
-                    }
-                }
-    
-                if (matches) {
+                if (TextUtil.equals(this.caseSensitive, peek, 0, peek.length, buffer, offset, len)) {
 
                     // We found the corresponding opening element, so we execute all pending auto-close events
                     // (if needed) and return true (meaning the close element has a matching open element).
@@ -1221,56 +1218,65 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
 
 
-        private boolean unstackUntil(final char[] unstackUntil, final int line, final int col)
+        private void unstack(
+                final char[][] unstackElements, final char[][] unstackLimits, final int line, final int col)
                 throws AttoParseException {
 
             int peekDelta = 0;
+            int unstackCount = 0;
             char[] peek = peekFromStack(peekDelta);
 
             while (peek != null) {
 
-                boolean matches = (unstackUntil.length == peek.length);
-
-                if (this.caseSensitive) {
-                    for (int i = 0; matches && i < unstackUntil.length; i++) {
-                        if (unstackUntil[i] != peek[i]) {
-                            matches = false;
-                        }
-                    }
-                } else {
-                    for (int i = 0; matches && i < unstackUntil.length; i++) {
-                        if (Character.toLowerCase(unstackUntil[i]) != Character.toLowerCase(peek[i])) {
-                            matches = false;
+                if (unstackLimits != null) {
+                    // First check whether we found a limit
+                    for (final char[] unstackLimit : unstackLimits) {
+                        if (TextUtil.equals(this.caseSensitive, unstackLimit, peek)) {
+                            // Just found a limit, we should stop computing unstacking here
+                            peek = null; // This will make us exit the loop
+                            break;
                         }
                     }
                 }
 
-                if (matches) {
+                if (peek != null) {
 
-                    // We found the corresponding opening element, so we execute all pending auto-close events
-                    // (if needed) and return (without popping the matched element itself!)
-                    // Will return true if we needed to autoclose anything.
-
-                    for (int i = 0; i < peekDelta; i++) {
-                        peek = popFromStack();
-                        if (this.autoClose) {
-                            this.handler.handleAutoCloseElementStart(peek, 0, peek.length, line, col);
-                            this.handler.handleAutoCloseElementEnd(peek, 0, peek.length, line, col);
+                    // Check whether this is an element we must close
+                    for (final char[] unstackElement : unstackElements) {
+                        if (TextUtil.equals(this.caseSensitive, unstackElement, peek)) {
+                            // This is an element we must unstack, so we should mark unstackCount
+                            unstackCount = peekDelta + 1;
+                            break;
                         }
                     }
 
-                    return (peekDelta > 0);
+                    // Feed the loop
+                    peek = peekFromStack(++peekDelta);
 
                 }
-
-                peek = peekFromStack(++peekDelta);
 
             }
 
-            return false;
+
+            for (int i = 0; i < unstackCount; i++) {
+
+                peek = popFromStack();
+
+                if (this.requireBalancedElements) {
+                    throw new AttoParseException(
+                            "Malformed markup: element " +
+                                    "\"" + new String(peek, 0, peek.length) + "\"" +
+                                    " is not closed where it should be", line, col);
+                }
+
+                if (this.autoClose) {
+                    this.handler.handleAutoCloseElementStart(peek, 0, peek.length, line, col);
+                    this.handler.handleAutoCloseElementEnd(peek, 0, peek.length, line, col);
+                }
+
+            }
 
         }
-
 
         
         
@@ -1387,7 +1393,7 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final int mid = (low + high) >>> 1;
                 final char[] midVal = values.get(mid);
 
-                final int cmp = compare(midVal, text, offset, len);
+                final int cmp = TextUtil.compareTo(true, midVal, 0, midVal.length, text, offset, len);
 
                 if (cmp < 0) {
                     low = mid + 1;
@@ -1405,33 +1411,12 @@ public abstract class AbstractDetailedMarkupAttoHandler
         }
 
 
-        private static int compare(final char[] ncr, final char[] text, final int offset, final int len) {
-            final int maxCommon = Math.min(ncr.length, len);
-            int i;
-            for (i = 0; i < maxCommon; i++) {
-                final char tc = text[offset + i];
-                if (ncr[i] < tc) {
-                    return -1;
-                } else if (ncr[i] > tc) {
-                    return 1;
-                }
-            }
-            if (ncr.length > i) {
-                return 1;
-            }
-            if (len > i) {
-                return -1;
-            }
-            return 0;
-        }
-
-
         private static class CharArrayComparator implements Comparator<char[]> {
 
             private static CharArrayComparator INSTANCE = new CharArrayComparator();
 
             public int compare(final char[] o1, final char[] o2) {
-                return StructureNamesRepository.compare(o1, o2, 0, o2.length);
+                return TextUtil.compareTo(true, o1, o2);
             }
         }
 

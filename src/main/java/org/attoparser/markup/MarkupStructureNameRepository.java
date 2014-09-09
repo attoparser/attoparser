@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.attoparser.markup.html.elements.HtmlElements;
+import org.attoparser.util.TextUtil;
 
 
 /**
@@ -95,7 +96,7 @@ public final class MarkupStructureNameRepository {
             final int mid = (low + high) >>> 1;
             final char[] midVal = values[mid];
 
-            final int cmp = compare(midVal, text, offset, len);
+            final int cmp = TextUtil.compareTo(true, midVal, 0, midVal.length, text, offset, len);
 
             if (cmp < 0) {
                 low = mid + 1;
@@ -110,28 +111,6 @@ public final class MarkupStructureNameRepository {
 
         return -1;  // Not Found!!
 
-    }
-
-
-
-    private static int compare(final char[] ncr, final char[] text, final int offset, final int len) {
-        final int maxCommon = Math.min(ncr.length, len);
-        int i;
-        for (i = 0; i < maxCommon; i++) {
-            final char tc = text[offset + i];
-            if (ncr[i] < tc) {
-                return -1;
-            } else if (ncr[i] > tc) {
-                return 1;
-            }
-        }
-        if (ncr.length > i) {
-            return 1;
-        }
-        if (len > i) {
-            return -1;
-        }
-        return 0;
     }
 
 

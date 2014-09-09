@@ -21,6 +21,7 @@ package org.attoparser.markup.html.elements;
 
 import org.attoparser.AttoParseException;
 import org.attoparser.IAttoHandleResult;
+import org.attoparser.markup.IElementPreparationResult;
 import org.attoparser.markup.html.IDetailedHtmlElementHandling;
 
 
@@ -45,18 +46,28 @@ public class BasicHtmlElement extends AbstractHtmlElement {
         super(name);
     }
 
-    
-    
-    
+
+    public IElementPreparationResult prepareForElement(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col,
+            final IDetailedHtmlElementHandling handler)
+            throws AttoParseException {
+
+        // No preparation to be done by default, no need to delegate this (it's the elements who know
+        // if they need preparation or not)
+        return null;
+
+    }
+
+
     public IAttoHandleResult handleStandaloneElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen, 
             final int line, final int col, 
-            final HtmlElementStack stack, final IDetailedHtmlElementHandling handler)
+            final IDetailedHtmlElementHandling handler)
             throws AttoParseException {
 
-        stack.pushElement(this);
-        
         return handler.handleHtmlStandaloneElementStart(this, true, buffer, nameOffset, nameLen, line, col);
         
     }
@@ -66,15 +77,10 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col,
-            final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
+            final IDetailedHtmlElementHandling handler)
             throws AttoParseException {
 
-        final IAttoHandleResult result =
-            handler.handleHtmlStandaloneElementEnd(this, true, buffer, nameOffset, nameLen, line, col);
-
-        stack.popElement();
-
-        return result;
+        return handler.handleHtmlStandaloneElementEnd(this, true, buffer, nameOffset, nameLen, line, col);
         
     }
 
@@ -85,10 +91,8 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             final char[] buffer, 
             final int nameOffset, final int nameLen, 
             final int line, final int col, 
-            final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
+            final IDetailedHtmlElementHandling handler)
             throws AttoParseException {
-        
-        stack.pushElement(this);
         
         return handler.handleHtmlOpenElementStart(this, buffer, nameOffset, nameLen, line, col);
 
@@ -99,7 +103,7 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col,
-            final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
+            final IDetailedHtmlElementHandling handler)
             throws AttoParseException {
         
         return handler.handleHtmlOpenElementEnd(this, buffer, nameOffset, nameLen, line, col);
@@ -113,7 +117,7 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             final char[] buffer, 
             final int nameOffset, final int nameLen, 
             final int line, final int col, 
-            final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
+            final IDetailedHtmlElementHandling handler)
             throws AttoParseException {
         
         return handler.handleHtmlCloseElementStart(this, buffer, nameOffset, nameLen, line, col);
@@ -125,15 +129,10 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col,
-            final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
+            final IDetailedHtmlElementHandling handler)
             throws AttoParseException {
 
-        final IAttoHandleResult result =
-            handler.handleHtmlCloseElementEnd(this, buffer, nameOffset, nameLen, line, col);
-
-        stack.popElement();
-
-        return result;
+        return handler.handleHtmlCloseElementEnd(this, buffer, nameOffset, nameLen, line, col);
         
     }
 
@@ -144,7 +143,7 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             final char[] buffer, 
             final int nameOffset, final int nameLen, 
             final int line, final int col, 
-            final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
+            final IDetailedHtmlElementHandling handler)
             throws AttoParseException {
 
         return handler.handleHtmlAutoCloseElementStart(this, buffer, nameOffset, nameLen, line, col);
@@ -156,15 +155,10 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col,
-            final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
+            final IDetailedHtmlElementHandling handler)
             throws AttoParseException {
 
-        final IAttoHandleResult result =
-                handler.handleHtmlAutoCloseElementEnd(this, buffer, nameOffset, nameLen, line, col);
-
-        stack.popElement();
-
-        return result;
+        return handler.handleHtmlAutoCloseElementEnd(this, buffer, nameOffset, nameLen, line, col);
 
     }
 
@@ -175,10 +169,9 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             final char[] buffer,
             final int nameOffset, final int nameLen, 
             final int line, final int col, 
-            final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
+            final IDetailedHtmlElementHandling handler)
             throws AttoParseException {
         
-        // Stack should not be affected by this, simply delegate the event
         return handler.handleHtmlUnmatchedCloseElementStart(this, buffer, nameOffset, nameLen, line, col);
         
     }
@@ -188,10 +181,9 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col,
-            final HtmlElementStack stack, final IDetailedHtmlElementHandling handler)
+            final IDetailedHtmlElementHandling handler)
             throws AttoParseException {
         
-        // Stack should not be affected by this, simply delegate the event
         return handler.handleHtmlUnmatchedCloseElementEnd(this, buffer, nameOffset, nameLen, line, col);
         
     }
@@ -208,10 +200,9 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             final int valueContentOffset, final int valueContentLen, 
             final int valueOuterOffset, final int valueOuterLen,
             final int valueLine, final int valueCol, 
-            final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
+            final IDetailedHtmlElementHandling handler)
             throws AttoParseException {
         
-        // Stack should not be affected by this, simply delegate the event
         return handler.handleHtmlAttribute(
                 buffer,
                 nameOffset, nameLen, nameLine, nameCol,
@@ -225,10 +216,9 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col, 
-            final HtmlElementStack stack, final IDetailedHtmlElementHandling handler)
+            final IDetailedHtmlElementHandling handler)
             throws AttoParseException {
         
-        // Stack should not be affected by this, simply delegate the event
         return handler.handleHtmlInnerWhiteSpace(buffer, offset, len, line, col);
         
     }

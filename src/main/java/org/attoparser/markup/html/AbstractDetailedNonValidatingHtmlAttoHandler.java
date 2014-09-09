@@ -22,9 +22,9 @@ package org.attoparser.markup.html;
 import org.attoparser.AttoParseException;
 import org.attoparser.IAttoHandleResult;
 import org.attoparser.markup.AbstractDetailedMarkupAttoHandler;
+import org.attoparser.markup.IElementPreparationResult;
 import org.attoparser.markup.MarkupParsingConfiguration;
 import org.attoparser.markup.html.elements.BasicHtmlElement;
-import org.attoparser.markup.html.elements.HtmlElementStack;
 import org.attoparser.markup.html.elements.HtmlElements;
 import org.attoparser.markup.html.elements.IHtmlElement;
 
@@ -45,14 +45,12 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
 
 
 
-    private final HtmlElementStack stack;
     private IHtmlElement currentElement = null;
 
     
     
     protected AbstractDetailedNonValidatingHtmlAttoHandler(final MarkupParsingConfiguration configuration) {
         super(configuration);
-        this.stack = new HtmlElementStack();
     }
 
     
@@ -81,11 +79,19 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
      * ----------------------------------------------------------------------
      */
 
-    
-    
-    
-    
-    
+
+    @Override
+    public final IElementPreparationResult prepareForElement(
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException {
+
+        final IHtmlElement elementToPrepare = getElementByName(buffer, offset, len);
+        return elementToPrepare.prepareForElement(buffer, offset, len, line, col, this);
+
+    }
+
     @Override
     public final IAttoHandleResult handleStandaloneElementStart(
             final char[] buffer, 
@@ -94,7 +100,7 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
             throws AttoParseException {
         
         this.currentElement = getElementByName(buffer, offset, len);
-        return this.currentElement.handleStandaloneElementStart(buffer, offset, len, line, col, this.stack, this);
+        return this.currentElement.handleStandaloneElementStart(buffer, offset, len, line, col, this);
 
     }
 
@@ -110,7 +116,7 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
         }
 
         final IAttoHandleResult result =
-            this.currentElement.handleStandaloneElementEnd(buffer, offset, len, line, col, this.stack, this);
+            this.currentElement.handleStandaloneElementEnd(buffer, offset, len, line, col, this);
         this.currentElement = null;
 
         return result;
@@ -128,7 +134,7 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
             throws AttoParseException {
         
         this.currentElement = getElementByName(buffer, offset, len);
-        return this.currentElement.handleOpenElementStart(buffer, offset, len, line, col, this.stack, this);
+        return this.currentElement.handleOpenElementStart(buffer, offset, len, line, col, this);
 
     }
 
@@ -144,7 +150,7 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
         }
 
         final IAttoHandleResult result =
-            this.currentElement.handleOpenElementEnd(buffer, offset, len, line, col, this.stack, this);
+            this.currentElement.handleOpenElementEnd(buffer, offset, len, line, col, this);
         this.currentElement = null;
 
         return result;
@@ -162,7 +168,7 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
             throws AttoParseException {
         
         this.currentElement = getElementByName(buffer, offset, len);
-        return this.currentElement.handleCloseElementStart(buffer, offset, len, line, col, this.stack, this);
+        return this.currentElement.handleCloseElementStart(buffer, offset, len, line, col, this);
         
     }
 
@@ -178,7 +184,7 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
         }
 
         final IAttoHandleResult result =
-            this.currentElement.handleCloseElementEnd(buffer, offset, len, line, col, this.stack, this);
+            this.currentElement.handleCloseElementEnd(buffer, offset, len, line, col, this);
         this.currentElement = null;
 
         return result;
@@ -196,7 +202,7 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
             throws AttoParseException {
         
         this.currentElement = getElementByName(buffer, offset, len);
-        return this.currentElement.handleAutoCloseElementStart(buffer, offset, len, line, col, this.stack, this);
+        return this.currentElement.handleAutoCloseElementStart(buffer, offset, len, line, col, this);
         
     }
 
@@ -212,7 +218,7 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
         }
 
         final IAttoHandleResult result =
-            this.currentElement.handleAutoCloseElementEnd(buffer, offset, len, line, col, this.stack, this);
+            this.currentElement.handleAutoCloseElementEnd(buffer, offset, len, line, col, this);
         this.currentElement = null;
 
         return result;
@@ -230,7 +236,7 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
             throws AttoParseException {
         
         this.currentElement = getElementByName(buffer, offset, len);
-        return this.currentElement.handleUnmatchedCloseElementStart(buffer, offset, len, line, col, this.stack, this);
+        return this.currentElement.handleUnmatchedCloseElementStart(buffer, offset, len, line, col, this);
         
     }
 
@@ -246,7 +252,7 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
         }
 
         final IAttoHandleResult result =
-            this.currentElement.handleUnmatchedCloseElementEnd(buffer, offset, len, line, col, this.stack, this);
+            this.currentElement.handleUnmatchedCloseElementEnd(buffer, offset, len, line, col, this);
         this.currentElement = null;
 
         return result;
@@ -275,7 +281,7 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
         return this.currentElement.handleAttribute(buffer, nameOffset, nameLen, nameLine, nameCol,
                 operatorOffset, operatorLen, operatorLine, operatorCol,
                 valueContentOffset, valueContentLen, valueOuterOffset, valueOuterLen,
-                valueLine, valueCol, this.stack, this);
+                valueLine, valueCol, this);
         
     }
 
@@ -293,7 +299,7 @@ public abstract class AbstractDetailedNonValidatingHtmlAttoHandler
             throw new IllegalStateException("Cannot handle attribute: no current element");
         }
         
-        return this.currentElement.handleInnerWhiteSpace(buffer, offset, len, line, col, this.stack, this);
+        return this.currentElement.handleInnerWhiteSpace(buffer, offset, len, line, col, this);
         
     }
 

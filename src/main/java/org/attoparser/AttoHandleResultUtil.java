@@ -20,7 +20,6 @@
 package org.attoparser;
 
 
-
 /**
  * <p>
  *   Utility class for operations on {@link IAttoHandleResult} instances.
@@ -64,40 +63,8 @@ public final class AttoHandleResultUtil {
             return first;
         }
 
-        final boolean firstIsStackable = (first instanceof StackableElementAttoHandleResult);
-        final boolean lastIsStackable = (last instanceof StackableElementAttoHandleResult);
-
-        if (!lastIsStackable && !firstIsStackable) {
-            return new AttoHandleResult(
-                    last.getParsingDisableLimit() != null? last.getParsingDisableLimit() : first.getParsingDisableLimit()
-            );
-        }
-
-        if (lastIsStackable && firstIsStackable) {
-            final StackableElementAttoHandleResult stackableLast = (StackableElementAttoHandleResult) last;
-            final StackableElementAttoHandleResult stackableFirst = (StackableElementAttoHandleResult) first;
-            return new StackableElementAttoHandleResult(
-                    last.getParsingDisableLimit() != null? last.getParsingDisableLimit() : first.getParsingDisableLimit(),
-                    (stackableLast.getUnstackUntil() != null? stackableLast.getUnstackUntil() : stackableFirst.getUnstackUntil()),
-                    (!stackableLast.getShouldStack()? stackableLast.getShouldStack() : stackableFirst.getShouldStack())
-            );
-        }
-
-        if (lastIsStackable) {
-            final StackableElementAttoHandleResult stackableLast = (StackableElementAttoHandleResult) last;
-            return new StackableElementAttoHandleResult(
-                    last.getParsingDisableLimit() != null? last.getParsingDisableLimit() : first.getParsingDisableLimit(),
-                    stackableLast.getUnstackUntil(),
-                    stackableLast.getShouldStack()
-            );
-        }
-
-        // Then first is stackable, last is not
-        final StackableElementAttoHandleResult stackableFirst = (StackableElementAttoHandleResult) first;
-        return new StackableElementAttoHandleResult(
-                last.getParsingDisableLimit() != null? last.getParsingDisableLimit() : first.getParsingDisableLimit(),
-                stackableFirst.getUnstackUntil(),
-                stackableFirst.getShouldStack()
+        return new AttoHandleResult(
+                last.getParsingDisableLimit() != null? last.getParsingDisableLimit() : first.getParsingDisableLimit()
         );
 
     }

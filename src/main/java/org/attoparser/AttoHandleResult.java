@@ -31,7 +31,7 @@ package org.attoparser;
  * @since 2.0.0
  *
  */
-public class AttoHandleResult implements IAttoHandleResult {
+public final class AttoHandleResult implements IAttoHandleResult {
 
     /**
      * <p>

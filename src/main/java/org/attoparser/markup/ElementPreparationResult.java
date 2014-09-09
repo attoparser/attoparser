@@ -17,15 +17,12 @@
  * 
  * =============================================================================
  */
-package org.attoparser;
-
+package org.attoparser.markup;
 
 
 /**
  * <p>
- *   Implementation of the {@link org.attoparser.IAttoHandleResult} able to instruct stack-aware handling layers
- *   to avoid stacking the handled element, or to auto-close (unstack) stacked elements before handling the current
- *   one.
+ *   Standard implementation of the {@link org.attoparser.markup.IElementPreparationResult} interface.
  * </p>
  *
  * @author Daniel Fern&aacute;ndez
@@ -33,28 +30,33 @@ package org.attoparser;
  * @since 2.0.0
  *
  */
-public final class StackableElementAttoHandleResult extends AttoHandleResult {
+public final class ElementPreparationResult implements IElementPreparationResult {
 
-    public static final StackableElementAttoHandleResult DONT_STACK = new StackableElementAttoHandleResult(null, null, false);
-
-
-    private final char[] unstackUntil;
-    private final boolean shouldStack;
+    public static final ElementPreparationResult DONT_STACK = new ElementPreparationResult(null, null, Boolean.FALSE);
 
 
-    public StackableElementAttoHandleResult(
-            final char[] parsingDisableLimit, final char[] unstackUntil, final boolean shouldStack) {
-        super(parsingDisableLimit);
-        this.unstackUntil = unstackUntil;
+    private final char[][] unstackElements;
+    private final char[][] unstackLimits;
+    private final Boolean shouldStack;
+
+
+    public ElementPreparationResult(
+            final char[][] unstackElements, final char[][] unstackLimits, final Boolean shouldStack) {
+        super();
+        this.unstackElements = unstackElements;
+        this.unstackLimits = unstackLimits;
         this.shouldStack = shouldStack;
     }
 
-
-    public char[] getUnstackUntil() {
-        return this.unstackUntil;
+    public char[][] getUnstackElements() {
+        return this.unstackElements;
     }
 
-    public boolean getShouldStack() {
+    public char[][] getUnstackLimits() {
+        return this.unstackLimits;
+    }
+
+    public Boolean getShouldStack() {
         return this.shouldStack;
     }
 

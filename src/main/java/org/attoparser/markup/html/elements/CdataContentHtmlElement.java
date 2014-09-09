@@ -65,7 +65,7 @@ public class CdataContentHtmlElement extends BasicHtmlElement {
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col,
-            final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
+            final IDetailedHtmlElementHandling handler)
             throws AttoParseException {
 
 

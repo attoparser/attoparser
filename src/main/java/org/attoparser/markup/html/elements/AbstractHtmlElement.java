@@ -20,11 +20,7 @@
 package org.attoparser.markup.html.elements;
 
 
-
-
-
-
-
+import org.attoparser.util.TextUtil;
 
 /**
  * 
@@ -36,10 +32,8 @@ package org.attoparser.markup.html.elements;
 public abstract class AbstractHtmlElement implements IHtmlElement {
 
     
-    private final int nameLen;
     private final String name;
-    private final char[] nameCharArray;
-    
+
 
 
     
@@ -54,16 +48,6 @@ public abstract class AbstractHtmlElement implements IHtmlElement {
         }
         
         this.name = name.toLowerCase();
-        this.nameCharArray = this.name.toCharArray();
-        this.nameLen = this.nameCharArray.length;
-
-        // Normalizing: set to lower-case
-        for (int i = 0; i < this.nameLen; i++) {
-            final char c = this.nameCharArray[i];
-            if (c >= 'A' && c <= 'Z') {
-                this.nameCharArray[i] = (char)(c + HtmlElements.CASE_DIFF);
-            }
-        }
 
     }
 
@@ -73,64 +57,20 @@ public abstract class AbstractHtmlElement implements IHtmlElement {
         return this.name;
     }
 
-    public final char[] getNameCharArray() {
-        return this.nameCharArray;
-    }
-
     
     
     public final boolean matches(final String elementName) {
-
-        if (elementName == null) {
-            throw new IllegalArgumentException("Element name cannot be null");
-        }
-        final int len = elementName.length();
-        if (len != this.nameLen) {
-            return false;
-        }
-        for (int i = 0; i < len; i++) {
-            char c = elementName.charAt(i);
-            if (c >= 'A' && c <= 'Z') {
-                c = (char)(c + HtmlElements.CASE_DIFF);
-            }
-            if (c != this.nameCharArray[i]) {
-                return false;
-            }
-        }
-        return true;
-        
+        return TextUtil.equals(false, this.name, elementName);
     }
 
     
     public final boolean matches(final char[] elementName) {
-        if (elementName == null) {
-            throw new IllegalArgumentException("Element name cannot be null");
-        }
-        return matches(elementName, 0, elementName.length);
+        return TextUtil.equals(false, this.name, elementName);
     }
 
     
     public final boolean matches(final char[] elementNameBuffer, final int offset, final int len) {
-        
-        if (elementNameBuffer == null) {
-            throw new IllegalArgumentException("Buffer cannot be null");
-        }
-        
-        if (len != this.nameLen) {
-            return false;
-        }
-        final int max = offset + len;
-        for (int i = offset; i < max; i++) {
-            char c = elementNameBuffer[i];
-            if (c >= 'A' && c <= 'Z') {
-                c = (char)(c + HtmlElements.CASE_DIFF);
-            }
-            if (c != this.nameCharArray[i - offset]) {
-                return false;
-            }
-        }
-        return true;
-        
+        return TextUtil.equals(false, this.name, 0, this.name.length(), elementNameBuffer, offset, len);
     }
 
 
