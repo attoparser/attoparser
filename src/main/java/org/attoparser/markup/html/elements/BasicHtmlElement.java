@@ -55,7 +55,7 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler)
             throws AttoParseException {
 
-        stack.openElement(this);
+        stack.pushElement(this);
         
         return handler.handleHtmlStandaloneElementStart(this, true, buffer, nameOffset, nameLen, line, col);
         
@@ -72,7 +72,7 @@ public class BasicHtmlElement extends AbstractHtmlElement {
         final IAttoHandleResult result =
             handler.handleHtmlStandaloneElementEnd(this, true, buffer, nameOffset, nameLen, line, col);
 
-        stack.closeElement();
+        stack.popElement();
 
         return result;
         
@@ -88,7 +88,7 @@ public class BasicHtmlElement extends AbstractHtmlElement {
             final HtmlElementStack stack, final IDetailedHtmlElementHandling handler) 
             throws AttoParseException {
         
-        stack.openElement(this);
+        stack.pushElement(this);
         
         return handler.handleHtmlOpenElementStart(this, buffer, nameOffset, nameLen, line, col);
 
@@ -131,7 +131,7 @@ public class BasicHtmlElement extends AbstractHtmlElement {
         final IAttoHandleResult result =
             handler.handleHtmlCloseElementEnd(this, buffer, nameOffset, nameLen, line, col);
 
-        stack.closeElement();
+        stack.popElement();
 
         return result;
         
@@ -162,7 +162,7 @@ public class BasicHtmlElement extends AbstractHtmlElement {
         final IAttoHandleResult result =
                 handler.handleHtmlAutoCloseElementEnd(this, buffer, nameOffset, nameLen, line, col);
 
-        stack.closeElement();
+        stack.popElement();
 
         return result;
 

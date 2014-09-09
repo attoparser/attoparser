@@ -723,20 +723,27 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
             }
 
-            final IAttoHandleResult result =
+            IAttoHandleResult result =
                     this.handler.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
 
             if (result instanceof StackableElementAttoHandleResult) {
 
                 final StackableElementAttoHandleResult stackableResult = (StackableElementAttoHandleResult) result;
 
+                if (stackableResult.getUnstackUntil() != null) {
+                    // We should first rearrange the stack, then re-execute the handler
+                    if (unstackUntil(stackableResult.getUnstackUntil(), line, col)) {
+                        return handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
+                    }
+                }
+
                 if (stackableResult.getShouldStack()) {
-                    addToStack(buffer, nameOffset, nameLen);
+                    pushToStack(buffer, nameOffset, nameLen);
                 }
 
             } else {
 
-                addToStack(buffer, nameOffset, nameLen);
+                pushToStack(buffer, nameOffset, nameLen);
 
             }
 
@@ -808,6 +815,50 @@ public abstract class AbstractDetailedMarkupAttoHandler
 
             return result;
 
+        }
+
+
+        public IAttoHandleResult handleUnmatchedCloseElementStart(
+                final char[] buffer,
+                final int nameOffset, final int nameLen,
+                final int line, final int col)
+                throws AttoParseException {
+            throw new UnsupportedOperationException(
+                    "This method at the wrapper handler should never be called, it is just " +
+                            "here to complete the interface implementation");
+        }
+
+
+        public IAttoHandleResult handleUnmatchedCloseElementEnd(
+                final char[] buffer,
+                final int nameOffset, final int nameLen,
+                final int line, final int col)
+                throws AttoParseException {
+            throw new UnsupportedOperationException(
+                    "This method at the wrapper handler should never be called, it is just " +
+                            "here to complete the interface implementation");
+        }
+
+
+        public IAttoHandleResult handleAutoCloseElementStart(
+                final char[] buffer,
+                final int nameOffset, final int nameLen,
+                final int line, final int col)
+                throws AttoParseException {
+            throw new UnsupportedOperationException(
+                    "This method at the wrapper handler should never be called, it is just " +
+                            "here to complete the interface implementation");
+        }
+
+
+        public IAttoHandleResult handleAutoCloseElementEnd(
+                final char[] buffer,
+                final int nameOffset, final int nameLen,
+                final int line, final int col)
+                throws AttoParseException {
+            throw new UnsupportedOperationException(
+                    "This method at the wrapper handler should never be called, it is just " +
+                            "here to complete the interface implementation");
         }
 
         
@@ -1007,50 +1058,6 @@ public abstract class AbstractDetailedMarkupAttoHandler
             
         }
 
-
-        public IAttoHandleResult handleUnmatchedCloseElementStart(
-                final char[] buffer, 
-                final int nameOffset, final int nameLen, 
-                final int line, final int col) 
-                throws AttoParseException {
-            throw new UnsupportedOperationException(
-                    "This method at the wrapper handler should never be called, it is just " +
-                    "here to complete the interface implementation");
-        }
-
-
-        public IAttoHandleResult handleUnmatchedCloseElementEnd(
-                final char[] buffer,
-                final int nameOffset, final int nameLen,
-                final int line, final int col)
-                throws AttoParseException {
-            throw new UnsupportedOperationException(
-                    "This method at the wrapper handler should never be called, it is just " +
-                    "here to complete the interface implementation");
-        }
-
-
-        public IAttoHandleResult handleAutoCloseElementStart(
-                final char[] buffer, 
-                final int nameOffset, final int nameLen, 
-                final int line, final int col) 
-                throws AttoParseException {
-            throw new UnsupportedOperationException(
-                    "This method at the wrapper handler should never be called, it is just " +
-                    "here to complete the interface implementation");
-        }
-
-
-        public IAttoHandleResult handleAutoCloseElementEnd(
-                final char[] buffer,
-                final int nameOffset, final int nameLen,
-                final int line, final int col)
-                throws AttoParseException {
-            throw new UnsupportedOperationException(
-                    "This method at the wrapper handler should never be called, it is just " +
-                    "here to complete the interface implementation");
-        }
-
         
 
         
@@ -1118,24 +1125,23 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 final char[] buffer, final int offset, final int len, final int line, final int col) 
                 throws AttoParseException {
 
-            final int initialStackSize = this.elementStackSize;
-            char[] popped = popFromStack();
-            int poppedCount = 1;
+            int peekDelta = 0;
+            char[] peek = peekFromStack(peekDelta);
 
-            while (popped != null) {
+            while (peek != null) {
 
-                boolean matches = (len == popped.length);
+                boolean matches = (len == peek.length);
             
                 final int maxi = offset + len;
                 if (this.caseSensitive) {
                     for (int i = offset; matches && i < maxi; i++) {
-                        if (buffer[i] != popped[i - offset]) {
+                        if (buffer[i] != peek[i - offset]) {
                             matches = false;
                         }
                     }
                 } else {
                     for (int i = offset; matches && i < maxi; i++) {
-                        if (Character.toLowerCase(buffer[i]) != Character.toLowerCase(popped[i - offset])) {
+                        if (Character.toLowerCase(buffer[i]) != Character.toLowerCase(peek[i - offset])) {
                             matches = false;
                         }
                     }
@@ -1146,19 +1152,14 @@ public abstract class AbstractDetailedMarkupAttoHandler
                     // We found the corresponding opening element, so we execute all pending auto-close events
                     // (if needed) and return true (meaning the close element has a matching open element).
 
-                    if (this.autoClose) {
-                        if (poppedCount > 1) {
-                            rollbackPopFromStack(initialStackSize); // we reinitialize the stack to its original state
-                            for (int i = 0; i < poppedCount - 1; i++) { // We don't report the last one as auto-close, because it's the matched one
-                                popped = popFromStack();
-                                this.handler.handleAutoCloseElementStart(popped, 0, popped.length, line, col);
-                                this.handler.handleAutoCloseElementEnd(popped, 0, popped.length, line, col);
-                            }
-                            popFromStack(); // this is the matched one, just pop and don't report as auto-close
+                    for (int i = 0; i < peekDelta; i++) {
+                        peek = popFromStack();
+                        if (this.autoClose) {
+                            this.handler.handleAutoCloseElementStart(peek, 0, peek.length, line, col);
+                            this.handler.handleAutoCloseElementEnd(peek, 0, peek.length, line, col);
                         }
                     }
-
-                    commitPopFromStack(initialStackSize);
+                    popFromStack();
 
                     return true;
 
@@ -1169,13 +1170,12 @@ public abstract class AbstractDetailedMarkupAttoHandler
                 if (this.requireBalancedElements) {
                     throw new AttoParseException(
                             "Malformed markup: element " +
-                            "\"" + new String(popped, 0, popped.length) + "\"" +
+                            "\"" + new String(peek, 0, peek.length) + "\"" +
                             " is never closed", line, col);
                 }
 
-                popped = popFromStack();
-                poppedCount++;
-                
+                peek = peekFromStack(++peekDelta);
+
             }
 
             // closing element at the root level
@@ -1187,7 +1187,6 @@ public abstract class AbstractDetailedMarkupAttoHandler
             }
 
             // Return false because the close element has no matching open element
-            rollbackPopFromStack(initialStackSize);
             return false;
             
         }
@@ -1219,10 +1218,63 @@ public abstract class AbstractDetailedMarkupAttoHandler
             }
             
         }
+
+
+
+        private boolean unstackUntil(final char[] unstackUntil, final int line, final int col)
+                throws AttoParseException {
+
+            int peekDelta = 0;
+            char[] peek = peekFromStack(peekDelta);
+
+            while (peek != null) {
+
+                boolean matches = (unstackUntil.length == peek.length);
+
+                if (this.caseSensitive) {
+                    for (int i = 0; matches && i < unstackUntil.length; i++) {
+                        if (unstackUntil[i] != peek[i]) {
+                            matches = false;
+                        }
+                    }
+                } else {
+                    for (int i = 0; matches && i < unstackUntil.length; i++) {
+                        if (Character.toLowerCase(unstackUntil[i]) != Character.toLowerCase(peek[i])) {
+                            matches = false;
+                        }
+                    }
+                }
+
+                if (matches) {
+
+                    // We found the corresponding opening element, so we execute all pending auto-close events
+                    // (if needed) and return (without popping the matched element itself!)
+                    // Will return true if we needed to autoclose anything.
+
+                    for (int i = 0; i < peekDelta; i++) {
+                        peek = popFromStack();
+                        if (this.autoClose) {
+                            this.handler.handleAutoCloseElementStart(peek, 0, peek.length, line, col);
+                            this.handler.handleAutoCloseElementEnd(peek, 0, peek.length, line, col);
+                        }
+                    }
+
+                    return (peekDelta > 0);
+
+                }
+
+                peek = peekFromStack(++peekDelta);
+
+            }
+
+            return false;
+
+        }
+
+
         
         
-        
-        private void addToStack(
+        private void pushToStack(
                 final char[] buffer, final int offset, final int len) {
             
             if (this.elementStackSize == this.elementStack.length) {
@@ -1237,25 +1289,25 @@ public abstract class AbstractDetailedMarkupAttoHandler
             
         }
 
+
+        private char[] peekFromStack(final int delta) {
+            if (this.elementStackSize <= delta) {
+                return null;
+            }
+            return this.elementStack[(this.elementStackSize - 1) - delta];
+        }
+
         
         private char[] popFromStack() {
             if (this.elementStackSize == 0) {
                 return null;
             }
+            final char[] popped = this.elementStack[this.elementStackSize - 1];
+            this.elementStack[this.elementStackSize - 1] = null;
             this.elementStackSize--;
-            return this.elementStack[this.elementStackSize];
+            return popped;
         }
-        
-        private void commitPopFromStack(final int initialSize) {
-            for (int i = this.elementStackSize; i < initialSize; i++) {
-                this.elementStack[i] = null;
-            }
-        }
-        
-        private void rollbackPopFromStack(final int initialSize) {
-            this.elementStackSize = initialSize;
-        }
-        
+
         
         private void growStack() {
             

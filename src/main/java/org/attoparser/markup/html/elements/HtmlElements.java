@@ -94,10 +94,10 @@ public final class HtmlElements {
     public static final IHtmlElement BLOCKQUOTE = new BasicHtmlElement("blockquote");
     public static final IHtmlElement OL = new BasicHtmlElement("ol");
     public static final IHtmlElement UL = new BasicHtmlElement("ul");
-    public static final IHtmlElement LI = new BasicHtmlElement("li");
+    public static final IHtmlElement LI = new SiblingAutoCloserHtmlElement("li", new String[] { "ul", "ol" });
     public static final IHtmlElement DL = new BasicHtmlElement("dl");
-    public static final IHtmlElement DT = new BasicHtmlElement("dt");
-    public static final IHtmlElement DD = new BasicHtmlElement("dd");
+    public static final IHtmlElement DT = new SiblingAutoCloserHtmlElement("dt", new String[] { "dl" });
+    public static final IHtmlElement DD = new SiblingAutoCloserHtmlElement("dd", new String[] { "dl" });
     public static final IHtmlElement FIGURE = new BasicHtmlElement("figure");
     public static final IHtmlElement FIGCAPTION = new BasicHtmlElement("figcaption");
     public static final IHtmlElement DIV = new BasicHtmlElement("div");
@@ -152,15 +152,15 @@ public final class HtmlElements {
     
     // Tabular data
     public static final IHtmlElement TABLE = new BasicHtmlElement("table");
-    public static final IHtmlElement CAPTION = new BasicHtmlElement("caption");
-    public static final IHtmlElement COLGROUP = new BasicHtmlElement("colgroup");
+    public static final IHtmlElement CAPTION = new SiblingAutoCloserHtmlElement("caption", new String[] { "table" });
+    public static final IHtmlElement COLGROUP = new SiblingAutoCloserHtmlElement("colgroup", new String[] { "table" });
     public static final IHtmlElement COL = new VoidHtmlElement("col");
-    public static final IHtmlElement TBODY = new BasicHtmlElement("tbody");
-    public static final IHtmlElement THEAD = new BasicHtmlElement("thead");
-    public static final IHtmlElement TFOOT = new BasicHtmlElement("tfoot");
-    public static final IHtmlElement TR = new BasicHtmlElement("tr");
-    public static final IHtmlElement TD = new BasicHtmlElement("td");
-    public static final IHtmlElement TH = new BasicHtmlElement("th");
+    public static final IHtmlElement TBODY = new SiblingAutoCloserHtmlElement("tbody", new String[] { "table" });
+    public static final IHtmlElement THEAD = new SiblingAutoCloserHtmlElement("thead", new String[] { "table" });
+    public static final IHtmlElement TFOOT = new SiblingAutoCloserHtmlElement("tfoot", new String[] { "table" });
+    public static final IHtmlElement TR = new SiblingAutoCloserHtmlElement("tr", new String[] { "table", "thead", "tbody", "tfoot" });
+    public static final IHtmlElement TD = new SiblingAutoCloserHtmlElement("td", new String[] { "tr" });
+    public static final IHtmlElement TH = new SiblingAutoCloserHtmlElement("th", new String[] { "tr" });
     
     // Forms
     public static final IHtmlElement FORM = new BasicHtmlElement("form");

@@ -38,7 +38,7 @@ public abstract class AbstractHtmlElement implements IHtmlElement {
     
     private final int nameLen;
     private final String name;
-    private final char[] normalizedName;
+    private final char[] nameCharArray;
     
 
 
@@ -53,15 +53,15 @@ public abstract class AbstractHtmlElement implements IHtmlElement {
             throw new IllegalArgumentException("Name cannot be null");
         }
         
-        this.name = name;
-        this.normalizedName = name.toCharArray();
-        this.nameLen = this.normalizedName.length;
+        this.name = name.toLowerCase();
+        this.nameCharArray = this.name.toCharArray();
+        this.nameLen = this.nameCharArray.length;
 
         // Normalizing: set to lower-case
         for (int i = 0; i < this.nameLen; i++) {
-            final char c = this.normalizedName[i]; 
+            final char c = this.nameCharArray[i];
             if (c >= 'A' && c <= 'Z') {
-                this.normalizedName[i] = (char)(c + HtmlElements.CASE_DIFF);
+                this.nameCharArray[i] = (char)(c + HtmlElements.CASE_DIFF);
             }
         }
 
@@ -72,8 +72,11 @@ public abstract class AbstractHtmlElement implements IHtmlElement {
     public final String getName() {
         return this.name;
     }
-    
-    
+
+    public final char[] getNameCharArray() {
+        return this.nameCharArray;
+    }
+
     
     
     public final boolean matches(final String elementName) {
@@ -90,7 +93,7 @@ public abstract class AbstractHtmlElement implements IHtmlElement {
             if (c >= 'A' && c <= 'Z') {
                 c = (char)(c + HtmlElements.CASE_DIFF);
             }
-            if (c != this.normalizedName[i]) {
+            if (c != this.nameCharArray[i]) {
                 return false;
             }
         }
@@ -122,7 +125,7 @@ public abstract class AbstractHtmlElement implements IHtmlElement {
             if (c >= 'A' && c <= 'Z') {
                 c = (char)(c + HtmlElements.CASE_DIFF);
             }
-            if (c != this.normalizedName[i - offset]) {
+            if (c != this.nameCharArray[i - offset]) {
                 return false;
             }
         }
