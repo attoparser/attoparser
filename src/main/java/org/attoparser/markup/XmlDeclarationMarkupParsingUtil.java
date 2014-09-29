@@ -34,7 +34,7 @@ import org.attoparser.IAttoHandleResult;
  * @since 1.0
  *
  */
-public final class XmlDeclarationMarkupParsingUtil {
+final class XmlDeclarationMarkupParsingUtil {
 
 
     
@@ -49,61 +49,15 @@ public final class XmlDeclarationMarkupParsingUtil {
     
 
     
-    
-    
-    
-    public static IAttoHandleResult parseXmlDeclaration(
-            final char[] buffer, 
-            final int offset, final int len, 
-            final int line, final int col, 
-            final IXmlDeclarationHandling handler)
-            throws AttoParseException {
-
-        final BestEffortParsingResult bestEffortParsingResult =
-                tryParseXmlDeclaration(buffer, offset, len, line, col, handler);
-        if (bestEffortParsingResult == null) {
-            throw new AttoParseException(
-                    "Could not parse as XML declaration: \"" + new String(buffer, offset, len) + "\"", line, col);
-        }
-
-        return bestEffortParsingResult.getHandleResult();
-        
-    }
-
-    
-
-    
-    
-    static BestEffortParsingResult tryParseXmlDeclaration(
-            final char[] buffer, 
-            final int offset, final int len, 
-            final int line, final int col, 
-            final IXmlDeclarationHandling handler)
-            throws AttoParseException {
-
-        if (len >= 7 && 
-                isXmlDeclarationStart(buffer, offset, (offset + len)) &&
-                buffer[offset + len - 2] == '?' &&
-                buffer[offset + len - 1] == '>') {
-
-            return BestEffortParsingResult.forHandleResult(
-                    doParseXmlDeclarationContent(
-                        buffer, offset + 2, len - 4, offset, len, line, col, handler));
-
-        }
-        
-        return null;
-        
-    }
 
 
     
-    static IAttoHandleResult doParseXmlDeclarationContent(
-            final char[] buffer, 
-            final int internalOffset, final int internalLen, 
+    static IAttoHandleResult parseXmlDeclaration(
+            final char[] buffer,
+            final int internalOffset, final int internalLen,
             final int outerOffset, final int outerLen,
-            final int line, final int col, 
-            final IXmlDeclarationHandling handler)
+            final int line, final int col,
+            final MarkupEventProcessor eventProcessor)
             throws AttoParseException {
 
         final int maxi = internalOffset + internalLen;
@@ -160,29 +114,19 @@ public final class XmlDeclarationMarkupParsingUtil {
         
         final int contentLen = maxi - contentOffset;
         
-        final XmlDeclarationAttributeHandling attHandling = 
-                new XmlDeclarationAttributeHandling(outerOffset, outerLen, line, col);
+        final XmlDeclarationAttributeProcessor attHandling =
+                new XmlDeclarationAttributeProcessor(outerOffset, outerLen, line, col);
 
 
-        final BestEffortParsingResult attrBestEffortParsingResult =
+        final IAttoHandleResult attrHandleResult =
                 AttributeSequenceMarkupParsingUtil.
-                        tryParseAttributeSequence(buffer, contentOffset, contentLen, locator, attHandling);
+                        parseAttributeSequence(buffer, contentOffset, contentLen, locator, attHandling);
 
-        if (attrBestEffortParsingResult == null) {
-            
-            throw new AttoParseException(
-                    "Could not parse attribute sequence in XML declaration: " +
-                    "\"" + new String(buffer, outerOffset, outerLen) + "\"", line, col);
-            
-        }
-
-        final IAttoHandleResult attrHandleResult = attrBestEffortParsingResult.getHandleResult();
-        
         attHandling.finalChecks(locator, buffer);
 
 
         final IAttoHandleResult finalHandlerResult =
-                handler.handleXmlDeclaration(
+                eventProcessor.processXmlDeclaration(
                         buffer,
                         keywordOffset, keywordLen,                                // keyword
                         keywordLine, keywordCol,                                  // keyword
@@ -222,7 +166,7 @@ public final class XmlDeclarationMarkupParsingUtil {
 
     
     
-    private static class XmlDeclarationAttributeHandling implements IAttributeSequenceHandling {
+    private static class XmlDeclarationAttributeProcessor implements IMarkupEventAttributeProcessor {
 
         private final int outerOffset;
         private final int outerLen;
@@ -232,21 +176,21 @@ public final class XmlDeclarationMarkupParsingUtil {
         // attribute names will only be in lowercase, as XML is case sensitive and upper
         // case would be wrong.
         
-        final static char[] VERSION = "version".toCharArray();
+        static final char[] VERSION = "version".toCharArray();
         boolean versionPresent = false;
         int versionOffset = 0;
         int versionLen = 0;
         int versionLine = -1;
         int versionCol = -1;
         
-        final static char[] ENCODING = "encoding".toCharArray();
+        static final char[] ENCODING = "encoding".toCharArray();
         boolean encodingPresent = false;
         int encodingOffset = 0;
         int encodingLen = 0;
         int encodingLine = -1;
         int encodingCol = -1;
 
-        final static char[] STANDALONE = "standalone".toCharArray();
+        static final char[] STANDALONE = "standalone".toCharArray();
         boolean standalonePresent = false;
         int standaloneOffset = 0;
         int standaloneLen = 0;
@@ -255,18 +199,16 @@ public final class XmlDeclarationMarkupParsingUtil {
 
         
         
-        XmlDeclarationAttributeHandling(final int outerOffset, final int outerLen, 
-                final int outerLine, final int outerCol) {
+        XmlDeclarationAttributeProcessor(final int outerOffset, final int outerLen,
+                                         final int outerLine, final int outerCol) {
             super();
             this.outerOffset = outerOffset;
             this.outerLen = outerLen;
             this.outerLine = outerLine;
             this.outerCol = outerCol;
         }
-        
-        
-        
-        public IAttoHandleResult handleAttribute(
+
+        public IAttoHandleResult processAttribute(
                 final char[] buffer, 
                 final int nameOffset, final int nameLen,
                 final int nameLine, final int nameCol, 
@@ -349,7 +291,7 @@ public final class XmlDeclarationMarkupParsingUtil {
         }
         
 
-        public IAttoHandleResult handleInnerWhiteSpace(
+        public IAttoHandleResult processInnerWhiteSpace(
                 final char[] buffer, 
                 final int offset, final int len,
                 final int line, final int col)
@@ -358,8 +300,8 @@ public final class XmlDeclarationMarkupParsingUtil {
             return null;
         }
 
-        
-        
+
+
         public void finalChecks(final int[] locator, final char[] buffer) throws AttoParseException {
             if (!this.versionPresent) {
                 throw new AttoParseException(
@@ -398,10 +340,12 @@ public final class XmlDeclarationMarkupParsingUtil {
             }
             return true;
         }
-        
-        
+
+
     }
-    
+
+
+
     
     
 }

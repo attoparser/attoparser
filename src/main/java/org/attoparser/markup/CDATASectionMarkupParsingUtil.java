@@ -21,7 +21,7 @@ package org.attoparser.markup;
 
 /**
  * <p>
- *   Class containing utility methods for parsing comments.
+ *   Class containing utility methods for parsing CDATA sections.
  * </p>
  * 
  * @author Daniel Fern&aacute;ndez
@@ -29,25 +29,32 @@ package org.attoparser.markup;
  * @since 1.0
  *
  */
-final class CommentMarkupParsingUtil {
-    
-
+final class CDATASectionMarkupParsingUtil {
 
     
-    private CommentMarkupParsingUtil() {
+
+    
+    private CDATASectionMarkupParsingUtil() {
         super();
     }
 
     
 
 
+
     
-    static boolean isCommentStart(final char[] buffer, final int offset, final int maxi) {
-        return ((maxi - offset > 3) && 
+    static boolean isCDATASectionStart(final char[] buffer, final int offset, final int maxi) {
+        return ((maxi - offset > 8) && 
                     buffer[offset] == '<' &&
                     buffer[offset + 1] == '!' &&
-                    buffer[offset + 2] == '-' && 
-                    buffer[offset + 3] == '-');
+                    buffer[offset + 2] == '[' && 
+                    (buffer[offset + 3] == 'C' || buffer[offset + 3] == 'c') && 
+                    (buffer[offset + 4] == 'D' || buffer[offset + 4] == 'd') && 
+                    (buffer[offset + 5] == 'A' || buffer[offset + 5] == 'a') && 
+                    (buffer[offset + 6] == 'T' || buffer[offset + 6] == 't') && 
+                    (buffer[offset + 7] == 'A' || buffer[offset + 7] == 'a') && 
+                    buffer[offset + 8] == '[');
     }
+
     
 }

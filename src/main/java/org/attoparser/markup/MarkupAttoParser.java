@@ -19,12 +19,14 @@
  */
 package org.attoparser.markup;
 
-import org.attoparser.AbstractBufferedAttoParser;
+import java.io.Reader;
+import java.util.Arrays;
+
+import org.attoparser.AbstractAttoParser;
 import org.attoparser.AttoHandleResult;
 import org.attoparser.AttoParseException;
 import org.attoparser.IAttoHandleResult;
 import org.attoparser.IAttoHandler;
-import org.attoparser.StructureType;
 
 
 /**
@@ -54,17 +56,49 @@ import org.attoparser.StructureType;
  * @since 1.0
  *
  */
-public final class MarkupAttoParser extends AbstractBufferedAttoParser {
+public final class MarkupAttoParser extends AbstractAttoParser {
 
+    /**
+     * <p>
+     *   Default buffer size to be used (buffer size will grow at runtime if
+     *   an artifact (structure or text) is bigger than the whole buffer).
+     *   Value: 4096 chars (= 8192 bytes).
+     * </p>
+     */
+    public static final int DEFAULT_BUFFER_SIZE = 4096;
+
+    /**
+     * <p>
+     *   Default pool size to be used. Buffers will be kept in a pool and
+     *   reused in order to increase performance. Pool will be non-exclusive
+     *   so that if pool size = 3 and a 4th request arrives, it is assigned
+     *   a new buffer object (not linked to the pool, and therefore GC-ed
+     *   at the end).
+     * </p>
+     *
+     * @since 2.0.0
+     */
+    public static final int DEFAULT_POOL_SIZE = 2;
+
+
+    private final MarkupParsingConfiguration configuration;
     private final boolean canSplitText;
+    private final BufferPool pool;
+
+
+
 
     /**
      * <p>
      *   Creates a new instance of this parser.
      * </p>
+     *
+     * @param configuration the parsing configuration to be used.
+     *
+     * @since 2.0.0
      */
-    public MarkupAttoParser() {
-        this(false);
+    public MarkupAttoParser(final MarkupParsingConfiguration configuration) {
+        this(configuration, false);
     }
 
 
@@ -73,11 +107,14 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
      *   Creates a new instance of this parser.
      * </p>
      *
+     * @param configuration the parsing configuration to be used.
      * @param canSplitText if {@code true}, text nodes may be split and sent to the handler as multiple text nodes.  The
      *                     default is {@code false}.
+     *
+     * @since 2.0.0
      */
-    public MarkupAttoParser(final boolean canSplitText) {
-        this(canSplitText, AbstractBufferedAttoParser.DEFAULT_POOL_SIZE, AbstractBufferedAttoParser.DEFAULT_BUFFER_SIZE);
+    public MarkupAttoParser(final MarkupParsingConfiguration configuration, final boolean canSplitText) {
+        this(configuration, canSplitText, DEFAULT_POOL_SIZE, DEFAULT_BUFFER_SIZE);
     }
 
 
@@ -88,39 +125,217 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
      * <p>
      *   Buffer size (in char's) will be the size of the <kbd>char[]</kbd> structures used as buffers for parsing,
      *   which might grow if a certain markup structure does not fit inside (e.g. a text). Default size is
-     *   {@link org.attoparser.AbstractBufferedAttoParser#DEFAULT_BUFFER_SIZE}.
+     *   {@link org.attoparser.markup.MarkupAttoParser#DEFAULT_BUFFER_SIZE}.
      * </p>
      * <p>
      *   Pool size is the size of the pool of <kbd>char[]</kbd> buffers that will be kept in memory in order to
      *   allow their reuse. This pool works in a non-exclusive mode, so that if pool size is 3 and a 4th request
      *   arrives, it is served a new non-pooled buffer without the need to block waiting for one of the pooled
-     *   instances. Default size is {@link org.attoparser.AbstractBufferedAttoParser#DEFAULT_POOL_SIZE}.
+     *   instances. Default size is {@link org.attoparser.markup.MarkupAttoParser#DEFAULT_POOL_SIZE}.
      * </p>
      *
-     * @since 2.0.0
+     * @param configuration the parsing configuration to be used.
      * @param canSplitText if {@code true}, text nodes may be split and sent to the handler as multiple text nodes.  The
      *                     default is {@code false}.
      * @param poolSize the size of the pool of buffers to be used.
      * @param bufferSize the default size of the buffers to be instanced for this parser.
+     *
+     * @since 2.0.0
      */
-    public MarkupAttoParser(final boolean canSplitText, final int poolSize, final int bufferSize) {
-        super(poolSize, bufferSize);
+    public MarkupAttoParser(final MarkupParsingConfiguration configuration, final boolean canSplitText, final int poolSize, final int bufferSize) {
+        super();
+        this.configuration = configuration;
+        this.pool = new BufferPool(poolSize, bufferSize);
         this.canSplitText = canSplitText;
     }
 
 
-    
-    
-    
+
+
+
+
+
     @Override
-    protected final BufferParseResult parseBuffer(
-            final char[] buffer, final int offset, final int len, 
-            final IAttoHandler handler, final int line, final int col,
-            final char[] skipUntilSequence)
+    protected final void parseDocument(
+            final Reader reader, final IAttoHandler handler)
+            throws AttoParseException {
+
+        if (!(handler instanceof IMarkupAttoHandler)) {
+            throw new IllegalArgumentException(
+                    MarkupAttoParser.class.getSimpleName() + " requires a handler implementing the " +
+                            IMarkupAttoHandler.class.getName() + " interface, but passed handler of class " +
+                            handler.getClass().getName() + " does not implement such interface.");
+        }
+
+        final IMarkupAttoHandler markupHandler = (IMarkupAttoHandler) handler;
+
+        // We will not report directly to the handler, but instead to an intermediate class that will be in
+        // charge of applying the required markup logic and rules, according to the specified configuration
+        final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(markupHandler, this.configuration);
+
+        parseDocument(reader, eventProcessor, this.pool.defaultBufferSize);
+
+    }
+
+
+
+
+
+    /*
+     * This method receiving the buffer size with package visibility allows
+     * testing different buffer sizes.
+     */
+    final void parseDocument(
+            final Reader reader, final MarkupEventProcessor eventProcessor, final int initialBufferSize)
             throws AttoParseException {
 
 
-        final int[] locator = new int[] {line, col};
+        long parsingStartTimeNanos = System.nanoTime();
+
+        final BufferParseStatus status = new BufferParseStatus();
+
+        char[] buffer = null;
+
+        try {
+
+            eventProcessor.processDocumentStart(parsingStartTimeNanos, 1, 1);
+
+            int bufferSize = initialBufferSize;
+            buffer = this.pool.allocateBuffer(bufferSize);
+
+            int bufferContentSize = reader.read(buffer);
+            boolean cont = (bufferContentSize != -1);
+
+            status.offset = -1;
+            status.line = 1;
+            status.col = 1;
+            status.inStructure = false;
+            status.skipUntilSequence = null;
+
+            while (cont) {
+
+                parseBuffer(buffer, 0, bufferContentSize, eventProcessor, status);
+
+                int readOffset = 0;
+                int readLen = bufferSize;
+
+                if (status.offset == 0) {
+
+                    if (bufferContentSize == bufferSize) {
+                        // Buffer is not big enough, double it!
+
+                        char[] newBuffer = null;
+                        try {
+
+                            bufferSize *= 2;
+
+                            newBuffer = this.pool.allocateBuffer(bufferSize);
+                            System.arraycopy(buffer, 0, newBuffer, 0, bufferContentSize);
+
+                            this.pool.releaseBuffer(buffer);
+
+                            buffer = newBuffer;
+
+                        } catch (final Exception e) {
+                            this.pool.releaseBuffer(newBuffer);
+                        }
+
+                    }
+
+                    // it's possible for two reads to occur in a row and 1) read less than the bufferSize and 2)
+                    // still not find the next tag/end of structure
+                    readOffset = bufferContentSize;
+                    readLen = bufferSize - readOffset;
+
+                } else if (status.offset < bufferContentSize) {
+
+                    System.arraycopy(buffer, status.offset, buffer, 0, bufferContentSize - status.offset);
+
+                    readOffset = bufferContentSize - status.offset;
+                    readLen = bufferSize - readOffset;
+
+                    status.offset = 0;
+                    bufferContentSize = readOffset;
+
+                }
+
+                final int read = reader.read(buffer, readOffset, readLen);
+                if (read != -1) {
+                    bufferContentSize = readOffset + read;
+                } else {
+                    cont = false;
+                }
+
+            }
+
+            int lastLine = status.line;
+            int lastCol = status.col;
+
+            final int lastStart = status.offset;
+            final int lastLen = bufferContentSize - lastStart;
+
+            if (lastLen > 0) {
+
+                if (status.inStructure) {
+                    throw new AttoParseException(
+                            "Incomplete structure: \"" + new String(buffer, lastStart, lastLen) + "\"", status.line, status.col);
+                }
+
+                eventProcessor.processText(buffer, lastStart, lastLen, status.line, status.col);
+
+                // As we have produced an additional text event, we need to fast-forward the
+                // lastLine and lastCol position to include the last text structure.
+                for (int i = lastStart; i < (lastStart + lastLen); i++) {
+                    final char c = buffer[i];
+                    if (c == '\n') {
+                        lastLine++;
+                        lastCol = 1;
+                    } else {
+                        lastCol++;
+                    }
+
+                }
+
+            }
+
+            final long parsingEndTimeNanos = System.nanoTime();
+            eventProcessor.processDocumentEnd(parsingEndTimeNanos, (parsingEndTimeNanos - parsingStartTimeNanos), lastLine, lastCol);
+
+        } catch (final AttoParseException e) {
+            throw e;
+        } catch (final Exception e) {
+            throw new AttoParseException(e);
+        } finally {
+            this.pool.releaseBuffer(buffer);
+            try {
+                reader.close();
+            } catch (final Throwable t) {
+                // This exception can be safely ignored
+            }
+        }
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    private final void parseBuffer(
+            final char[] buffer, final int offset, final int len,
+            final MarkupEventProcessor eventProcessor, final BufferParseStatus status)
+            throws AttoParseException {
+
+
+        final int[] locator = new int[] {status.line, status.col};
         
         int currentLine = locator[0];
         int currentCol = locator[1];
@@ -139,7 +354,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
         boolean inXmlDeclaration = false;
         boolean inProcessingInstruction = false;
 
-        char[] skipUntil = skipUntilSequence;
+        char[] skipUntil = status.skipUntilSequence;
 
         int tagStart = -1;
         int tagEnd = -1;
@@ -160,7 +375,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                     if (canSplitText) {
 
                         final IAttoHandleResult result =
-                            handler.handleText(buffer, current, len - current, currentLine, currentCol);
+                                eventProcessor.processText(buffer, current, len - current, currentLine, currentCol);
                         if (result != null && result != AttoHandleResult.CONTINUE) {
                             skipUntil = result.getParsingDisableLimit();
                         }
@@ -169,7 +384,12 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
 
                     }
 
-                    return new BufferParseResult(current, currentLine, currentCol, false, skipUntil);
+                    status.offset = current;
+                    status.line = currentLine;
+                    status.col = currentCol;
+                    status.inStructure = false;
+                    status.skipUntilSequence = skipUntil;
+                    return;
 
                 }
 
@@ -179,7 +399,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                 // parsing-enabled events should not be mixed in order to improve event handling.
 
                 final IAttoHandleResult result =
-                        handler.handleText(buffer, current, sequenceIndex - current, currentLine, currentCol);
+                        eventProcessor.processText(buffer, current, sequenceIndex - current, currentLine, currentCol);
                 if (result != null && result != AttoHandleResult.CONTINUE) {
                     skipUntil = result.getParsingDisableLimit();
                 } else {
@@ -200,10 +420,10 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                 
                 if (tagStart == -1) {
 
-                    if (canSplitText) {
+                    if (this.canSplitText) {
 
                         final IAttoHandleResult result =
-                            handler.handleText(buffer, current, len - current, currentLine, currentCol);
+                                eventProcessor.processText(buffer, current, len - current, currentLine, currentCol);
                         if (result != null && result != AttoHandleResult.CONTINUE) {
                             skipUntil = result.getParsingDisableLimit();
                         }
@@ -212,7 +432,12 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
 
                     }
 
-                    return new BufferParseResult(current, currentLine, currentCol, false, skipUntil);
+                    status.offset = current;
+                    status.line = currentLine;
+                    status.col = currentCol;
+                    status.inStructure = false;
+                    status.skipUntilSequence = skipUntil;
+                    return;
 
                 }
 
@@ -222,7 +447,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                     if (!inCloseElement) {
                         inComment = CommentMarkupParsingUtil.isCommentStart(buffer, tagStart, maxi);
                         if (!inComment) {
-                            inCdata = CdataMarkupParsingUtil.isCdataStart(buffer, tagStart, maxi);
+                            inCdata = CDATASectionMarkupParsingUtil.isCDATASectionStart(buffer, tagStart, maxi);
                             if (!inCdata) {
                                 inDocType = DocTypeMarkupParsingUtil.isDocTypeStart(buffer, tagStart, maxi);
                                 if (!inDocType) {
@@ -248,7 +473,12 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                     tagStart = MarkupParsingUtil.findNextStructureStart(buffer, tagStart + 1, maxi, locator);
                     
                     if (tagStart == -1) {
-                        return new BufferParseResult(current, currentLine, currentCol, false, skipUntil);
+                        status.offset = current;
+                        status.line = currentLine;
+                        status.col = currentCol;
+                        status.inStructure = false;
+                        status.skipUntilSequence = skipUntil;
+                        return;
                     }
 
                     inOpenElement = ElementMarkupParsingUtil.isOpenElementStart(buffer, tagStart, maxi);
@@ -257,7 +487,7 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                         if (!inCloseElement) {
                             inComment = CommentMarkupParsingUtil.isCommentStart(buffer, tagStart, maxi);
                             if (!inComment) {
-                                inCdata = CdataMarkupParsingUtil.isCdataStart(buffer, tagStart, maxi);
+                                inCdata = CDATASectionMarkupParsingUtil.isCDATASectionStart(buffer, tagStart, maxi);
                                 if (!inCdata) {
                                     inDocType = DocTypeMarkupParsingUtil.isDocTypeStart(buffer, tagStart, maxi);
                                     if (!inDocType) {
@@ -281,9 +511,9 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                     // We avoid empty-string text events
 
                     final IAttoHandleResult result =
-                        handler.handleText(
-                                buffer, current, (tagStart - current),
-                                currentLine, currentCol);
+                            eventProcessor.processText(
+                                    buffer, current, (tagStart - current),
+                                    currentLine, currentCol);
 
                     if (result != null && result != AttoHandleResult.CONTINUE) {
                         skipUntil = result.getParsingDisableLimit();
@@ -312,18 +542,32 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                 
                 if (tagEnd < 0) {
                     // This is an unfinished structure
-                    return new BufferParseResult(current, currentLine, currentCol, true, skipUntil);
+                    status.offset = current;
+                    status.line = currentLine;
+                    status.col = currentCol;
+                    status.inStructure = true;
+                    status.skipUntilSequence = skipUntil;
+                    return;
                 }
 
                 
                 if (inOpenElement) {
                     // This is a open/standalone tag (to be determined by looking at the penultimate character)
 
-                    final StructureType structureType =
-                            (buffer[tagEnd - 1] == '/')? StructureType.STANDALONE_ELEMENT : StructureType.OPEN_ELEMENT;
+                    final boolean standalone = (buffer[tagEnd - 1] == '/');
+                    final IAttoHandleResult result;
+                    if (standalone) {
+                        result =
+                            ElementMarkupParsingUtil.
+                                    parseOpenOrStandaloneElement(
+                                            buffer, current + 1, ((tagEnd - current) + 1) - 3, current, (tagEnd - current) + 1, currentLine, currentCol, eventProcessor, true);
+                    } else {
+                        result =
+                            ElementMarkupParsingUtil.
+                                    parseOpenOrStandaloneElement(
+                                            buffer, current + 1, ((tagEnd - current) + 1) - 2, current, (tagEnd - current) + 1, currentLine, currentCol, eventProcessor, false);
+                    }
 
-                    final IAttoHandleResult result =
-                            handler.handleStructure(structureType, buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
                     if (result != null && result != AttoHandleResult.CONTINUE) {
                         skipUntil = result.getParsingDisableLimit();
                     }
@@ -334,7 +578,9 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                     // This is a closing tag
 
                     final IAttoHandleResult result =
-                            handler.handleStructure(StructureType.CLOSE_ELEMENT, buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
+                            ElementMarkupParsingUtil.
+                                    parseCloseElement(
+                                            buffer, current + 2, ((tagEnd - current) + 1) - 3, current, (tagEnd - current) + 1, currentLine, currentCol, eventProcessor);
                     if (result != null && result != AttoHandleResult.CONTINUE) {
                         skipUntil = result.getParsingDisableLimit();
                     }
@@ -351,13 +597,18 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                         tagEnd = MarkupParsingUtil.findNextStructureEndDontAvoidQuotes(buffer, tagEnd + 1, maxi, locator);
                         
                         if (tagEnd == -1) {
-                            return new BufferParseResult(current, currentLine, currentCol, true, skipUntil);
+                            status.offset = current;
+                            status.line = currentLine;
+                            status.col = currentCol;
+                            status.inStructure = true;
+                            status.skipUntilSequence = skipUntil;
+                            return;
                         }
                         
                     }
 
                     final IAttoHandleResult result =
-                            handler.handleStructure(StructureType.COMMENT, buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
+                            eventProcessor.processComment(buffer, current + 4, ((tagEnd - current) + 1) - 7, current, (tagEnd - current) + 1, currentLine, currentCol);
                     if (result != null && result != AttoHandleResult.CONTINUE) {
                         skipUntil = result.getParsingDisableLimit();
                     }
@@ -374,13 +625,18 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                         tagEnd = MarkupParsingUtil.findNextStructureEndDontAvoidQuotes(buffer, tagEnd + 1, maxi, locator);
                         
                         if (tagEnd == -1) {
-                            return new BufferParseResult(current, currentLine, currentCol, true, skipUntil);
+                            status.offset = current;
+                            status.line = currentLine;
+                            status.col = currentCol;
+                            status.inStructure = true;
+                            status.skipUntilSequence = skipUntil;
+                            return;
                         }
                         
                     }
 
                     final IAttoHandleResult result =
-                            handler.handleStructure(StructureType.CDATA, buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
+                            eventProcessor.processCDATASection(buffer, current + 9, ((tagEnd - current) + 1) - 12, current, (tagEnd - current) + 1, currentLine, currentCol);
                     if (result != null && result != AttoHandleResult.CONTINUE) {
                         skipUntil = result.getParsingDisableLimit();
                     }
@@ -391,7 +647,9 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                     // This is a DOCTYPE clause
 
                     final IAttoHandleResult result =
-                            handler.handleStructure(StructureType.DOCTYPE, buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
+                            DocTypeMarkupParsingUtil.parseDocType(
+                                    buffer, current, ((tagEnd - current) + 1), currentLine, currentCol, eventProcessor);
+
                     if (result != null && result != AttoHandleResult.CONTINUE) {
                         skipUntil = result.getParsingDisableLimit();
                     }
@@ -402,7 +660,8 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                     // This is an XML Declaration
 
                     final IAttoHandleResult result =
-                            handler.handleStructure(StructureType.XML_DECLARATION, buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
+                            XmlDeclarationMarkupParsingUtil.parseXmlDeclaration(
+                                    buffer, current + 2, ((tagEnd - current) + 1) - 4, current, (tagEnd - current) + 1, currentLine, currentCol, eventProcessor);
                     if (result != null && result != AttoHandleResult.CONTINUE) {
                         skipUntil = result.getParsingDisableLimit();
                     }
@@ -419,14 +678,19 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
                         tagEnd = MarkupParsingUtil.findNextStructureEndDontAvoidQuotes(buffer, tagEnd + 1, maxi, locator);
                         
                         if (tagEnd == -1) {
-                            return new BufferParseResult(current, currentLine, currentCol, true, skipUntil);
+                            status.offset = current;
+                            status.line = currentLine;
+                            status.col = currentCol;
+                            status.inStructure = true;
+                            status.skipUntilSequence = skipUntil;
+                            return;
                         }
                         
                     }
 
-
                     final IAttoHandleResult result =
-                            handler.handleStructure(StructureType.PROCESSING_INSTRUCTION, buffer, current, (tagEnd - current) + 1, currentLine, currentCol);
+                            ProcessingInstructionMarkupParsingUtil.parseProcessingInstruction(
+                                    buffer, current + 2, ((tagEnd - current) + 1) - 4, current, (tagEnd - current) + 1, currentLine, currentCol, eventProcessor);
                     if (result != null && result != AttoHandleResult.CONTINUE) {
                         skipUntil = result.getParsingDisableLimit();
                     }
@@ -449,10 +713,118 @@ public final class MarkupAttoParser extends AbstractBufferedAttoParser {
             }
             
         }
-        
-        return new BufferParseResult(current, locator[0], locator[1], false, skipUntil);
-        
+
+        status.offset = current;
+        status.line = locator[0];
+        status.col = locator[1];
+        status.inStructure = false;
+        status.skipUntilSequence = skipUntil;
+
     }
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+    /*
+     *   This class encapsulates the results of parsing a fragment
+     *   (a buffer) of a document.
+     *
+     *   It contains:
+     *
+     *     * offset: The current artifact position, initial position
+     *               of the last unfinished artifact found while parsing
+     *               a buffer segment.
+     *     * line, col: line and column number of the last unfinished
+     *                  artifact found while parsing a buffer segment.
+     *     * inStructure: signals whether the last unfinished artifact is
+     *                    suspected to be a structure (in contrast to a text).
+     *     * skipUntilSequence: whether we should skip parsing until the specified
+     *                          markup sequence is found.
+     *
+     */
+    private static final class BufferParseStatus {
+
+        private int offset;
+        private int line;
+        private int col;
+        private boolean inStructure;
+        private char[] skipUntilSequence;
+
+    }
+
+
+
+    /*
+     * This class models a pool of buffers, used to keep the amount of
+     * large char[] buffer objects required to operate to a minimum.
+     *
+     * Note this pool never blocks, so if a new buffer is needed and all
+     * are currently allocated, a new char[] object is created and returned.
+     *
+     */
+    private static final class BufferPool {
+
+        private char[][] pool;
+        private boolean[] allocated;
+        private int defaultBufferSize;
+
+        private BufferPool(final int poolSize, final int defaultBufferSize) {
+
+            super();
+
+            this.pool = new char[poolSize][];
+            this.allocated = new boolean[poolSize];
+            this.defaultBufferSize = defaultBufferSize;
+
+            for (int i = 0; i < this.pool.length; i++) {
+                this.pool[i] = new char[this.defaultBufferSize];
+            }
+            Arrays.fill(this.allocated, false);
+
+        }
+
+        private synchronized char[] allocateBuffer(final int bufferSize) {
+            if (bufferSize != this.defaultBufferSize) {
+                // We will only allocate buffers of the default size
+                return new char[bufferSize];
+            }
+            for (int i = 0; i < this.pool.length; i++) {
+                if (!this.allocated[i]) {
+                    this.allocated[i] = true;
+                    return this.pool[i];
+                }
+            }
+            return new char[bufferSize];
+        }
+
+        private synchronized void releaseBuffer(final char[] buffer) {
+            if (buffer == null) {
+                return;
+            }
+            if (buffer.length != this.defaultBufferSize) {
+                // This buffer is not part of the pool
+                return;
+            }
+            for (int i = 0; i < this.pool.length; i++) {
+                if (this.pool[i] == buffer) {
+                    // Found it. Mark it as non-allocated
+                    this.allocated[i] = false;
+                    return;
+                }
+            }
+            // The buffer wasn't part of our pool
+            return;
+        }
+
+
+    }
+
+
 }

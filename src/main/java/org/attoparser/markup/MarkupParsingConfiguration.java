@@ -29,7 +29,7 @@ import java.io.Serializable;
 /**
  * <p>
  *   Models a series of markup parsing parameterizations that can be applied during document parsing
- *   by {@link AbstractDetailedMarkupAttoHandler} (and its subclasses).
+ *   by {@link MarkupEventProcessor} (and its subclasses).
  * </p>
  * <p>
  *   For example, a this parameterizations can be used for checking the well-formedness

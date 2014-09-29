@@ -31,10 +31,10 @@ import org.attoparser.markup.html.elements.IHtmlElement;
  * 
  * @author Daniel Fern&aacute;ndez
  * 
- * @since 1.1
+ * @since 2.0.0
  *
  */
-public interface IDetailedHtmlElementHandling extends IHtmlAttributeSequenceHandling {
+public interface IDetailedHtmlElementHandling extends IDetailedHtmlAttributeSequenceHandling {
 
     
 

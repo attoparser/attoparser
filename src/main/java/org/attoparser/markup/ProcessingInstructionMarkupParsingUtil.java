@@ -33,7 +33,7 @@ import org.attoparser.IAttoHandleResult;
  * @since 1.0
  *
  */
-public final class ProcessingInstructionMarkupParsingUtil {
+final class ProcessingInstructionMarkupParsingUtil {
 
     
 
@@ -47,60 +47,12 @@ public final class ProcessingInstructionMarkupParsingUtil {
 
     
     
-    
-    
-    public static IAttoHandleResult parseProcessingInstruction(
-            final char[] buffer, 
-            final int offset, final int len, 
-            final int line, final int col, 
-            final IProcessingInstructionHandling handler)
-            throws AttoParseException {
-
-        final BestEffortParsingResult bestEffortParsingResult =
-                tryParseProcessingInstruction(buffer, offset, len, line, col, handler);
-        if (bestEffortParsingResult == null) {
-            throw new AttoParseException(
-                    "Could not parse as processing instruction: \"" + new String(buffer, offset, len) + "\"", line, col);
-        }
-
-        return bestEffortParsingResult.getHandleResult();
-
-    }
-
-    
-
-    
-    
-    static BestEffortParsingResult tryParseProcessingInstruction(
+    static IAttoHandleResult parseProcessingInstruction(
             final char[] buffer,
-            final int offset, final int len,
-            final int line, final int col,
-            final IProcessingInstructionHandling handler)
-            throws AttoParseException {
-
-        if (len >= 5 &&
-                isProcessingInstructionStart(buffer, offset, (offset + len)) &&
-                buffer[offset + len - 2] == '?' &&
-                buffer[offset + len - 1] == '>') {
-
-            return BestEffortParsingResult.forHandleResult(
-                    doParseProcessingInstruction(
-                        buffer, offset + 2, len - 4, offset, len, line, col, handler));
-
-        }
-
-        return null;
-
-    }
-
-
-
-    static IAttoHandleResult doParseProcessingInstruction(
-            final char[] buffer, 
-            final int internalOffset, final int internalLen, 
+            final int internalOffset, final int internalLen,
             final int outerOffset, final int outerLen,
-            final int line, final int col, 
-            final IProcessingInstructionHandling handler)
+            final int line, final int col,
+            final MarkupEventProcessor eventProcessor)
             throws AttoParseException {
 
         final int maxi = internalOffset + internalLen;
@@ -119,7 +71,7 @@ public final class ProcessingInstructionMarkupParsingUtil {
         if (targetEnd == -1) {
             // There is no content, only target
             
-            return handler.handleProcessingInstruction(
+            return eventProcessor.processProcessingInstruction(
                     buffer, 
                     i, maxi - i,                                      // target
                     line, col + 2,                                    // target
@@ -148,7 +100,7 @@ public final class ProcessingInstructionMarkupParsingUtil {
         if (contentStart == -1) {
             // There is no content. Only whitespace until the end of the structure
             
-            return handler.handleProcessingInstruction(
+            return eventProcessor.processProcessingInstruction(
                     buffer, 
                     targetOffset, targetLen,                          // target
                     line, col + 2,                                    // target
@@ -160,7 +112,7 @@ public final class ProcessingInstructionMarkupParsingUtil {
         }
 
         
-        return handler.handleProcessingInstruction(
+        return eventProcessor.processProcessingInstruction(
                 buffer, 
                 targetOffset, targetLen,                          // target
                 line, col + 2,                                    // target

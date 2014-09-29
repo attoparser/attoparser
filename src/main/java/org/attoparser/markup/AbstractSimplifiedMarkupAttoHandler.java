@@ -17,7 +17,7 @@
  * 
  * =============================================================================
  */
-package org.attoparser.markup.xml;
+package org.attoparser.markup;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -27,14 +27,26 @@ import org.attoparser.IAttoHandleResult;
 
 
 /**
+ * <p>
+ *   Base abstract implementations for markup-specialized attohandlers that offer an event
+ *   handling interface similar to that of the standard SAX {@link org.xml.sax.ContentHandler}.
+ * </p>
+ * <p>
+ *   Handlers extending from this class can make use of a {@link MarkupParsingConfiguration} instance
+ *   specifying a markup parsing configuration to be applied during document parsing (for example, 
+ *   for ensuring that a document is well-formed from an XML/XHTML standpoint).
+ * </p>
+ * <p>
+ *   This class provides empty implementations for all event handlers, so that
+ *   subclasses can override only the methods they need.
+ * </p>
  * 
  * @author Daniel Fern&aacute;ndez
  * 
- * @since 1.1
+ * @since 1.0
  *
  */
-public abstract class AbstractStandardXmlAttoHandler
-        extends AbstractXmlAttoHandler {
+public abstract class AbstractSimplifiedMarkupAttoHandler extends AbstractMarkupAttoHandler {
 
     
     private String currentElementName;
@@ -46,48 +58,29 @@ public abstract class AbstractStandardXmlAttoHandler
     
     
     
-    protected AbstractStandardXmlAttoHandler() {
+    protected AbstractSimplifiedMarkupAttoHandler() {
         super();
     }
-    
-    
 
-    @Override
-    public final IAttoHandleResult handleXmlStandaloneElementStart(
-            final char[] buffer, 
+
+
+
+    public final IElementPreparationResult prepareForElement(
+            final char[] buffer,
             final int nameOffset, final int nameLen,
-            final int line, final int col) 
+            final int line, final int col)
             throws AttoParseException {
-        
-        this.currentElementName = new String(buffer, nameOffset, nameLen);
-        this.currentElementAttributes = null;
-        this.currentElementLine = line;
-        this.currentElementCol = col;
 
         return null;
 
     }
 
-    
-    
-    @Override
-    public final IAttoHandleResult handleXmlStandaloneElementEnd(
-            final char[] buffer,
-            final int nameOffset, final int nameLen,
-            final int line, final int col)
-            throws AttoParseException {
-        
-        return handleXmlStandaloneElement(
-                this.currentElementName, this.currentElementAttributes, this.currentElementLine, this.currentElementCol);
-        
-    }
 
-    
-    
+
     @Override
-    public final IAttoHandleResult handleXmlOpenElementStart(
+    public final IAttoHandleResult handleStandaloneElementStart(
             final char[] buffer, 
-            final int nameOffset, final int nameLen, 
+            final int nameOffset, final int nameLen,
             final int line, final int col) 
             throws AttoParseException {
 
@@ -103,21 +96,20 @@ public abstract class AbstractStandardXmlAttoHandler
     
     
     @Override
-    public final IAttoHandleResult handleXmlOpenElementEnd(
+    public final IAttoHandleResult handleStandaloneElementEnd(
             final char[] buffer,
-            final int nameOffset, final int nameLen,
+            final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
-
-        return handleXmlOpenElement(
-                this.currentElementName, this.currentElementAttributes, this.currentElementLine, this.currentElementCol);
+        
+        return handleStandaloneElement(this.currentElementName, this.currentElementAttributes, this.currentElementLine, this.currentElementCol);
         
     }
 
     
     
     @Override
-    public final IAttoHandleResult handleXmlCloseElementStart(
+    public final IAttoHandleResult handleOpenElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen, 
             final int line, final int col) 
@@ -135,24 +127,55 @@ public abstract class AbstractStandardXmlAttoHandler
     
     
     @Override
-    public final IAttoHandleResult handleXmlCloseElementEnd(
+    public final IAttoHandleResult handleOpenElementEnd(
             final char[] buffer,
-            final int nameOffset, final int nameLen,
+            final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
 
-        return handleXmlCloseElement(
-                this.currentElementName, this.currentElementLine, this.currentElementCol);
+        return handleOpenElement(this.currentElementName, this.currentElementAttributes, this.currentElementLine, this.currentElementCol);
         
     }
 
-
-
+    
+    
     @Override
-    public final IAttoHandleResult handleXmlAutoCloseElementStart(
+    public final IAttoHandleResult handleCloseElementStart(
+            final char[] buffer, 
+            final int nameOffset, final int nameLen, 
+            final int line, final int col) 
+            throws AttoParseException {
+
+        this.currentElementName = new String(buffer, nameOffset, nameLen);
+        this.currentElementAttributes = null;
+        this.currentElementLine = line;
+        this.currentElementCol = col;
+
+        return null;
+        
+    }
+
+    
+    
+    @Override
+    public final IAttoHandleResult handleCloseElementEnd(
             final char[] buffer,
-            final int nameOffset, final int nameLen,
+            final int offset, final int len,
             final int line, final int col)
+            throws AttoParseException {
+
+        return handleCloseElement(this.currentElementName, this.currentElementLine, this.currentElementCol);
+        
+    }
+
+    
+    
+    
+    @Override
+    public final IAttoHandleResult handleAutoCloseElementStart(
+            final char[] buffer, 
+            final int nameOffset, final int nameLen, 
+            final int line, final int col) 
             throws AttoParseException {
 
         this.currentElementName = new String(buffer, nameOffset, nameLen);
@@ -164,17 +187,16 @@ public abstract class AbstractStandardXmlAttoHandler
 
     }
 
-
-
+    
+    
     @Override
-    public final IAttoHandleResult handleXmlAutoCloseElementEnd(
+    public final IAttoHandleResult handleAutoCloseElementEnd(
             final char[] buffer,
-            final int nameOffset, final int nameLen,
+            final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
 
-        return handleXmlCloseElement(
-                this.currentElementName, this.currentElementLine, this.currentElementCol);
+        return handleAutoClosedElement(this.currentElementName, this.currentElementLine, this.currentElementCol);
 
     }
 
@@ -182,7 +204,39 @@ public abstract class AbstractStandardXmlAttoHandler
     
     
     @Override
-    public final IAttoHandleResult handleXmlAttribute(
+    public final IAttoHandleResult handleUnmatchedCloseElementStart(
+            final char[] buffer, 
+            final int nameOffset, final int nameLen, 
+            final int line, final int col) 
+            throws AttoParseException {
+
+        this.currentElementName = new String(buffer, nameOffset, nameLen);
+        this.currentElementAttributes = null;
+        this.currentElementLine = line;
+        this.currentElementCol = col;
+
+        return null;
+
+    }
+
+    
+    
+    @Override
+    public final IAttoHandleResult handleUnmatchedCloseElementEnd(
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException {
+
+        return handleUnmatchedClosedElement(this.currentElementName, this.currentElementLine, this.currentElementCol);
+        
+    }
+
+    
+    
+    
+    @Override
+    public final IAttoHandleResult handleAttribute(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol, 
@@ -210,14 +264,15 @@ public abstract class AbstractStandardXmlAttoHandler
     
     
     @Override
-    public final IAttoHandleResult handleXmlInnerWhiteSpace(
+    public final IAttoHandleResult handleInnerWhiteSpace(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col) 
             throws AttoParseException {
 
+        // Nothing to be done here - we will ignore inner whitespace
         return null;
-
+        
     }
 
     
@@ -348,8 +403,7 @@ public abstract class AbstractStandardXmlAttoHandler
      * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    @SuppressWarnings("unused")
-    public IAttoHandleResult handleXmlStandaloneElement(
+    public IAttoHandleResult handleStandaloneElement(
             final String elementName, final Map<String,String> attributes,
             final int line, final int col)
             throws AttoParseException {
@@ -373,8 +427,7 @@ public abstract class AbstractStandardXmlAttoHandler
      * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    @SuppressWarnings("unused")
-    public IAttoHandleResult handleXmlOpenElement(
+    public IAttoHandleResult handleOpenElement(
             final String elementName, final Map<String,String> attributes,
             final int line, final int col)
             throws AttoParseException {
@@ -394,8 +447,53 @@ public abstract class AbstractStandardXmlAttoHandler
      * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    @SuppressWarnings("unused")
-    public IAttoHandleResult handleXmlCloseElement(
+    public IAttoHandleResult handleCloseElement(
+            final String elementName, final int line, final int col)
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
+        return null;
+    }
+    
+
+    /**
+     * <p>
+     *   Called when a close element (a <i>close tag</i>) is needed in order
+     *   to correctly balance the markup. This is called <i>autoclosing</i>.
+     * </p>
+     * <p>
+     *   Implementors might choose to ignore these autoclosing events.
+     * </p>
+     * 
+     * @param elementName the element name (e.g. "&lt;/div&gt;" -> "div").
+     * @param line the line in the document where this elements appears.
+     * @param col the column in the document where this element appears.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
+     * @throws AttoParseException
+     */
+    public IAttoHandleResult handleAutoClosedElement(
+            final String elementName, final int line, final int col)
+            throws AttoParseException {
+        // Nothing to be done here, meant to be overridden if required
+        return null;
+    }
+    
+
+    /**
+     * <p>
+     *   Called when a close element (a <i>close tag</i>) appears without
+     *   a corresponding <i>open element</i>.
+     * </p>
+     * <p>
+     *   Implementors might choose to ignore these events.
+     * </p>
+     * 
+     * @param elementName the element name (e.g. "&lt;/div&gt;" -> "div").
+     * @param line the line in the document where this elements appears.
+     * @param col the column in the document where this element appears.
+     * @return the result of handling the event, or null if no relevant result has to be returned.
+     * @throws AttoParseException
+     */
+    public IAttoHandleResult handleUnmatchedClosedElement(
             final String elementName, final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
@@ -418,7 +516,6 @@ public abstract class AbstractStandardXmlAttoHandler
      * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    @SuppressWarnings("unused")
     public IAttoHandleResult handleDocType(
             final String elementName, final String publicId, final String systemId, 
             final String internalSubset, final int line, final int col)
@@ -447,7 +544,6 @@ public abstract class AbstractStandardXmlAttoHandler
      * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    @SuppressWarnings("unused")
     public IAttoHandleResult handleComment(
             final char[] buffer, final int offset, final int len, 
             final int line, final int col)
@@ -476,7 +572,6 @@ public abstract class AbstractStandardXmlAttoHandler
      * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    @SuppressWarnings("unused")
     public IAttoHandleResult handleCDATASection(
             final char[] buffer, final int offset, final int len, 
             final int line, final int col)
@@ -500,7 +595,6 @@ public abstract class AbstractStandardXmlAttoHandler
      * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    @SuppressWarnings("unused")
     public IAttoHandleResult handleXmlDeclaration(
             final String version, 
             final String encoding, 
@@ -525,7 +619,6 @@ public abstract class AbstractStandardXmlAttoHandler
      * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    @SuppressWarnings("unused")
     public IAttoHandleResult handleProcessingInstruction(
             final String target, final String content, 
             final int line, final int col) 

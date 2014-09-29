@@ -74,21 +74,21 @@ package org.attoparser;
  *   <li>{@link org.attoparser.markup.AbstractBasicMarkupAttoHandler}: markup-specialized
  *       (XML and HTML) abstract handler able to differentiate among different
  *       types of markup structures: Elements, comments, CDATA, DOCTYPE, etc.</li>
- *   <li>{@link org.attoparser.markup.AbstractDetailedMarkupAttoHandler}: markup-specialized
+ *   <li>{@link org.attoparser.markup.MarkupEventProcessor}: markup-specialized
  *       (XML and HTML) abstract handler able not only to differentiate among different
  *       types of markup structures, but also of reporting lowel-level detail inside
  *       elements (name, attributes, inner whitespace) and DOCTYPE clauses.</li>
- *   <li>{@link org.attoparser.markup.AbstractStandardMarkupAttoHandler}: higher-level
+ *   <li>{@link org.attoparser.markup.AbstractSimplifiedMarkupAttoHandler}: higher-level
  *       markup-specialized (XML and HTML) abstract handler that offers an interface
  *       more similar to the Standard SAX {@link org.xml.sax.ContentHandler}s (use of 
  *       Strings instead of char[]'s, attribute maps, etc).</li>
- *   <li>{@link org.attoparser.markup.xml.AbstractDetailedXmlAttoHandler}: XML-specialized
- *       abstract handler equivalent to {@link org.attoparser.markup.AbstractDetailedMarkupAttoHandler}
+ *   <li>{@link org.attoparser.markup.xml.AbstractXmlAttoHandler}: XML-specialized
+ *       abstract handler equivalent to {@link org.attoparser.markup.MarkupEventProcessor}
  *       but only allowing XML markup.</li>
  *   <li>{@link org.attoparser.markup.xml.AbstractStandardXmlAttoHandler}: XML-specialized
- *       abstract handler equivalent to {@link org.attoparser.markup.AbstractStandardMarkupAttoHandler}
+ *       abstract handler equivalent to {@link org.attoparser.markup.AbstractSimplifiedMarkupAttoHandler}
  *       but only allowing XML markup.</li>
- *   <li>{@link org.attoparser.markup.xml.DOMXmlAttoHandler}: handler implementation
+ *   <li>{@link org.attoparser.markup.xml.dom.DOMXmlAttoHandler}: handler implementation
  *       (non-abstract) for building an attoDOM tree (DOM node tres based on classes
  *       from the <tt>org.attoparser.markup.dom</tt> package) from XML markup.</li> 
  * </ul>
@@ -116,110 +116,34 @@ package org.attoparser;
  */
 public interface IAttoHandler {
 
-    
+
     /**
      * <p>
      *   Called at the beginning of document parsing.
      * </p>
-     * 
+     *
+     * @param startTimeNanos the current time (in nanoseconds) obtained when parsing starts.
      * @param line the line of the document where parsing starts (usually number 1)
      * @param col the column of the document where parsing starts (usually number 1)
-     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public IAttoHandleResult handleDocumentStart(final int line, final int col)
+    public IAttoHandleResult handleDocumentStart(final long startTimeNanos, final int line, final int col)
             throws AttoParseException;
-    
-    
+
     /**
      * <p>
      *   Called at the end of document parsing.
      * </p>
-     * 
+     *
+     * @param endTimeNanos the current time (in nanoseconds) obtained when parsing ends.
+     * @param totalTimeNanos the difference between current times at the start and end of
+     *        parsing (in nanoseconds)
      * @param line the line of the document where parsing ends (usually the last one)
      * @param col the column of the document where the parsing ends (usually the last one)
-     * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public IAttoHandleResult handleDocumentEnd(final int line, final int col)
+    public IAttoHandleResult handleDocumentEnd(
+            final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
             throws AttoParseException;
 
-    
-    /**
-     * <p>
-     *   Called when a <i>text</i> artifact is found.
-     * </p>
-     * <p>
-     *   A sequence of chars is considered to be <i>text</i> when no structures of any kind are
-     *   contained inside it. In markup parsers, for example, this means no tags (a.k.a. <i>elements</i>),
-     *   DOCTYPE's, processing instructions, etc. are contained in the sequence.
-     * </p>
-     * <p>
-     *   Text sequences might include any number of new line and/or control characters.
-     * </p>
-     * <p>
-     *   Text artifacts are reported using the document <tt>buffer</tt> directly, and this buffer 
-     *   should not be considered to be immutable, so reported texts should be copied if they need
-     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
-     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification). 
-     * </p>
-     * <p>
-     *   <b>Implementations of this handler should never modify the document buffer.</b> 
-     * </p>
-     * 
-     * @param buffer the document buffer (not copied)
-     * @param offset the offset (position in buffer) where the text artifact starts.
-     * @param len the length (in chars) of the text artifact, starting in offset.
-     * @param line the line in the original document where this text artifact starts.
-     * @param col the column in the original document where this text artifact starts.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws AttoParseException
-     */
-    public IAttoHandleResult handleText(final char[] buffer, final int offset, final int len,
-            final int line, final int col)
-            throws AttoParseException;
-
-    
-    /**
-     * <p>
-     *   Called when a <i>structure</i> artifact is found.
-     * </p>
-     * <p>
-     *   Depending on the specific {@link IAttoParser} implementation being used, 
-     *   <i>"structure"</i> might have a different meaning. In markup-oriented parsers (like the default
-     *   {@link org.attoparser.markup.MarkupAttoParser}) implementation provided, structures
-     *   like tags (a.k.a. <i>elements</i>), DOCTYPEs, XML Declarations, processing instructions, 
-     *   etc. are reported using this event handler.
-     * </p>
-     * <p>
-     *   Lower-level {@link IAttoHandler} implementations will usually provide a finer-grained
-     *   differentiation among the different types of structures (see for example
-     *   {@link org.attoparser.markup.AbstractBasicMarkupAttoHandler} or
-     *   {@link org.attoparser.markup.AbstractDetailedMarkupAttoHandler}).
-     * </p>
-     * <p>
-     *   Structure artifacts are reported using the document <tt>buffer</tt> directly, and this buffer
-     *   should not be considered to be immutable, so reported structures should be copied if they need
-     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
-     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification). 
-     * </p>
-     * <p>
-     *   <b>Implementations of this handler should never modify the document buffer.</b> 
-     * </p>
-     *
-     * @param structureType the type of structure that the parser thinks this is (might be corrected if needed)
-     * @param buffer the document buffer (not copied)
-     * @param offset the offset (position in buffer) where the structure artifact starts.
-     * @param len the length (in chars) of the structure artifact, starting in offset.
-     * @param line the line in the original document where this structure artifact starts.
-     * @param col the column in the original document where this structure artifact starts.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws AttoParseException
-     */
-    public IAttoHandleResult handleStructure(
-            final StructureType structureType,
-            final char[] buffer, final int offset, final int len,
-            final int line, final int col)
-            throws AttoParseException;
-    
 }

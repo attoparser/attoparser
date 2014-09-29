@@ -33,7 +33,7 @@ import org.attoparser.IAttoHandleResult;
  * @since 1.0
  *
  */
-public final class DocTypeMarkupParsingUtil {
+final class DocTypeMarkupParsingUtil {
 
     
     private static final char[] DOCTYPE_TYPE_PUBLIC_UPPER = "PUBLIC".toCharArray();
@@ -52,108 +52,11 @@ public final class DocTypeMarkupParsingUtil {
 
     
     
-    
-    
-    public static IAttoHandleResult parseDocType(
-            final char[] buffer, 
-            final int offset, final int len, 
-            final int line, final int col, 
-            final IBasicDocTypeHandling handler)
-            throws AttoParseException {
-
-        final BestEffortParsingResult bestEffortParsingResult =
-                tryParseDocType(buffer, offset, len, line, col, handler);
-        if (bestEffortParsingResult == null) {
-            throw new AttoParseException(
-                    "Could not parse as markup DOCTYPE clause: \"" + new String(buffer, offset, len) + "\"", line, col);
-        }
-
-        return bestEffortParsingResult.getHandleResult();
-
-    }
-    
-    
-    
-    static BestEffortParsingResult tryParseDocType(
-            final char[] buffer, 
-            final int offset, final int len, 
-            final int line, final int col, 
-            final IBasicDocTypeHandling handler)
-            throws AttoParseException {
-
-        if (len >= 10 && 
-                isDocTypeStart(buffer, offset, (offset + len)) &&
-                buffer[offset + len - 1] == '>') {
-            
-            final char c9 = buffer[offset + 9];
-            final int contentOffset =
-                ((c9 == ' ' || Character.isWhitespace(c9))? 10 : 9);
-            
-            return BestEffortParsingResult.forHandleResult(
-                    handler.handleDocType(buffer, offset + contentOffset, (len - contentOffset) - 1, offset, len, line, col));
-            
-        }
-        
-        return null;
-        
-    }
-
-    
-    
-    
-    
-    public static IAttoHandleResult parseDetailedDocType(
-            final char[] buffer, 
-            final int offset, final int len, 
-            final int line, final int col, 
-            final IDetailedDocTypeHandling handler)
-            throws AttoParseException {
-
-        final BestEffortParsingResult bestEffortParsingResult =
-                tryParseDetailedDocType(buffer, offset, len, line, col, handler);
-        if (bestEffortParsingResult == null) {
-            throw new AttoParseException(
-                    "Could not parse as a well-formed DOCTYPE clause: \"" + new String(buffer, offset, len) + "\"", line, col);
-        }
-
-        return bestEffortParsingResult.getHandleResult();
-
-    }
-    
-
-    
-    
-
-
-    
-    
-    static BestEffortParsingResult tryParseDetailedDocType(
-            final char[] buffer, 
-            final int offset, final int len, 
-            final int line, final int col, 
-            final IDetailedDocTypeHandling handler)
-            throws AttoParseException {
-
-        if (len >= 10 && 
-                isDocTypeStart(buffer, offset, (offset + len)) &&
-                buffer[offset + len - 1] == '>') {
-            
-            return BestEffortParsingResult.forHandleResult(
-                    doParseDetailedDocType(buffer, offset, len, line, col, handler));
-
-        }
-        
-        return null;
-        
-    }
-    
-    
-    
-    private static IAttoHandleResult doParseDetailedDocType(
+    static IAttoHandleResult parseDocType(
             final char[] buffer,
-            final int offset, final int len, 
-            final int line, final int col, 
-            final IDetailedDocTypeHandling handler)
+            final int offset, final int len,
+            final int line, final int col,
+            final MarkupEventProcessor eventProcessor)
             throws AttoParseException {
         
         final int internalOffset = offset + 2;
@@ -165,7 +68,7 @@ public final class DocTypeMarkupParsingUtil {
         if (internalSubsetLastChar == -1) {
             return doParseDetailedDocTypeWithInternalSubset(
                     buffer, internalOffset, internalLen, offset, len, line, col, 
-                    0, 0, 0, 0, handler);
+                    0, 0, 0, 0, eventProcessor);
         }
 
         final int maxi = internalOffset + internalLen;
@@ -191,7 +94,7 @@ public final class DocTypeMarkupParsingUtil {
                 buffer, internalOffset, (internalSubsetStart - internalOffset), offset, len, line, col, 
                 internalSubsetStart + 1, (internalSubsetLastChar - internalSubsetStart) - 1, 
                 locator[0], locator[1], 
-                handler);
+                eventProcessor);
         
         
     }
@@ -208,7 +111,7 @@ public final class DocTypeMarkupParsingUtil {
             final int line, final int col, 
             final int internalSubsetOffset, final int internalSubsetLen,
             final int internalSubsetLine, final int internalSubsetCol,
-            final IDetailedDocTypeHandling handler)
+            final MarkupEventProcessor eventProcessor)
             throws AttoParseException {
 
         final int maxi = contentOffset + contentLen;
@@ -227,7 +130,7 @@ public final class DocTypeMarkupParsingUtil {
         if (keywordEnd == -1) {
             // The buffer only contains the DOCTYPE keyword. Weird but true.
             
-            return handler.handleDocType(
+            return eventProcessor.processDocType(
                     buffer, 
                     i, maxi - i,                                                // keyword 
                     line, col + 2,                                              // keyword
@@ -270,7 +173,7 @@ public final class DocTypeMarkupParsingUtil {
         if (elementNameStart == -1) {
             // There is no element name. Only whitespace until the end of the DOCTYPE structure
             
-            return handler.handleDocType(
+            return eventProcessor.processDocType(
                     buffer, 
                     keywordOffset, keywordLen,                                  // keyword 
                     keywordLine, keywordCol,                                    // keyword
@@ -308,7 +211,7 @@ public final class DocTypeMarkupParsingUtil {
         if (elementNameEnd == -1) {
             // The element name is the last thing to appear in the structure
             
-            return handler.handleDocType(
+            return eventProcessor.processDocType(
                     buffer, 
                     keywordOffset, keywordLen,                                  // keyword 
                     keywordLine, keywordCol,                                    // keyword
@@ -351,7 +254,7 @@ public final class DocTypeMarkupParsingUtil {
         if (typeStart == -1) {
             // There is no type. Only whitespace until the end of the DOCTYPE structure
             
-            return handler.handleDocType(
+            return eventProcessor.processDocType(
                     buffer, 
                     keywordOffset, keywordLen,                                  // keyword 
                     keywordLine, keywordCol,                                    // keyword
@@ -483,7 +386,7 @@ public final class DocTypeMarkupParsingUtil {
             if (isTypePublic) {
                 // If type is PUBLIC and we only have one spec, it is the publicId
                 
-                return handler.handleDocType(
+                return eventProcessor.processDocType(
                         buffer, 
                         keywordOffset, keywordLen,                                  // keyword 
                         keywordLine, keywordCol,                                    // keyword
@@ -503,7 +406,7 @@ public final class DocTypeMarkupParsingUtil {
 
             }
             
-            return handler.handleDocType(
+            return eventProcessor.processDocType(
                     buffer, 
                     keywordOffset, keywordLen,                                  // keyword 
                     keywordLine, keywordCol,                                    // keyword
@@ -561,7 +464,7 @@ public final class DocTypeMarkupParsingUtil {
             if (isTypePublic) {
                 // If type is PUBLIC and we only have one spec, it is the publicId
                 
-                return handler.handleDocType(
+                return eventProcessor.processDocType(
                         buffer, 
                         keywordOffset, keywordLen,                                  // keyword 
                         keywordLine, keywordCol,                                    // keyword
@@ -581,7 +484,7 @@ public final class DocTypeMarkupParsingUtil {
 
             }
             
-            return handler.handleDocType(
+            return eventProcessor.processDocType(
                     buffer, 
                     keywordOffset, keywordLen,                                  // keyword 
                     keywordLine, keywordCol,                                    // keyword
@@ -643,7 +546,7 @@ public final class DocTypeMarkupParsingUtil {
 
             }
             
-            return handler.handleDocType(
+            return eventProcessor.processDocType(
                     buffer, 
                     keywordOffset, keywordLen,                                  // keyword 
                     keywordLine, keywordCol,                                    // keyword
@@ -722,7 +625,7 @@ public final class DocTypeMarkupParsingUtil {
         
         // If everything we can find until the end of the clause is whitespace, we are fine
         
-        return handler.handleDocType(
+        return eventProcessor.processDocType(
                 buffer, 
                 keywordOffset, keywordLen,                                  // keyword 
                 keywordLine, keywordCol,                                    // keyword

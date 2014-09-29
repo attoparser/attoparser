@@ -41,21 +41,21 @@ import java.io.Reader;
  *   <li>{@link org.attoparser.markup.AbstractBasicMarkupAttoHandler}: markup-specialized
  *       (XML and HTML) abstract handler able to differentiate among different
  *       types of markup structures: Elements, comments, CDATA, DOCTYPE, etc.</li>
- *   <li>{@link org.attoparser.markup.AbstractDetailedMarkupAttoHandler}: markup-specialized
+ *   <li>{@link org.attoparser.markup.MarkupEventProcessor}: markup-specialized
  *       (XML and HTML) abstract handler able not only to differentiate among different
  *       types of markup structures, but also of reporting lowel-level detail inside
  *       elements (name, attributes, inner whitespace) and DOCTYPE clauses.</li>
- *   <li>{@link org.attoparser.markup.AbstractStandardMarkupAttoHandler}: higher-level
+ *   <li>{@link org.attoparser.markup.AbstractSimplifiedMarkupAttoHandler}: higher-level
  *       markup-specialized (XML and HTML) abstract handler that offers an interface
  *       more similar to the Standard SAX ContentHandlers (use of Strings instead of
  *       char[]'s, attribute maps, etc).</li>
- *   <li>{@link org.attoparser.markup.xml.AbstractDetailedXmlAttoHandler}: XML-specialized
- *       abstract handler equivalent to {@link org.attoparser.markup.AbstractDetailedMarkupAttoHandler}
+ *   <li>{@link org.attoparser.markup.xml.AbstractXmlAttoHandler}: XML-specialized
+ *       abstract handler equivalent to {@link org.attoparser.markup.MarkupEventProcessor}
  *       but only allowing XML markup.</li>
  *   <li>{@link org.attoparser.markup.xml.AbstractStandardXmlAttoHandler}: XML-specialized
- *       abstract handler equivalent to {@link org.attoparser.markup.AbstractStandardMarkupAttoHandler}
+ *       abstract handler equivalent to {@link org.attoparser.markup.AbstractSimplifiedMarkupAttoHandler}
  *       but only allowing XML markup.</li>
- *   <li>{@link org.attoparser.markup.xml.DOMXmlAttoHandler}: handler implementation
+ *   <li>{@link org.attoparser.markup.xml.dom.DOMXmlAttoHandler}: handler implementation
  *       (non-abstract) for building an attoDOM tree (DOM node tres based on classes
  *       from the <tt>org.attoparser.markup.dom</tt> package) from XML markup.</li> 
  * </ul>

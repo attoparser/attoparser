@@ -56,7 +56,7 @@ public class XmlParsing {
 
     
 
-    public static MarkupParsingConfiguration xmlParsingConfiguration() {
+    public static MarkupParsingConfiguration baseXmlParsingConfiguration() {
         try {
             return XML_PARSING_CONFIGURATION.clone();
         } catch (final CloneNotSupportedException e) {

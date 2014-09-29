@@ -19,35 +19,39 @@
  */
 package org.attoparser.markup;
 
+import org.attoparser.AttoParseException;
+import org.attoparser.IAttoHandleResult;
+
+
 /**
- * <p>
- *   Class containing utility methods for parsing comments.
- * </p>
- * 
+ *
  * @author Daniel Fern&aacute;ndez
  * 
- * @since 1.0
+ * @since 2.0.0
  *
  */
-final class CommentMarkupParsingUtil {
-    
+interface IMarkupEventAttributeProcessor {
 
 
-    
-    private CommentMarkupParsingUtil() {
-        super();
-    }
 
-    
+    IAttoHandleResult processAttribute(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int nameLine, final int nameCol,
+            final int operatorOffset, final int operatorLen,
+            final int operatorLine, final int operatorCol,
+            final int valueContentOffset, final int valueContentLen,
+            final int valueOuterOffset, final int valueOuterLen,
+            final int valueLine, final int valueCol)
+            throws AttoParseException;
 
 
-    
-    static boolean isCommentStart(final char[] buffer, final int offset, final int maxi) {
-        return ((maxi - offset > 3) && 
-                    buffer[offset] == '<' &&
-                    buffer[offset + 1] == '!' &&
-                    buffer[offset + 2] == '-' && 
-                    buffer[offset + 3] == '-');
-    }
-    
+
+    IAttoHandleResult processInnerWhiteSpace(
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException;
+
+
 }
