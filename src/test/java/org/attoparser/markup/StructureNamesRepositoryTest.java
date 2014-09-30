@@ -20,7 +20,7 @@
 package org.attoparser.markup;
 
 import junit.framework.TestCase;
-import org.attoparser.markup.html.elements.HtmlElements;
+import org.attoparser.markup.html.HtmlNames;
 
 
 /**
@@ -39,19 +39,27 @@ public class StructureNamesRepositoryTest extends TestCase {
         final MarkupEventProcessor.StructureNamesRepository structureNamesRepository = new MarkupEventProcessor.StructureNamesRepository();
 
 
-        final char[][] elementNamesCharArr = new char[HtmlElements.ALL_STANDARD_ELEMENT_NAMES.size()][];
+        final char[][] structureNamesArr = new char[HtmlNames.ALL_STANDARD_ELEMENT_NAMES.size() * 2 + HtmlNames.ALL_STANDARD_ATTRIBUTE_NAMES.size() * 2][];
         int j = 0;
-        for (final String elementName : HtmlElements.ALL_STANDARD_ELEMENT_NAMES) {
-            elementNamesCharArr[j++] =
+        for (final String elementName : HtmlNames.ALL_STANDARD_ELEMENT_NAMES) {
+            structureNamesArr[j++] =
                     structureNamesRepository.getStructureName(elementName.toCharArray(), 0, elementName.length());
+            structureNamesArr[j++] =
+                    structureNamesRepository.getStructureName(elementName.toUpperCase().toCharArray(), 0, elementName.length());
+        }
+        for (final String attributeName : HtmlNames.ALL_STANDARD_ATTRIBUTE_NAMES) {
+            structureNamesArr[j++] =
+                    structureNamesRepository.getStructureName(attributeName.toCharArray(), 0, attributeName.length());
+            structureNamesArr[j++] =
+                    structureNamesRepository.getStructureName(attributeName.toUpperCase().toCharArray(), 0, attributeName.length());
         }
 
 
         for (int i = 0; i < 1000000; i++) {
-            for (final char[] elementName : elementNamesCharArr) {
+            for (final char[] structureName : structureNamesArr) {
                 final char[] sn =
-                        structureNamesRepository.getStructureName(elementName, 0, elementName.length);
-                assertSame(elementName, sn);
+                        structureNamesRepository.getStructureName(structureName, 0, structureName.length);
+                assertSame(structureName, sn);
             }
         }
 

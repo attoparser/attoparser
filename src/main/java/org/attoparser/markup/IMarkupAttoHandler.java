@@ -339,14 +339,15 @@ public interface IMarkupAttoHandler extends IAttoHandler {
      * @param buffer the document buffer (not copied)
      * @param nameOffset the offset (position in buffer) where the element name appears.
      * @param nameLen the length (in chars) of the element name.
+     * @param minimized whether the element has been found minimized (&lt;element/&gt;)in code or not.
      * @param line the line in the original document where this artifact starts.
-     * @param col the column in the original document where this artifact starts.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
+     * @param col the column in the original document where this artifact starts.   @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
     public IAttoHandleResult handleStandaloneElementStart(
             final char[] buffer,
             final int nameOffset, final int nameLen,
+            final boolean minimized,
             final int line, final int col)
             throws AttoParseException;
 
@@ -358,14 +359,15 @@ public interface IMarkupAttoHandler extends IAttoHandler {
      * @param buffer the document buffer (not copied)
      * @param nameOffset the offset (position in buffer) where the element name appears.
      * @param nameLen the length (in chars) of the element name.
+     * @param minimized whether the element has been found minimized (&lt;element/&gt;)in code or not.
      * @param line the line in the original document where the element ending structure appears.
-     * @param col the column in the original document where the element ending structure appears.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
+     * @param col the column in the original document where the element ending structure appears.   @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
     public IAttoHandleResult handleStandaloneElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
+            final boolean minimized,
             final int line, final int col)
             throws AttoParseException;
 

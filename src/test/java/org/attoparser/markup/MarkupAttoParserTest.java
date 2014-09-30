@@ -21,6 +21,7 @@ package org.attoparser.markup;
 
 import java.io.CharArrayReader;
 import java.io.StringWriter;
+import java.util.List;
 
 import junit.framework.ComparisonFailure;
 import junit.framework.TestCase;
@@ -30,11 +31,11 @@ import org.attoparser.IAttoParser;
 import org.attoparser.markup.MarkupParsingConfiguration.ElementBalancing;
 import org.attoparser.markup.MarkupParsingConfiguration.PrologPresence;
 import org.attoparser.markup.MarkupParsingConfiguration.UniqueRootElementPresence;
-import org.attoparser.markup.handlers.directoutput.DirectOutputMarkupAttoHandler;
-import org.attoparser.markup.handlers.trace.TextTracerMarkupAttoHandler;
-import org.attoparser.markup.handlers.trace.TextTracerSimplifiedMarkupAttoHandler;
-import org.attoparser.markup.html.HtmlParsing;
-import org.attoparser.markup.html.handlers.trace.TextTracerHtmlAttoHandler;
+import org.attoparser.markup.directoutput.DirectOutputMarkupAttoHandler;
+import org.attoparser.markup.html.HtmlMarkupAttoHandler;
+import org.attoparser.markup.simple.SimplifierMarkupAttoHandler;
+import org.attoparser.markup.trace.MarkupParsingTraceEvent;
+import org.attoparser.markup.trace.TraceBuilderMarkupAttoHandler;
 
 
 /**
@@ -86,22 +87,22 @@ public class MarkupAttoParserTest extends TestCase {
         final IAttoParser p = new MarkupAttoParser(noRestrictions);
         
         StringWriter sw1 = new StringWriter();
-        IAttoHandler h = new TextTracerSimplifiedMarkupAttoHandler(sw1);
+        IAttoHandler h = new SimplifierMarkupAttoHandler(new TextTracerSimpleMarkupAttoHandler(sw1));
         p.parse(dt1, h);
         assertEquals("[DT()()()(){1,1}]", sw1.toString());
 
         StringWriter sw2 = new StringWriter();
-        h = new TextTracerSimplifiedMarkupAttoHandler(sw2);
+        h = new SimplifierMarkupAttoHandler(new TextTracerSimpleMarkupAttoHandler(sw2));
         p.parse(dt2, h);
         assertEquals("[DT(html)()()(){1,1}]", sw2.toString());
 
         StringWriter sw3 = new StringWriter();
-        h = new TextTracerSimplifiedMarkupAttoHandler(sw3);
+        h = new SimplifierMarkupAttoHandler(new TextTracerSimpleMarkupAttoHandler(sw3));
         p.parse(dt3, h);
         assertEquals("[DT(html)(lala)()(){1,1}]", sw3.toString());
 
         StringWriter sw4 = new StringWriter();
-        h = new TextTracerSimplifiedMarkupAttoHandler(sw4);
+        h = new SimplifierMarkupAttoHandler(new TextTracerSimpleMarkupAttoHandler(sw4));
         p.parse(dt4, h);
         assertEquals("[DT(html)(aaa)()(<!ELEMENT>){1,1}]", sw4.toString());
 
@@ -109,100 +110,100 @@ public class MarkupAttoParserTest extends TestCase {
 
         testHtmlDoc(
             "<img src=\"hello\">Something",
-            "[USES(img){1,1}AS( ){1,5}A(src){1,6}(=){1,9}(\"hello\"){1,10}USEE{1,17}T(Something){1,18}]",
+            "[NSES(img){1,1}IWS( ){1,5}A(src){1,6}(=){1,9}(\"hello\"){1,10}NSEE(img){1,17}T(Something){1,18}]",
             noRestrictionsAutoClose);
         testHtmlDoc(
             "<p><img src=\"hello\">Something</p>",
-            "[OES(p){1,1}OEE{1,3}USES(img){1,4}AS( ){1,8}A(src){1,9}(=){1,12}(\"hello\"){1,13}USEE{1,20}T(Something){1,21}CES(p){1,30}CEE{1,33}]",
+            "[OES(p){1,1}OEE(p){1,3}NSES(img){1,4}IWS( ){1,8}A(src){1,9}(=){1,12}(\"hello\"){1,13}NSEE(img){1,20}T(Something){1,21}CES(p){1,30}CEE(p){1,33}]",
             noRestrictionsAutoClose);
         testHtmlDoc(
             "<ul><li>a",
-            "[OES(ul){1,1}OEE{1,4}OES(li){1,5}OEE{1,8}T(a){1,9}ACES(li){1,10}ACEE{1,10}ACES(ul){1,10}ACEE{1,10}]",
+            "[OES(ul){1,1}OEE(ul){1,4}OES(li){1,5}OEE(li){1,8}T(a){1,9}ACES(li){1,10}ACEE(li){1,10}ACES(ul){1,10}ACEE(ul){1,10}]",
             noRestrictionsAutoClose);
         testHtmlDoc(
             "<ul><li>a</ul>",
-            "[OES(ul){1,1}OEE{1,4}OES(li){1,5}OEE{1,8}T(a){1,9}ACES(li){1,10}ACEE{1,10}CES(ul){1,10}CEE{1,14}]",
+            "[OES(ul){1,1}OEE(ul){1,4}OES(li){1,5}OEE(li){1,8}T(a){1,9}ACES(li){1,10}ACEE(li){1,10}CES(ul){1,10}CEE(ul){1,14}]",
             noRestrictionsAutoClose);
         testHtmlDoc(
             "<ul><li>a<li>b</ul>",
-            "[OES(ul){1,1}OEE{1,4}OES(li){1,5}OEE{1,8}T(a){1,9}ACES(li){1,10}ACEE{1,10}OES(li){1,10}OEE{1,13}T(b){1,14}ACES(li){1,15}ACEE{1,15}CES(ul){1,15}CEE{1,19}]",
+            "[OES(ul){1,1}OEE(ul){1,4}OES(li){1,5}OEE(li){1,8}T(a){1,9}ACES(li){1,10}ACEE(li){1,10}OES(li){1,10}OEE(li){1,13}T(b){1,14}ACES(li){1,15}ACEE(li){1,15}CES(ul){1,15}CEE(ul){1,19}]",
             noRestrictionsAutoClose);
         testHtmlDoc(
             "<ul><li>a<span>lala<li>b</ul>",
-            "[OES(ul){1,1}OEE{1,4}OES(li){1,5}OEE{1,8}T(a){1,9}OES(span){1,10}OEE{1,15}T(lala){1,16}ACES(span){1,20}ACEE{1,20}ACES(li){1,20}ACEE{1,20}OES(li){1,20}OEE{1,23}T(b){1,24}ACES(li){1,25}ACEE{1,25}CES(ul){1,25}CEE{1,29}]",
+            "[OES(ul){1,1}OEE(ul){1,4}OES(li){1,5}OEE(li){1,8}T(a){1,9}OES(span){1,10}OEE(span){1,15}T(lala){1,16}ACES(span){1,20}ACEE(span){1,20}ACES(li){1,20}ACEE(li){1,20}OES(li){1,20}OEE(li){1,23}T(b){1,24}ACES(li){1,25}ACEE(li){1,25}CES(ul){1,25}CEE(ul){1,29}]",
             noRestrictionsAutoClose);
         testHtmlDoc(
             "<table><thead><tr><th>A",
-            "[OES(table){1,1}OEE{1,7}OES(thead){1,8}OEE{1,14}OES(tr){1,15}OEE{1,18}OES(th){1,19}OEE{1,22}T(A){1,23}ACES(th){1,24}ACEE{1,24}ACES(tr){1,24}ACEE{1,24}ACES(thead){1,24}ACEE{1,24}ACES(table){1,24}ACEE{1,24}]",
+            "[OES(table){1,1}OEE(table){1,7}OES(thead){1,8}OEE(thead){1,14}OES(tr){1,15}OEE(tr){1,18}OES(th){1,19}OEE(th){1,22}T(A){1,23}ACES(th){1,24}ACEE(th){1,24}ACES(tr){1,24}ACEE(tr){1,24}ACES(thead){1,24}ACEE(thead){1,24}ACES(table){1,24}ACEE(table){1,24}]",
             noRestrictionsAutoClose);
         testHtmlDoc(
             "<table><thead><tr><th>A<th>B",
-            "[OES(table){1,1}OEE{1,7}OES(thead){1,8}OEE{1,14}OES(tr){1,15}OEE{1,18}OES(th){1,19}OEE{1,22}T(A){1,23}ACES(th){1,24}ACEE{1,24}OES(th){1,24}OEE{1,27}T(B){1,28}ACES(th){1,29}ACEE{1,29}ACES(tr){1,29}ACEE{1,29}ACES(thead){1,29}ACEE{1,29}ACES(table){1,29}ACEE{1,29}]",
+            "[OES(table){1,1}OEE(table){1,7}OES(thead){1,8}OEE(thead){1,14}OES(tr){1,15}OEE(tr){1,18}OES(th){1,19}OEE(th){1,22}T(A){1,23}ACES(th){1,24}ACEE(th){1,24}OES(th){1,24}OEE(th){1,27}T(B){1,28}ACES(th){1,29}ACEE(th){1,29}ACES(tr){1,29}ACEE(tr){1,29}ACES(thead){1,29}ACEE(thead){1,29}ACES(table){1,29}ACEE(table){1,29}]",
             noRestrictionsAutoClose);
         testHtmlDoc(
             "<table><thead><tr><th>A<td>B",
-            "[OES(table){1,1}OEE{1,7}OES(thead){1,8}OEE{1,14}OES(tr){1,15}OEE{1,18}OES(th){1,19}OEE{1,22}T(A){1,23}ACES(th){1,24}ACEE{1,24}OES(td){1,24}OEE{1,27}T(B){1,28}ACES(td){1,29}ACEE{1,29}ACES(tr){1,29}ACEE{1,29}ACES(thead){1,29}ACEE{1,29}ACES(table){1,29}ACEE{1,29}]",
+            "[OES(table){1,1}OEE(table){1,7}OES(thead){1,8}OEE(thead){1,14}OES(tr){1,15}OEE(tr){1,18}OES(th){1,19}OEE(th){1,22}T(A){1,23}ACES(th){1,24}ACEE(th){1,24}OES(td){1,24}OEE(td){1,27}T(B){1,28}ACES(td){1,29}ACEE(td){1,29}ACES(tr){1,29}ACEE(tr){1,29}ACES(thead){1,29}ACEE(thead){1,29}ACES(table){1,29}ACEE(table){1,29}]",
             noRestrictionsAutoClose);
         testHtmlDoc(
             "<table><thead><tr><td>A<th>B",
-            "[OES(table){1,1}OEE{1,7}OES(thead){1,8}OEE{1,14}OES(tr){1,15}OEE{1,18}OES(td){1,19}OEE{1,22}T(A){1,23}ACES(td){1,24}ACEE{1,24}OES(th){1,24}OEE{1,27}T(B){1,28}ACES(th){1,29}ACEE{1,29}ACES(tr){1,29}ACEE{1,29}ACES(thead){1,29}ACEE{1,29}ACES(table){1,29}ACEE{1,29}]",
+            "[OES(table){1,1}OEE(table){1,7}OES(thead){1,8}OEE(thead){1,14}OES(tr){1,15}OEE(tr){1,18}OES(td){1,19}OEE(td){1,22}T(A){1,23}ACES(td){1,24}ACEE(td){1,24}OES(th){1,24}OEE(th){1,27}T(B){1,28}ACES(th){1,29}ACEE(th){1,29}ACES(tr){1,29}ACEE(tr){1,29}ACES(thead){1,29}ACEE(thead){1,29}ACES(table){1,29}ACEE(table){1,29}]",
             noRestrictionsAutoClose);
         testHtmlDoc(
             "<table><thead><tr><td><p>P<th>B",
-            "[OES(table){1,1}OEE{1,7}OES(thead){1,8}OEE{1,14}OES(tr){1,15}OEE{1,18}OES(td){1,19}OEE{1,22}OES(p){1,23}OEE{1,25}T(P){1,26}ACES(p){1,27}ACEE{1,27}ACES(td){1,27}ACEE{1,27}OES(th){1,27}OEE{1,30}T(B){1,31}ACES(th){1,32}ACEE{1,32}ACES(tr){1,32}ACEE{1,32}ACES(thead){1,32}ACEE{1,32}ACES(table){1,32}ACEE{1,32}]",
+            "[OES(table){1,1}OEE(table){1,7}OES(thead){1,8}OEE(thead){1,14}OES(tr){1,15}OEE(tr){1,18}OES(td){1,19}OEE(td){1,22}OES(p){1,23}OEE(p){1,25}T(P){1,26}ACES(p){1,27}ACEE(p){1,27}ACES(td){1,27}ACEE(td){1,27}OES(th){1,27}OEE(th){1,30}T(B){1,31}ACES(th){1,32}ACEE(th){1,32}ACES(tr){1,32}ACEE(tr){1,32}ACES(thead){1,32}ACEE(thead){1,32}ACES(table){1,32}ACEE(table){1,32}]",
             noRestrictionsAutoClose);
         testHtmlDoc(
             "<table><thead><tr><tbody><td><p>P<th>B",
-            "[OES(table){1,1}OEE{1,7}OES(thead){1,8}OEE{1,14}OES(tr){1,15}OEE{1,18}ACES(tr){1,19}ACEE{1,19}ACES(thead){1,19}ACEE{1,19}OES(tbody){1,19}OEE{1,25}OES(td){1,26}OEE{1,29}OES(p){1,30}OEE{1,32}T(P){1,33}ACES(p){1,34}ACEE{1,34}ACES(td){1,34}ACEE{1,34}OES(th){1,34}OEE{1,37}T(B){1,38}ACES(th){1,39}ACEE{1,39}ACES(tbody){1,39}ACEE{1,39}ACES(table){1,39}ACEE{1,39}]",
+            "[OES(table){1,1}OEE(table){1,7}OES(thead){1,8}OEE(thead){1,14}OES(tr){1,15}OEE(tr){1,18}ACES(tr){1,19}ACEE(tr){1,19}ACES(thead){1,19}ACEE(thead){1,19}OES(tbody){1,19}OEE(tbody){1,25}OES(td){1,26}OEE(td){1,29}OES(p){1,30}OEE(p){1,32}T(P){1,33}ACES(p){1,34}ACEE(p){1,34}ACES(td){1,34}ACEE(td){1,34}OES(th){1,34}OEE(th){1,37}T(B){1,38}ACES(th){1,39}ACEE(th){1,39}ACES(tbody){1,39}ACEE(tbody){1,39}ACES(table){1,39}ACEE(table){1,39}]",
             noRestrictionsAutoClose);
         testHtmlDoc(
             "<li>A<li>B",
-            "[OES(li){1,1}OEE{1,4}T(A){1,5}ACES(li){1,6}ACEE{1,6}OES(li){1,6}OEE{1,9}T(B){1,10}ACES(li){1,11}ACEE{1,11}]",
+            "[OES(li){1,1}OEE(li){1,4}T(A){1,5}ACES(li){1,6}ACEE(li){1,6}OES(li){1,6}OEE(li){1,9}T(B){1,10}ACES(li){1,11}ACEE(li){1,11}]",
             noRestrictionsAutoClose);
         testHtmlDoc(
             "<li>A<li>B",
-            "[OES(li){1,1}OEE{1,4}T(A){1,5}OES(li){1,6}OEE{1,9}T(B){1,10}]",
+            "[OES(li){1,1}OEE(li){1,4}T(A){1,5}OES(li){1,6}OEE(li){1,9}T(B){1,10}]",
             noRestrictions);
         testHtmlDoc(
             "<table><th:block><tr><td>A<tr><td>B<td>C",
-            "[OES(table){1,1}OEE{1,7}OES(th:block){1,8}OEE{1,17}OES(tr){1,18}OEE{1,21}OES(td){1,22}OEE{1,25}T(A){1,26}ACES(td){1,27}ACEE{1,27}ACES(tr){1,27}ACEE{1,27}OES(tr){1,27}OEE{1,30}OES(td){1,31}OEE{1,34}T(B){1,35}ACES(td){1,36}ACEE{1,36}OES(td){1,36}OEE{1,39}T(C){1,40}ACES(td){1,41}ACEE{1,41}ACES(tr){1,41}ACEE{1,41}ACES(th:block){1,41}ACEE{1,41}ACES(table){1,41}ACEE{1,41}]",
+            "[OES(table){1,1}OEE(table){1,7}OES(th:block){1,8}OEE(th:block){1,17}OES(tr){1,18}OEE(tr){1,21}OES(td){1,22}OEE(td){1,25}T(A){1,26}ACES(td){1,27}ACEE(td){1,27}ACES(tr){1,27}ACEE(tr){1,27}OES(tr){1,27}OEE(tr){1,30}OES(td){1,31}OEE(td){1,34}T(B){1,35}ACES(td){1,36}ACEE(td){1,36}OES(td){1,36}OEE(td){1,39}T(C){1,40}ACES(td){1,41}ACEE(td){1,41}ACES(tr){1,41}ACEE(tr){1,41}ACES(th:block){1,41}ACEE(th:block){1,41}ACES(table){1,41}ACEE(table){1,41}]",
             noRestrictionsAutoClose);
         testHtmlDoc(
             "<table><th:block><tr><td>A<tr><td>B<td>C<tfoot>",
-            "[OES(table){1,1}OEE{1,7}OES(th:block){1,8}OEE{1,17}OES(tr){1,18}OEE{1,21}OES(td){1,22}OEE{1,25}T(A){1,26}ACES(td){1,27}ACEE{1,27}ACES(tr){1,27}ACEE{1,27}OES(tr){1,27}OEE{1,30}OES(td){1,31}OEE{1,34}T(B){1,35}ACES(td){1,36}ACEE{1,36}OES(td){1,36}OEE{1,39}T(C){1,40}ACES(td){1,41}ACEE{1,41}ACES(tr){1,41}ACEE{1,41}OES(tfoot){1,41}OEE{1,47}ACES(tfoot){1,48}ACEE{1,48}ACES(th:block){1,48}ACEE{1,48}ACES(table){1,48}ACEE{1,48}]",
+            "[OES(table){1,1}OEE(table){1,7}OES(th:block){1,8}OEE(th:block){1,17}OES(tr){1,18}OEE(tr){1,21}OES(td){1,22}OEE(td){1,25}T(A){1,26}ACES(td){1,27}ACEE(td){1,27}ACES(tr){1,27}ACEE(tr){1,27}OES(tr){1,27}OEE(tr){1,30}OES(td){1,31}OEE(td){1,34}T(B){1,35}ACES(td){1,36}ACEE(td){1,36}OES(td){1,36}OEE(td){1,39}T(C){1,40}ACES(td){1,41}ACEE(td){1,41}ACES(tr){1,41}ACEE(tr){1,41}OES(tfoot){1,41}OEE(tfoot){1,47}ACES(tfoot){1,48}ACEE(tfoot){1,48}ACES(th:block){1,48}ACEE(th:block){1,48}ACES(table){1,48}ACEE(table){1,48}]",
             noRestrictionsAutoClose);
         testHtmlDoc(
             "<ul><li><ol><li>A<li>B",
-            "[OES(ul){1,1}OEE{1,4}OES(li){1,5}OEE{1,8}OES(ol){1,9}OEE{1,12}OES(li){1,13}OEE{1,16}T(A){1,17}ACES(li){1,18}ACEE{1,18}OES(li){1,18}OEE{1,21}T(B){1,22}ACES(li){1,23}ACEE{1,23}ACES(ol){1,23}ACEE{1,23}ACES(li){1,23}ACEE{1,23}ACES(ul){1,23}ACEE{1,23}]",
+            "[OES(ul){1,1}OEE(ul){1,4}OES(li){1,5}OEE(li){1,8}OES(ol){1,9}OEE(ol){1,12}OES(li){1,13}OEE(li){1,16}T(A){1,17}ACES(li){1,18}ACEE(li){1,18}OES(li){1,18}OEE(li){1,21}T(B){1,22}ACES(li){1,23}ACEE(li){1,23}ACES(ol){1,23}ACEE(ol){1,23}ACES(li){1,23}ACEE(li){1,23}ACES(ul){1,23}ACEE(ul){1,23}]",
             noRestrictionsAutoClose);
         testHtmlDoc(
             "<p>A<p>B",
-            "[OES(p){1,1}OEE{1,3}T(A){1,4}ACES(p){1,5}ACEE{1,5}OES(p){1,5}OEE{1,7}T(B){1,8}ACES(p){1,9}ACEE{1,9}]",
+            "[OES(p){1,1}OEE(p){1,3}T(A){1,4}ACES(p){1,5}ACEE(p){1,5}OES(p){1,5}OEE(p){1,7}T(B){1,8}ACES(p){1,9}ACEE(p){1,9}]",
             noRestrictionsAutoClose);
         testHtmlDoc(
             "<p>A<h1>B",
-            "[OES(p){1,1}OEE{1,3}T(A){1,4}ACES(p){1,5}ACEE{1,5}OES(h1){1,5}OEE{1,8}T(B){1,9}ACES(h1){1,10}ACEE{1,10}]",
+            "[OES(p){1,1}OEE(p){1,3}T(A){1,4}ACES(p){1,5}ACEE(p){1,5}OES(h1){1,5}OEE(h1){1,8}T(B){1,9}ACES(h1){1,10}ACEE(h1){1,10}]",
             noRestrictionsAutoClose);
         testHtmlDoc(
             "<p>A<div>B",
-            "[OES(p){1,1}OEE{1,3}T(A){1,4}ACES(p){1,5}ACEE{1,5}OES(div){1,5}OEE{1,9}T(B){1,10}ACES(div){1,11}ACEE{1,11}]",
+            "[OES(p){1,1}OEE(p){1,3}T(A){1,4}ACES(p){1,5}ACEE(p){1,5}OES(div){1,5}OEE(div){1,9}T(B){1,10}ACES(div){1,11}ACEE(div){1,11}]",
             noRestrictionsAutoClose);
         testHtmlDoc(
             "<p>A<hr>B",
-            "[OES(p){1,1}OEE{1,3}T(A){1,4}ACES(p){1,5}ACEE{1,5}USES(hr){1,5}USEE{1,8}T(B){1,9}]",
+            "[OES(p){1,1}OEE(p){1,3}T(A){1,4}ACES(p){1,5}ACEE(p){1,5}NSES(hr){1,5}NSEE(hr){1,8}T(B){1,9}]",
             noRestrictionsAutoClose);
         testHtmlDoc(
             "<p>A<hr/>B",
-            "[OES(p){1,1}OEE{1,3}T(A){1,4}ACES(p){1,5}ACEE{1,5}MSES(hr){1,5}MSEE{1,8}T(B){1,10}]",
+            "[OES(p){1,1}OEE(p){1,3}T(A){1,4}ACES(p){1,5}ACEE(p){1,5}SES(hr){1,5}SEE(hr){1,8}T(B){1,10}]",
             noRestrictionsAutoClose);
         testDoc(
             "<br a>Hello",
-            "[OES(br){1,1}IWS( ){1,4}A(a){1,5}(){1,6}(){1,6}OEE{1,6}T(Hello){1,7}]",
+            "[OES(br){1,1}IWS( ){1,4}A(a){1,5}(){1,6}(){1,6}OEE(br){1,6}T(Hello){1,7}]",
             "[OE(br[a='']){1,1}T(Hello){1,7}]",
             noRestrictions);
         testDoc(
             "<br a b>Hello",
-            "[OES(br){1,1}IWS( ){1,4}A(a){1,5}(){1,6}(){1,6}IWS( ){1,6}A(b){1,7}(){1,8}(){1,8}OEE{1,8}T(Hello){1,9}]",
+            "[OES(br){1,1}IWS( ){1,4}A(a){1,5}(){1,6}(){1,6}IWS( ){1,6}A(b){1,7}(){1,8}(){1,8}OEE(br){1,8}T(Hello){1,9}]",
             "[OE(br[a='',b='']){1,1}T(Hello){1,9}]",
             noRestrictions);
         testDocError(
@@ -213,144 +214,144 @@ public class MarkupAttoParserTest extends TestCase {
             noRestrictions);
         testDoc(
             "<li a=\"a < 0\">Hello</li>",
-            "[OES(li){1,1}IWS( ){1,4}A(a){1,5}(=){1,6}(\"a < 0\"){1,7}OEE{1,14}T(Hello){1,15}CES(li){1,20}CEE{1,24}]",
+            "[OES(li){1,1}IWS( ){1,4}A(a){1,5}(=){1,6}(\"a < 0\"){1,7}OEE(li){1,14}T(Hello){1,15}CES(li){1,20}CEE(li){1,24}]",
             "[OE(li[a='a < 0']){1,1}T(Hello){1,15}CE(li){1,20}]",
             noRestrictions);
         testDoc(
             "<script> var a = \"<div>\" if (a < 0)</script>",
-            "[OES(script){1,1}OEE{1,8}T( var a = \"){1,9}OES(div){1,19}OEE{1,23}T(\" if (a < 0)){1,24}CES(script){1,36}CEE{1,44}]",
+            "[OES(script){1,1}OEE(script){1,8}T( var a = \"){1,9}OES(div){1,19}OEE(div){1,23}T(\" if (a < 0)){1,24}CES(script){1,36}CEE(script){1,44}]",
             "[OE(script){1,1}T( var a = \"){1,9}OE(div){1,19}T(\" if (a < 0)){1,24}CE(script){1,36}]",
             noRestrictions);
         testDoc(
             "<style> a = \"<div>\" if (a < 0)</style>",
-            "[OES(style){1,1}OEE{1,7}T( a = \"){1,8}OES(div){1,14}OEE{1,18}T(\" if (a < 0)){1,19}CES(style){1,31}CEE{1,38}]",
+            "[OES(style){1,1}OEE(style){1,7}T( a = \"){1,8}OES(div){1,14}OEE(div){1,18}T(\" if (a < 0)){1,19}CES(style){1,31}CEE(style){1,38}]",
             "[OE(style){1,1}T( a = \"){1,8}OE(div){1,14}T(\" if (a < 0)){1,19}CE(style){1,31}]",
             noRestrictions);
         testHtmlDoc(
-            "<script> var a = \"<div>\" if (a < 0)</script>",
-            "[OES(script){1,1}OEE{1,8}T( var a = \"<div>\" if (a < 0)){1,9}CES(script){1,36}CEE{1,44}]",
-            HtmlParsing.baseHtmlMarkupParsingConfiguration());
+                "<script> var a = \"<div>\" if (a < 0)</script>",
+                "[OES(script){1,1}OEE(script){1,8}T( var a = \"<div>\" if (a < 0)){1,9}CES(script){1,36}CEE(script){1,44}]",
+                MarkupParsingConfiguration.defaultHtmlConfiguration());
         testHtmlDoc(
             "<style> a = \"<div>\" if (a < 0)</style>",
-            "[OES(style){1,1}OEE{1,7}T( a = \"<div>\" if (a < 0)){1,8}CES(style){1,31}CEE{1,38}]",
-            HtmlParsing.baseHtmlMarkupParsingConfiguration());
+            "[OES(style){1,1}OEE(style){1,7}T( a = \"<div>\" if (a < 0)){1,8}CES(style){1,31}CEE(style){1,38}]",
+            MarkupParsingConfiguration.defaultHtmlConfiguration());
         testHtmlDoc(
             "<script> var a = \"<div>\"\n\nif (a < 0)</script>",
-            "[OES(script){1,1}OEE{1,8}T( var a = \"<div>\"\n\nif (a < 0)){1,9}CES(script){3,11}CEE{3,19}]",
-            HtmlParsing.baseHtmlMarkupParsingConfiguration());
+            "[OES(script){1,1}OEE(script){1,8}T( var a = \"<div>\"\n\nif (a < 0)){1,9}CES(script){3,11}CEE(script){3,19}]",
+            MarkupParsingConfiguration.defaultHtmlConfiguration());
         testHtmlDoc(
             "<style> a = \"<div>\"\n\nif (a < 0)</style>",
-            "[OES(style){1,1}OEE{1,7}T( a = \"<div>\"\n\nif (a < 0)){1,8}CES(style){3,11}CEE{3,18}]",
-            HtmlParsing.baseHtmlMarkupParsingConfiguration());
+            "[OES(style){1,1}OEE(style){1,7}T( a = \"<div>\"\n\nif (a < 0)){1,8}CES(style){3,11}CEE(style){3,18}]",
+            MarkupParsingConfiguration.defaultHtmlConfiguration());
         testDoc(
             "<SCRIPT> var a = \"<div>\" if (a < 0)</SCRIPT>",
-            "[OES(SCRIPT){1,1}OEE{1,8}T( var a = \"){1,9}OES(div){1,19}OEE{1,23}T(\" if (a < 0)){1,24}CES(SCRIPT){1,36}CEE{1,44}]",
+            "[OES(SCRIPT){1,1}OEE(SCRIPT){1,8}T( var a = \"){1,9}OES(div){1,19}OEE(div){1,23}T(\" if (a < 0)){1,24}CES(SCRIPT){1,36}CEE(SCRIPT){1,44}]",
             "[OE(SCRIPT){1,1}T( var a = \"){1,9}OE(div){1,19}T(\" if (a < 0)){1,24}CE(SCRIPT){1,36}]",
             noRestrictions);
         testDoc(
             "<STYLE> a = \"<div>\" if (a < 0)</STYLE>",
-            "[OES(STYLE){1,1}OEE{1,7}T( a = \"){1,8}OES(div){1,14}OEE{1,18}T(\" if (a < 0)){1,19}CES(STYLE){1,31}CEE{1,38}]",
+            "[OES(STYLE){1,1}OEE(STYLE){1,7}T( a = \"){1,8}OES(div){1,14}OEE(div){1,18}T(\" if (a < 0)){1,19}CES(STYLE){1,31}CEE(STYLE){1,38}]",
             "[OE(STYLE){1,1}T( a = \"){1,8}OE(div){1,14}T(\" if (a < 0)){1,19}CE(STYLE){1,31}]",
             noRestrictions);
         testHtmlDoc(
             "<SCRIPT> var a = \"<div>\" if (a < 0)</SCRIPT>",
-            "[OES(SCRIPT){1,1}OEE{1,8}T( var a = \"<div>\" if (a < 0)){1,9}CES(SCRIPT){1,36}CEE{1,44}]",
-            HtmlParsing.baseHtmlMarkupParsingConfiguration());
+            "[OES(SCRIPT){1,1}OEE(SCRIPT){1,8}T( var a = \"<div>\" if (a < 0)){1,9}CES(SCRIPT){1,36}CEE(SCRIPT){1,44}]",
+            MarkupParsingConfiguration.defaultHtmlConfiguration());
         testHtmlDoc(
             "<STYLE> a = \"<div>\" if (a < 0)</STYLE>",
-            "[OES(STYLE){1,1}OEE{1,7}T( a = \"<div>\" if (a < 0)){1,8}CES(STYLE){1,31}CEE{1,38}]",
-            HtmlParsing.baseHtmlMarkupParsingConfiguration());
+            "[OES(STYLE){1,1}OEE(STYLE){1,7}T( a = \"<div>\" if (a < 0)){1,8}CES(STYLE){1,31}CEE(STYLE){1,38}]",
+            MarkupParsingConfiguration.defaultHtmlConfiguration());
         testHtmlDoc(
             "<SCRIPT> var a = \"<div>\"\n\nif (a < 0)</SCRIPT>",
-            "[OES(SCRIPT){1,1}OEE{1,8}T( var a = \"<div>\"\n\nif (a < 0)){1,9}CES(SCRIPT){3,11}CEE{3,19}]",
-            HtmlParsing.baseHtmlMarkupParsingConfiguration());
+            "[OES(SCRIPT){1,1}OEE(SCRIPT){1,8}T( var a = \"<div>\"\n\nif (a < 0)){1,9}CES(SCRIPT){3,11}CEE(SCRIPT){3,19}]",
+            MarkupParsingConfiguration.defaultHtmlConfiguration());
         testHtmlDoc(
             "<STYLE> a = \"<div>\"\n\nif (a < 0)</STYLE>",
-            "[OES(STYLE){1,1}OEE{1,7}T( a = \"<div>\"\n\nif (a < 0)){1,8}CES(STYLE){3,11}CEE{3,18}]",
-            HtmlParsing.baseHtmlMarkupParsingConfiguration());
+            "[OES(STYLE){1,1}OEE(STYLE){1,7}T( a = \"<div>\"\n\nif (a < 0)){1,8}CES(STYLE){3,11}CEE(STYLE){3,18}]",
+            MarkupParsingConfiguration.defaultHtmlConfiguration());
         testDoc(
             "<script type=\"text/javascript\"> var a = \"<div>\" if (a < 0)</script>",
-            "[OES(script){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE{1,31}T( var a = \"){1,32}OES(div){1,42}OEE{1,46}T(\" if (a < 0)){1,47}CES(script){1,59}CEE{1,67}]",
+            "[OES(script){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE(script){1,31}T( var a = \"){1,32}OES(div){1,42}OEE(div){1,46}T(\" if (a < 0)){1,47}CES(script){1,59}CEE(script){1,67}]",
             "[OE(script[type='text/javascript']){1,1}T( var a = \"){1,32}OE(div){1,42}T(\" if (a < 0)){1,47}CE(script){1,59}]",
             noRestrictions);
         testDoc(
             "<style type=\"text/css\"> a = \"<div>\" if (a < 0)</style>",
-            "[OES(style){1,1}IWS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE{1,23}T( a = \"){1,24}OES(div){1,30}OEE{1,34}T(\" if (a < 0)){1,35}CES(style){1,47}CEE{1,54}]",
+            "[OES(style){1,1}IWS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE(style){1,23}T( a = \"){1,24}OES(div){1,30}OEE(div){1,34}T(\" if (a < 0)){1,35}CES(style){1,47}CEE(style){1,54}]",
             "[OE(style[type='text/css']){1,1}T( a = \"){1,24}OE(div){1,30}T(\" if (a < 0)){1,35}CE(style){1,47}]",
             noRestrictions);
         testHtmlDoc(
             "<script type=\"text/javascript\"> var a = \"<div>\" if (a < 0)</script>",
-            "[OES(script){1,1}AS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE{1,31}T( var a = \"<div>\" if (a < 0)){1,32}CES(script){1,59}CEE{1,67}]",
-            HtmlParsing.baseHtmlMarkupParsingConfiguration());
+            "[OES(script){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE(script){1,31}T( var a = \"<div>\" if (a < 0)){1,32}CES(script){1,59}CEE(script){1,67}]",
+            MarkupParsingConfiguration.defaultHtmlConfiguration());
         testHtmlDoc(
             "<style type=\"text/css\"> a = \"<div>\" if (a < 0)</style>",
-            "[OES(style){1,1}AS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE{1,23}T( a = \"<div>\" if (a < 0)){1,24}CES(style){1,47}CEE{1,54}]",
-            HtmlParsing.baseHtmlMarkupParsingConfiguration());
+            "[OES(style){1,1}IWS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE(style){1,23}T( a = \"<div>\" if (a < 0)){1,24}CES(style){1,47}CEE(style){1,54}]",
+            MarkupParsingConfiguration.defaultHtmlConfiguration());
         testHtmlDoc(
             "<script type=\"text/javascript\"> var a = \"<div>\"\n\nif (a < 0)</script>",
-            "[OES(script){1,1}AS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE{1,31}T( var a = \"<div>\"\n\nif (a < 0)){1,32}CES(script){3,11}CEE{3,19}]",
-            HtmlParsing.baseHtmlMarkupParsingConfiguration());
+            "[OES(script){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE(script){1,31}T( var a = \"<div>\"\n\nif (a < 0)){1,32}CES(script){3,11}CEE(script){3,19}]",
+            MarkupParsingConfiguration.defaultHtmlConfiguration());
         testHtmlDoc(
             "<style type=\"text/css\"> a = \"<div>\"\n\nif (a < 0)</style>",
-            "[OES(style){1,1}AS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE{1,23}T( a = \"<div>\"\n\nif (a < 0)){1,24}CES(style){3,11}CEE{3,18}]",
-            HtmlParsing.baseHtmlMarkupParsingConfiguration());
+            "[OES(style){1,1}IWS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE(style){1,23}T( a = \"<div>\"\n\nif (a < 0)){1,24}CES(style){3,11}CEE(style){3,18}]",
+            MarkupParsingConfiguration.defaultHtmlConfiguration());
         testDoc(
             "<SCRIPT type=\"text/javascript\"> var a = \"<div>\" if (a < 0)</SCRIPT>",
-            "[OES(SCRIPT){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE{1,31}T( var a = \"){1,32}OES(div){1,42}OEE{1,46}T(\" if (a < 0)){1,47}CES(SCRIPT){1,59}CEE{1,67}]",
+            "[OES(SCRIPT){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE(SCRIPT){1,31}T( var a = \"){1,32}OES(div){1,42}OEE(div){1,46}T(\" if (a < 0)){1,47}CES(SCRIPT){1,59}CEE(SCRIPT){1,67}]",
             "[OE(SCRIPT[type='text/javascript']){1,1}T( var a = \"){1,32}OE(div){1,42}T(\" if (a < 0)){1,47}CE(SCRIPT){1,59}]",
             noRestrictions);
         testDoc(
             "<STYLE type=\"text/css\"> a = \"<div>\" if (a < 0)</STYLE>",
-            "[OES(STYLE){1,1}IWS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE{1,23}T( a = \"){1,24}OES(div){1,30}OEE{1,34}T(\" if (a < 0)){1,35}CES(STYLE){1,47}CEE{1,54}]",
+            "[OES(STYLE){1,1}IWS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE(STYLE){1,23}T( a = \"){1,24}OES(div){1,30}OEE(div){1,34}T(\" if (a < 0)){1,35}CES(STYLE){1,47}CEE(STYLE){1,54}]",
             "[OE(STYLE[type='text/css']){1,1}T( a = \"){1,24}OE(div){1,30}T(\" if (a < 0)){1,35}CE(STYLE){1,47}]",
             noRestrictions);
         testHtmlDoc(
             "<SCRIPT type=\"text/javascript\"> var a = \"<div>\" if (a < 0)</SCRIPT>",
-            "[OES(SCRIPT){1,1}AS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE{1,31}T( var a = \"<div>\" if (a < 0)){1,32}CES(SCRIPT){1,59}CEE{1,67}]",
-            HtmlParsing.baseHtmlMarkupParsingConfiguration());
+            "[OES(SCRIPT){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE(SCRIPT){1,31}T( var a = \"<div>\" if (a < 0)){1,32}CES(SCRIPT){1,59}CEE(SCRIPT){1,67}]",
+            MarkupParsingConfiguration.defaultHtmlConfiguration());
         testHtmlDoc(
             "<STYLE type=\"text/css\"> a = \"<div>\" if (a < 0)</STYLE>",
-            "[OES(STYLE){1,1}AS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE{1,23}T( a = \"<div>\" if (a < 0)){1,24}CES(STYLE){1,47}CEE{1,54}]",
-            HtmlParsing.baseHtmlMarkupParsingConfiguration());
+            "[OES(STYLE){1,1}IWS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE(STYLE){1,23}T( a = \"<div>\" if (a < 0)){1,24}CES(STYLE){1,47}CEE(STYLE){1,54}]",
+            MarkupParsingConfiguration.defaultHtmlConfiguration());
         testHtmlDoc(
             "<SCRIPT type=\"text/javascript\"> var a = \"<div>\"\n\nif (a < 0)</SCRIPT>",
-            "[OES(SCRIPT){1,1}AS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE{1,31}T( var a = \"<div>\"\n\nif (a < 0)){1,32}CES(SCRIPT){3,11}CEE{3,19}]",
-            HtmlParsing.baseHtmlMarkupParsingConfiguration());
+            "[OES(SCRIPT){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE(SCRIPT){1,31}T( var a = \"<div>\"\n\nif (a < 0)){1,32}CES(SCRIPT){3,11}CEE(SCRIPT){3,19}]",
+            MarkupParsingConfiguration.defaultHtmlConfiguration());
         testHtmlDoc(
             "<STYLE type=\"text/css\"> a = \"<div>\"\n\nif (a < 0)</STYLE>",
-            "[OES(STYLE){1,1}AS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE{1,23}T( a = \"<div>\"\n\nif (a < 0)){1,24}CES(STYLE){3,11}CEE{3,18}]",
-            HtmlParsing.baseHtmlMarkupParsingConfiguration());
+            "[OES(STYLE){1,1}IWS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE(STYLE){1,23}T( a = \"<div>\"\n\nif (a < 0)){1,24}CES(STYLE){3,11}CEE(STYLE){3,18}]",
+            MarkupParsingConfiguration.defaultHtmlConfiguration());
         testHtmlDoc(
             "<ScripT type=\"text/javascript\"> var a = \"<div>\" if (a < 0)</ScripT>",
-            "[OES(ScripT){1,1}AS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE{1,31}T( var a = \"<div>\" if (a < 0)){1,32}CES(ScripT){1,59}CEE{1,67}]",
-            HtmlParsing.baseHtmlMarkupParsingConfiguration());
+            "[OES(ScripT){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE(ScripT){1,31}T( var a = \"<div>\" if (a < 0)){1,32}CES(ScripT){1,59}CEE(ScripT){1,67}]",
+            MarkupParsingConfiguration.defaultHtmlConfiguration());
         testHtmlDoc(
             "<StylE type=\"text/css\"> a = \"<div>\" if (a < 0)</StylE>",
-            "[OES(StylE){1,1}AS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE{1,23}T( a = \"<div>\" if (a < 0)){1,24}CES(StylE){1,47}CEE{1,54}]",
-            HtmlParsing.baseHtmlMarkupParsingConfiguration());
+            "[OES(StylE){1,1}IWS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE(StylE){1,23}T( a = \"<div>\" if (a < 0)){1,24}CES(StylE){1,47}CEE(StylE){1,54}]",
+            MarkupParsingConfiguration.defaultHtmlConfiguration());
         testDoc(
             "<h1 a=\"if (a < 0)\">Hello</ h1>",
-            "[OES(h1){1,1}IWS( ){1,4}A(a){1,5}(=){1,6}(\"if (a < 0)\"){1,7}OEE{1,19}T(Hello</ h1>){1,20}ACES(h1){1,31}ACEE{1,31}]",
+            "[OES(h1){1,1}IWS( ){1,4}A(a){1,5}(=){1,6}(\"if (a < 0)\"){1,7}OEE(h1){1,19}T(Hello</ h1>){1,20}ACES(h1){1,31}ACEE(h1){1,31}]",
             "[OE(h1[a='if (a < 0)']){1,1}T(Hello</ h1>){1,20}ACE(h1){1,31}]",
             noRestrictionsAutoClose);
         testDoc(
             "<h1>Hello</ h1>",
-            "[OES(h1){1,1}OEE{1,4}T(Hello</ h1>){1,5}ACES(h1){1,16}ACEE{1,16}]",
+            "[OES(h1){1,1}OEE(h1){1,4}T(Hello</ h1>){1,5}ACES(h1){1,16}ACEE(h1){1,16}]",
             "[OE(h1){1,1}T(Hello</ h1>){1,5}ACE(h1){1,16}]",
             noRestrictionsAutoClose);
         testDoc(
             "<h1>Hello</ h1>",
-            "[OES(h1){1,1}OEE{1,4}T(Hello</ h1>){1,5}]",
+            "[OES(h1){1,1}OEE(h1){1,4}T(Hello</ h1>){1,5}]",
             "[OE(h1){1,1}T(Hello</ h1>){1,5}]",
             noRestrictions);
         testDoc(
             "<p><h1>Hello</ h1></p>",
-            "[OES(p){1,1}OEE{1,3}OES(h1){1,4}OEE{1,7}T(Hello</ h1>){1,8}ACES(h1){1,19}ACEE{1,19}CES(p){1,19}CEE{1,22}]",
+            "[OES(p){1,1}OEE(p){1,3}OES(h1){1,4}OEE(h1){1,7}T(Hello</ h1>){1,8}ACES(h1){1,19}ACEE(h1){1,19}CES(p){1,19}CEE(p){1,22}]",
             "[OE(p){1,1}OE(h1){1,4}T(Hello</ h1>){1,8}ACE(h1){1,19}CE(p){1,19}]",
             noRestrictionsAutoClose);
         testDoc(
             "<p><h1>Hello</ h1></p>",
-            "[OES(p){1,1}OEE{1,3}OES(h1){1,4}OEE{1,7}T(Hello</ h1>){1,8}CES(p){1,19}CEE{1,22}]",
+            "[OES(p){1,1}OEE(p){1,3}OES(h1){1,4}OEE(h1){1,7}T(Hello</ h1>){1,8}CES(p){1,19}CEE(p){1,22}]",
             "[OE(p){1,1}OE(h1){1,4}T(Hello</ h1>){1,8}CE(p){1,19}]",
             noRestrictions);
         testDoc(
@@ -365,37 +366,37 @@ public class MarkupAttoParserTest extends TestCase {
             noRestrictionsAutoClose);
         testDoc(
             "<p>Hello</p>",
-            "[OES(p){1,1}OEE{1,3}T(Hello){1,4}CES(p){1,9}CEE{1,12}]",
+            "[OES(p){1,1}OEE(p){1,3}T(Hello){1,4}CES(p){1,9}CEE(p){1,12}]",
             "[OE(p){1,1}T(Hello){1,4}CE(p){1,9}]",
             noRestrictionsAutoClose);
         testDoc(
             "<h1>Hello</h1>",
-            "[OES(h1){1,1}OEE{1,4}T(Hello){1,5}CES(h1){1,10}CEE{1,14}]",
+            "[OES(h1){1,1}OEE(h1){1,4}T(Hello){1,5}CES(h1){1,10}CEE(h1){1,14}]",
             "[OE(h1){1,1}T(Hello){1,5}CE(h1){1,10}]",
             noRestrictionsAutoClose);
         testDoc(
             "<h1>Hello</h1 >",
-            "[OES(h1){1,1}OEE{1,4}T(Hello){1,5}CES(h1){1,10}IWS( ){1,14}CEE{1,15}]",
+            "[OES(h1){1,1}OEE(h1){1,4}T(Hello){1,5}CES(h1){1,10}IWS( ){1,14}CEE(h1){1,15}]",
             "[OE(h1){1,1}T(Hello){1,5}CE(h1){1,10}]",
             noRestrictionsAutoClose);
         testDoc(
             "<h1>Hello</h1 \n\n>",
-            "[OES(h1){1,1}OEE{1,4}T(Hello){1,5}CES(h1){1,10}IWS( \n\n){1,14}CEE{3,1}]",
+            "[OES(h1){1,1}OEE(h1){1,4}T(Hello){1,5}CES(h1){1,10}IWS( \n\n){1,14}CEE(h1){3,1}]",
             "[OE(h1){1,1}T(Hello){1,5}CE(h1){1,10}]",
             noRestrictionsAutoClose);
         testDoc(
             "<\np  >Hello</p>",
-            "[T(<\np  >Hello){1,1}UCES(p){2,10}UCEE{2,13}]",
+            "[T(<\np  >Hello){1,1}UCES(p){2,10}UCEE(p){2,13}]",
             "[T(<\np  >Hello){1,1}UCE(p){2,10}]",
             noRestrictionsAutoClose);
         testDoc(
             "< h1  >Hello</h1>",
-            "[T(< h1  >Hello){1,1}UCES(h1){1,13}UCEE{1,17}]",
+            "[T(< h1  >Hello){1,1}UCES(h1){1,13}UCEE(h1){1,17}]",
             "[T(< h1  >Hello){1,1}UCE(h1){1,13}]",
             noRestrictionsAutoClose);
         testDoc(
             "<h1>Hello</ h1>",
-            "[OES(h1){1,1}OEE{1,4}T(Hello</ h1>){1,5}ACES(h1){1,16}ACEE{1,16}]",
+            "[OES(h1){1,1}OEE(h1){1,4}T(Hello</ h1>){1,5}ACES(h1){1,16}ACEE(h1){1,16}]",
             "[OE(h1){1,1}T(Hello</ h1>){1,5}ACE(h1){1,16}]",
             noRestrictionsAutoClose);
         testDoc(
@@ -417,196 +418,196 @@ public class MarkupAttoParserTest extends TestCase {
             noRestrictionsAutoClose);
         testDoc(
             "Hello, <p>lala</p>",
-            "[T(Hello, ){1,1}OES(p){1,8}OEE{1,10}T(lala){1,11}CES(p){1,15}CEE{1,18}]",
+            "[T(Hello, ){1,1}OES(p){1,8}OEE(p){1,10}T(lala){1,11}CES(p){1,15}CEE(p){1,18}]",
             "[T(Hello, ){1,1}OE(p){1,8}T(lala){1,11}CE(p){1,15}]",
             noRestrictionsAutoClose);
         testDoc(
             "Hello, <p>lal'a</p>",
-            "[T(Hello, ){1,1}OES(p){1,8}OEE{1,10}T(lal'a){1,11}CES(p){1,16}CEE{1,19}]",
+            "[T(Hello, ){1,1}OES(p){1,8}OEE(p){1,10}T(lal'a){1,11}CES(p){1,16}CEE(p){1,19}]",
             "[T(Hello, ){1,1}OE(p){1,8}T(lal'a){1,11}CE(p){1,16}]",
             noRestrictionsAutoClose);
         testDoc(
             "Hello, <p>l'al'a</p>",
-            "[T(Hello, ){1,1}OES(p){1,8}OEE{1,10}T(l'al'a){1,11}CES(p){1,17}CEE{1,20}]",
+            "[T(Hello, ){1,1}OES(p){1,8}OEE(p){1,10}T(l'al'a){1,11}CES(p){1,17}CEE(p){1,20}]",
             "[T(Hello, ){1,1}OE(p){1,8}T(l'al'a){1,11}CE(p){1,17}]",
             noRestrictionsAutoClose);
         testDoc(
             "Hello, <p>lala</p>",
-            "[T(o, ){1,1}OES(p){1,4}OEE{1,6}T(l){1,7}ACES(p){1,8}ACEE{1,8}]",
+            "[T(o, ){1,1}OES(p){1,4}OEE(p){1,6}T(l){1,7}ACES(p){1,8}ACEE(p){1,8}]",
             "[T(o, ){1,1}OE(p){1,4}T(l){1,7}ACE(p){1,8}]",
             4, 7,
             noRestrictionsAutoClose);
         testDoc(
             "Hello, <br/>",
-            "[T(Hello, ){1,1}SES(br){1,8}SEE{1,11}]",
+            "[T(Hello, ){1,1}SES(br){1,8}SEE(br){1,11}]",
             "[T(Hello, ){1,1}SE(br){1,8}]",
             noRestrictionsAutoClose);
         testDoc(
             "Hello, <br th:text=\"ll\"/>",
-            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}(=){1,19}(\"ll\"){1,20}SEE{1,24}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}(=){1,19}(\"ll\"){1,20}SEE(br){1,24}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]",
             noRestrictionsAutoClose);
         testDoc(
             "Hello, <br th:text='ll'/>",
-            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}(=){1,19}('ll'){1,20}SEE{1,24}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}(=){1,19}('ll'){1,20}SEE(br){1,24}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]",
             noRestrictionsAutoClose);
         testDoc(
             "Hello, <br th:text =\"ll\"/>",
-            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =){1,19}(\"ll\"){1,21}SEE{1,25}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =){1,19}(\"ll\"){1,21}SEE(br){1,25}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]",
             noRestrictionsAutoClose);
         testDoc(
             "Hello, <br th:text =   \"ll\"/>",
-            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}(\"ll\"){1,24}SEE{1,28}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}(\"ll\"){1,24}SEE(br){1,28}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]",
             noRestrictionsAutoClose);
         testDoc(
             "Hello, <br th:text =   ll/>",
-            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}(ll){1,24}SEE{1,26}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}(ll){1,24}SEE(br){1,26}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]",
             noRestrictionsAutoClose);
         testDoc(
             "Hello, <br th:text =   \"ll\"a=2/>",
-            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}(\"ll\"){1,24}A(a){1,28}(=){1,29}(2){1,30}SEE{1,31}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}(\"ll\"){1,24}A(a){1,28}(=){1,29}(2){1,30}SEE(br){1,31}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll',a='2']){1,8}]",
             noRestrictionsAutoClose);
         testDoc(
             "Hello, <br th:text =   'll'a=2/>",
-            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}('ll'){1,24}A(a){1,28}(=){1,29}(2){1,30}SEE{1,31}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}('ll'){1,24}A(a){1,28}(=){1,29}(2){1,30}SEE(br){1,31}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll',a='2']){1,8}]",
             noRestrictionsAutoClose);
         testDoc(
             "Hello, <br th:text =   \"ll\"a= \n 2/>",
-            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}(\"ll\"){1,24}A(a){1,28}(= \n ){1,29}(2){2,2}SEE{2,3}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}(\"ll\"){1,24}A(a){1,28}(= \n ){1,29}(2){2,2}SEE(br){2,3}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll',a='2']){1,8}]",
             noRestrictionsAutoClose);
         testDoc(
             "Hello, <br th:text =   ll a= \n 2/>",
-            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}(ll){1,24}IWS( ){1,26}A(a){1,27}(= \n ){1,28}(2){2,2}SEE{2,3}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}(ll){1,24}IWS( ){1,26}A(a){1,27}(= \n ){1,28}(2){2,2}SEE(br){2,3}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll',a='2']){1,8}]",
             noRestrictionsAutoClose);
         testDoc(
             "Hello, <br th:text =   ll a/>",
-            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}(ll){1,24}IWS( ){1,26}A(a){1,27}(){1,28}(){1,28}SEE{1,28}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}(ll){1,24}IWS( ){1,26}A(a){1,27}(){1,28}(){1,28}SEE(br){1,28}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll',a='']){1,8}]",
             noRestrictionsAutoClose);
         testDoc(
             "Hello, <br th:text =   ll a=/>",
-            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}(ll){1,24}IWS( ){1,26}A(a){1,27}(=){1,28}(){1,29}SEE{1,29}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( =   ){1,19}(ll){1,24}IWS( ){1,26}A(a){1,27}(=){1,28}(){1,29}SEE(br){1,29}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll',a='']){1,8}]",
             noRestrictionsAutoClose);
         testDoc(
             "Hello, <br th:text = a=/>",
-            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( = ){1,19}(a=){1,22}SEE{1,24}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( = ){1,19}(a=){1,22}SEE(br){1,24}]",
             "[T(Hello, ){1,1}SE(br[th:text='a=']){1,8}]",
             noRestrictionsAutoClose);
         testDoc(
             "Hello, <br th:text = a= b/>",
-            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( = ){1,19}(a=){1,22}IWS( ){1,24}A(b){1,25}(){1,26}(){1,26}SEE{1,26}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( = ){1,19}(a=){1,22}IWS( ){1,24}A(b){1,25}(){1,26}(){1,26}SEE(br){1,26}]",
             "[T(Hello, ){1,1}SE(br[th:text='a=',b='']){1,8}]",
             noRestrictionsAutoClose);
         testDoc(
             "Hello, <br th:text = a=b/>",
-            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( = ){1,19}(a=b){1,22}SEE{1,25}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( = ){1,19}(a=b){1,22}SEE(br){1,25}]",
             "[T(Hello, ){1,1}SE(br[th:text='a=b']){1,8}]",
             noRestrictionsAutoClose);
         testDoc(
             "Hello, <br th:text = \"a=b\"/>",
-            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( = ){1,19}(\"a=b\"){1,22}SEE{1,27}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( = ){1,19}(\"a=b\"){1,22}SEE(br){1,27}]",
             "[T(Hello, ){1,1}SE(br[th:text='a=b']){1,8}]",
             noRestrictionsAutoClose);
         testDoc(
             "Hello, <br th:text = \"a= b\"/>",
-            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( = ){1,19}(\"a= b\"){1,22}SEE{1,28}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( = ){1,19}(\"a= b\"){1,22}SEE(br){1,28}]",
             "[T(Hello, ){1,1}SE(br[th:text='a= b']){1,8}]",
             noRestrictionsAutoClose);
         testDoc(
             "Hello, <br th:text = 'a= b'/>",
-            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( = ){1,19}('a= b'){1,22}SEE{1,28}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( = ){1,19}('a= b'){1,22}SEE(br){1,28}]",
             "[T(Hello, ){1,1}SE(br[th:text='a= b']){1,8}]",
             noRestrictionsAutoClose);
         testDoc(
             "Hello, <br th:text = \"a= b\"\n/>",
-            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( = ){1,19}(\"a= b\"){1,22}IWS(\n){1,28}SEE{2,1}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}( = ){1,19}(\"a= b\"){1,22}IWS(\n){1,28}SEE(br){2,1}]",
             "[T(Hello, ){1,1}SE(br[th:text='a= b']){1,8}]",
             noRestrictionsAutoClose);
         testDoc(
             "Hello, <br  th:text=\"ll\"/>",
-            "[T(Hello, ){1,1}SES(br){1,8}IWS(  ){1,11}A(th:text){1,13}(=){1,20}(\"ll\"){1,21}SEE{1,25}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS(  ){1,11}A(th:text){1,13}(=){1,20}(\"ll\"){1,21}SEE(br){1,25}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]",
             noRestrictionsAutoClose);
         testDoc(
             "Hello, <br \nth:text=\"ll\"/>",
-            "[T(Hello, ){1,1}SES(br){1,8}IWS( \n){1,11}A(th:text){2,1}(=){2,8}(\"ll\"){2,9}SEE{2,13}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( \n){1,11}A(th:text){2,1}(=){2,8}(\"ll\"){2,9}SEE(br){2,13}]",
             null,
             noRestrictionsAutoClose);
         testDoc(
             "Hello, World! <br/>\n<div\n l\n     a=\"12 3\" zas    o=\"\"  b=\"lelo\n  = s\">lala</div> <p th=\"lala\" >liool</p>",
-            "[T(Hello, World! ){1,1}SES(br){1,15}SEE{1,18}T(\n){1,20}" +
+            "[T(Hello, World! ){1,1}SES(br){1,15}SEE(br){1,18}T(\n){1,20}" +
               "OES(div){2,1}IWS(\n ){2,5}A(l){3,2}(){3,3}(){3,3}IWS(\n     ){3,3}" +
               "A(a){4,6}(=){4,7}(\"12 3\"){4,8}IWS( ){4,14}A(zas){4,15}(){4,18}(){4,18}IWS(    ){4,18}" +
               "A(o){4,22}(=){4,23}(\"\"){4,24}IWS(  ){4,26}A(b){4,28}(=){4,29}(\"lelo\n  = s\"){4,30}" +
-              "OEE{5,7}T(lala){5,8}CES(div){5,12}CEE{5,17}T( ){5,18}" +
-              "OES(p){5,19}IWS( ){5,21}A(th){5,22}(=){5,24}(\"lala\"){5,25}IWS( ){5,31}OEE{5,32}" +
-              "T(liool){5,33}CES(p){5,38}CEE{5,41}]",
+              "OEE(div){5,7}T(lala){5,8}CES(div){5,12}CEE(div){5,17}T( ){5,18}" +
+              "OES(p){5,19}IWS( ){5,21}A(th){5,22}(=){5,24}(\"lala\"){5,25}IWS( ){5,31}OEE(p){5,32}" +
+              "T(liool){5,33}CES(p){5,38}CEE(p){5,41}]",
               null,
               noRestrictionsAutoClose);
 
         testDoc(
             "Hello<!--hi!-->, <br/>",
-            "[T(Hello){1,1}C(hi!){1,6}T(, ){1,16}SES(br){1,18}SEE{1,21}]",
+            "[T(Hello){1,1}C(hi!){1,6}T(, ){1,16}SES(br){1,18}SEE(br){1,21}]",
             null,
             noRestrictionsAutoClose);
         testDoc(
             "Hello<!--hi\"!-->, <br/>",
-            "[T(Hello){1,1}C(hi\"!){1,6}T(, ){1,17}SES(br){1,19}SEE{1,22}]",
+            "[T(Hello){1,1}C(hi\"!){1,6}T(, ){1,17}SES(br){1,19}SEE(br){1,22}]",
             null,
             noRestrictionsAutoClose);
 
         testDoc(
             "Hello<!-- 4 > 3 -->, <br/>",
-            "[T(Hello){1,1}C( 4 > 3 ){1,6}T(, ){1,20}SES(br){1,22}SEE{1,25}]",
+            "[T(Hello){1,1}C( 4 > 3 ){1,6}T(, ){1,20}SES(br){1,22}SEE(br){1,25}]",
             null,
             noRestrictionsAutoClose);
         testDoc(
             "Hello<!-- 4 > 3 > 10 -->, <br/>",
-            "[T(Hello){1,1}C( 4 > 3 > 10 ){1,6}T(, ){1,25}SES(br){1,27}SEE{1,30}]",
+            "[T(Hello){1,1}C( 4 > 3 > 10 ){1,6}T(, ){1,25}SES(br){1,27}SEE(br){1,30}]",
             "[T(Hello){1,1}C( 4 > 3 > 10 ){1,6}T(, ){1,25}SE(br){1,27}]",
             noRestrictionsAutoClose);
         testDoc(
             "Hello<!-- 4 > 3\n > 10 -->, <br/>",
-            "[T(Hello){1,1}C( 4 > 3\n > 10 ){1,6}T(, ){2,10}SES(br){2,12}SEE{2,15}]",
+            "[T(Hello){1,1}C( 4 > 3\n > 10 ){1,6}T(, ){2,10}SES(br){2,12}SEE(br){2,15}]",
             null,
             noRestrictionsAutoClose);
         testDoc(
             "Hello<![CDATA[ 4 > 3\n > 10 ]]>, <br/>",
-            "[T(Hello){1,1}D( 4 > 3\n > 10 ){1,6}T(, ){2,10}SES(br){2,12}SEE{2,15}]",
+            "[T(Hello){1,1}CD( 4 > 3\n > 10 ){1,6}T(, ){2,10}SES(br){2,12}SEE(br){2,15}]",
             null,
             noRestrictionsAutoClose);
         testDoc(
             "Hello<![CDATA[ 4 > 3\n \"> 10 ]]>, <br/>",
-            "[T(Hello){1,1}D( 4 > 3\n \"> 10 ){1,6}T(, ){2,11}SES(br){2,13}SEE{2,16}]",
-            "[T(Hello){1,1}D( 4 > 3\n \"> 10 ){1,6}T(, ){2,11}SE(br){2,13}]",
+            "[T(Hello){1,1}CD( 4 > 3\n \"> 10 ){1,6}T(, ){2,11}SES(br){2,13}SEE(br){2,16}]",
+            "[T(Hello){1,1}CD( 4 > 3\n \"> 10 ){1,6}T(, ){2,11}SE(br){2,13}]",
             noRestrictionsAutoClose);
         testDoc(
             "Hello<![CDATA[ 4 > 3\n '> 10 ]]>, <br/>",
-            "[T(Hello){1,1}D( 4 > 3\n '> 10 ){1,6}T(, ){2,11}SES(br){2,13}SEE{2,16}]",
-            "[T(Hello){1,1}D( 4 > 3\n '> 10 ){1,6}T(, ){2,11}SE(br){2,13}]",
+            "[T(Hello){1,1}CD( 4 > 3\n '> 10 ){1,6}T(, ){2,11}SES(br){2,13}SEE(br){2,16}]",
+            "[T(Hello){1,1}CD( 4 > 3\n '> 10 ){1,6}T(, ){2,11}SE(br){2,13}]",
             noRestrictionsAutoClose);
         testDoc(
             "Hello<![CDATA[ 4 > 3 > 10 ]]>, <br/>",
-            "[T(Hello){1,1}D( 4 > 3 > 10 ){1,6}T(, ){1,30}SES(br){1,32}SEE{1,35}]",
+            "[T(Hello){1,1}CD( 4 > 3 > 10 ){1,6}T(, ){1,30}SES(br){1,32}SEE(br){1,35}]",
             null,
             noRestrictionsAutoClose);
         testDoc(
             "Hello<![CDATA[ 4 > 3\n\n\n\n > 10 ]]>, <br/>",
-            "[T(Hello){1,1}D( 4 > 3\n\n\n\n > 10 ){1,6}T(, ){5,10}SES(br){5,12}SEE{5,15}]",
+            "[T(Hello){1,1}CD( 4 > 3\n\n\n\n > 10 ){1,6}T(, ){5,10}SES(br){5,12}SEE(br){5,15}]",
             null,
             noRestrictionsAutoClose);
         testDoc(
             "Hello<![CDATA[ 4 > 3\n\n  \n   \n   \t> 10 ]]>, <br/>",
-            "[T(Hello){1,1}D( 4 > 3\n\n  \n   \n   \t> 10 ){1,6}T(, ){5,13}SES(br){5,15}SEE{5,18}]",
+            "[T(Hello){1,1}CD( 4 > 3\n\n  \n   \n   \t> 10 ){1,6}T(, ){5,13}SES(br){5,15}SEE(br){5,18}]",
             null,
             noRestrictionsAutoClose);
         testDoc(
@@ -615,11 +616,11 @@ public class MarkupAttoParserTest extends TestCase {
             "Hello<![CDATA[ 4 > 3\n\n  \n   \n   \t> 10 ]]>, <br/>\n" +
             "Hello<![CDATA[ 4 > 3\n\n  \n   \n   \t> 10 ]]>, <br/>\n" +
             "Hello<![CDATA[ 4 > 3\n\n  \n   \n   \t> 10 ]]>, <br/>",
-            "[T(Hello){1,1}D( 4 > 3\n\n  \n   \n   \t> 10 ){1,6}T(, ){5,13}SES(br){5,15}SEE{5,18}" +
-            "T(\nHello){5,20}D( 4 > 3\n\n  \n   \n   \t> 10 ){6,6}T(, ){10,13}SES(br){10,15}SEE{10,18}" +
-            "T(\nHello){10,20}D( 4 > 3\n\n  \n   \n   \t> 10 ){11,6}T(, ){15,13}SES(br){15,15}SEE{15,18}" +
-            "T(\nHello){15,20}D( 4 > 3\n\n  \n   \n   \t> 10 ){16,6}T(, ){20,13}SES(br){20,15}SEE{20,18}" +
-            "T(\nHello){20,20}D( 4 > 3\n\n  \n   \n   \t> 10 ){21,6}T(, ){25,13}SES(br){25,15}SEE{25,18}]",
+            "[T(Hello){1,1}CD( 4 > 3\n\n  \n   \n   \t> 10 ){1,6}T(, ){5,13}SES(br){5,15}SEE(br){5,18}" +
+            "T(\nHello){5,20}CD( 4 > 3\n\n  \n   \n   \t> 10 ){6,6}T(, ){10,13}SES(br){10,15}SEE(br){10,18}" +
+            "T(\nHello){10,20}CD( 4 > 3\n\n  \n   \n   \t> 10 ){11,6}T(, ){15,13}SES(br){15,15}SEE(br){15,18}" +
+            "T(\nHello){15,20}CD( 4 > 3\n\n  \n   \n   \t> 10 ){16,6}T(, ){20,13}SES(br){20,15}SEE(br){20,18}" +
+            "T(\nHello){20,20}CD( 4 > 3\n\n  \n   \n   \t> 10 ){21,6}T(, ){25,13}SES(br){25,15}SEE(br){25,18}]",
             null,
             noRestrictionsAutoClose);
         testDoc(
@@ -775,13 +776,13 @@ public class MarkupAttoParserTest extends TestCase {
             "la \n&aacute; lasd &amp; aiass da & asdll . asi ua&$\" khj askjh 1 kh ak hhjh" +
             "kljasdl kjaslkj asjqq9k fiuh 23kj hdfkjh assdflkjh lkjh fdfa\nsdfkjlh dfs" +
             "llkd8u u \nhkkj asyu 4lk vl jhksajhd889p3rk sl a, alkj a9))sad l\nkjsalkja aslk" +
-            "la &aacute;\n lasd &amp;){1,1}OES(p){11,12}OEE{11,14}T( aiass da & asdll . asi ua&$\" khj askjh 1 kh ak hh\njh" +
+            "la &aacute;\n lasd &amp;){1,1}OES(p){11,12}OEE(p){11,14}T( aiass da & asdll . asi ua&$\" khj askjh 1 kh ak hh\njh" +
             "kl\njasdl kjaslkj asjqq9\nk fiuh 23kj hdfkjh assd\nflkjh lkjh fdfasdfkjlh dfs" +
             "llk\nd8u u hkkj asyu 4lk vl jhksajhd889p3rk sl a, alkj a9\n))sad lkjsalkja aslk" +
             "la \n&aacute; lasd &amp; aiass da & asdll . asi ua&$\" khj askjh 1 kh ak hhjh" +
             "kljasdl kjaslkj asjqq9k fiuh 23kj hdfkjh assdflkjh lkjh fdfa\nsdfkjlh dfs" +
             "llkd8u u \nhkkj asyu 4lk vl jhksajhd889p3rk sl a, alkj a9))sad l\nkjsalkja aslk" +
-            "la &aacute;\n lasd &amp; aiass da & asdll . asi ua&$\"){11,15}CES(p){22,41}CEE{22,44}T( khj askjh 1 kh ak hh\njh" +
+            "la &aacute;\n lasd &amp; aiass da & asdll . asi ua&$\"){11,15}CES(p){22,41}CEE(p){22,44}T( khj askjh 1 kh ak hh\njh" +
             "kl\njasdl kjaslkj asjqq9\nk fiuh 23kj hdfkjh assd\nflkjh lkjh fdfasdfkjlh dfs" +
             "llk\nd8u u hkkj asyu 4lk vl jhksajhd889p3rk sl a, alkj a9\n))sad lkjsalkja aslk" +
             "la \n&aacute; lasd &amp; aiass da & asdll . asi ua&$\" khj askjh 1 kh ak hhjh" +
@@ -852,22 +853,22 @@ public class MarkupAttoParserTest extends TestCase {
 
         testDoc(
             "<div class = \"lala\">",
-            "[OES(div){1,1}IWS( ){1,5}A(class){1,6}( = ){1,11}(\"lala\"){1,14}OEE{1,20}ACES(div){1,21}ACEE{1,21}]",
+            "[OES(div){1,1}IWS( ){1,5}A(class){1,6}( = ){1,11}(\"lala\"){1,14}OEE(div){1,20}ACES(div){1,21}ACEE(div){1,21}]",
             null,
             noRestrictionsAutoClose);
         testDoc(
             "<div class \n\n= \nlala li=\nlla>",
-            "[OES(div){1,1}IWS( ){1,5}A(class){1,6}( \n\n= \n){1,11}(lala){4,1}IWS( ){4,5}A(li){4,6}(=\n){4,8}(lla){5,1}OEE{5,4}ACES(div){5,5}ACEE{5,5}]",
+            "[OES(div){1,1}IWS( ){1,5}A(class){1,6}( \n\n= \n){1,11}(lala){4,1}IWS( ){4,5}A(li){4,6}(=\n){4,8}(lla){5,1}OEE(div){5,4}ACES(div){5,5}ACEE(div){5,5}]",
             null,
             noRestrictionsAutoClose);
         testDoc(
             "<div class \n\n= \n\"lala\"li=\nlla>",
-            "[OES(div){1,1}IWS( ){1,5}A(class){1,6}( \n\n= \n){1,11}(\"lala\"){4,1}A(li){4,7}(=\n){4,9}(lla){5,1}OEE{5,4}ACES(div){5,5}ACEE{5,5}]",
+            "[OES(div){1,1}IWS( ){1,5}A(class){1,6}( \n\n= \n){1,11}(\"lala\"){4,1}A(li){4,7}(=\n){4,9}(lla){5,1}OEE(div){5,4}ACES(div){5,5}ACEE(div){5,5}]",
             null,
             noRestrictionsAutoClose);
         testDoc(
             "<div class \n\n= \n'lala'li=\nlla>",
-            "[OES(div){1,1}IWS( ){1,5}A(class){1,6}( \n\n= \n){1,11}('lala'){4,1}A(li){4,7}(=\n){4,9}(lla){5,1}OEE{5,4}ACES(div){5,5}ACEE{5,5}]",
+            "[OES(div){1,1}IWS( ){1,5}A(class){1,6}( \n\n= \n){1,11}('lala'){4,1}A(li){4,7}(=\n){4,9}(lla){5,1}OEE(div){5,4}ACES(div){5,5}ACEE(div){5,5}]",
             null,
             noRestrictionsAutoClose);
 
@@ -1073,32 +1074,32 @@ public class MarkupAttoParserTest extends TestCase {
 
         testDoc(
             "<?xml version=\"1.0\"?>",
-            "[X(1.0){1,15}(null){1,20}(null){1,20}]",
-            "[X(1.0)(null)(null){1,1}]",
+            "[XD(xml){1,3}(1.0){1,15}(){1,20}(){1,20}]",
+            "[XD(1.0)()(){1,1}]",
             noRestrictionsAutoClose);
 
         testDoc(
             "<?xml version=\"1.0\" encoding=\"\"?>",
-            "[X(1.0){1,15}(){1,30}(null){1,32}]",
-            "[X(1.0)()(null){1,1}]",
+            "[XD(xml){1,3}(1.0){1,15}(){1,30}(){1,32}]",
+            "[XD(1.0)()(){1,1}]",
             noRestrictionsAutoClose);
 
         testDoc(
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-            "[X(1.0){1,15}(UTF-8){1,30}(null){1,37}]",
-            "[X(1.0)(UTF-8)(null){1,1}]",
+            "[XD(xml){1,3}(1.0){1,15}(UTF-8){1,30}(){1,37}]",
+            "[XD(1.0)(UTF-8)(){1,1}]",
             noRestrictionsAutoClose);
 
         testDoc(
             "<?xml version=\"1.0\"   \nencoding=\"UTF-8\"   ?>",
-            "[X(1.0){1,15}(UTF-8){2,10}(null){2,20}]",
-            "[X(1.0)(UTF-8)(null){1,1}]",
+            "[XD(xml){1,3}(1.0){1,15}(UTF-8){2,10}(){2,20}]",
+            "[XD(1.0)(UTF-8)(){1,1}]",
             noRestrictionsAutoClose);
 
         testDoc(
             "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>",
-            "[X(1.0){1,15}(UTF-8){1,30}(yes){1,49}]",
-            "[X(1.0)(UTF-8)(yes){1,1}]",
+            "[XD(xml){1,3}(1.0){1,15}(UTF-8){1,30}(yes){1,49}]",
+            "[XD(1.0)(UTF-8)(yes){1,1}]",
             noRestrictionsAutoClose);
 
         testDocError(
@@ -1139,29 +1140,29 @@ public class MarkupAttoParserTest extends TestCase {
 
         testDoc(
             "<?xml version=\"1.0\"  ?>",
-            "[X(1.0){1,15}(null){1,22}(null){1,22}]",
-            "[X(1.0)(null)(null){1,1}]",
+            "[XD(xml){1,3}(1.0){1,15}(){1,22}(){1,22}]",
+            "[XD(1.0)()(){1,1}]",
             noRestrictionsAutoClose);
 
         testDoc(
             "<?xml version=\"1.0\"?><!DOCTYPE html>",
-            "[X(1.0){1,15}(null){1,20}(null){1,20}DT(DOCTYPE){1,24}(html){1,32}(){1,36}(){1,36}(){1,36}(){1,36}]",
-            "[X(1.0)(null)(null){1,1}DT(html)()()(){1,22}]",
+            "[XD(xml){1,3}(1.0){1,15}(){1,20}(){1,20}DT(DOCTYPE){1,24}(html){1,32}(){1,36}(){1,36}(){1,36}(){1,36}]",
+            "[XD(1.0)()(){1,1}DT(html)()()(){1,22}]",
             noRestrictionsAutoClose);
         testDoc(
             "<?xml version=\"1.0\"?>\n<!DOCTYPE html>",
-            "[X(1.0){1,15}(null){1,20}(null){1,20}T(\n){1,22}DT(DOCTYPE){2,3}(html){2,11}(){2,15}(){2,15}(){2,15}(){2,15}]",
-            "[X(1.0)(null)(null){1,1}T(\n){1,22}DT(html)()()(){2,1}]",
+            "[XD(xml){1,3}(1.0){1,15}(){1,20}(){1,20}T(\n){1,22}DT(DOCTYPE){2,3}(html){2,11}(){2,15}(){2,15}(){2,15}(){2,15}]",
+            "[XD(1.0)()(){1,1}T(\n){1,22}DT(html)()()(){2,1}]",
             noRestrictionsAutoClose);
 
         testDoc(
             "\n <!ELEMENT sgml ANY>",
-            "[T(\n ){1,1}OES(!ELEMENT){2,2}IWS( ){2,11}A(sgml){2,12}(){2,16}(){2,16}IWS( ){2,16}A(ANY){2,17}(){2,20}(){2,20}OEE{2,20}ACES(!ELEMENT){2,21}ACEE{2,21}]",
+            "[T(\n ){1,1}OES(!ELEMENT){2,2}IWS( ){2,11}A(sgml){2,12}(){2,16}(){2,16}IWS( ){2,16}A(ANY){2,17}(){2,20}(){2,20}OEE(!ELEMENT){2,20}ACES(!ELEMENT){2,21}ACEE(!ELEMENT){2,21}]",
             "[T(\n ){1,1}OE(!ELEMENT[sgml='',ANY='']){2,2}ACE(!ELEMENT){2,21}]",
             noRestrictionsAutoClose);
         testDoc(
             "\n <!ELEMENT sgml ANY>\n <!-- this is a comment inside --> <!ENTITY % std       \"standard SGML\">\n",
-            "[T(\n ){1,1}OES(!ELEMENT){2,2}IWS( ){2,11}A(sgml){2,12}(){2,16}(){2,16}IWS( ){2,16}A(ANY){2,17}(){2,20}(){2,20}OEE{2,20}T(\n ){2,21}C( this is a comment inside ){3,2}T( ){3,35}OES(!ENTITY){3,36}IWS( ){3,44}A(%){3,45}(){3,46}(){3,46}IWS( ){3,46}A(std){3,47}(){3,50}(){3,50}IWS(       ){3,50}A(\"standard){3,57}(){3,66}(){3,66}IWS( ){3,66}A(SGML\"){3,67}(){3,72}(){3,72}OEE{3,72}T(\n){3,73}ACES(!ENTITY){4,1}ACEE{4,1}ACES(!ELEMENT){4,1}ACEE{4,1}]",
+            "[T(\n ){1,1}OES(!ELEMENT){2,2}IWS( ){2,11}A(sgml){2,12}(){2,16}(){2,16}IWS( ){2,16}A(ANY){2,17}(){2,20}(){2,20}OEE(!ELEMENT){2,20}T(\n ){2,21}C( this is a comment inside ){3,2}T( ){3,35}OES(!ENTITY){3,36}IWS( ){3,44}A(%){3,45}(){3,46}(){3,46}IWS( ){3,46}A(std){3,47}(){3,50}(){3,50}IWS(       ){3,50}A(\"standard){3,57}(){3,66}(){3,66}IWS( ){3,66}A(SGML\"){3,67}(){3,72}(){3,72}OEE(!ENTITY){3,72}T(\n){3,73}ACES(!ENTITY){4,1}ACEE(!ENTITY){4,1}ACES(!ELEMENT){4,1}ACEE(!ELEMENT){4,1}]",
             "[T(\n ){1,1}OE(!ELEMENT[sgml='',ANY='']){2,2}T(\n ){2,21}C( this is a comment inside ){3,2}T( ){3,35}OE(!ENTITY[%='',std='',\"standard='',SGML\"='']){3,36}T(\n){3,73}ACE(!ENTITY){4,1}ACE(!ELEMENT){4,1}]",
             noRestrictionsAutoClose);
 
@@ -1173,13 +1174,13 @@ public class MarkupAttoParserTest extends TestCase {
             noRestrictionsAutoClose);
         testDoc(
             "<?xsl-stylesheet ?>",
-            "[P(xsl-stylesheet){1,3}(null){1,18}]",
-            "[P(xsl-stylesheet)(null){1,1}]",
+            "[P(xsl-stylesheet){1,3}(){1,18}]",
+            "[P(xsl-stylesheet)(){1,1}]",
             noRestrictionsAutoClose);
         testDoc(
             "<?xsl-stylesheet?>",
-            "[P(xsl-stylesheet){1,3}(null){1,17}]",
-            "[P(xsl-stylesheet)(null){1,1}]",
+            "[P(xsl-stylesheet){1,3}(){1,17}]",
+            "[P(xsl-stylesheet)(){1,1}]",
             noRestrictionsAutoClose);
         testDoc(
             "<?xsl-stylesheet a=\"1\" a b > uas23 ?>",
@@ -1188,28 +1189,28 @@ public class MarkupAttoParserTest extends TestCase {
             noRestrictionsAutoClose);
         testDoc(
             "<p><!--a--></p>",
-            "[OES(p){1,1}OEE{1,3}C(a){1,4}CES(p){1,12}CEE{1,15}]",
+            "[OES(p){1,1}OEE(p){1,3}C(a){1,4}CES(p){1,12}CEE(p){1,15}]",
             "[OE(p){1,1}C(a){1,4}CE(p){1,12}]",
             noRestrictionsAutoClose);
         testDoc(
             "<p><!--a-->",
-            "[OES(p){1,1}OEE{1,3}C(a){1,4}ACES(p){1,12}ACEE{1,12}]",
+            "[OES(p){1,1}OEE(p){1,3}C(a){1,4}ACES(p){1,12}ACEE(p){1,12}]",
             "[OE(p){1,1}C(a){1,4}ACE(p){1,12}]",
             noRestrictionsAutoClose);
         testDoc(
             "<p><?xsl-stylesheet a=\"1\" a b > uas23 ?>",
-            "[OES(p){1,1}OEE{1,3}P(xsl-stylesheet){1,6}(a=\"1\" a b > uas23 ){1,21}ACES(p){1,41}ACEE{1,41}]",
+            "[OES(p){1,1}OEE(p){1,3}P(xsl-stylesheet){1,6}(a=\"1\" a b > uas23 ){1,21}ACES(p){1,41}ACEE(p){1,41}]",
             "[OE(p){1,1}P(xsl-stylesheet)(a=\"1\" a b > uas23 ){1,4}ACE(p){1,41}]",
             noRestrictionsAutoClose);
 
         testDoc(
             "<p>Hello</p>",
-            "[OES(p){1,1}OEE{1,3}T(Hello){1,4}CES(p){1,9}CEE{1,12}]",
+            "[OES(p){1,1}OEE(p){1,3}T(Hello){1,4}CES(p){1,9}CEE(p){1,12}]",
             "[OE(p){1,1}T(Hello){1,4}CE(p){1,9}]",
             wellFormedXml);
         testDoc(
             "<h1>Hello</h1>",
-            "[OES(h1){1,1}OEE{1,4}T(Hello){1,5}CES(h1){1,10}CEE{1,14}]",
+            "[OES(h1){1,1}OEE(h1){1,4}T(Hello){1,5}CES(h1){1,10}CEE(h1){1,14}]",
             "[OE(h1){1,1}T(Hello){1,5}CE(h1){1,10}]",
             wellFormedXml);
         testDocError(
@@ -1226,49 +1227,49 @@ public class MarkupAttoParserTest extends TestCase {
             wellFormedXml);
         testDoc(
             "<h1>Hello</h1 >",
-            "[OES(h1){1,1}OEE{1,4}T(Hello){1,5}CES(h1){1,10}IWS( ){1,14}CEE{1,15}]",
+            "[OES(h1){1,1}OEE(h1){1,4}T(Hello){1,5}CES(h1){1,10}IWS( ){1,14}CEE(h1){1,15}]",
             "[OE(h1){1,1}T(Hello){1,5}CE(h1){1,10}]",
             wellFormedXml);
 
         testDoc(
             "<?xml version=\"1.0\"?>\n<!DOCTYPE html>\n<html></html>",
-            "[X(1.0){1,15}(null){1,20}(null){1,20}T(\n){1,22}DT(DOCTYPE){2,3}(html){2,11}(){2,15}(){2,15}(){2,15}(){2,15}T(\n){2,16}OES(html){3,1}OEE{3,6}CES(html){3,7}CEE{3,13}]",
-            "[X(1.0)(null)(null){1,1}T(\n){1,22}DT(html)()()(){2,1}T(\n){2,16}OE(html){3,1}CE(html){3,7}]",
+            "[XD(xml){1,3}(1.0){1,15}(){1,20}(){1,20}T(\n){1,22}DT(DOCTYPE){2,3}(html){2,11}(){2,15}(){2,15}(){2,15}(){2,15}T(\n){2,16}OES(html){3,1}OEE(html){3,6}CES(html){3,7}CEE(html){3,13}]",
+            "[XD(1.0)()(){1,1}T(\n){1,22}DT(html)()()(){2,1}T(\n){2,16}OE(html){3,1}CE(html){3,7}]",
             wellFormedXml);
         testDoc(
             "<?xml version=\"1.0\"?>\n<html></html>",
-            "[X(1.0){1,15}(null){1,20}(null){1,20}T(\n){1,22}OES(html){2,1}OEE{2,6}CES(html){2,7}CEE{2,13}]",
-            "[X(1.0)(null)(null){1,1}T(\n){1,22}OE(html){2,1}CE(html){2,7}]",
+            "[XD(xml){1,3}(1.0){1,15}(){1,20}(){1,20}T(\n){1,22}OES(html){2,1}OEE(html){2,6}CES(html){2,7}CEE(html){2,13}]",
+            "[XD(1.0)()(){1,1}T(\n){1,22}OE(html){2,1}CE(html){2,7}]",
             wellFormedXml);
         testDoc(
             "<!DOCTYPE html>\n<html></html>",
-            "[DT(DOCTYPE){1,3}(html){1,11}(){1,15}(){1,15}(){1,15}(){1,15}T(\n){1,16}OES(html){2,1}OEE{2,6}CES(html){2,7}CEE{2,13}]",
+            "[DT(DOCTYPE){1,3}(html){1,11}(){1,15}(){1,15}(){1,15}(){1,15}T(\n){1,16}OES(html){2,1}OEE(html){2,6}CES(html){2,7}CEE(html){2,13}]",
             "[DT(html)()()(){1,1}T(\n){1,16}OE(html){2,1}CE(html){2,7}]",
             wellFormedXml);
         testDoc(
             "\n<!DOCTYPE html>\n<html></html>",
-            "[T(\n){1,1}DT(DOCTYPE){2,3}(html){2,11}(){2,15}(){2,15}(){2,15}(){2,15}T(\n){2,16}OES(html){3,1}OEE{3,6}CES(html){3,7}CEE{3,13}]",
+            "[T(\n){1,1}DT(DOCTYPE){2,3}(html){2,11}(){2,15}(){2,15}(){2,15}(){2,15}T(\n){2,16}OES(html){3,1}OEE(html){3,6}CES(html){3,7}CEE(html){3,13}]",
             "[T(\n){1,1}DT(html)()()(){2,1}T(\n){2,16}OE(html){3,1}CE(html){3,7}]",
             wellFormedXml);
         testDoc(
             "\n<?xml version=\"1.0\"?>\n<!DOCTYPE html>\n<html></html>",
-            "[T(\n){1,1}X(1.0){2,15}(null){2,20}(null){2,20}T(\n){2,22}DT(DOCTYPE){3,3}(html){3,11}(){3,15}(){3,15}(){3,15}(){3,15}T(\n){3,16}OES(html){4,1}OEE{4,6}CES(html){4,7}CEE{4,13}]",
-            "[T(\n){1,1}X(1.0)(null)(null){2,1}T(\n){2,22}DT(html)()()(){3,1}T(\n){3,16}OE(html){4,1}CE(html){4,7}]",
+            "[T(\n){1,1}XD(xml){2,3}(1.0){2,15}(){2,20}(){2,20}T(\n){2,22}DT(DOCTYPE){3,3}(html){3,11}(){3,15}(){3,15}(){3,15}(){3,15}T(\n){3,16}OES(html){4,1}OEE(html){4,6}CES(html){4,7}CEE(html){4,13}]",
+            "[T(\n){1,1}XD(1.0)()(){2,1}T(\n){2,22}DT(html)()()(){3,1}T(\n){3,16}OE(html){4,1}CE(html){4,7}]",
             wellFormedXml);
         testDoc(
             "<?xml version=\"1.0\"?>\n<!-- a comment -->\n<!DOCTYPE html>\n<html></html>",
-            "[X(1.0){1,15}(null){1,20}(null){1,20}T(\n){1,22}C( a comment ){2,1}T(\n){2,19}DT(DOCTYPE){3,3}(html){3,11}(){3,15}(){3,15}(){3,15}(){3,15}T(\n){3,16}OES(html){4,1}OEE{4,6}CES(html){4,7}CEE{4,13}]",
-            "[X(1.0)(null)(null){1,1}T(\n){1,22}C( a comment ){2,1}T(\n){2,19}DT(html)()()(){3,1}T(\n){3,16}OE(html){4,1}CE(html){4,7}]",
+            "[XD(xml){1,3}(1.0){1,15}(){1,20}(){1,20}T(\n){1,22}C( a comment ){2,1}T(\n){2,19}DT(DOCTYPE){3,3}(html){3,11}(){3,15}(){3,15}(){3,15}(){3,15}T(\n){3,16}OES(html){4,1}OEE(html){4,6}CES(html){4,7}CEE(html){4,13}]",
+            "[XD(1.0)()(){1,1}T(\n){1,22}C( a comment ){2,1}T(\n){2,19}DT(html)()()(){3,1}T(\n){3,16}OE(html){4,1}CE(html){4,7}]",
             wellFormedXml);
         testDoc(
             "<!-- a comment -->\n<?xml version=\"1.0\"?>\n<!DOCTYPE html>\n<html></html>",
-            "[C( a comment ){1,1}T(\n){1,19}X(1.0){2,15}(null){2,20}(null){2,20}T(\n){2,22}DT(DOCTYPE){3,3}(html){3,11}(){3,15}(){3,15}(){3,15}(){3,15}T(\n){3,16}OES(html){4,1}OEE{4,6}CES(html){4,7}CEE{4,13}]",
-            "[C( a comment ){1,1}T(\n){1,19}X(1.0)(null)(null){2,1}T(\n){2,22}DT(html)()()(){3,1}T(\n){3,16}OE(html){4,1}CE(html){4,7}]",
+            "[C( a comment ){1,1}T(\n){1,19}XD(xml){2,3}(1.0){2,15}(){2,20}(){2,20}T(\n){2,22}DT(DOCTYPE){3,3}(html){3,11}(){3,15}(){3,15}(){3,15}(){3,15}T(\n){3,16}OES(html){4,1}OEE(html){4,6}CES(html){4,7}CEE(html){4,13}]",
+            "[C( a comment ){1,1}T(\n){1,19}XD(1.0)()(){2,1}T(\n){2,22}DT(html)()()(){3,1}T(\n){3,16}OE(html){4,1}CE(html){4,7}]",
             wellFormedXml);
         testDoc(
             "<!DOCTYPE html>\n<html><?xml version=\"1.0\"?>\n</html>",
-            "[DT(DOCTYPE){1,3}(html){1,11}(){1,15}(){1,15}(){1,15}(){1,15}T(\n){1,16}OES(html){2,1}OEE{2,6}X(1.0){2,21}(null){2,26}(null){2,26}T(\n){2,28}CES(html){3,1}CEE{3,7}]",
-            "[DT(html)()()(){1,1}T(\n){1,16}OE(html){2,1}X(1.0)(null)(null){2,7}T(\n){2,28}CE(html){3,1}]",
+            "[DT(DOCTYPE){1,3}(html){1,11}(){1,15}(){1,15}(){1,15}(){1,15}T(\n){1,16}OES(html){2,1}OEE(html){2,6}XD(xml){2,9}(1.0){2,21}(){2,26}(){2,26}T(\n){2,28}CES(html){3,1}CEE(html){3,7}]",
+            "[DT(html)()()(){1,1}T(\n){1,16}OE(html){2,1}XD(1.0)()(){2,7}T(\n){2,28}CE(html){3,1}]",
             noRestrictionsAutoClose);
         testDocError(
             "<!DOCTYPE html>\n<?xml version=\"1.0\"?>\n<html></html>",
@@ -1298,12 +1299,12 @@ public class MarkupAttoParserTest extends TestCase {
 
         testDoc(
             "Hello, <br th:text=\"ll\"/>",
-            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}(=){1,19}(\"ll\"){1,20}SEE{1,24}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}(=){1,19}(\"ll\"){1,20}SEE(br){1,24}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]",
             wellFormedXml);
         testDoc(
             "Hello, <br th:text='ll'/>",
-            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}(=){1,19}('ll'){1,20}SEE{1,24}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}(=){1,19}('ll'){1,20}SEE(br){1,24}]",
             "[T(Hello, ){1,1}SE(br[th:text='ll']){1,8}]",
             wellFormedXml);
         testDocError(
@@ -1320,7 +1321,7 @@ public class MarkupAttoParserTest extends TestCase {
             wellFormedXml);
         testDoc(
             "<html></html><html></html>",
-            "[OES(html){1,1}OEE{1,6}CES(html){1,7}CEE{1,13}OES(html){1,14}OEE{1,19}CES(html){1,20}CEE{1,26}]",
+            "[OES(html){1,1}OEE(html){1,6}CES(html){1,7}CEE(html){1,13}OES(html){1,14}OEE(html){1,19}CES(html){1,20}CEE(html){1,26}]",
             "[OE(html){1,1}CE(html){1,7}OE(html){1,14}CE(html){1,20}]",
             wellFormedXml);
         testDocError(
@@ -1341,7 +1342,7 @@ public class MarkupAttoParserTest extends TestCase {
             wellFormedXml);
         testDoc(
             "Hello, <br th:text=\"ll\" th:text=\"la\"/>",
-            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}(=){1,19}(\"ll\"){1,20}IWS( ){1,24}A(th:text){1,25}(=){1,32}(\"la\"){1,33}SEE{1,37}]",
+            "[T(Hello, ){1,1}SES(br){1,8}IWS( ){1,11}A(th:text){1,12}(=){1,19}(\"ll\"){1,20}IWS( ){1,24}A(th:text){1,25}(=){1,32}(\"la\"){1,33}SEE(br){1,37}]",
             "[T(Hello, ){1,1}SE(br[th:text='la']){1,8}]",
             noRestrictionsAutoClose);
         testDocError(
@@ -1355,7 +1356,7 @@ public class MarkupAttoParserTest extends TestCase {
 
         testDoc(
                 "<h1>Hello</h1>",
-                "[OES(h1){1,1}OEE{1,4}T(Hello){1,5}CES(h1){1,10}CEE{1,14}]",
+                "[OES(h1){1,1}OEE(h1){1,4}T(Hello){1,5}CES(h1){1,10}CEE(h1){1,14}]",
                 "[OE(h1){1,1}T(Hello){1,5}CE(h1){1,10}]",
                 noUnbalacedClosed);
         testDocError(
@@ -1366,7 +1367,7 @@ public class MarkupAttoParserTest extends TestCase {
                 noUnbalacedClosed);
         testDoc(
                 "<h1>Hello",
-                "[OES(h1){1,1}OEE{1,4}T(Hello){1,5}ACES(h1){1,10}ACEE{1,10}]",
+                "[OES(h1){1,1}OEE(h1){1,4}T(Hello){1,5}ACES(h1){1,10}ACEE(h1){1,10}]",
                 "[OE(h1){1,1}T(Hello){1,5}ACE(h1){1,10}]",
                 noRestrictionsAutoClose);
         testDocError(
@@ -1377,7 +1378,7 @@ public class MarkupAttoParserTest extends TestCase {
                 noUnbalacedClosed);
         testDoc(
                 "<h1><h2>Hello</h1>",
-                "[OES(h1){1,1}OEE{1,4}OES(h2){1,5}OEE{1,8}T(Hello){1,9}ACES(h2){1,14}ACEE{1,14}CES(h1){1,14}CEE{1,18}]",
+                "[OES(h1){1,1}OEE(h1){1,4}OES(h2){1,5}OEE(h2){1,8}T(Hello){1,9}ACES(h2){1,14}ACEE(h2){1,14}CES(h1){1,14}CEE(h1){1,18}]",
                 "[OE(h1){1,1}OE(h2){1,5}T(Hello){1,9}ACE(h2){1,14}CE(h1){1,14}]",
                 noUnbalacedClosed);
         testDocError(
@@ -1388,17 +1389,17 @@ public class MarkupAttoParserTest extends TestCase {
                 noUnbalacedClosed);
         testDoc(
                 "<h1><h2>Hello</h2>",
-                "[OES(h1){1,1}OEE{1,4}OES(h2){1,5}OEE{1,8}T(Hello){1,9}CES(h2){1,14}CEE{1,18}ACES(h1){1,19}ACEE{1,19}]",
+                "[OES(h1){1,1}OEE(h1){1,4}OES(h2){1,5}OEE(h2){1,8}T(Hello){1,9}CES(h2){1,14}CEE(h2){1,18}ACES(h1){1,19}ACEE(h1){1,19}]",
                 "[OE(h1){1,1}OE(h2){1,5}T(Hello){1,9}CE(h2){1,14}ACE(h1){1,19}]",
                 noUnbalacedClosed);
         testDoc(
                 "<h1><h2>Hello<!--a--></h1>",
-                "[OES(h1){1,1}OEE{1,4}OES(h2){1,5}OEE{1,8}T(Hello){1,9}C(a){1,14}ACES(h2){1,22}ACEE{1,22}CES(h1){1,22}CEE{1,26}]",
+                "[OES(h1){1,1}OEE(h1){1,4}OES(h2){1,5}OEE(h2){1,8}T(Hello){1,9}C(a){1,14}ACES(h2){1,22}ACEE(h2){1,22}CES(h1){1,22}CEE(h1){1,26}]",
                 "[OE(h1){1,1}OE(h2){1,5}T(Hello){1,9}C(a){1,14}ACE(h2){1,22}CE(h1){1,22}]",
                 noUnbalacedClosed);
         testDoc(
                 "<h1></H1>",
-                "[OES(h1){1,1}OEE{1,4}CES(H1){1,5}CEE{1,9}]",
+                "[OES(h1){1,1}OEE(h1){1,4}CES(H1){1,5}CEE(H1){1,9}]",
                 "[OE(h1){1,1}CE(H1){1,5}]",
                 wellFormedXmlCaseInsensitive);
         testDocError(
@@ -1407,7 +1408,7 @@ public class MarkupAttoParserTest extends TestCase {
                 wellFormedXml);
         testDoc(
                 "<!DOCTYPE h1><H1></H1>",
-                "[DT(DOCTYPE){1,3}(h1){1,11}(){1,13}(){1,13}(){1,13}(){1,13}OES(H1){1,14}OEE{1,17}CES(H1){1,18}CEE{1,22}]",
+                "[DT(DOCTYPE){1,3}(h1){1,11}(){1,13}(){1,13}(){1,13}(){1,13}OES(H1){1,14}OEE(H1){1,17}CES(H1){1,18}CEE(H1){1,22}]",
                 "[DT(h1)()()(){1,1}OE(H1){1,14}CE(H1){1,18}]",
                 wellFormedXmlCaseInsensitive);
         testDocError(
@@ -1420,12 +1421,12 @@ public class MarkupAttoParserTest extends TestCase {
                 wellFormedXmlCaseInsensitive);
         testDoc(
                 "<a b=\"2\" B=\"3\"/>",
-                "[SES(a){1,1}IWS( ){1,3}A(b){1,4}(=){1,5}(\"2\"){1,6}IWS( ){1,9}A(B){1,10}(=){1,11}(\"3\"){1,12}SEE{1,15}]",
+                "[SES(a){1,1}IWS( ){1,3}A(b){1,4}(=){1,5}(\"2\"){1,6}IWS( ){1,9}A(B){1,10}(=){1,11}(\"3\"){1,12}SEE(a){1,15}]",
                 "[SE(a[b='2',B='3']){1,1}]",
                 wellFormedXml);
         testDoc(
                 "<a />",
-                "[SES(a){1,1}IWS( ){1,3}SEE{1,4}]",
+                "[SES(a){1,1}IWS( ){1,3}SEE(a){1,4}]",
                 "[SE(a){1,1}]",
                 wellFormedXml);
         testDoc(
@@ -1445,17 +1446,17 @@ public class MarkupAttoParserTest extends TestCase {
                 wellFormedXml);
         testDoc(
                 "<@block b=\"2\"/>",
-                "[SES(@block){1,1}IWS( ){1,8}A(b){1,9}(=){1,10}(\"2\"){1,11}SEE{1,14}]",
+                "[SES(@block){1,1}IWS( ){1,8}A(b){1,9}(=){1,10}(\"2\"){1,11}SEE(@block){1,14}]",
                 "[SE(@block[b='2']){1,1}]",
                 wellFormedXml);
         testDoc(
                 "<@inject b=\"2\"/>",
-                "[SES(@inject){1,1}IWS( ){1,9}A(b){1,10}(=){1,11}(\"2\"){1,12}SEE{1,15}]",
+                "[SES(@inject){1,1}IWS( ){1,9}A(b){1,10}(=){1,11}(\"2\"){1,12}SEE(@inject){1,15}]",
                 "[SE(@inject[b='2']){1,1}]",
                 wellFormedXml);
         testDoc(
                 "</@inject>",
-                "[UCES(@inject){1,1}UCEE{1,10}]",
+                "[UCES(@inject){1,1}UCEE(@inject){1,10}]",
                 "[UCE(@inject){1,1}]",
                 noRestrictions);
         
@@ -1546,15 +1547,29 @@ public class MarkupAttoParserTest extends TestCase {
 
             // TEST WITH TRACING HANDLER
             {
-                final StringWriter sw = new StringWriter(); 
-                final IMarkupAttoHandler handler = new TextTracerMarkupAttoHandler(sw);
+
+                final TraceBuilderMarkupAttoHandler handler = new TraceBuilderMarkupAttoHandler();
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, markupParsingConfiguration);
+
                 if (offset == 0 && len == input.length) {
                     parser.parseDocument(new CharArrayReader(input), eventProcessor, bufferSize);
                 } else { 
                     parser.parseDocument(new CharArrayReader(input, offset, len), eventProcessor, bufferSize);
                 }
-                final String result = sw.toString();
+
+                final List<MarkupParsingTraceEvent> trace = handler.getTrace();
+                final StringBuilder strBuilder = new StringBuilder();
+                for (final MarkupParsingTraceEvent event : trace) {
+                    if (event.getType().equals(MarkupParsingTraceEvent.Type.DOCUMENT_START)) {
+                        strBuilder.append("[");
+                    } else if (event.getType().equals(MarkupParsingTraceEvent.Type.DOCUMENT_END)) {
+                        strBuilder.append("]");
+                    } else {
+                        strBuilder.append(event);
+                    }
+                }
+
+                final String result = strBuilder.toString();
                 if (outputBreakDown != null) {
                     assertEquals(outputBreakDown, result);
                 }
@@ -1599,7 +1614,8 @@ public class MarkupAttoParserTest extends TestCase {
                 // TEST WITH TRACING SIMPLE MARKUP HANDLER (String literals)
                 {
                     final StringWriter sw = new StringWriter(); 
-                    final IMarkupAttoHandler handler = new TextTracerSimplifiedMarkupAttoHandler(sw);
+                    final IMarkupAttoHandler handler =
+                            new SimplifierMarkupAttoHandler(new TextTracerSimpleMarkupAttoHandler(sw));
                     final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, markupParsingConfiguration);
                     if (offset == 0 && len == input.length) {
                         parser.parseDocument(new CharArrayReader(input), eventProcessor, bufferSize);
@@ -1672,18 +1688,33 @@ public class MarkupAttoParserTest extends TestCase {
 
             // TEST WITH TRACING HTML DETAILED HANDLER
             {
-                final StringWriter sw = new StringWriter();
-                final IMarkupAttoHandler handler = new TextTracerHtmlAttoHandler(sw);
+                final TraceBuilderMarkupAttoHandler traceHandler = new TraceBuilderMarkupAttoHandler();
+                final IMarkupAttoHandler handler = new HtmlMarkupAttoHandler(traceHandler);
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, parsingConfiguration);
+
                 if (offset == 0 && len == input.length) {
                     parser.parseDocument(new CharArrayReader(input), eventProcessor, bufferSize);
                 } else {
                     parser.parseDocument(new CharArrayReader(input, offset, len), eventProcessor, bufferSize);
                 }
-                final String result = sw.toString();
+
+                final List<MarkupParsingTraceEvent> trace = traceHandler.getTrace();
+                final StringBuilder strBuilder = new StringBuilder();
+                for (final MarkupParsingTraceEvent event : trace) {
+                    if (event.getType().equals(MarkupParsingTraceEvent.Type.DOCUMENT_START)) {
+                        strBuilder.append("[");
+                    } else if (event.getType().equals(MarkupParsingTraceEvent.Type.DOCUMENT_END)) {
+                        strBuilder.append("]");
+                    } else {
+                        strBuilder.append(event);
+                    }
+                }
+
+                final String result = strBuilder.toString();
                 if (outputBreakDown != null) {
                     assertEquals(outputBreakDown, result);
                 }
+
             }
 
 

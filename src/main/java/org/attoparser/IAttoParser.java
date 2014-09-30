@@ -45,17 +45,17 @@ import java.io.Reader;
  *       (XML and HTML) abstract handler able not only to differentiate among different
  *       types of markup structures, but also of reporting lowel-level detail inside
  *       elements (name, attributes, inner whitespace) and DOCTYPE clauses.</li>
- *   <li>{@link org.attoparser.markup.AbstractSimplifiedMarkupAttoHandler}: higher-level
+ *   <li>{@link org.attoparser.markup.simple.SimplifierMarkupAttoHandler}: higher-level
  *       markup-specialized (XML and HTML) abstract handler that offers an interface
  *       more similar to the Standard SAX ContentHandlers (use of Strings instead of
  *       char[]'s, attribute maps, etc).</li>
- *   <li>{@link org.attoparser.markup.xml.AbstractXmlAttoHandler}: XML-specialized
+ *   <li>{@link org.attoparser.markup.xml.XmlMarkupAttoHandler}: XML-specialized
  *       abstract handler equivalent to {@link org.attoparser.markup.MarkupEventProcessor}
  *       but only allowing XML markup.</li>
  *   <li>{@link org.attoparser.markup.xml.AbstractStandardXmlAttoHandler}: XML-specialized
- *       abstract handler equivalent to {@link org.attoparser.markup.AbstractSimplifiedMarkupAttoHandler}
+ *       abstract handler equivalent to {@link org.attoparser.markup.simple.SimplifierMarkupAttoHandler}
  *       but only allowing XML markup.</li>
- *   <li>{@link org.attoparser.markup.xml.dom.DOMXmlAttoHandler}: handler implementation
+ *   <li>{@link org.attoparser.markup.dom.DOMBuilderMarkupAttoHandler}: handler implementation
  *       (non-abstract) for building an attoDOM tree (DOM node tres based on classes
  *       from the <tt>org.attoparser.markup.dom</tt> package) from XML markup.</li> 
  * </ul>

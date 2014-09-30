@@ -17,45 +17,84 @@
  * 
  * =============================================================================
  */
-package org.attoparser.markup;
+package org.attoparser.markup.simple;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.attoparser.AttoParseException;
 import org.attoparser.IAttoHandleResult;
+import org.attoparser.markup.AbstractMarkupAttoHandler;
+import org.attoparser.markup.IElementPreparationResult;
 
 
 /**
- *
+ * <p>
+ *   Base abstract implementations for markup-specialized attohandlers that offer an event
+ *   handling interface similar to that of the standard SAX {@link org.xml.sax.ContentHandler}.
+ * </p>
+ * <p>
+ *   Handlers extending from this class can make use of a {@link org.attoparser.markup.MarkupParsingConfiguration} instance
+ *   specifying a markup parsing configuration to be applied during document parsing (for example, 
+ *   for ensuring that a document is well-formed from an XML/XHTML standpoint).
+ * </p>
+ * <p>
+ *   This class provides empty implementations for all event handlers, so that
+ *   subclasses can override only the methods they need.
+ * </p>
+ * 
  * @author Daniel Fern&aacute;ndez
- *
- * @since 2.0.0
+ * 
+ * @since 1.0
  *
  */
-public abstract class AbstractMarkupAttoHandler implements IMarkupAttoHandler {
+public final class SimplifierMarkupAttoHandler extends AbstractMarkupAttoHandler {
 
 
-    protected AbstractMarkupAttoHandler() {
+    private final ISimpleMarkupAttoHandler handler;
+    
+    private String currentElementName;
+    private Map<String,String> currentElementAttributes;
+    private int currentElementLine;
+    private int currentElementCol;
+    
+    
+    
+    
+    
+    public SimplifierMarkupAttoHandler(final ISimpleMarkupAttoHandler handler) {
         super();
+        this.handler = handler;
     }
 
 
-
+    @Override
     public IAttoHandleResult handleDocumentStart(
-            final long startTimeNanos, final int line, final int col)
+            final long startTimeNanos,
+            final int line, final int col)
             throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
+
+        this.handler.handleDocumentStart(startTimeNanos, line, col);
         return null;
+
     }
 
 
+
+    @Override
     public IAttoHandleResult handleDocumentEnd(
-            final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
+            final long endTimeNanos, final long totalTimeNanos,
+            final int line, final int col)
             throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
+
+        this.handler.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col);
         return null;
+
     }
 
 
 
+    @Override
     public IAttoHandleResult handleXmlDeclaration(
             final char[] buffer,
             final int keywordOffset, final int keywordLen,
@@ -69,12 +108,25 @@ public abstract class AbstractMarkupAttoHandler implements IMarkupAttoHandler {
             final int outerOffset, final int outerLen,
             final int line, final int col)
             throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
+
+        final String version = new String(buffer, versionOffset, versionLen);
+        final String encoding =
+                (encodingOffset > 0?
+                        new String(buffer, encodingOffset, encodingLen) :
+                        null);
+        final String standalone =
+                (standaloneOffset > 0?
+                        new String(buffer, standaloneOffset, standaloneLen) :
+                        null);
+
+        this.handler.handleXmlDeclaration(version, encoding, standalone, line, col);
         return null;
+
     }
 
 
 
+    @Override
     public IAttoHandleResult handleDocType(
             final char[] buffer,
             final int keywordOffset, final int keywordLen,
@@ -92,196 +144,301 @@ public abstract class AbstractMarkupAttoHandler implements IMarkupAttoHandler {
             final int outerOffset, final int outerLen,
             final int outerLine, final int outerCol)
             throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
+
+        this.handler.handleDocType(
+                new String(buffer, elementNameOffset, elementNameLen),
+                (publicIdOffset <= 0 ? null : new String(buffer, publicIdOffset, publicIdLen)),
+                (systemIdOffset <= 0 ? null : new String(buffer, systemIdOffset, systemIdLen)),
+                (internalSubsetOffset <= 0 ? null : new String(buffer, internalSubsetOffset, internalSubsetLen)),
+                outerLine, outerCol);
         return null;
+
     }
 
 
 
+    @Override
     public IAttoHandleResult handleCDATASection(
             final char[] buffer,
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
             final int line, final int col)
             throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
+
+        this.handler.handleCDATASection(buffer, contentOffset, contentLen, line, col);
         return null;
+
     }
 
 
 
+    @Override
     public IAttoHandleResult handleComment(
             final char[] buffer,
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
             final int line, final int col)
             throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
+
+        this.handler.handleComment(buffer, contentOffset, contentLen, line, col);
         return null;
+
     }
 
 
 
+    @Override
     public IAttoHandleResult handleText(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
+
+        this.handler.handleText(buffer, offset, len, line, col);
         return null;
+
     }
 
 
+
+    @Override
     public IElementPreparationResult prepareForElement(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
+
         return null;
+
     }
 
 
+
+    @Override
     public IAttoHandleResult handleStandaloneElementStart(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final boolean minimized, final int line, final int col)
             throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
+
+        this.currentElementName = new String(buffer, nameOffset, nameLen);
+        this.currentElementAttributes = null;
+        this.currentElementLine = line;
+        this.currentElementCol = col;
+
         return null;
+
     }
 
+    
+    
+    @Override
     public IAttoHandleResult handleStandaloneElementEnd(
             final char[] buffer,
-            final int nameOffset, final int nameLen,
+            final int offset, final int len,
             final boolean minimized, final int line, final int col)
             throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
+        
+        this.handler.handleStandaloneElement(
+                this.currentElementName, this.currentElementAttributes, minimized, this.currentElementLine, this.currentElementCol);
         return null;
+        
     }
 
     
-
+    
+    @Override
     public IAttoHandleResult handleOpenElementStart(
-            final char[] buffer,
-            final int nameOffset, final int nameLen, 
-            final int line, final int col)
-            throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
-        return null;
-    }
-
-    public IAttoHandleResult handleOpenElementEnd(
-            final char[] buffer,
-            final int nameOffset, final int nameLen,
-            final int line, final int col)
-            throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
-        return null;
-    }
-
-
-    
-    public IAttoHandleResult handleCloseElementStart(
-            final char[] buffer,
-            final int nameOffset, final int nameLen, 
-            final int line, final int col)
-            throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
-        return null;
-    }
-
-    public IAttoHandleResult handleCloseElementEnd(
-            final char[] buffer,
-            final int nameOffset, final int nameLen,
-            final int line, final int col)
-            throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
-        return null;
-    }
-
-
-    
-    public IAttoHandleResult handleAutoCloseElementStart(
-            final char[] buffer,
-            final int nameOffset, final int nameLen, 
-            final int line, final int col)
-            throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
-        return null;
-    }
-
-    public IAttoHandleResult handleAutoCloseElementEnd(
-            final char[] buffer,
-            final int nameOffset, final int nameLen,
-            final int line, final int col)
-            throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
-        return null;
-    }
-    
-
-    
-    public IAttoHandleResult handleUnmatchedCloseElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen, 
-            final int line, final int col)
+            final int line, final int col) 
             throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
+
+        this.currentElementName = new String(buffer, nameOffset, nameLen);
+        this.currentElementAttributes = null;
+        this.currentElementLine = line;
+        this.currentElementCol = col;
+
         return null;
+
     }
-
-
-    public IAttoHandleResult handleUnmatchedCloseElementEnd(
-            final char[] buffer,
-            final int nameOffset, final int nameLen,
-            final int line, final int col)
-            throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
-        return null;
-    }
-
 
     
-    public IAttoHandleResult handleAttribute(
-            final char[] buffer,
-            final int nameOffset, final int nameLen,
-            final int nameLine, final int nameCol,
-            final int operatorOffset, final int operatorLen,
-            final int operatorLine, final int operatorCol,
-            final int valueContentOffset, final int valueContentLen,
-            final int valueOuterOffset, final int valueOuterLen,
-            final int valueLine, final int valueCol)
-            throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
-        return null;
-    }
-
-
     
-    public IAttoHandleResult handleInnerWhiteSpace(
+    @Override
+    public IAttoHandleResult handleOpenElementEnd(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
+
+        this.handler.handleOpenElement(this.currentElementName, this.currentElementAttributes, this.currentElementLine, this.currentElementCol);
         return null;
+        
+    }
+
+    
+    
+    @Override
+    public IAttoHandleResult handleCloseElementStart(
+            final char[] buffer, 
+            final int nameOffset, final int nameLen, 
+            final int line, final int col) 
+            throws AttoParseException {
+
+        this.currentElementName = new String(buffer, nameOffset, nameLen);
+        this.currentElementAttributes = null;
+        this.currentElementLine = line;
+        this.currentElementCol = col;
+
+        return null;
+        
+    }
+
+    
+    
+    @Override
+    public IAttoHandleResult handleCloseElementEnd(
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException {
+
+        this.handler.handleCloseElement(this.currentElementName, this.currentElementLine, this.currentElementCol);
+        return null;
+        
+    }
+
+    
+    
+    
+    @Override
+    public IAttoHandleResult handleAutoCloseElementStart(
+            final char[] buffer, 
+            final int nameOffset, final int nameLen, 
+            final int line, final int col) 
+            throws AttoParseException {
+
+        this.currentElementName = new String(buffer, nameOffset, nameLen);
+        this.currentElementAttributes = null;
+        this.currentElementLine = line;
+        this.currentElementCol = col;
+
+        return null;
+
+    }
+
+    
+    
+    @Override
+    public IAttoHandleResult handleAutoCloseElementEnd(
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException {
+
+        this.handler.handleAutoCloseElement(this.currentElementName, this.currentElementLine, this.currentElementCol);
+        return null;
+
     }
 
 
+    
+    
+    @Override
+    public IAttoHandleResult handleUnmatchedCloseElementStart(
+            final char[] buffer, 
+            final int nameOffset, final int nameLen, 
+            final int line, final int col) 
+            throws AttoParseException {
 
-    public IAttoHandleResult handleProcessingInstruction(
+        this.currentElementName = new String(buffer, nameOffset, nameLen);
+        this.currentElementAttributes = null;
+        this.currentElementLine = line;
+        this.currentElementCol = col;
+
+        return null;
+
+    }
+
+    
+    
+    @Override
+    public IAttoHandleResult handleUnmatchedCloseElementEnd(
             final char[] buffer,
-            final int targetOffset, final int targetLen,
+            final int offset, final int len,
+            final int line, final int col)
+            throws AttoParseException {
+
+        this.handler.handleUnmatchedCloseElement(this.currentElementName, this.currentElementLine, this.currentElementCol);
+        return null;
+        
+    }
+
+    
+    
+    
+    @Override
+    public IAttoHandleResult handleAttribute(
+            final char[] buffer, 
+            final int nameOffset, final int nameLen,
+            final int nameLine, final int nameCol, 
+            final int operatorOffset, final int operatorLen,
+            final int operatorLine, final int operatorCol, 
+            final int valueContentOffset, final int valueContentLen, 
+            final int valueOuterOffset, final int valueOuterLen,
+            final int valueLine, final int valueCol)
+            throws AttoParseException {
+
+        final String attributeName = new String(buffer, nameOffset, nameLen);
+        final String attributeValue = 
+                (valueContentLen <= 0?  "" : new String(buffer, valueContentOffset, valueContentLen));
+        
+        if (this.currentElementAttributes == null) {
+            this.currentElementAttributes = new LinkedHashMap<String, String>(3, 1.0f);
+        }
+
+        this.currentElementAttributes.put(attributeName, attributeValue);
+
+        return null;
+
+    }
+
+    
+    
+    @Override
+    public IAttoHandleResult handleInnerWhiteSpace(
+            final char[] buffer, 
+            final int offset, final int len, 
+            final int line, final int col) 
+            throws AttoParseException {
+
+        // Nothing to be done here - we will ignore inner whitespace
+        return null;
+        
+    }
+
+    
+    
+    @Override
+    public IAttoHandleResult handleProcessingInstruction(
+            final char[] buffer, 
+            final int targetOffset, final int targetLen, 
             final int targetLine, final int targetCol,
             final int contentOffset, final int contentLen,
             final int contentLine, final int contentCol,
-            final int outerOffset, final int outerLen,
+            final int outerOffset, final int outerLen, 
             final int line, final int col)
             throws AttoParseException {
-        // Nothing to be done here, meant to be overridden if required
+
+        this.handler.handleProcessingInstruction(
+                new String(buffer, targetOffset, targetLen),
+                (contentOffset <= 0 ? null : new String(buffer, contentOffset, contentLen)),
+                line, col);
         return null;
+        
     }
+
 
 
 }

@@ -48,10 +48,13 @@ public final class MarkupParsingConfiguration implements Serializable {
         REQUIRE_BALANCED, AUTO_CLOSE, AUTO_CLOSE_REQUIRE_NO_UNMATCHED_CLOSE, 
         REQUIRE_NO_UNMATCHED_CLOSE, NO_BALANCING } 
 
-    
     private static final long serialVersionUID = 5191449744126332916L;
-    
-    
+
+    // Cannot make public because they are mutable
+    private static final MarkupParsingConfiguration DEFAULT_HTML_MARKUP_PARSING_CONFIGURATION;
+    private static final MarkupParsingConfiguration DEFAULT_XML_MARKUP_PARSING_CONFIGURATION;
+
+
     private boolean caseSensitive = true;
     
     private ElementBalancing elementBalancing = ElementBalancing.NO_BALANCING;
@@ -61,6 +64,64 @@ public final class MarkupParsingConfiguration implements Serializable {
  
     private PrologParsingConfiguration prologParsingConfiguration = new PrologParsingConfiguration();
     private UniqueRootElementPresence uniqueRootElementPresence = UniqueRootElementPresence.DEPENDS_ON_PROLOG_DOCTYPE;
+
+
+
+
+
+
+    static {
+
+        DEFAULT_HTML_MARKUP_PARSING_CONFIGURATION = new MarkupParsingConfiguration();
+        DEFAULT_HTML_MARKUP_PARSING_CONFIGURATION.setCaseSensitive(false);
+        DEFAULT_HTML_MARKUP_PARSING_CONFIGURATION.setElementBalancing(ElementBalancing.AUTO_CLOSE);
+        DEFAULT_HTML_MARKUP_PARSING_CONFIGURATION.setRequireUniqueAttributesInElement(true);
+        DEFAULT_HTML_MARKUP_PARSING_CONFIGURATION.setRequireXmlWellFormedAttributeValues(false);
+        DEFAULT_HTML_MARKUP_PARSING_CONFIGURATION.setUniqueRootElementPresence(UniqueRootElementPresence.DEPENDS_ON_PROLOG_DOCTYPE);
+        DEFAULT_HTML_MARKUP_PARSING_CONFIGURATION.getPrologParsingConfiguration().setValidateProlog(true);
+        DEFAULT_HTML_MARKUP_PARSING_CONFIGURATION.getPrologParsingConfiguration().setPrologPresence(PrologPresence.ALLOWED);
+        DEFAULT_HTML_MARKUP_PARSING_CONFIGURATION.getPrologParsingConfiguration().setXmlDeclarationPresence(PrologPresence.ALLOWED);
+        DEFAULT_HTML_MARKUP_PARSING_CONFIGURATION.getPrologParsingConfiguration().setDoctypePresence(PrologPresence.ALLOWED);
+        DEFAULT_HTML_MARKUP_PARSING_CONFIGURATION.getPrologParsingConfiguration().setRequireDoctypeKeywordsUpperCase(false);
+
+
+        DEFAULT_XML_MARKUP_PARSING_CONFIGURATION = new MarkupParsingConfiguration();
+        DEFAULT_XML_MARKUP_PARSING_CONFIGURATION.setCaseSensitive(true);
+        DEFAULT_XML_MARKUP_PARSING_CONFIGURATION.setElementBalancing(ElementBalancing.REQUIRE_BALANCED);
+        DEFAULT_XML_MARKUP_PARSING_CONFIGURATION.setRequireUniqueAttributesInElement(true);
+        DEFAULT_XML_MARKUP_PARSING_CONFIGURATION.setRequireXmlWellFormedAttributeValues(true);
+        DEFAULT_XML_MARKUP_PARSING_CONFIGURATION.setUniqueRootElementPresence(UniqueRootElementPresence.DEPENDS_ON_PROLOG_DOCTYPE);
+        DEFAULT_XML_MARKUP_PARSING_CONFIGURATION.getPrologParsingConfiguration().setValidateProlog(true);
+        DEFAULT_XML_MARKUP_PARSING_CONFIGURATION.getPrologParsingConfiguration().setPrologPresence(PrologPresence.ALLOWED);
+        DEFAULT_XML_MARKUP_PARSING_CONFIGURATION.getPrologParsingConfiguration().setXmlDeclarationPresence(PrologPresence.ALLOWED);
+        DEFAULT_XML_MARKUP_PARSING_CONFIGURATION.getPrologParsingConfiguration().setDoctypePresence(PrologPresence.ALLOWED);
+        DEFAULT_XML_MARKUP_PARSING_CONFIGURATION.getPrologParsingConfiguration().setRequireDoctypeKeywordsUpperCase(true);
+
+    }
+
+
+
+
+
+    public static MarkupParsingConfiguration defaultHtmlConfiguration() {
+        try {
+            return DEFAULT_HTML_MARKUP_PARSING_CONFIGURATION.clone();
+        } catch (final CloneNotSupportedException e) {
+            // Will never be thrown
+            throw new IllegalStateException(e);
+        }
+    }
+
+
+
+    public static MarkupParsingConfiguration defaultXmlConfiguration() {
+        try {
+            return DEFAULT_XML_MARKUP_PARSING_CONFIGURATION.clone();
+        } catch (final CloneNotSupportedException e) {
+            // Will never be thrown
+            throw new IllegalStateException(e);
+        }
+    }
 
 
 

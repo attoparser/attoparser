@@ -29,6 +29,7 @@ import org.attoparser.IAttoHandleResult;
 import org.attoparser.markup.MarkupParsingConfiguration.ElementBalancing;
 import org.attoparser.markup.MarkupParsingConfiguration.PrologParsingConfiguration;
 import org.attoparser.markup.MarkupParsingConfiguration.UniqueRootElementPresence;
+import org.attoparser.markup.html.HtmlNames;
 import org.attoparser.util.TextUtil;
 
 
@@ -289,6 +290,7 @@ final class MarkupEventProcessor implements IMarkupEventAttributeProcessor {
     IAttoHandleResult processStandaloneElementStart(
             final char[] buffer,
             final int nameOffset, final int nameLen,
+            final boolean minimized,
             final int line, final int col)
             throws AttoParseException {
 
@@ -330,18 +332,19 @@ final class MarkupEventProcessor implements IMarkupEventAttributeProcessor {
 
         }
 
-        return this.handler.handleStandaloneElementStart(buffer, nameOffset, nameLen, line, col);
+        return this.handler.handleStandaloneElementStart(buffer, nameOffset, nameLen, minimized, line, col);
 
     }
 
     IAttoHandleResult processStandaloneElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
+            final boolean minimized,
             final int line, final int col)
             throws AttoParseException {
 
         final IAttoHandleResult result =
-            this.handler.handleStandaloneElementEnd(buffer, nameOffset, nameLen, line, col);
+            this.handler.handleStandaloneElementEnd(buffer, nameOffset, nameLen, minimized, line, col);
         this.elementRead = true;
         return result;
 
@@ -938,8 +941,9 @@ final class MarkupEventProcessor implements IMarkupEventAttributeProcessor {
                 return this.repository.get(index);
             }
 
-            // We rely on the static structure name cache, just in case it is a standard HTML structure name
-            final char[] structureName = MarkupStructureNameRepository.getStructureName(text, offset, len);
+            // We rely on the static structure name cache, just in case it is a standard HTML structure name.
+            // Note the StandardNamesRepository will create the new char[] if not found, so no need to null-check.
+            final char[] structureName = StandardNamesRepository.getStructureName(text, offset, len);
 
             this.repository.add(structureName);
             Collections.sort(this.repository, CharArrayComparator.INSTANCE);
@@ -989,6 +993,90 @@ final class MarkupEventProcessor implements IMarkupEventAttributeProcessor {
 
     }
 
+
+
+
+    /*
+     *     This class is IMMUTABLE, and therefore thread-safe. Will be used in a static manner by all
+     *     threads which require the use of a repository of standard names (HTML names, in this case).
+     */
+    static final class StandardNamesRepository {
+
+
+        private static final char[][] REPOSITORY;
+
+
+        static {
+
+            final List<String> names = new ArrayList<String>();
+            // Add all the standard HTML element (tag) names
+            names.addAll(HtmlNames.ALL_STANDARD_ELEMENT_NAMES);
+            // We know all standard element names are lowercase, so let's cache them uppercase too
+            for (final String name : HtmlNames.ALL_STANDARD_ELEMENT_NAMES) {
+                names.add(name.toUpperCase());
+            }
+            // Add all the standard HTML attribute names
+            names.addAll(HtmlNames.ALL_STANDARD_ATTRIBUTE_NAMES);
+            // We know all standard attribute names are lowercase, so let's cache them uppercase too
+            for (final String name : HtmlNames.ALL_STANDARD_ATTRIBUTE_NAMES) {
+                names.add(name.toUpperCase());
+            }
+            Collections.sort(names);
+
+            REPOSITORY = new char[names.size()][];
+
+            for (int i = 0; i < names.size(); i++) {
+                final String name = names.get(i);
+                REPOSITORY[i] = name.toCharArray();
+            }
+
+        }
+
+
+        static char[] getStructureName(final char[] text, final int offset, final int len) {
+
+            final int index = binarySearch(REPOSITORY, text, offset, len);
+
+            if (index == -1) {
+                final char[] structureName = new char[len];
+                System.arraycopy(text, offset, structureName, 0, len);
+                return structureName;
+            }
+
+            return REPOSITORY[index];
+
+        }
+
+
+        static int binarySearch(final char[][] values,
+                                final char[] text, final int offset, final int len) {
+
+            int low = 0;
+            int high = values.length - 1;
+
+            while (low <= high) {
+
+                final int mid = (low + high) >>> 1;
+                final char[] midVal = values[mid];
+
+                final int cmp = TextUtil.compareTo(true, midVal, 0, midVal.length, text, offset, len);
+
+                if (cmp < 0) {
+                    low = mid + 1;
+                } else if (cmp > 0) {
+                    high = mid - 1;
+                } else {
+                    // Found!!
+                    return mid;
+                }
+
+            }
+
+            return -1;  // Not Found!!
+
+        }
+
+    }
 
 
 

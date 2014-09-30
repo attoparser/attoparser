@@ -75,11 +75,11 @@ final class ElementMarkupParsingUtil {
                 final IAttoHandleResult handleResult1 =
                         eventProcessor.processStandaloneElementStart(
                             buffer, contentOffset, contentLen,
-                            line, col);
+                            true, line, col);
                 final IAttoHandleResult handleResult2 =
                         eventProcessor.processStandaloneElementEnd(
                             buffer, contentOffset, contentLen,
-                            locator[0], locator[1]);
+                            true, locator[0], locator[1]);
 
                 return AttoHandleResultUtil.combinePriorityLast(handleResult1, handleResult2);
 
@@ -106,7 +106,7 @@ final class ElementMarkupParsingUtil {
             handleResult1 =
                     eventProcessor.processStandaloneElementStart(
                             buffer, contentOffset, (elementNameEnd - contentOffset),
-                            line, col);
+                            true, line, col);
         } else {
             handleResult1 =
                     eventProcessor.processOpenElementStart(
@@ -127,7 +127,7 @@ final class ElementMarkupParsingUtil {
             handleResult3 =
                     eventProcessor.processStandaloneElementEnd(
                             buffer, contentOffset, (elementNameEnd - contentOffset),
-                            locator[0], locator[1]);
+                            true, locator[0], locator[1]);
         } else {
             handleResult3 =
                     eventProcessor.processOpenElementEnd(
