@@ -175,7 +175,7 @@
         </executions>
         <configuration>
           <instructions>
-            <Export-Package>org.attoparser.markup.dom.impl,*</Export-Package>
+            <Export-Package>org.attoparser.dom.impl,*</Export-Package>
           </instructions>
         </configuration>
       </plugin>

@@ -40,7 +40,7 @@ public final class AttoHandleResultUtil {
 
     /**
      * <p>
-     *     Combines both instances of {@link org.attoparser.IAttoHandleResult}, giving priority to the data contained
+     *     Combines both instances of {@link IAttoHandleResult}, giving priority to the data contained
      *     in the <kbd>last</kbd> instance.
      * </p>
      * <p>

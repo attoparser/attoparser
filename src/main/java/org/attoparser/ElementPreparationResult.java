@@ -22,7 +22,7 @@ package org.attoparser;
 
 /**
  * <p>
- *   Standard implementation of the {@link IAttoHandleResult} interface.
+ *   Standard implementation of the {@link IElementPreparationResult} interface.
  * </p>
  *
  * @author Daniel Fern&aacute;ndez
@@ -30,31 +30,34 @@ package org.attoparser;
  * @since 2.0.0
  *
  */
-public final class AttoHandleResult implements IAttoHandleResult {
+public final class ElementPreparationResult implements IElementPreparationResult {
 
-    /**
-     * <p>
-     *   Just go on with parsing - no additional instructions for parser after event handling.
-     * </p>
-     * <p>
-     *   In all scenarios, returning this instance as a result of a <kbd>handle*</kbd> method
-     *   should be completely equivalent to returning <kbd>null</kbd>. This instance is provided as
-     *   an option in case code guidelines don't allow returning <kbd>null</kbd> for <em>OK</em>.
-     * </p>
-     */
-    public static final AttoHandleResult CONTINUE = new AttoHandleResult(null);
-
-    private final char[] parsingDisableLimit;
+    public static final ElementPreparationResult DONT_STACK = new ElementPreparationResult(null, null, Boolean.FALSE);
 
 
-    public AttoHandleResult(final char[] parsingDisableLimit) {
+    private final char[][] unstackElements;
+    private final char[][] unstackLimits;
+    private final Boolean shouldStack;
+
+
+    public ElementPreparationResult(
+            final char[][] unstackElements, final char[][] unstackLimits, final Boolean shouldStack) {
         super();
-        this.parsingDisableLimit = parsingDisableLimit;
+        this.unstackElements = unstackElements;
+        this.unstackLimits = unstackLimits;
+        this.shouldStack = shouldStack;
     }
 
+    public char[][] getUnstackElements() {
+        return this.unstackElements;
+    }
 
-    public final char[] getParsingDisableLimit() {
-        return this.parsingDisableLimit;
+    public char[][] getUnstackLimits() {
+        return this.unstackLimits;
+    }
+
+    public Boolean getShouldStack() {
+        return this.shouldStack;
     }
 
 }
