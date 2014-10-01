@@ -31,7 +31,7 @@ import org.attoparser.MarkupParsingConfiguration.UniqueRootElementPresence;
 import org.attoparser.directoutput.DirectOutputMarkupAttoHandler;
 import org.attoparser.html.HtmlMarkupAttoHandler;
 import org.attoparser.simple.SimplifierMarkupAttoHandler;
-import org.attoparser.trace.MarkupParsingTraceEvent;
+import org.attoparser.trace.MarkupTraceEvent;
 import org.attoparser.trace.TraceBuilderMarkupAttoHandler;
 
 
@@ -1554,12 +1554,12 @@ public class MarkupAttoParserTest extends TestCase {
                     parser.parseDocument(new CharArrayReader(input, offset, len), eventProcessor, bufferSize);
                 }
 
-                final List<MarkupParsingTraceEvent> trace = handler.getTrace();
+                final List<MarkupTraceEvent> trace = handler.getTrace();
                 final StringBuilder strBuilder = new StringBuilder();
-                for (final MarkupParsingTraceEvent event : trace) {
-                    if (event.getType().equals(MarkupParsingTraceEvent.Type.DOCUMENT_START)) {
+                for (final MarkupTraceEvent event : trace) {
+                    if (event.getEventType().equals(MarkupTraceEvent.EventType.DOCUMENT_START)) {
                         strBuilder.append("[");
-                    } else if (event.getType().equals(MarkupParsingTraceEvent.Type.DOCUMENT_END)) {
+                    } else if (event.getEventType().equals(MarkupTraceEvent.EventType.DOCUMENT_END)) {
                         strBuilder.append("]");
                     } else {
                         strBuilder.append(event);
@@ -1695,12 +1695,12 @@ public class MarkupAttoParserTest extends TestCase {
                     parser.parseDocument(new CharArrayReader(input, offset, len), eventProcessor, bufferSize);
                 }
 
-                final List<MarkupParsingTraceEvent> trace = traceHandler.getTrace();
+                final List<MarkupTraceEvent> trace = traceHandler.getTrace();
                 final StringBuilder strBuilder = new StringBuilder();
-                for (final MarkupParsingTraceEvent event : trace) {
-                    if (event.getType().equals(MarkupParsingTraceEvent.Type.DOCUMENT_START)) {
+                for (final MarkupTraceEvent event : trace) {
+                    if (event.getEventType().equals(MarkupTraceEvent.EventType.DOCUMENT_START)) {
                         strBuilder.append("[");
-                    } else if (event.getType().equals(MarkupParsingTraceEvent.Type.DOCUMENT_END)) {
+                    } else if (event.getEventType().equals(MarkupTraceEvent.EventType.DOCUMENT_END)) {
                         strBuilder.append("]");
                     } else {
                         strBuilder.append(event);

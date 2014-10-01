@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.attoparser.AbstractMarkupAttoHandler;
 import org.attoparser.AttoParseException;
 import org.attoparser.IAttoHandleResult;
-import org.attoparser.AbstractMarkupAttoHandler;
 
 
 
@@ -39,7 +39,7 @@ import org.attoparser.AbstractMarkupAttoHandler;
 public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandler {
 
     
-    private final List<MarkupParsingTraceEvent> trace = new ArrayList<MarkupParsingTraceEvent>(20);
+    private final List<MarkupTraceEvent> trace = new ArrayList<MarkupTraceEvent>(20);
     
 
 
@@ -51,7 +51,7 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
 
     
     
-    public List<MarkupParsingTraceEvent> getTrace() {
+    public List<MarkupTraceEvent> getTrace() {
         return Collections.unmodifiableList(this.trace);
     }
     
@@ -61,7 +61,7 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
     @Override
     public IAttoHandleResult handleDocumentStart(final long startTimeNanos, final int line, final int col)
             throws AttoParseException {
-        this.trace.add(MarkupParsingTraceEvent.forDocumentStart(startTimeNanos, line, col));
+        this.trace.add(new MarkupTraceEvent.DocumentStartTraceEvent(startTimeNanos, line, col));
         return null;
     }
 
@@ -71,7 +71,7 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
     public IAttoHandleResult handleDocumentEnd(
             final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
             throws AttoParseException {
-        this.trace.add(MarkupParsingTraceEvent.forDocumentEnd(endTimeNanos, totalTimeNanos, line, col));
+        this.trace.add(new MarkupTraceEvent.DocumentEndTraceEvent(endTimeNanos, totalTimeNanos, line, col));
         return null;
     }
 
@@ -85,9 +85,9 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
             throws AttoParseException {
         final String elementName = new String(buffer, offset, len);
         if (minimized) {
-            this.trace.add(MarkupParsingTraceEvent.forStandaloneElementStart(elementName, line, col));
+            this.trace.add(new MarkupTraceEvent.StandaloneElementStartTraceEvent(elementName, line, col));
         } else {
-            this.trace.add(MarkupParsingTraceEvent.forNonMinimizedStandaloneElementStart(elementName, line, col));
+            this.trace.add(new MarkupTraceEvent.NonMinimizedStandaloneElementStartTraceEvent(elementName, line, col));
         }
         return null;
     }
@@ -102,9 +102,9 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
             throws AttoParseException {
         final String elementName = new String(buffer, offset, len);
         if (minimized) {
-            this.trace.add(MarkupParsingTraceEvent.forStandaloneElementEnd(elementName, line, col));
+            this.trace.add(new MarkupTraceEvent.StandaloneElementEndTraceEvent(elementName, line, col));
         } else {
-            this.trace.add(MarkupParsingTraceEvent.forNonMinimizedStandaloneElementEnd(elementName, line, col));
+            this.trace.add(new MarkupTraceEvent.NonMinimizedStandaloneElementEndTraceEvent(elementName, line, col));
         }
         return null;
     }
@@ -119,7 +119,7 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
             final int line, final int col)
             throws AttoParseException {
         final String elementName = new String(buffer, offset, len);
-        this.trace.add(MarkupParsingTraceEvent.forOpenElementStart(elementName, line, col));
+        this.trace.add(new MarkupTraceEvent.OpenElementStartTraceEvent(elementName, line, col));
         return null;
     }
     
@@ -133,7 +133,7 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
             final int line, final int col)
             throws AttoParseException {
         final String elementName = new String(buffer, offset, len);
-        this.trace.add(MarkupParsingTraceEvent.forOpenElementEnd(elementName, line, col));
+        this.trace.add(new MarkupTraceEvent.OpenElementEndTraceEvent(elementName, line, col));
         return null;
     }
     
@@ -147,7 +147,7 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
             final int line, final int col)
             throws AttoParseException {
         final String elementName = new String(buffer, offset, len);
-        this.trace.add(MarkupParsingTraceEvent.forCloseElementStart(elementName, line, col));
+        this.trace.add(new MarkupTraceEvent.CloseElementStartTraceEvent(elementName, line, col));
         return null;
     }
     
@@ -161,7 +161,7 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
             final int line, final int col)
             throws AttoParseException {
         final String elementName = new String(buffer, offset, len);
-        this.trace.add(MarkupParsingTraceEvent.forCloseElementEnd(elementName, line, col));
+        this.trace.add(new MarkupTraceEvent.CloseElementEndTraceEvent(elementName, line, col));
         return null;
     }
     
@@ -175,7 +175,7 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
             final int line, final int col)
             throws AttoParseException {
         final String elementName = new String(buffer, offset, len);
-        this.trace.add(MarkupParsingTraceEvent.forAutoCloseElementStart(elementName, line, col));
+        this.trace.add(new MarkupTraceEvent.AutoCloseElementStartTraceEvent(elementName, line, col));
         return null;
     }
     
@@ -189,7 +189,7 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
             final int line, final int col)
             throws AttoParseException {
         final String elementName = new String(buffer, offset, len);
-        this.trace.add(MarkupParsingTraceEvent.forAutoCloseElementEnd(elementName, line, col));
+        this.trace.add(new MarkupTraceEvent.AutoCloseElementEndTraceEvent(elementName, line, col));
         return null;
     }
     
@@ -203,7 +203,7 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
             final int line, final int col)
             throws AttoParseException {
         final String elementName = new String(buffer, offset, len);
-        this.trace.add(MarkupParsingTraceEvent.forUnmatchedCloseElementStart(elementName, line, col));
+        this.trace.add(new MarkupTraceEvent.UnmatchedCloseElementStartTraceEvent(elementName, line, col));
         return null;
     }
     
@@ -217,7 +217,7 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
             final int line, final int col)
             throws AttoParseException {
         final String elementName = new String(buffer, offset, len);
-        this.trace.add(MarkupParsingTraceEvent.forUnmatchedCloseElementEnd(elementName, line, col));
+        this.trace.add(new MarkupTraceEvent.UnmatchedCloseElementEndTraceEvent(elementName, line, col));
         return null;
     }
 
@@ -240,7 +240,7 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
         final String operator = new String(buffer, operatorOffset, operatorLen);
         final String value = new String(buffer, valueOuterOffset, valueOuterLen);
 
-        this.trace.add(MarkupParsingTraceEvent.forAttribute(
+        this.trace.add(new MarkupTraceEvent.AttributeTraceEvent(
                 attributeName, nameLine, nameCol, operator, operatorLine, operatorCol, value, valueLine, valueCol));
         return null;
 
@@ -253,7 +253,7 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
             final int line, final int col)
             throws AttoParseException {
         final String content = new String(buffer, offset, len);
-        this.trace.add(MarkupParsingTraceEvent.forText(content, line, col));
+        this.trace.add(new MarkupTraceEvent.TextTraceEvent(content, line, col));
         return null;
     }
 
@@ -267,7 +267,7 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
             final int line, final int col)
             throws AttoParseException {
         final String content = new String(buffer, contentOffset, contentLen);
-        this.trace.add(MarkupParsingTraceEvent.forComment(content, line, col));
+        this.trace.add(new MarkupTraceEvent.CommentTraceEvent(content, line, col));
         return null;
     }
 
@@ -280,7 +280,7 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
             final int line, final int col)
             throws AttoParseException {
         final String content = new String(buffer, contentOffset, contentLen);
-        this.trace.add(MarkupParsingTraceEvent.forCDATASection(content, line, col));
+        this.trace.add(new MarkupTraceEvent.CDATASectionTraceEvent(content, line, col));
         return null;
     }
 
@@ -314,7 +314,7 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
                         null);
 
         this.trace.add(
-                MarkupParsingTraceEvent.forXmlDeclaration(
+                new MarkupTraceEvent.XmlDeclarationTraceEvent(
                         keyword, keywordLine, keywordCol,
                         version, versionLine, versionCol,
                         encoding, encodingLine, encodingCol,
@@ -337,7 +337,7 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
             final int line, final int col)
             throws AttoParseException {
         final String content = new String(buffer, offset, len);
-        this.trace.add(MarkupParsingTraceEvent.forInnerWhiteSpace(content, line, col));
+        this.trace.add(new MarkupTraceEvent.InnerWhiteSpaceTraceEvent(content, line, col));
         return null;
     }
 
@@ -369,7 +369,7 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
         final String systemId = (systemIdOffset <= 0 ? null : new String(buffer, systemIdOffset, systemIdLen));
         final String internalSubset = (internalSubsetOffset <= 0 ? null : new String(buffer, internalSubsetOffset, internalSubsetLen));
 
-        this.trace.add(MarkupParsingTraceEvent.forDocType(
+        this.trace.add(new MarkupTraceEvent.DocTypeTraceEvent(
                 keyword, keywordLine, keywordCol,
                 elementName, elementNameLine, elementNameCol,
                 type, typeLine, typeCol,
@@ -398,7 +398,7 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
         final String content = (contentOffset <= 0 ? null : new String(buffer, contentOffset, contentLen));
 
         this.trace.add(
-                MarkupParsingTraceEvent.forProcessingInstruction(
+                new MarkupTraceEvent.ProcessingInstructionTraceEvent(
                         target, targetLine, targetCol,
                         content, contentLine, contentCol));
         return null;
