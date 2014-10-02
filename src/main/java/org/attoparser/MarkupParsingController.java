@@ -20,35 +20,32 @@
 package org.attoparser;
 
 
+
 /**
  *
  * @author Daniel Fern&aacute;ndez
- * 
+ *
  * @since 2.0.0
  *
  */
-interface IMarkupEventAttributeProcessor {
+public final class MarkupParsingController {
+
+    boolean parsingEnabled;
+    char[] disabilityLimitSequence;
+
+    MarkupParsingController() {
+        super();
+    }
 
 
 
-    IAttoHandleResult processAttribute(
-            final char[] buffer,
-            final int nameOffset, final int nameLen,
-            final int nameLine, final int nameCol,
-            final int operatorOffset, final int operatorLen,
-            final int operatorLine, final int operatorCol,
-            final int valueContentOffset, final int valueContentLen,
-            final int valueOuterOffset, final int valueOuterLen,
-            final int valueLine, final int valueCol)
-            throws AttoParseException;
+    public boolean isParsingEnabled() {
+        return this.parsingEnabled;
+    }
 
-
-
-    IAttoHandleResult processInnerWhiteSpace(
-            final char[] buffer,
-            final int offset, final int len,
-            final int line, final int col)
-            throws AttoParseException;
+    public void disableParsingAfterStructure(final char[] untilSequence) {
+        this.disabilityLimitSequence = untilSequence;
+    }
 
 
 }

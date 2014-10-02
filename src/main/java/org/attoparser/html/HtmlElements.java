@@ -323,12 +323,15 @@ final class HtmlElements {
             int low = 0;
             int high = values.size() - 1;
 
+            int mid, cmp;
+            String midVal;
+
             while (low <= high) {
 
-                final int mid = (low + high) >>> 1;
-                final String midVal = values.get(mid).getName();
+                mid = (low + high) >>> 1;
+                midVal = values.get(mid).getName();
 
-                final int cmp = TextUtil.compareTo(false, midVal, 0, midVal.length(), text, offset, len);
+                cmp = TextUtil.compareTo(false, midVal, 0, midVal.length(), text, offset, len);
 
                 if (cmp < 0) {
                     low = mid + 1;

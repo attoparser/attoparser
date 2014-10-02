@@ -191,11 +191,14 @@ public final class MarkupAttoParser implements IMarkupAttoParser {
             throw new IllegalArgumentException("Handler cannot be null");
         }
 
+        final MarkupParsingController parsingController = new MarkupParsingController();
+        handler.setMarkupParsingController(parsingController);
+
         // We will not report directly to the handler, but instead to an intermediate class that will be in
         // charge of applying the required markup logic and rules, according to the specified configuration
         final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, this.configuration);
 
-        parseDocument(reader, eventProcessor, this.pool.defaultBufferSize);
+        parseDocument(reader, eventProcessor, this.pool.defaultBufferSize, parsingController);
 
     }
 
@@ -208,7 +211,8 @@ public final class MarkupAttoParser implements IMarkupAttoParser {
      * testing different buffer sizes.
      */
     void parseDocument(
-            final Reader reader, final MarkupEventProcessor eventProcessor, final int initialBufferSize)
+            final Reader reader, final MarkupEventProcessor eventProcessor, final int initialBufferSize,
+            final MarkupParsingController parsingController)
             throws AttoParseException {
 
 
@@ -236,7 +240,7 @@ public final class MarkupAttoParser implements IMarkupAttoParser {
 
             while (cont) {
 
-                parseBuffer(buffer, 0, bufferContentSize, eventProcessor, status);
+                parseBuffer(buffer, 0, bufferContentSize, eventProcessor, status, parsingController);
 
                 int readOffset = 0;
                 int readLen = bufferSize;
@@ -353,20 +357,21 @@ public final class MarkupAttoParser implements IMarkupAttoParser {
     
     private void parseBuffer(
             final char[] buffer, final int offset, final int len,
-            final MarkupEventProcessor eventProcessor, final BufferParseStatus status)
+            final MarkupEventProcessor eventProcessor, final BufferParseStatus status,
+            final MarkupParsingController parsingController)
             throws AttoParseException {
 
 
         final int[] locator = new int[] {status.line, status.col};
         
-        int currentLine = locator[0];
-        int currentCol = locator[1];
+        int currentLine;
+        int currentCol;
         
         final int maxi = offset + len;
         int i = offset;
         int current = i;
         
-        boolean inStructure = false;
+        boolean inStructure;
         
         boolean inOpenElement = false;
         boolean inCloseElement = false;
@@ -378,8 +383,8 @@ public final class MarkupAttoParser implements IMarkupAttoParser {
 
         char[] skipUntil = status.skipUntilSequence;
 
-        int tagStart = -1;
-        int tagEnd = -1;
+        int tagStart;
+        int tagEnd;
         
         while (i < maxi) {
 
@@ -396,10 +401,11 @@ public final class MarkupAttoParser implements IMarkupAttoParser {
                     // Not found, should ask for more buffer
                     if (canSplitText) {
 
-                        final IAttoHandleResult result =
-                                eventProcessor.processText(buffer, current, len - current, currentLine, currentCol);
-                        if (result != null && result != AttoHandleResult.CONTINUE) {
-                            skipUntil = result.getParsingDisableLimit();
+                        eventProcessor.processText(buffer, current, len - current, currentLine, currentCol);
+                        if (parsingController.disabilityLimitSequence != null) {
+                            skipUntil = parsingController.disabilityLimitSequence;
+                            parsingController.disabilityLimitSequence = null;
+                            parsingController.parsingEnabled = false;
                         }
 
                         current = len;
@@ -420,12 +426,14 @@ public final class MarkupAttoParser implements IMarkupAttoParser {
                 // a returned Text event (if parsing is not re-enabled with a structure). Parsing-disabled and
                 // parsing-enabled events should not be mixed in order to improve event handling.
 
-                final IAttoHandleResult result =
-                        eventProcessor.processText(buffer, current, sequenceIndex - current, currentLine, currentCol);
-                if (result != null && result != AttoHandleResult.CONTINUE) {
-                    skipUntil = result.getParsingDisableLimit();
+                eventProcessor.processText(buffer, current, sequenceIndex - current, currentLine, currentCol);
+                if (parsingController.disabilityLimitSequence != null) {
+                    skipUntil = parsingController.disabilityLimitSequence;
+                    parsingController.disabilityLimitSequence = null;
+                    parsingController.parsingEnabled = false;
                 } else {
                     skipUntil = null;
+                    parsingController.parsingEnabled = true;
                 }
 
                 current = sequenceIndex;
@@ -444,10 +452,11 @@ public final class MarkupAttoParser implements IMarkupAttoParser {
 
                     if (this.canSplitText) {
 
-                        final IAttoHandleResult result =
-                                eventProcessor.processText(buffer, current, len - current, currentLine, currentCol);
-                        if (result != null && result != AttoHandleResult.CONTINUE) {
-                            skipUntil = result.getParsingDisableLimit();
+                        eventProcessor.processText(buffer, current, len - current, currentLine, currentCol);
+                        if (parsingController.disabilityLimitSequence != null) {
+                            skipUntil = parsingController.disabilityLimitSequence;
+                            parsingController.disabilityLimitSequence = null;
+                            parsingController.parsingEnabled = false;
                         }
 
                         current = len;
@@ -532,13 +541,14 @@ public final class MarkupAttoParser implements IMarkupAttoParser {
                 if (tagStart > current) {
                     // We avoid empty-string text events
 
-                    final IAttoHandleResult result =
-                            eventProcessor.processText(
-                                    buffer, current, (tagStart - current),
-                                    currentLine, currentCol);
+                    eventProcessor.processText(
+                            buffer, current, (tagStart - current),
+                            currentLine, currentCol);
 
-                    if (result != null && result != AttoHandleResult.CONTINUE) {
-                        skipUntil = result.getParsingDisableLimit();
+                    if (parsingController.disabilityLimitSequence != null) {
+                        skipUntil = parsingController.disabilityLimitSequence;
+                        parsingController.disabilityLimitSequence = null;
+                        parsingController.parsingEnabled = false;
                     }
 
                 }
@@ -577,21 +587,22 @@ public final class MarkupAttoParser implements IMarkupAttoParser {
                     // This is a open/standalone tag (to be determined by looking at the penultimate character)
 
                     final boolean standalone = (buffer[tagEnd - 1] == '/');
-                    final IAttoHandleResult result;
+
                     if (standalone) {
-                        result =
-                            ElementMarkupParsingUtil.
-                                    parseOpenOrStandaloneElement(
-                                            buffer, current + 1, ((tagEnd - current) + 1) - 3, current, (tagEnd - current) + 1, currentLine, currentCol, eventProcessor, true);
+                        ElementMarkupParsingUtil.
+                                parseOpenOrStandaloneElement(
+                                        buffer, current + 1, ((tagEnd - current) + 1) - 3, current, (tagEnd - current) + 1, currentLine, currentCol, eventProcessor, true);
                     } else {
-                        result =
-                            ElementMarkupParsingUtil.
-                                    parseOpenOrStandaloneElement(
-                                            buffer, current + 1, ((tagEnd - current) + 1) - 2, current, (tagEnd - current) + 1, currentLine, currentCol, eventProcessor, false);
+                        ElementMarkupParsingUtil.
+                                parseOpenOrStandaloneElement(
+                                        buffer, current + 1, ((tagEnd - current) + 1) - 2, current, (tagEnd - current) + 1, currentLine, currentCol, eventProcessor, false);
                     }
 
-                    if (result != null && result != AttoHandleResult.CONTINUE) {
-                        skipUntil = result.getParsingDisableLimit();
+
+                    if (parsingController.disabilityLimitSequence != null) {
+                        skipUntil = parsingController.disabilityLimitSequence;
+                        parsingController.disabilityLimitSequence = null;
+                        parsingController.parsingEnabled = false;
                     }
 
                     inOpenElement = false;
@@ -599,12 +610,14 @@ public final class MarkupAttoParser implements IMarkupAttoParser {
                 } else if (inCloseElement) {
                     // This is a closing tag
 
-                    final IAttoHandleResult result =
-                            ElementMarkupParsingUtil.
-                                    parseCloseElement(
-                                            buffer, current + 2, ((tagEnd - current) + 1) - 3, current, (tagEnd - current) + 1, currentLine, currentCol, eventProcessor);
-                    if (result != null && result != AttoHandleResult.CONTINUE) {
-                        skipUntil = result.getParsingDisableLimit();
+                    ElementMarkupParsingUtil.
+                            parseCloseElement(
+                                    buffer, current + 2, ((tagEnd - current) + 1) - 3, current, (tagEnd - current) + 1, currentLine, currentCol, eventProcessor);
+
+                    if (parsingController.disabilityLimitSequence != null) {
+                        skipUntil = parsingController.disabilityLimitSequence;
+                        parsingController.disabilityLimitSequence = null;
+                        parsingController.parsingEnabled = false;
                     }
 
                     inCloseElement = false;
@@ -629,10 +642,12 @@ public final class MarkupAttoParser implements IMarkupAttoParser {
                         
                     }
 
-                    final IAttoHandleResult result =
-                            eventProcessor.processComment(buffer, current + 4, ((tagEnd - current) + 1) - 7, current, (tagEnd - current) + 1, currentLine, currentCol);
-                    if (result != null && result != AttoHandleResult.CONTINUE) {
-                        skipUntil = result.getParsingDisableLimit();
+                    eventProcessor.processComment(buffer, current + 4, ((tagEnd - current) + 1) - 7, current, (tagEnd - current) + 1, currentLine, currentCol);
+
+                    if (parsingController.disabilityLimitSequence != null) {
+                        skipUntil = parsingController.disabilityLimitSequence;
+                        parsingController.disabilityLimitSequence = null;
+                        parsingController.parsingEnabled = false;
                     }
 
                     inComment = false;
@@ -657,10 +672,12 @@ public final class MarkupAttoParser implements IMarkupAttoParser {
                         
                     }
 
-                    final IAttoHandleResult result =
-                            eventProcessor.processCDATASection(buffer, current + 9, ((tagEnd - current) + 1) - 12, current, (tagEnd - current) + 1, currentLine, currentCol);
-                    if (result != null && result != AttoHandleResult.CONTINUE) {
-                        skipUntil = result.getParsingDisableLimit();
+                    eventProcessor.processCDATASection(buffer, current + 9, ((tagEnd - current) + 1) - 12, current, (tagEnd - current) + 1, currentLine, currentCol);
+
+                    if (parsingController.disabilityLimitSequence != null) {
+                        skipUntil = parsingController.disabilityLimitSequence;
+                        parsingController.disabilityLimitSequence = null;
+                        parsingController.parsingEnabled = false;
                     }
 
                     inCdata = false;
@@ -668,12 +685,13 @@ public final class MarkupAttoParser implements IMarkupAttoParser {
                 } else if (inDocType) {
                     // This is a DOCTYPE clause
 
-                    final IAttoHandleResult result =
-                            DocTypeMarkupParsingUtil.parseDocType(
-                                    buffer, current, ((tagEnd - current) + 1), currentLine, currentCol, eventProcessor);
+                    DocTypeMarkupParsingUtil.parseDocType(
+                            buffer, current, ((tagEnd - current) + 1), currentLine, currentCol, eventProcessor);
 
-                    if (result != null && result != AttoHandleResult.CONTINUE) {
-                        skipUntil = result.getParsingDisableLimit();
+                    if (parsingController.disabilityLimitSequence != null) {
+                        skipUntil = parsingController.disabilityLimitSequence;
+                        parsingController.disabilityLimitSequence = null;
+                        parsingController.parsingEnabled = false;
                     }
 
                     inDocType = false;
@@ -681,11 +699,13 @@ public final class MarkupAttoParser implements IMarkupAttoParser {
                 } else if (inXmlDeclaration) {
                     // This is an XML Declaration
 
-                    final IAttoHandleResult result =
-                            XmlDeclarationMarkupParsingUtil.parseXmlDeclaration(
-                                    buffer, current + 2, ((tagEnd - current) + 1) - 4, current, (tagEnd - current) + 1, currentLine, currentCol, eventProcessor);
-                    if (result != null && result != AttoHandleResult.CONTINUE) {
-                        skipUntil = result.getParsingDisableLimit();
+                    XmlDeclarationMarkupParsingUtil.parseXmlDeclaration(
+                            buffer, current + 2, ((tagEnd - current) + 1) - 4, current, (tagEnd - current) + 1, currentLine, currentCol, eventProcessor);
+
+                    if (parsingController.disabilityLimitSequence != null) {
+                        skipUntil = parsingController.disabilityLimitSequence;
+                        parsingController.disabilityLimitSequence = null;
+                        parsingController.parsingEnabled = false;
                     }
 
                     inXmlDeclaration = false;
@@ -710,11 +730,13 @@ public final class MarkupAttoParser implements IMarkupAttoParser {
                         
                     }
 
-                    final IAttoHandleResult result =
-                            ProcessingInstructionMarkupParsingUtil.parseProcessingInstruction(
-                                    buffer, current + 2, ((tagEnd - current) + 1) - 4, current, (tagEnd - current) + 1, currentLine, currentCol, eventProcessor);
-                    if (result != null && result != AttoHandleResult.CONTINUE) {
-                        skipUntil = result.getParsingDisableLimit();
+                    ProcessingInstructionMarkupParsingUtil.parseProcessingInstruction(
+                            buffer, current + 2, ((tagEnd - current) + 1) - 4, current, (tagEnd - current) + 1, currentLine, currentCol, eventProcessor);
+
+                    if (parsingController.disabilityLimitSequence != null) {
+                        skipUntil = parsingController.disabilityLimitSequence;
+                        parsingController.disabilityLimitSequence = null;
+                        parsingController.parsingEnabled = false;
                     }
 
                     inProcessingInstruction = false;

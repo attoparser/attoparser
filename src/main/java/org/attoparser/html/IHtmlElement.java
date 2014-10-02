@@ -20,15 +20,9 @@
 package org.attoparser.html;
 
 import org.attoparser.AttoParseException;
-import org.attoparser.IAttoHandleResult;
 import org.attoparser.IElementPreparationResult;
 import org.attoparser.IMarkupAttoHandler;
-
-
-
-
-
-
+import org.attoparser.MarkupParsingController;
 
 
 /**
@@ -50,84 +44,84 @@ interface IHtmlElement {
 
     IElementPreparationResult prepareForElement(
             final char[] buffer, final int nameOffset, final int nameLen, final int line, final int col,
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler, final MarkupParsingController parsingController)
             throws AttoParseException;
 
     
-    IAttoHandleResult handleStandaloneElementStart(
+    void handleStandaloneElementStart(
             final char[] buffer, final int offset, final int len, final boolean minimized,
             final int line, final int col,
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler, final MarkupParsingController parsingController)
             throws AttoParseException;
     
-    IAttoHandleResult handleStandaloneElementEnd(
+    void handleStandaloneElementEnd(
             final char[] buffer, final int offset, final int len, final boolean minimized,
             final int line, final int col,
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler, final MarkupParsingController parsingController)
             throws AttoParseException;
 
     
     
-    IAttoHandleResult handleOpenElementStart(
+    void handleOpenElementStart(
             final char[] buffer, final int offset, final int len, final int line, final int col, 
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler, final MarkupParsingController parsingController)
             throws AttoParseException;
 
-    IAttoHandleResult handleOpenElementEnd(
+    void handleOpenElementEnd(
             final char[] buffer, final int offset, final int len, final int line, final int col,
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler, final MarkupParsingController parsingController)
             throws AttoParseException;
 
-    
-    
-    IAttoHandleResult handleCloseElementStart(
+
+
+    void handleCloseElementStart(
             final char[] buffer, final int offset, final int len, final int line, final int col, 
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler, final MarkupParsingController parsingController)
             throws AttoParseException;
 
-    IAttoHandleResult handleCloseElementEnd(
+    void handleCloseElementEnd(
             final char[] buffer, final int offset, final int len, final int line, final int col,
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler, final MarkupParsingController parsingController)
             throws AttoParseException;
 
-    
-    
-    IAttoHandleResult handleAutoCloseElementStart(
+
+
+    void handleAutoCloseElementStart(
             final char[] buffer, final int offset, final int len, final int line, final int col, 
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler, final MarkupParsingController parsingController)
             throws AttoParseException;
 
-    IAttoHandleResult handleAutoCloseElementEnd(
+    void handleAutoCloseElementEnd(
             final char[] buffer, final int offset, final int len, final int line, final int col,
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler, final MarkupParsingController parsingController)
             throws AttoParseException;
-    
 
-    
-    IAttoHandleResult handleUnmatchedCloseElementStart(
+
+
+    void handleUnmatchedCloseElementStart(
             final char[] buffer, final int offset, final int len, final int line, final int col, 
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler, final MarkupParsingController parsingController)
             throws AttoParseException;
 
-    IAttoHandleResult handleUnmatchedCloseElementEnd(
+    void handleUnmatchedCloseElementEnd(
             final char[] buffer, final int offset, final int len, final int line, final int col,
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler, final MarkupParsingController parsingController)
             throws AttoParseException;
-    
-    
-    
-    IAttoHandleResult handleAttribute(
+
+
+
+    void handleAttribute(
             final char[] buffer, 
             final int nameOffset, final int nameLen, final int nameLine, final int nameCol, 
             final int operatorOffset, final int operatorLen, final int operatorLine, final int operatorCol, 
             final int valueContentOffset, final int valueContentLen, final int valueOuterOffset, final int valueOuterLen,
             final int valueLine, final int valueCol,
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler, final MarkupParsingController parsingController)
             throws AttoParseException;
 
-    IAttoHandleResult handleInnerWhiteSpace(
+    void handleInnerWhiteSpace(
             final char[] buffer, final int offset, final int len, final int line, final int col,
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler, final MarkupParsingController parsingController)
             throws AttoParseException;
     
 }

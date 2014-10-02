@@ -30,30 +30,37 @@ package org.attoparser;
 public abstract class AbstractMarkupAttoHandler implements IMarkupAttoHandler {
 
 
+
+
     protected AbstractMarkupAttoHandler() {
         super();
     }
 
 
 
-    public IAttoHandleResult handleDocumentStart(
+    public void setMarkupParsingController(final MarkupParsingController parsingController) {
+        // Nothing to do. By default handlers will not be interested in using this object at all.
+        // Implementations will have to explicitly override if they need to use it.
+    }
+
+
+
+    public void handleDocumentStart(
             final long startTimeNanos, final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
-        return null;
     }
 
 
-    public IAttoHandleResult handleDocumentEnd(
+    public void handleDocumentEnd(
             final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
-        return null;
     }
 
 
 
-    public IAttoHandleResult handleXmlDeclaration(
+    public void handleXmlDeclaration(
             final char[] buffer,
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -67,12 +74,11 @@ public abstract class AbstractMarkupAttoHandler implements IMarkupAttoHandler {
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
-        return null;
     }
 
 
 
-    public IAttoHandleResult handleDocType(
+    public void handleDocType(
             final char[] buffer,
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -90,42 +96,38 @@ public abstract class AbstractMarkupAttoHandler implements IMarkupAttoHandler {
             final int outerLine, final int outerCol)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
-        return null;
     }
 
 
 
-    public IAttoHandleResult handleCDATASection(
+    public void handleCDATASection(
             final char[] buffer,
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
-        return null;
     }
 
 
 
-    public IAttoHandleResult handleComment(
+    public void handleComment(
             final char[] buffer,
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
-        return null;
     }
 
 
 
-    public IAttoHandleResult handleText(
+    public void handleText(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
-        return null;
     }
 
 
@@ -139,108 +141,98 @@ public abstract class AbstractMarkupAttoHandler implements IMarkupAttoHandler {
     }
 
 
-    public IAttoHandleResult handleStandaloneElementStart(
+    public void handleStandaloneElementStart(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final boolean minimized, final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
-        return null;
     }
 
-    public IAttoHandleResult handleStandaloneElementEnd(
+    public void handleStandaloneElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final boolean minimized, final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
-        return null;
     }
 
     
 
-    public IAttoHandleResult handleOpenElementStart(
+    public void handleOpenElementStart(
             final char[] buffer,
             final int nameOffset, final int nameLen, 
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
-        return null;
     }
 
-    public IAttoHandleResult handleOpenElementEnd(
+    public void handleOpenElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
-        return null;
     }
 
 
     
-    public IAttoHandleResult handleCloseElementStart(
+    public void handleCloseElementStart(
             final char[] buffer,
             final int nameOffset, final int nameLen, 
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
-        return null;
     }
 
-    public IAttoHandleResult handleCloseElementEnd(
+    public void handleCloseElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
-        return null;
     }
 
 
     
-    public IAttoHandleResult handleAutoCloseElementStart(
+    public void handleAutoCloseElementStart(
             final char[] buffer,
             final int nameOffset, final int nameLen, 
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
-        return null;
     }
 
-    public IAttoHandleResult handleAutoCloseElementEnd(
+    public void handleAutoCloseElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
-        return null;
     }
     
 
     
-    public IAttoHandleResult handleUnmatchedCloseElementStart(
+    public void handleUnmatchedCloseElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen, 
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
-        return null;
     }
 
 
-    public IAttoHandleResult handleUnmatchedCloseElementEnd(
+    public void handleUnmatchedCloseElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
-        return null;
     }
 
 
     
-    public IAttoHandleResult handleAttribute(
+    public void handleAttribute(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol,
@@ -251,23 +243,21 @@ public abstract class AbstractMarkupAttoHandler implements IMarkupAttoHandler {
             final int valueLine, final int valueCol)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
-        return null;
     }
 
 
     
-    public IAttoHandleResult handleInnerWhiteSpace(
+    public void handleInnerWhiteSpace(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
-        return null;
     }
 
 
 
-    public IAttoHandleResult handleProcessingInstruction(
+    public void handleProcessingInstruction(
             final char[] buffer,
             final int targetOffset, final int targetLen,
             final int targetLine, final int targetCol,
@@ -277,7 +267,6 @@ public abstract class AbstractMarkupAttoHandler implements IMarkupAttoHandler {
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done here, meant to be overridden if required
-        return null;
     }
 
 

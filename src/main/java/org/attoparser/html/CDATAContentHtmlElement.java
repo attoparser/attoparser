@@ -19,11 +19,10 @@
  */
 package org.attoparser.html;
 
-import org.attoparser.AttoHandleResult;
-import org.attoparser.AttoHandleResultUtil;
 import org.attoparser.AttoParseException;
-import org.attoparser.IAttoHandleResult;
 import org.attoparser.IMarkupAttoHandler;
+import org.attoparser.MarkupParsingController;
+import org.attoparser.util.TextUtil;
 
 
 /**
@@ -38,8 +37,8 @@ final class CDATAContentHtmlElement extends BasicHtmlElement {
 
     private final char[] nameLower;
     private final char[] nameUpper;
-    private final IAttoHandleResult openElementEndResultLower;
-    private final IAttoHandleResult openElementEndResultUpper;
+    private final char[] limitSequenceLower;
+    private final char[] limitSequenceUpper;
 
 
     public CDATAContentHtmlElement(final String name) {
@@ -53,64 +52,49 @@ final class CDATAContentHtmlElement extends BasicHtmlElement {
         this.nameLower = nameLower.toCharArray();
         this.nameUpper = nameUppoer.toCharArray();
 
-        this.openElementEndResultLower = new AttoHandleResult(("</" + nameLower + ">").toCharArray());
-        this.openElementEndResultUpper = new AttoHandleResult(("</" + nameUppoer + ">").toCharArray());
+        this.limitSequenceLower = ("</" + nameLower + ">").toCharArray();
+        this.limitSequenceUpper = ("</" + nameUppoer + ">").toCharArray();
 
     }
 
 
     
     @Override
-    public IAttoHandleResult handleOpenElementEnd(
+    public void handleOpenElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col,
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler,
+            final MarkupParsingController parsingController)
             throws AttoParseException {
 
 
-        final IAttoHandleResult result1 =
-                handler.handleOpenElementEnd(buffer, nameOffset, nameLen, line, col);
+        handler.handleOpenElementEnd(buffer, nameOffset, nameLen, line, col);
 
-        final IAttoHandleResult result2 = computeResult(buffer, nameOffset, nameLen);
-
-        // Disable parsing until the closing element is found (this element's content is #CDATA, not #PCDATA)
-        return AttoHandleResultUtil.combinePriorityLast(result1, result2);
-        
-    }
-
-
-
-    private final IAttoHandleResult computeResult(final char[] buffer, final int nameOffset, final int nameLen) {
-
-        if (nameEquals(buffer, nameOffset, nameLen, this.nameLower)) {
-            return this.openElementEndResultLower;
-        }
-
-        if (nameEquals(buffer, nameOffset, nameLen, this.nameUpper)) {
-            return this.openElementEndResultUpper;
-        }
-
-        final char[] limit = new char[nameLen + 3];
-        limit[0] = '<';
-        limit[1] = '/';
-        System.arraycopy(buffer,nameOffset,limit,2,nameLen);
-        limit[nameLen + 2] = '>';
-        return new AttoHandleResult(limit);
+        // This is an element with CDATA body, so we should disable parsing until we find the corresponding closing tag
+        parsingController.disableParsingAfterStructure(computeLimitSequence(buffer, nameOffset, nameLen));
 
     }
 
 
-    private static final boolean nameEquals(final char[] buffer, final int nameOffset, final int nameLen, final char[] comparedTo) {
-        if (nameLen != comparedTo.length) {
-            return false;
+
+    private char[] computeLimitSequence(final char[] buffer, final int nameOffset, final int nameLen) {
+
+        if (TextUtil.equals(true, this.nameLower, 0, this.nameLower.length, buffer, nameOffset, nameLen)) {
+            return this.limitSequenceLower;
         }
-        for (int i = 0; i < nameLen; i++) {
-            if (buffer[i + nameOffset] != comparedTo[i]) {
-                return false;
-            }
+
+        if (TextUtil.equals(true, this.nameUpper, 0, this.nameUpper.length, buffer, nameOffset, nameLen)) {
+            return this.limitSequenceUpper;
         }
-        return true;
+
+        final char[] limitSeq = new char[nameLen + 3];
+        limitSeq[0] = '<';
+        limitSeq[1] = '/';
+        System.arraycopy(buffer,nameOffset,limitSeq,2,nameLen);
+        limitSeq[nameLen + 2] = '>';
+        return limitSeq;
+
     }
 
 

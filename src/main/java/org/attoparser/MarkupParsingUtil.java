@@ -51,10 +51,12 @@ final class MarkupParsingUtil {
         boolean inQuotes = false;
         boolean inApos = false;
 
+        char c;
+
         int colIndex = offset;
         for (int i = offset; i < maxi; i++) {
             
-            final char c = text[i];
+            c = text[i];
 
             if (c == '\n') {
                 colIndex = i;
@@ -80,11 +82,13 @@ final class MarkupParsingUtil {
     static int findNextStructureEndDontAvoidQuotes(
             final char[] text, final int offset, final int maxi, 
             final int[] locator) {
-        
+
+        char c;
+
         int colIndex = offset;
         for (int i = offset; i < maxi; i++) {
             
-            final char c = text[i];
+            c = text[i];
             
             if (c == '\n') {
                 colIndex = i;
@@ -107,10 +111,12 @@ final class MarkupParsingUtil {
             final char[] text, final int offset, final int maxi, 
             final int[] locator) {
 
+        char c;
+
         int colIndex = offset;
         for (int i = offset; i < maxi; i++) {
             
-            final char c = text[i];
+            c = text[i];
             
             if (c == '\n') {
                 colIndex = i;
@@ -136,9 +142,11 @@ final class MarkupParsingUtil {
         boolean inQuotes = false;
         boolean inApos = false;
 
+        char c;
+
         for (int i = offset; i < maxi; i++) {
             
-            final char c = text[i];
+            c = text[i];
             
             if (avoidQuotes && !inApos && c == '"') {
                 inQuotes = !inQuotes;
@@ -160,11 +168,14 @@ final class MarkupParsingUtil {
     static int findNextNonWhitespaceCharWildcard(
             final char[] text, final int offset, final int maxi, 
             final int[] locator) {
-        
+
+        char c;
+        boolean isWhitespace;
+
         for (int i = offset; i < maxi; i++) {
             
-            final char c = text[i];
-            final boolean isWhitespace = (c == ' ' || c == '\n' || Character.isWhitespace(c));
+            c = text[i];
+            isWhitespace = (c == ' ' || c == '\n' || Character.isWhitespace(c));
             
             if (!isWhitespace) {
                 return i;
@@ -182,10 +193,12 @@ final class MarkupParsingUtil {
     static int findNextOperatorCharWildcard(
             final char[] text, final int offset, final int maxi,  
             final int[] locator) {
-        
+
+        char c;
+
         for (int i = offset; i < maxi; i++) {
             
-            final char c = text[i];
+            c = text[i];
             
             if (c == '=' || (c == ' ' || c == '\n' || Character.isWhitespace(c))) {
                 return i;
@@ -203,10 +216,12 @@ final class MarkupParsingUtil {
     static int findNextNonOperatorCharWildcard(
             final char[] text, final int offset, final int maxi, 
             final int[] locator) {
-        
+
+        char c;
+
         for (int i = offset; i < maxi; i++) {
             
-            final char c = text[i];
+            c = text[i];
             
             if (c != '=' && !(c == ' ' || c == '\n' || Character.isWhitespace(c))) {
                 return i;
@@ -228,9 +243,11 @@ final class MarkupParsingUtil {
         boolean inQuotes = false;
         boolean inApos = false;
 
+        char c;
+
         for (int i = offset; i < maxi; i++) {
             
-            final char c = text[i];
+            c = text[i];
             
             if (!inApos && c == '"') {
                 if (inQuotes) {
@@ -270,11 +287,11 @@ final class MarkupParsingUtil {
         }
 
         final char c1 = charSeq[0];
+        char c;
 
-        int colIndex = offset;
         for (int i = offset; i < maxi; i++) {
 
-            final char c = text[i];
+            c = text[i];
 
             if (c == c1) {
                 // First char matches, let's see the others

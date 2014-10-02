@@ -35,7 +35,7 @@ import org.attoparser.util.TextUtil;
  * @since 2.0.0
  *
  */
-final class MarkupEventProcessor implements IMarkupEventAttributeProcessor {
+final class MarkupEventProcessor implements AttributeSequenceMarkupParsingUtil.IMarkupEventAttributeSequenceProcessor {
 
 
     private static final int DEFAULT_STACK_LEN = 10;
@@ -136,14 +136,14 @@ final class MarkupEventProcessor implements IMarkupEventAttributeProcessor {
 
 
 
-    IAttoHandleResult processDocumentStart(final long startTimeNanos, final int line, final int col)
+    void processDocumentStart(final long startTimeNanos, final int line, final int col)
             throws AttoParseException {
-        return this.handler.handleDocumentStart(startTimeNanos, line, col);
+        this.handler.handleDocumentStart(startTimeNanos, line, col);
     }
 
 
 
-    IAttoHandleResult processDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
+    void processDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
             throws AttoParseException {
 
         if (this.requireBalancedElements && this.elementStackSize > 0) {
@@ -165,48 +165,48 @@ final class MarkupEventProcessor implements IMarkupEventAttributeProcessor {
             cleanStack(line, col);
         }
 
-        return this.handler.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col);
+        this.handler.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col);
 
     }
 
 
 
-    IAttoHandleResult processCDATASection(
+    void processCDATASection(
             final char[] buffer,
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
             final int line, final int col)
             throws AttoParseException {
-        return this.handler.handleCDATASection(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
+        this.handler.handleCDATASection(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
     }
 
 
 
 
-    IAttoHandleResult processComment(
+    void processComment(
             final char[] buffer,
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
             final int line, final int col)
             throws AttoParseException {
-        return this.handler.handleComment(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
+        this.handler.handleComment(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
     }
 
 
 
 
-    IAttoHandleResult processText(
+    void processText(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
-        return this.handler.handleText(buffer, offset, len, line, col);
+        this.handler.handleText(buffer, offset, len, line, col);
     }
 
 
 
 
-    IAttoHandleResult processProcessingInstruction(
+    void processProcessingInstruction(
             final char[] buffer,
             final int targetOffset, final int targetLen,
             final int targetLine, final int targetCol,
@@ -215,7 +215,7 @@ final class MarkupEventProcessor implements IMarkupEventAttributeProcessor {
             final int outerOffset, final int outerLen,
             final int line, final int col)
             throws AttoParseException {
-        return this.handler.handleProcessingInstruction(
+        this.handler.handleProcessingInstruction(
                 buffer,
                 targetOffset, targetLen, targetLine, targetCol,
                 contentOffset, contentLen, contentLine, contentCol,
@@ -225,7 +225,7 @@ final class MarkupEventProcessor implements IMarkupEventAttributeProcessor {
 
 
 
-    IAttoHandleResult processXmlDeclaration(
+    void processXmlDeclaration(
             final char[] buffer,
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -266,23 +266,20 @@ final class MarkupEventProcessor implements IMarkupEventAttributeProcessor {
 
         }
 
-        final IAttoHandleResult result =
-            this.handler.handleXmlDeclaration(buffer, keywordOffset, keywordLen, keywordLine,
-                    keywordCol, versionOffset, versionLen, versionLine, versionCol,
-                    encodingOffset, encodingLen, encodingLine, encodingCol,
-                    standaloneOffset, standaloneLen, standaloneLine, standaloneCol,
-                    outerOffset, outerLen, line, col);
-
         if (this.validateProlog) {
             this.validPrologXmlDeclarationRead = true;
         }
 
-        return result;
+        this.handler.handleXmlDeclaration(buffer, keywordOffset, keywordLen, keywordLine,
+                keywordCol, versionOffset, versionLen, versionLine, versionCol,
+                encodingOffset, encodingLen, encodingLine, encodingCol,
+                standaloneOffset, standaloneLen, standaloneLine, standaloneCol,
+                outerOffset, outerLen, line, col);
 
     }
 
 
-    IAttoHandleResult processStandaloneElementStart(
+    void processStandaloneElementStart(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final boolean minimized,
@@ -327,26 +324,24 @@ final class MarkupEventProcessor implements IMarkupEventAttributeProcessor {
 
         }
 
-        return this.handler.handleStandaloneElementStart(buffer, nameOffset, nameLen, minimized, line, col);
+        this.handler.handleStandaloneElementStart(buffer, nameOffset, nameLen, minimized, line, col);
 
     }
 
-    IAttoHandleResult processStandaloneElementEnd(
+    void processStandaloneElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final boolean minimized,
             final int line, final int col)
             throws AttoParseException {
 
-        final IAttoHandleResult result =
-            this.handler.handleStandaloneElementEnd(buffer, nameOffset, nameLen, minimized, line, col);
         this.elementRead = true;
-        return result;
+        this.handler.handleStandaloneElementEnd(buffer, nameOffset, nameLen, minimized, line, col);
 
     }
 
 
-    IAttoHandleResult processOpenElementStart(
+    void processOpenElementStart(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col)
@@ -396,27 +391,23 @@ final class MarkupEventProcessor implements IMarkupEventAttributeProcessor {
         /*
          * Actually perform the handling of the open element start
          */
-        return this.handler.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
+        this.handler.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
 
     }
 
-    IAttoHandleResult processOpenElementEnd(
+    void processOpenElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
 
-        final IAttoHandleResult result =
-            this.handler.handleOpenElementEnd(buffer, nameOffset, nameLen, line, col);
-
         this.elementRead = true;
-
-        return result;
+        this.handler.handleOpenElementEnd(buffer, nameOffset, nameLen, line, col);
 
     }
 
 
-    IAttoHandleResult processCloseElementStart(
+    void processCloseElementStart(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col)
@@ -433,41 +424,38 @@ final class MarkupEventProcessor implements IMarkupEventAttributeProcessor {
             }
 
             if (this.closeElementIsMatched) {
-                return this.handler.handleCloseElementStart(buffer, nameOffset, nameLen, line, col);
+                this.handler.handleCloseElementStart(buffer, nameOffset, nameLen, line, col);
+                return;
             } else {
-                return this.handler.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col);
+                this.handler.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col);
+                return;
             }
-
-        } else {
-
-            return this.handler.handleCloseElementStart(buffer, nameOffset, nameLen, line, col);
 
         }
 
+        this.handler.handleCloseElementStart(buffer, nameOffset, nameLen, line, col);
 
     }
 
-    IAttoHandleResult processCloseElementEnd(
+    void processCloseElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
 
-        final IAttoHandleResult result;
-        if (!this.useStack || this.closeElementIsMatched) {
-            result = this.handler.handleCloseElementEnd(buffer, nameOffset, nameLen, line, col);
-        } else {
-            result = this.handler.handleUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col);
-        }
-
         this.elementRead = true;
 
-        return result;
+        if (this.useStack && !this.closeElementIsMatched) {
+            this.handler.handleUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col);
+            return;
+        }
+
+        this.handler.handleCloseElementEnd(buffer, nameOffset, nameLen, line, col);
 
     }
 
 
-    public IAttoHandleResult processAttribute(
+    public void processAttribute(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol,
@@ -536,7 +524,7 @@ final class MarkupEventProcessor implements IMarkupEventAttributeProcessor {
 
         }
 
-        return this.handler.handleAttribute(
+        this.handler.handleAttribute(
                 buffer,
                 nameOffset, nameLen, nameLine, nameCol,
                 operatorOffset, operatorLen, operatorLine, operatorCol,
@@ -546,19 +534,19 @@ final class MarkupEventProcessor implements IMarkupEventAttributeProcessor {
 
 
 
-    public IAttoHandleResult processInnerWhiteSpace(
+    public void processInnerWhiteSpace(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
 
-        return this.handler.handleInnerWhiteSpace(buffer, offset, len, line, col);
+        this.handler.handleInnerWhiteSpace(buffer, offset, len, line, col);
 
     }
 
 
 
-    IAttoHandleResult processDocType(
+    void processDocType(
             final char[] buffer,
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -634,8 +622,11 @@ final class MarkupEventProcessor implements IMarkupEventAttributeProcessor {
 
         }
 
-        final IAttoHandleResult result =
-            this.handler.handleDocType(
+        if (this.validateProlog) {
+            this.validPrologDocTypeRead = true;
+        }
+
+        this.handler.handleDocType(
                     buffer,
                     keywordOffset, keywordLen, keywordLine, keywordCol,
                     elementNameOffset, elementNameLen, elementNameLine, elementNameCol,
@@ -644,12 +635,6 @@ final class MarkupEventProcessor implements IMarkupEventAttributeProcessor {
                     systemIdOffset, systemIdLen, systemIdLine, systemIdCol,
                     internalSubsetOffset, internalSubsetLen, internalSubsetLine, internalSubsetCol,
                     outerOffset, outerLen, outerLine, outerCol);
-
-        if (this.validateProlog) {
-            this.validPrologDocTypeRead = true;
-        }
-
-        return result;
 
     }
 
@@ -793,12 +778,14 @@ final class MarkupEventProcessor implements IMarkupEventAttributeProcessor {
         int unstackCount = 0;
         char[] peek = peekFromStack(peekDelta);
 
+        int i;
+
         while (peek != null) {
 
             if (unstackLimits != null) {
                 // First check whether we found a limit
-                for (final char[] unstackLimit : unstackLimits) {
-                    if (TextUtil.equals(this.caseSensitive, unstackLimit, peek)) {
+                for (i = 0; i < unstackLimits.length; i++) {
+                    if (TextUtil.equals(this.caseSensitive, unstackLimits[i], peek)) {
                         // Just found a limit, we should stop computing unstacking here
                         peek = null; // This will make us exit the loop
                         break;
@@ -809,8 +796,8 @@ final class MarkupEventProcessor implements IMarkupEventAttributeProcessor {
             if (peek != null) {
 
                 // Check whether this is an element we must close
-                for (final char[] unstackElement : unstackElements) {
-                    if (TextUtil.equals(this.caseSensitive, unstackElement, peek)) {
+                for (i = 0; i < unstackElements.length; i++) {
+                    if (TextUtil.equals(this.caseSensitive, unstackElements[i], peek)) {
                         // This is an element we must unstack, so we should mark unstackCount
                         unstackCount = peekDelta + 1;
                         break;
@@ -825,7 +812,7 @@ final class MarkupEventProcessor implements IMarkupEventAttributeProcessor {
         }
 
 
-        for (int i = 0; i < unstackCount; i++) {
+        for (i = 0; i < unstackCount; i++) {
 
             peek = popFromStack();
 
@@ -954,12 +941,15 @@ final class MarkupEventProcessor implements IMarkupEventAttributeProcessor {
             int low = 0;
             int high = values.size() - 1;
 
+            int mid, cmp;
+            char[] midVal;
+
             while (low <= high) {
 
-                final int mid = (low + high) >>> 1;
-                final char[] midVal = values.get(mid);
+                mid = (low + high) >>> 1;
+                midVal = values.get(mid);
 
-                final int cmp = TextUtil.compareTo(true, midVal, 0, midVal.length, text, offset, len);
+                cmp = TextUtil.compareTo(true, midVal, 0, midVal.length, text, offset, len);
 
                 if (cmp < 0) {
                     low = mid + 1;
@@ -1049,12 +1039,15 @@ final class MarkupEventProcessor implements IMarkupEventAttributeProcessor {
             int low = 0;
             int high = values.length - 1;
 
+            int mid, cmp;
+            char[] midVal;
+
             while (low <= high) {
 
-                final int mid = (low + high) >>> 1;
-                final char[] midVal = values[mid];
+                mid = (low + high) >>> 1;
+                midVal = values[mid];
 
-                final int cmp = TextUtil.compareTo(true, midVal, 0, midVal.length, text, offset, len);
+                cmp = TextUtil.compareTo(true, midVal, 0, midVal.length, text, offset, len);
 
                 if (cmp < 0) {
                     low = mid + 1;

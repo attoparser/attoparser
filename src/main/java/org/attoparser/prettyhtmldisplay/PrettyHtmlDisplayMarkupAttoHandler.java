@@ -25,9 +25,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.attoparser.AttoParseException;
-import org.attoparser.IAttoHandleResult;
 import org.attoparser.AbstractMarkupAttoHandler;
+import org.attoparser.AttoParseException;
 
 
 
@@ -133,7 +132,12 @@ public class PrettyHtmlDisplayMarkupAttoHandler extends AbstractMarkupAttoHandle
     
     public PrettyHtmlDisplayMarkupAttoHandler(final String documentName, final Writer writer, final boolean createHtmlAsFragment) {
         super();
-        this.documentName = documentName;
+        if (writer == null) {
+            throw new IllegalArgumentException("Writer cannot be null");
+        }
+        this.documentName =
+                (documentName == null?
+                        String.valueOf(System.identityHashCode(this)) : documentName);
         this.documentId = tokenify(this.documentName);
         this.writer = writer;
         this.createHtmlAsFragment = createHtmlAsFragment;
@@ -210,7 +214,7 @@ public class PrettyHtmlDisplayMarkupAttoHandler extends AbstractMarkupAttoHandle
     
     
     @Override
-    public IAttoHandleResult handleDocumentStart(final long startTimeNanos,
+    public void handleDocumentStart(final long startTimeNanos,
             final int line, final int col)
             throws AttoParseException {
         
@@ -234,14 +238,12 @@ public class PrettyHtmlDisplayMarkupAttoHandler extends AbstractMarkupAttoHandle
             throw new AttoParseException(e);
         }
 
-        return null;
-
     }
 
     
     
     @Override
-    public IAttoHandleResult handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos,
+    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos,
             final int line, final int col)
             throws AttoParseException {
         
@@ -258,15 +260,13 @@ public class PrettyHtmlDisplayMarkupAttoHandler extends AbstractMarkupAttoHandle
             throw new AttoParseException(e);
         }
 
-        return null;
-
     }
     
     
 
     
     @Override
-    public IAttoHandleResult handleStandaloneElementStart(
+    public void handleStandaloneElementStart(
             final char[] buffer,
             final int offset, final int len,
             final boolean minimized,
@@ -283,13 +283,11 @@ public class PrettyHtmlDisplayMarkupAttoHandler extends AbstractMarkupAttoHandle
             throw new AttoParseException(e);
         }
 
-        return null;
-
     }
 
     
     @Override
-    public IAttoHandleResult handleStandaloneElementEnd(
+    public void handleStandaloneElementEnd(
             final char[] buffer,
             final int offset, final int len,
             final boolean minimized,
@@ -305,15 +303,13 @@ public class PrettyHtmlDisplayMarkupAttoHandler extends AbstractMarkupAttoHandle
             throw new AttoParseException(e);
         }
 
-        return null;
-
     }
 
     
     
     
     @Override
-    public IAttoHandleResult handleOpenElementStart(
+    public void handleOpenElementStart(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
@@ -329,13 +325,11 @@ public class PrettyHtmlDisplayMarkupAttoHandler extends AbstractMarkupAttoHandle
             throw new AttoParseException(e);
         }
 
-        return null;
-
     }
 
     
     @Override
-    public IAttoHandleResult handleOpenElementEnd(
+    public void handleOpenElementEnd(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
@@ -350,15 +344,13 @@ public class PrettyHtmlDisplayMarkupAttoHandler extends AbstractMarkupAttoHandle
             throw new AttoParseException(e);
         }
 
-        return null;
-
     }
 
     
     
     
     @Override
-    public IAttoHandleResult handleCloseElementStart(
+    public void handleCloseElementStart(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col) 
@@ -374,13 +366,11 @@ public class PrettyHtmlDisplayMarkupAttoHandler extends AbstractMarkupAttoHandle
             throw new AttoParseException(e);
         }
 
-        return null;
-
     }
 
     
     @Override
-    public IAttoHandleResult handleCloseElementEnd(
+    public void handleCloseElementEnd(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
@@ -395,15 +385,13 @@ public class PrettyHtmlDisplayMarkupAttoHandler extends AbstractMarkupAttoHandle
             throw new AttoParseException(e);
         }
 
-        return null;
-
     }
 
 
 
 
     @Override
-    public IAttoHandleResult handleAutoCloseElementStart(
+    public void handleAutoCloseElementStart(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
@@ -419,13 +407,11 @@ public class PrettyHtmlDisplayMarkupAttoHandler extends AbstractMarkupAttoHandle
             throw new AttoParseException(e);
         }
 
-        return null;
-
     }
 
 
     @Override
-    public IAttoHandleResult handleAutoCloseElementEnd(
+    public void handleAutoCloseElementEnd(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
@@ -440,15 +426,13 @@ public class PrettyHtmlDisplayMarkupAttoHandler extends AbstractMarkupAttoHandle
             throw new AttoParseException(e);
         }
 
-        return null;
-
     }
 
 
 
 
     @Override
-    public IAttoHandleResult handleUnmatchedCloseElementStart(
+    public void handleUnmatchedCloseElementStart(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
@@ -464,13 +448,11 @@ public class PrettyHtmlDisplayMarkupAttoHandler extends AbstractMarkupAttoHandle
             throw new AttoParseException(e);
         }
 
-        return null;
-
     }
 
 
     @Override
-    public IAttoHandleResult handleUnmatchedCloseElementEnd(
+    public void handleUnmatchedCloseElementEnd(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
@@ -485,15 +467,13 @@ public class PrettyHtmlDisplayMarkupAttoHandler extends AbstractMarkupAttoHandle
             throw new AttoParseException(e);
         }
 
-        return null;
-
     }
 
 
 
 
     @Override
-    public IAttoHandleResult handleAttribute(
+    public void handleAttribute(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol,
@@ -520,13 +500,11 @@ public class PrettyHtmlDisplayMarkupAttoHandler extends AbstractMarkupAttoHandle
             throw new AttoParseException(e);
         }
 
-        return null;
-
     }
 
 
     @Override
-    public IAttoHandleResult handleInnerWhiteSpace(
+    public void handleInnerWhiteSpace(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col)
@@ -540,8 +518,6 @@ public class PrettyHtmlDisplayMarkupAttoHandler extends AbstractMarkupAttoHandle
             throw new AttoParseException(e);
         }
 
-        return null;
-
     }
 
 
@@ -550,7 +526,7 @@ public class PrettyHtmlDisplayMarkupAttoHandler extends AbstractMarkupAttoHandle
     
     
     @Override
-    public IAttoHandleResult handleText(final char[] buffer, final int offset, final int len,
+    public void handleText(final char[] buffer, final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         
@@ -564,14 +540,12 @@ public class PrettyHtmlDisplayMarkupAttoHandler extends AbstractMarkupAttoHandle
             throw new AttoParseException(e);
         }
 
-        return null;
-
     }
 
 
     
     @Override
-    public IAttoHandleResult handleComment(
+    public void handleComment(
             final char[] buffer, 
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
@@ -590,13 +564,11 @@ public class PrettyHtmlDisplayMarkupAttoHandler extends AbstractMarkupAttoHandle
             throw new AttoParseException(e);
         }
 
-        return null;
-
     }
 
     
     @Override
-    public IAttoHandleResult handleCDATASection(
+    public void handleCDATASection(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
@@ -615,15 +587,13 @@ public class PrettyHtmlDisplayMarkupAttoHandler extends AbstractMarkupAttoHandle
             throw new AttoParseException(e);
         }
 
-        return null;
-
     }
 
     
     
     
     @Override
-    public IAttoHandleResult handleXmlDeclaration(
+    public void handleXmlDeclaration(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -698,8 +668,6 @@ public class PrettyHtmlDisplayMarkupAttoHandler extends AbstractMarkupAttoHandle
             throw new AttoParseException(e);
         }
 
-        return null;
-
     }
 
     
@@ -707,7 +675,7 @@ public class PrettyHtmlDisplayMarkupAttoHandler extends AbstractMarkupAttoHandle
 
 
     @Override
-    public IAttoHandleResult handleDocType(
+    public void handleDocType(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -737,8 +705,6 @@ public class PrettyHtmlDisplayMarkupAttoHandler extends AbstractMarkupAttoHandle
             throw new AttoParseException(e);
         }
 
-        return null;
-
     }
 
 
@@ -746,7 +712,7 @@ public class PrettyHtmlDisplayMarkupAttoHandler extends AbstractMarkupAttoHandle
 
 
     @Override
-    public IAttoHandleResult handleProcessingInstruction(
+    public void handleProcessingInstruction(
             final char[] buffer, 
             final int targetOffset, final int targetLen, 
             final int targetLine, final int targetCol,
@@ -776,13 +742,8 @@ public class PrettyHtmlDisplayMarkupAttoHandler extends AbstractMarkupAttoHandle
             throw new AttoParseException(e);
         }
 
-        return null;
-
     }
 
-    
-    
 
-    
     
 }

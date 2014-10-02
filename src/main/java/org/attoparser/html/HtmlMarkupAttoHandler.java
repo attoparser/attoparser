@@ -19,11 +19,11 @@
  */
 package org.attoparser.html;
 
-import org.attoparser.AttoParseException;
-import org.attoparser.IAttoHandleResult;
 import org.attoparser.AbstractMarkupAttoHandler;
+import org.attoparser.AttoParseException;
 import org.attoparser.IElementPreparationResult;
 import org.attoparser.IMarkupAttoHandler;
+import org.attoparser.MarkupParsingController;
 
 
 /**
@@ -33,10 +33,12 @@ import org.attoparser.IMarkupAttoHandler;
  * @since 1.1
  *
  */
-public final class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
+public class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
 
 
     private final IMarkupAttoHandler handler;
+    private MarkupParsingController parsingController = null; // Will be always set, but anyway we should initialize.
+
     private IHtmlElement currentElement = null;
 
 
@@ -44,36 +46,48 @@ public final class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
 
     public HtmlMarkupAttoHandler(final IMarkupAttoHandler handler) {
         super();
+        if (handler == null) {
+            throw new IllegalArgumentException("Delegate handler cannot be null");
+        }
         this.handler = handler;
     }
 
 
 
+    @Override
+    public void setMarkupParsingController(final MarkupParsingController parsingController) {
+        // This will be ALWAYS called, so there is no need to actually check whether this property is null when using it
+        this.parsingController = parsingController;
+        this.handler.setMarkupParsingController(parsingController);
+    }
+
+
+
 
     @Override
-    public IAttoHandleResult handleDocumentStart(
+    public void handleDocumentStart(
             final long startTimeNanos, final int line, final int col)
             throws AttoParseException {
 
-        return this.handler.handleDocumentStart(startTimeNanos, line, col);
+        this.handler.handleDocumentStart(startTimeNanos, line, col);
 
     }
 
 
 
     @Override
-    public IAttoHandleResult handleDocumentEnd(
+    public void handleDocumentEnd(
             final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
             throws AttoParseException {
 
-        return this.handler.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col);
+        this.handler.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col);
 
     }
 
 
 
     @Override
-    public IAttoHandleResult handleXmlDeclaration(
+    public void handleXmlDeclaration(
             final char[] buffer,
             final int keywordOffset, final int keywordLen, final int keywordLine, final int keywordCol,
             final int versionOffset, final int versionLen, final int versionLine, final int versionCol,
@@ -83,7 +97,7 @@ public final class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
             final int line, final int col)
             throws AttoParseException {
 
-        return this.handler.handleXmlDeclaration(
+        this.handler.handleXmlDeclaration(
                 buffer,
                 keywordOffset, keywordLen, keywordLine, keywordCol,
                 versionOffset, versionLen, versionLine, versionCol,
@@ -97,7 +111,7 @@ public final class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
 
 
     @Override
-    public IAttoHandleResult handleDocType(
+    public void handleDocType(
             final char[] buffer,
             final int keywordOffset, final int keywordLen, final int keywordLine, final int keywordCol,
             final int elementNameOffset, final int elementNameLen, final int elementNameLine, final int elementNameCol,
@@ -109,7 +123,7 @@ public final class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
             final int outerLine, final int outerCol)
             throws AttoParseException {
 
-        return this.handler.handleDocType(
+        this.handler.handleDocType(
                 buffer,
                 keywordOffset, keywordLen, keywordLine, keywordCol,
                 elementNameOffset, elementNameLen, elementNameLine, elementNameCol,
@@ -125,74 +139,74 @@ public final class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
 
 
     @Override
-    public IAttoHandleResult handleCDATASection(
+    public void handleCDATASection(
             final char[] buffer,
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
             final int line, final int col)
             throws AttoParseException {
 
-        return this.handler.handleCDATASection(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
+        this.handler.handleCDATASection(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
 
     }
 
 
 
     @Override
-    public IAttoHandleResult handleComment(
+    public void handleComment(
             final char[] buffer,
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
             final int line, final int col)
             throws AttoParseException {
 
-        return this.handler.handleComment(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
+        this.handler.handleComment(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
 
     }
 
 
 
     @Override
-    public IAttoHandleResult handleText(
+    public void handleText(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
 
-        return this.handler.handleText(buffer, offset, len, line, col);
+        this.handler.handleText(buffer, offset, len, line, col);
 
     }
 
 
 
     @Override
-    public final IElementPreparationResult prepareForElement(
+    public IElementPreparationResult prepareForElement(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
 
         final IHtmlElement elementToPrepare = HtmlElements.forName(buffer, offset, len);
-        return elementToPrepare.prepareForElement(buffer, offset, len, line, col, this.handler);
+        return elementToPrepare.prepareForElement(buffer, offset, len, line, col, this.handler, this.parsingController);
 
     }
 
 
 
     @Override
-    public final IAttoHandleResult handleStandaloneElementStart(
+    public void handleStandaloneElementStart(
             final char[] buffer,
             final int offset, final int len,
             final boolean minimized, final int line, final int col)
             throws AttoParseException {
         
         this.currentElement = HtmlElements.forName(buffer, offset, len);
-        return this.currentElement.handleStandaloneElementStart(buffer, offset, len, minimized, line, col, this.handler);
+        this.currentElement.handleStandaloneElementStart(buffer, offset, len, minimized, line, col, this.handler, this.parsingController);
 
     }
 
     @Override
-    public final IAttoHandleResult handleStandaloneElementEnd(
+    public void handleStandaloneElementEnd(
             final char[] buffer,
             final int offset, final int len,
             final boolean minimized, final int line, final int col)
@@ -202,11 +216,11 @@ public final class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
             throw new IllegalStateException("Cannot end element: no current element");
         }
 
-        final IAttoHandleResult result =
-            this.currentElement.handleStandaloneElementEnd(buffer, offset, len, minimized, line, col, this.handler);
+        final IHtmlElement element = this.currentElement;
         this.currentElement = null;
 
-        return result;
+        // Hoping for better days in which tail calls might be optimized ;)
+        element.handleStandaloneElementEnd(buffer, offset, len, minimized, line, col, this.handler, this.parsingController);
 
     }
 
@@ -214,19 +228,19 @@ public final class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
     
     
     @Override
-    public final IAttoHandleResult handleOpenElementStart(
+    public void handleOpenElementStart(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col) 
             throws AttoParseException {
         
         this.currentElement = HtmlElements.forName(buffer, offset, len);
-        return this.currentElement.handleOpenElementStart(buffer, offset, len, line, col, this.handler);
+        this.currentElement.handleOpenElementStart(buffer, offset, len, line, col, this.handler, this.parsingController);
 
     }
 
     @Override
-    public final IAttoHandleResult handleOpenElementEnd(
+    public void handleOpenElementEnd(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
@@ -236,11 +250,11 @@ public final class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
             throw new IllegalStateException("Cannot end element: no current element");
         }
 
-        final IAttoHandleResult result =
-            this.currentElement.handleOpenElementEnd(buffer, offset, len, line, col, this.handler);
+        final IHtmlElement element = this.currentElement;
         this.currentElement = null;
 
-        return result;
+        // Hoping for better days in which tail calls might be optimized ;)
+        element.handleOpenElementEnd(buffer, offset, len, line, col, this.handler, this.parsingController);
 
     }
 
@@ -248,19 +262,19 @@ public final class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
     
     
     @Override
-    public final IAttoHandleResult handleCloseElementStart(
+    public void handleCloseElementStart(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col) 
             throws AttoParseException {
         
         this.currentElement = HtmlElements.forName(buffer, offset, len);
-        return this.currentElement.handleCloseElementStart(buffer, offset, len, line, col, this.handler);
+        this.currentElement.handleCloseElementStart(buffer, offset, len, line, col, this.handler, this.parsingController);
         
     }
 
     @Override
-    public final IAttoHandleResult handleCloseElementEnd(
+    public void handleCloseElementEnd(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
@@ -270,11 +284,11 @@ public final class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
             throw new IllegalStateException("Cannot end element: no current element");
         }
 
-        final IAttoHandleResult result =
-            this.currentElement.handleCloseElementEnd(buffer, offset, len, line, col, this.handler);
+        final IHtmlElement element = this.currentElement;
         this.currentElement = null;
 
-        return result;
+        // Hoping for better days in which tail calls might be optimized ;)
+        element.handleCloseElementEnd(buffer, offset, len, line, col, this.handler, this.parsingController);
 
     }
 
@@ -282,19 +296,19 @@ public final class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
     
     
     @Override
-    public final IAttoHandleResult handleAutoCloseElementStart(
+    public void handleAutoCloseElementStart(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
         
         this.currentElement = HtmlElements.forName(buffer, offset, len);
-        return this.currentElement.handleAutoCloseElementStart(buffer, offset, len, line, col, this.handler);
+        this.currentElement.handleAutoCloseElementStart(buffer, offset, len, line, col, this.handler, this.parsingController);
         
     }
 
     @Override
-    public final IAttoHandleResult handleAutoCloseElementEnd(
+    public void handleAutoCloseElementEnd(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
@@ -304,11 +318,11 @@ public final class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
             throw new IllegalStateException("Cannot end element: no current element");
         }
 
-        final IAttoHandleResult result =
-            this.currentElement.handleAutoCloseElementEnd(buffer, offset, len, line, col, this.handler);
+        final IHtmlElement element = this.currentElement;
         this.currentElement = null;
 
-        return result;
+        // Hoping for better days in which tail calls might be optimized ;)
+        element.handleAutoCloseElementEnd(buffer, offset, len, line, col, this.handler, this.parsingController);
 
     }
 
@@ -316,19 +330,19 @@ public final class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
     
     
     @Override
-    public final IAttoHandleResult handleUnmatchedCloseElementStart(
+    public void handleUnmatchedCloseElementStart(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
         
         this.currentElement = HtmlElements.forName(buffer, offset, len);
-        return this.currentElement.handleUnmatchedCloseElementStart(buffer, offset, len, line, col, this.handler);
+        this.currentElement.handleUnmatchedCloseElementStart(buffer, offset, len, line, col, this.handler, this.parsingController);
         
     }
 
     @Override
-    public final IAttoHandleResult handleUnmatchedCloseElementEnd(
+    public void handleUnmatchedCloseElementEnd(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
@@ -338,11 +352,11 @@ public final class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
             throw new IllegalStateException("Cannot end element: no current element");
         }
 
-        final IAttoHandleResult result =
-            this.currentElement.handleUnmatchedCloseElementEnd(buffer, offset, len, line, col, this.handler);
+        final IHtmlElement element = this.currentElement;
         this.currentElement = null;
 
-        return result;
+        // Hoping for better days in which tail calls might be optimized ;)
+        element.handleUnmatchedCloseElementEnd(buffer, offset, len, line, col, this.handler, this.parsingController);
 
     }
     
@@ -350,7 +364,7 @@ public final class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
     
     
     @Override
-    public final IAttoHandleResult handleAttribute(
+    public void handleAttribute(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol, 
@@ -365,10 +379,10 @@ public final class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
             throw new IllegalStateException("Cannot handle attribute: no current element");
         }
         
-        return this.currentElement.handleAttribute(buffer, nameOffset, nameLen, nameLine, nameCol,
+        this.currentElement.handleAttribute(buffer, nameOffset, nameLen, nameLine, nameCol,
                 operatorOffset, operatorLen, operatorLine, operatorCol,
                 valueContentOffset, valueContentLen, valueOuterOffset, valueOuterLen,
-                valueLine, valueCol, this.handler);
+                valueLine, valueCol, this.handler, this.parsingController);
         
     }
 
@@ -376,7 +390,7 @@ public final class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
 
 
     @Override
-    public final IAttoHandleResult handleInnerWhiteSpace(
+    public void handleInnerWhiteSpace(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
@@ -386,7 +400,7 @@ public final class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
             throw new IllegalStateException("Cannot handle attribute: no current element");
         }
         
-        return this.currentElement.handleInnerWhiteSpace(buffer, offset, len, line, col, this.handler);
+        this.currentElement.handleInnerWhiteSpace(buffer, offset, len, line, col, this.handler, this.parsingController);
         
     }
 
@@ -394,7 +408,7 @@ public final class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
 
 
     @Override
-    public IAttoHandleResult handleProcessingInstruction(
+    public void handleProcessingInstruction(
             final char[] buffer,
             final int targetOffset, final int targetLen, final int targetLine, final int targetCol,
             final int contentOffset, final int contentLen, final int contentLine, final int contentCol,
@@ -402,7 +416,7 @@ public final class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
             final int line, final int col)
             throws AttoParseException {
 
-        return this.handler.handleProcessingInstruction(
+        this.handler.handleProcessingInstruction(
                 buffer,
                 targetOffset, targetLen, targetLine, targetCol,
                 contentOffset, contentLen, contentLine, contentCol,

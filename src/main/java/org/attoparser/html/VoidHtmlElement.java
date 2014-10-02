@@ -20,15 +20,10 @@
 package org.attoparser.html;
 
 import org.attoparser.AttoParseException;
-import org.attoparser.IAttoHandleResult;
 import org.attoparser.ElementPreparationResult;
 import org.attoparser.IElementPreparationResult;
 import org.attoparser.IMarkupAttoHandler;
-
-
-
-
-
+import org.attoparser.MarkupParsingController;
 
 
 /**
@@ -53,7 +48,8 @@ class VoidHtmlElement extends BasicHtmlElement {
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col,
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler,
+            final MarkupParsingController parsingController)
             throws AttoParseException {
 
         return ElementPreparationResult.DONT_STACK;
@@ -62,27 +58,29 @@ class VoidHtmlElement extends BasicHtmlElement {
 
 
     @Override
-    public final IAttoHandleResult handleOpenElementStart(
+    public void handleOpenElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen, 
             final int line, final int col, 
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler,
+            final MarkupParsingController parsingController)
             throws AttoParseException {
 
-        return handler.handleStandaloneElementStart(buffer, nameOffset, nameLen, false, line, col);
+        handler.handleStandaloneElementStart(buffer, nameOffset, nameLen, false, line, col);
 
     }
 
     
     @Override
-    public final IAttoHandleResult handleOpenElementEnd(
+    public void handleOpenElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col,
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler,
+            final MarkupParsingController parsingController)
             throws AttoParseException {
 
-        return handler.handleStandaloneElementEnd(buffer, nameOffset, nameLen, false, line, col);
+        handler.handleStandaloneElementEnd(buffer, nameOffset, nameLen, false, line, col);
 
     }
 
@@ -90,59 +88,63 @@ class VoidHtmlElement extends BasicHtmlElement {
     
     
     @Override
-    public final IAttoHandleResult handleCloseElementStart(
+    public void handleCloseElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen, 
             final int line, final int col, 
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler,
+            final MarkupParsingController parsingController)
             throws AttoParseException {
 
         // Void elements have no closing tag, so these are always unmatched
-        return handler.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col);
+        handler.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col);
 
     }
 
     
     @Override
-    public final IAttoHandleResult handleCloseElementEnd(
+    public void handleCloseElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col,
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler,
+            final MarkupParsingController parsingController)
             throws AttoParseException {
 
         // Void elements have no closing tag, so these are always unmatched
-        return handler.handleUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col);
+        handler.handleUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col);
         
     }
 
 
     @Override
-    public IAttoHandleResult handleAutoCloseElementStart(
+    public void handleAutoCloseElementStart(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col,
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler,
+            final MarkupParsingController parsingController)
             throws AttoParseException {
 
         // Void elements have no closing tag, so these are always unmatched (note anyway that auto-closing for these
         // elements should never happen)
-        return handler.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col);
+        handler.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col);
 
     }
 
 
     @Override
-    public IAttoHandleResult handleAutoCloseElementEnd(
+    public void handleAutoCloseElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col,
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler,
+            final MarkupParsingController parsingController)
             throws AttoParseException {
 
         // Void elements have no closing tag, so these are always unmatched (note anyway that auto-closing for these
         // elements should never happen)
-        return handler.handleUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col);
+        handler.handleUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col);
 
     }
 

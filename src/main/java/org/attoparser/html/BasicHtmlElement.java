@@ -20,14 +20,9 @@
 package org.attoparser.html;
 
 import org.attoparser.AttoParseException;
-import org.attoparser.IAttoHandleResult;
 import org.attoparser.IElementPreparationResult;
 import org.attoparser.IMarkupAttoHandler;
-
-
-
-
-
+import org.attoparser.MarkupParsingController;
 
 
 /**
@@ -51,149 +46,160 @@ class BasicHtmlElement extends AbstractHtmlElement {
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col,
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler,
+            final MarkupParsingController parsingController)
             throws AttoParseException {
 
         // No preparation to be done by default, no need to delegate this (it's the elements who know
         // if they need preparation or not)
-        return null;
+        return handler.prepareForElement(buffer, nameOffset, nameLen, line, col);
 
     }
 
 
-    public IAttoHandleResult handleStandaloneElementStart(
+    public void handleStandaloneElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final boolean minimized,
             final int line, final int col, 
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler,
+            final MarkupParsingController parsingController)
             throws AttoParseException {
 
-        return handler.handleStandaloneElementStart(buffer, nameOffset, nameLen, minimized, line, col);
+        handler.handleStandaloneElementStart(buffer, nameOffset, nameLen, minimized, line, col);
         
     }
 
     
-    public IAttoHandleResult handleStandaloneElementEnd(
+    public void handleStandaloneElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final boolean minimized,
             final int line, final int col,
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler,
+            final MarkupParsingController parsingController)
             throws AttoParseException {
 
-        return handler.handleStandaloneElementEnd(buffer, nameOffset, nameLen, minimized, line, col);
+        handler.handleStandaloneElementEnd(buffer, nameOffset, nameLen, minimized, line, col);
         
     }
 
     
     
     
-    public IAttoHandleResult handleOpenElementStart(
+    public void handleOpenElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen, 
             final int line, final int col, 
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler,
+            final MarkupParsingController parsingController)
             throws AttoParseException {
         
-        return handler.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
+        handler.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
 
     }
 
     
-    public IAttoHandleResult handleOpenElementEnd(
+    public void handleOpenElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col,
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler,
+            final MarkupParsingController parsingController)
             throws AttoParseException {
         
-        return handler.handleOpenElementEnd(buffer, nameOffset, nameLen, line, col);
+        handler.handleOpenElementEnd(buffer, nameOffset, nameLen, line, col);
         
     }
 
 
     
     
-    public IAttoHandleResult handleCloseElementStart(
+    public void handleCloseElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen, 
             final int line, final int col, 
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler,
+            final MarkupParsingController parsingController)
             throws AttoParseException {
         
-        return handler.handleCloseElementStart(buffer, nameOffset, nameLen, line, col);
+        handler.handleCloseElementStart(buffer, nameOffset, nameLen, line, col);
 
     }
 
     
-    public IAttoHandleResult handleCloseElementEnd(
+    public void handleCloseElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col,
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler,
+            final MarkupParsingController parsingController)
             throws AttoParseException {
 
-        return handler.handleCloseElementEnd(buffer, nameOffset, nameLen, line, col);
+        handler.handleCloseElementEnd(buffer, nameOffset, nameLen, line, col);
         
     }
 
     
     
     
-    public IAttoHandleResult handleAutoCloseElementStart(
+    public void handleAutoCloseElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen, 
             final int line, final int col, 
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler,
+            final MarkupParsingController parsingController)
             throws AttoParseException {
 
-        return handler.handleAutoCloseElementStart(buffer, nameOffset, nameLen, line, col);
+        handler.handleAutoCloseElementStart(buffer, nameOffset, nameLen, line, col);
 
     }
     
     
-    public IAttoHandleResult handleAutoCloseElementEnd(
+    public void handleAutoCloseElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col,
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler,
+            final MarkupParsingController parsingController)
             throws AttoParseException {
 
-        return handler.handleAutoCloseElementEnd(buffer, nameOffset, nameLen, line, col);
+        handler.handleAutoCloseElementEnd(buffer, nameOffset, nameLen, line, col);
 
     }
 
     
     
     
-    public final IAttoHandleResult handleUnmatchedCloseElementStart(
+    public void handleUnmatchedCloseElementStart(
             final char[] buffer,
             final int nameOffset, final int nameLen, 
             final int line, final int col, 
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler,
+            final MarkupParsingController parsingController)
             throws AttoParseException {
         
-        return handler.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col);
+        handler.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col);
         
     }
 
     
-    public final IAttoHandleResult handleUnmatchedCloseElementEnd(
+    public void handleUnmatchedCloseElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col,
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler,
+            final MarkupParsingController parsingController)
             throws AttoParseException {
         
-        return handler.handleUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col);
+        handler.handleUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col);
         
     }
 
     
     
     
-    public final IAttoHandleResult handleAttribute(
+    public void handleAttribute(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol, 
@@ -202,10 +208,11 @@ class BasicHtmlElement extends AbstractHtmlElement {
             final int valueContentOffset, final int valueContentLen, 
             final int valueOuterOffset, final int valueOuterLen,
             final int valueLine, final int valueCol, 
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler,
+            final MarkupParsingController parsingController)
             throws AttoParseException {
         
-        return handler.handleAttribute(
+        handler.handleAttribute(
                 buffer,
                 nameOffset, nameLen, nameLine, nameCol,
                 operatorOffset, operatorLen, operatorLine, operatorCol,
@@ -214,14 +221,15 @@ class BasicHtmlElement extends AbstractHtmlElement {
     }
 
     
-    public final IAttoHandleResult handleInnerWhiteSpace(
+    public void handleInnerWhiteSpace(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col, 
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler,
+            final MarkupParsingController parsingController)
             throws AttoParseException {
         
-        return handler.handleInnerWhiteSpace(buffer, offset, len, line, col);
+        handler.handleInnerWhiteSpace(buffer, offset, len, line, col);
         
     }
     

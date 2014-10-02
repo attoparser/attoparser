@@ -44,7 +44,7 @@ final class ProcessingInstructionMarkupParsingUtil {
 
     
     
-    static IAttoHandleResult parseProcessingInstruction(
+    static void parseProcessingInstruction(
             final char[] buffer,
             final int internalOffset, final int internalLen,
             final int outerOffset, final int outerLen,
@@ -68,14 +68,15 @@ final class ProcessingInstructionMarkupParsingUtil {
         if (targetEnd == -1) {
             // There is no content, only target
             
-            return eventProcessor.processProcessingInstruction(
+            eventProcessor.processProcessingInstruction(
                     buffer, 
                     i, maxi - i,                                      // target
                     line, col + 2,                                    // target
                     0, 0,                                             // content
-                    locator[0], locator[1],                        // content
+                    locator[0], locator[1],                           // content
                     outerOffset, outerLen,                            // outer 
                     line, col);                                       // outer
+            return;
 
         }
         
@@ -97,27 +98,28 @@ final class ProcessingInstructionMarkupParsingUtil {
         if (contentStart == -1) {
             // There is no content. Only whitespace until the end of the structure
             
-            return eventProcessor.processProcessingInstruction(
+            eventProcessor.processProcessingInstruction(
                     buffer, 
                     targetOffset, targetLen,                          // target
                     line, col + 2,                                    // target
                     0, 0,                                             // content
-                    locator[0], locator[1],                        // content
+                    locator[0], locator[1],                           // content
                     outerOffset, outerLen,                            // outer 
                     line, col);                                       // outer
+            return;
 
         }
 
         
-        return eventProcessor.processProcessingInstruction(
+        eventProcessor.processProcessingInstruction(
                 buffer, 
                 targetOffset, targetLen,                          // target
                 line, col + 2,                                    // target
                 contentStart, maxi - contentStart,                // content
-                locator[0], locator[1],                        // content
+                locator[0], locator[1],                           // content
                 outerOffset, outerLen,                            // outer 
                 line, col);                                       // outer
-        
+
     }
     
     

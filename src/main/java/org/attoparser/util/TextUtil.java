@@ -35,7 +35,7 @@ public final class TextUtil {
 
 
 
-    public static final boolean equals(final boolean caseSensitive, final String text1, final String text2) {
+    public static boolean equals(final boolean caseSensitive, final String text1, final String text2) {
 
         if (text1 == null) {
             throw new IllegalArgumentException("First text being compared cannot be null");
@@ -49,17 +49,17 @@ public final class TextUtil {
     }
 
 
-    public static final boolean equals(final boolean caseSensitive, final String text1, final char[] text2) {
+    public static boolean equals(final boolean caseSensitive, final String text1, final char[] text2) {
         return equals(caseSensitive, text1, 0, text1.length(), text2, 0, text2.length);
     }
 
-    public static final boolean equals(final boolean caseSensitive, final char[] text1, final char[] text2) {
+    public static boolean equals(final boolean caseSensitive, final char[] text1, final char[] text2) {
         return equals(caseSensitive, text1, 0, text1.length, text2, 0, text2.length);
     }
 
 
 
-    public static final boolean equals(
+    public static boolean equals(
             final boolean caseSensitive,
             final char[] text1, final int text1Offset, final int text1Len,
             final char[] text2, final int text2Offset, final int text2Len) {
@@ -88,15 +88,15 @@ public final class TextUtil {
 
             if (!caseSensitive) {
 
-                final char u1 = Character.toUpperCase(c1);
-                final char u2 = Character.toUpperCase(c2);
-                if (u1 == u2) {
+                c1 = Character.toUpperCase(c1);
+                c2 = Character.toUpperCase(c2);
+                if (c1 == c2) {
                     continue;
                 }
 
                 // We check both upper and lower case because that is how String#equalsIgnoreCase() is defined.
                 // See String#regionMatches(boolean,int,String,int,int)
-                if (Character.toLowerCase(u1) == Character.toLowerCase(u2)) {
+                if (Character.toLowerCase(c1) == Character.toLowerCase(c2)) {
                     continue;
                 }
 
@@ -112,7 +112,7 @@ public final class TextUtil {
 
 
 
-    public static final boolean equals(
+    public static boolean equals(
             final boolean caseSensitive,
             final String text1, final int text1Offset, final int text1Len,
             final char[] text2, final int text2Offset, final int text2Len) {
@@ -141,15 +141,15 @@ public final class TextUtil {
 
             if (!caseSensitive) {
 
-                final char u1 = Character.toUpperCase(c1);
-                final char u2 = Character.toUpperCase(c2);
-                if (u1 == u2) {
+                c1 = Character.toUpperCase(c1);
+                c2 = Character.toUpperCase(c2);
+                if (c1 == c2) {
                     continue;
                 }
 
                 // We check both upper and lower case because that is how String#equalsIgnoreCase() is defined.
                 // See String#regionMatches(boolean,int,String,int,int)
-                if (Character.toLowerCase(u1) == Character.toLowerCase(u2)) {
+                if (Character.toLowerCase(c1) == Character.toLowerCase(c2)) {
                     continue;
                 }
 
@@ -165,7 +165,7 @@ public final class TextUtil {
 
 
 
-    public static final boolean equals(
+    public static boolean equals(
             final boolean caseSensitive,
             final String text1, final int text1Offset, final int text1Len,
             final String text2, final int text2Offset, final int text2Len) {
@@ -194,15 +194,15 @@ public final class TextUtil {
 
             if (!caseSensitive) {
 
-                final char u1 = Character.toUpperCase(c1);
-                final char u2 = Character.toUpperCase(c2);
-                if (u1 == u2) {
+                c1 = Character.toUpperCase(c1);
+                c2 = Character.toUpperCase(c2);
+                if (c1 == c2) {
                     continue;
                 }
 
                 // We check both upper and lower case because that is how String#equalsIgnoreCase() is defined.
                 // See String#regionMatches(boolean,int,String,int,int)
-                if (Character.toLowerCase(u1) == Character.toLowerCase(u2)) {
+                if (Character.toLowerCase(c1) == Character.toLowerCase(c2)) {
                     continue;
                 }
 
@@ -224,7 +224,7 @@ public final class TextUtil {
 
 
 
-    public static final boolean startsWith(final boolean caseSensitive, final String text, final String prefix) {
+    public static boolean startsWith(final boolean caseSensitive, final String text, final String prefix) {
 
         if (text == null) {
             throw new IllegalArgumentException("Text cannot be null");
@@ -238,17 +238,17 @@ public final class TextUtil {
     }
 
 
-    public static final boolean startsWith(final boolean caseSensitive, final String text, final char[] prefix) {
+    public static boolean startsWith(final boolean caseSensitive, final String text, final char[] prefix) {
         return startsWith(caseSensitive, text, 0, text.length(), prefix, 0, prefix.length);
     }
 
-    public static final boolean startsWith(final boolean caseSensitive, final char[] text, final char[] prefix) {
+    public static boolean startsWith(final boolean caseSensitive, final char[] text, final char[] prefix) {
         return startsWith(caseSensitive, text, 0, text.length, prefix, 0, prefix.length);
     }
 
 
 
-    public static final boolean startsWith(
+    public static boolean startsWith(
             final boolean caseSensitive,
             final char[] text, final int textOffset, final int textLen,
             final char[] prefix, final int prefixOffset, final int prefixLen) {
@@ -277,15 +277,15 @@ public final class TextUtil {
 
             if (!caseSensitive) {
 
-                final char u1 = Character.toUpperCase(c1);
-                final char u2 = Character.toUpperCase(c2);
-                if (u1 == u2) {
+                c1 = Character.toUpperCase(c1);
+                c2 = Character.toUpperCase(c2);
+                if (c1 == c2) {
                     continue;
                 }
 
                 // We check both upper and lower case because that is how String#equalsIgnoreCase() is defined.
                 // See String#regionMatches(boolean,int,String,int,int)
-                if (Character.toLowerCase(u1) == Character.toLowerCase(u2)) {
+                if (Character.toLowerCase(c1) == Character.toLowerCase(c2)) {
                     continue;
                 }
 
@@ -301,7 +301,7 @@ public final class TextUtil {
 
 
 
-    public static final boolean startsWith(
+    public static boolean startsWith(
             final boolean caseSensitive,
             final String text, final int textOffset, final int textLen,
             final char[] prefix, final int prefixOffset, final int prefixLen) {
@@ -330,15 +330,15 @@ public final class TextUtil {
 
             if (!caseSensitive) {
 
-                final char u1 = Character.toUpperCase(c1);
-                final char u2 = Character.toUpperCase(c2);
-                if (u1 == u2) {
+                c1 = Character.toUpperCase(c1);
+                c2 = Character.toUpperCase(c2);
+                if (c1 == c2) {
                     continue;
                 }
 
                 // We check both upper and lower case because that is how String#equalsIgnoreCase() is defined.
                 // See String#regionMatches(boolean,int,String,int,int)
-                if (Character.toLowerCase(u1) == Character.toLowerCase(u2)) {
+                if (Character.toLowerCase(c1) == Character.toLowerCase(c2)) {
                     continue;
                 }
 
@@ -354,7 +354,7 @@ public final class TextUtil {
 
 
 
-    public static final boolean startsWith(
+    public static boolean startsWith(
             final boolean caseSensitive,
             final char[] text, final int textOffset, final int textLen,
             final String prefix, final int prefixOffset, final int prefixLen) {
@@ -383,15 +383,15 @@ public final class TextUtil {
 
             if (!caseSensitive) {
 
-                final char u1 = Character.toUpperCase(c1);
-                final char u2 = Character.toUpperCase(c2);
-                if (u1 == u2) {
+                c1 = Character.toUpperCase(c1);
+                c2 = Character.toUpperCase(c2);
+                if (c1 == c2) {
                     continue;
                 }
 
                 // We check both upper and lower case because that is how String#equalsIgnoreCase() is defined.
                 // See String#regionMatches(boolean,int,String,int,int)
-                if (Character.toLowerCase(u1) == Character.toLowerCase(u2)) {
+                if (Character.toLowerCase(c1) == Character.toLowerCase(c2)) {
                     continue;
                 }
 
@@ -407,7 +407,7 @@ public final class TextUtil {
 
 
 
-    public static final boolean startsWith(
+    public static boolean startsWith(
             final boolean caseSensitive,
             final String text, final int textOffset, final int textLen,
             final String prefix, final int prefixOffset, final int prefixLen) {
@@ -436,15 +436,15 @@ public final class TextUtil {
 
             if (!caseSensitive) {
 
-                final char u1 = Character.toUpperCase(c1);
-                final char u2 = Character.toUpperCase(c2);
-                if (u1 == u2) {
+                c1 = Character.toUpperCase(c1);
+                c2 = Character.toUpperCase(c2);
+                if (c1 == c2) {
                     continue;
                 }
 
                 // We check both upper and lower case because that is how String#equalsIgnoreCase() is defined.
                 // See String#regionMatches(boolean,int,String,int,int)
-                if (Character.toLowerCase(u1) == Character.toLowerCase(u2)) {
+                if (Character.toLowerCase(c1) == Character.toLowerCase(c2)) {
                     continue;
                 }
 
@@ -466,7 +466,7 @@ public final class TextUtil {
 
 
 
-    public static final boolean endsWith(final boolean caseSensitive, final String text, final String suffix) {
+    public static boolean endsWith(final boolean caseSensitive, final String text, final String suffix) {
 
         if (text == null) {
             throw new IllegalArgumentException("Text cannot be null");
@@ -480,17 +480,17 @@ public final class TextUtil {
     }
 
 
-    public static final boolean endsWith(final boolean caseSensitive, final String text, final char[] suffix) {
+    public static boolean endsWith(final boolean caseSensitive, final String text, final char[] suffix) {
         return endsWith(caseSensitive, text, 0, text.length(), suffix, 0, suffix.length);
     }
 
-    public static final boolean endsWith(final boolean caseSensitive, final char[] text, final char[] suffix) {
+    public static boolean endsWith(final boolean caseSensitive, final char[] text, final char[] suffix) {
         return endsWith(caseSensitive, text, 0, text.length, suffix, 0, suffix.length);
     }
 
 
 
-    public static final boolean endsWith(
+    public static boolean endsWith(
             final boolean caseSensitive,
             final char[] text, final int textOffset, final int textLen,
             final char[] suffix, final int suffixOffset, final int suffixLen) {
@@ -519,15 +519,15 @@ public final class TextUtil {
 
             if (!caseSensitive) {
 
-                final char u1 = Character.toUpperCase(c1);
-                final char u2 = Character.toUpperCase(c2);
-                if (u1 == u2) {
+                c1 = Character.toUpperCase(c1);
+                c2 = Character.toUpperCase(c2);
+                if (c1 == c2) {
                     continue;
                 }
 
                 // We check both upper and lower case because that is how String#equalsIgnoreCase() is defined.
                 // See String#regionMatches(boolean,int,String,int,int)
-                if (Character.toLowerCase(u1) == Character.toLowerCase(u2)) {
+                if (Character.toLowerCase(c1) == Character.toLowerCase(c2)) {
                     continue;
                 }
 
@@ -543,7 +543,7 @@ public final class TextUtil {
 
 
 
-    public static final boolean endsWith(
+    public static boolean endsWith(
             final boolean caseSensitive,
             final String text, final int textOffset, final int textLen,
             final char[] suffix, final int suffixOffset, final int suffixLen) {
@@ -572,15 +572,15 @@ public final class TextUtil {
 
             if (!caseSensitive) {
 
-                final char u1 = Character.toUpperCase(c1);
-                final char u2 = Character.toUpperCase(c2);
-                if (u1 == u2) {
+                c1 = Character.toUpperCase(c1);
+                c2 = Character.toUpperCase(c2);
+                if (c1 == c2) {
                     continue;
                 }
 
                 // We check both upper and lower case because that is how String#equalsIgnoreCase() is defined.
                 // See String#regionMatches(boolean,int,String,int,int)
-                if (Character.toLowerCase(u1) == Character.toLowerCase(u2)) {
+                if (Character.toLowerCase(c1) == Character.toLowerCase(c2)) {
                     continue;
                 }
 
@@ -596,7 +596,7 @@ public final class TextUtil {
 
 
 
-    public static final boolean endsWith(
+    public static boolean endsWith(
             final boolean caseSensitive,
             final char[] text, final int textOffset, final int textLen,
             final String suffix, final int suffixOffset, final int suffixLen) {
@@ -625,15 +625,15 @@ public final class TextUtil {
 
             if (!caseSensitive) {
 
-                final char u1 = Character.toUpperCase(c1);
-                final char u2 = Character.toUpperCase(c2);
-                if (u1 == u2) {
+                c1 = Character.toUpperCase(c1);
+                c2 = Character.toUpperCase(c2);
+                if (c1 == c2) {
                     continue;
                 }
 
                 // We check both upper and lower case because that is how String#equalsIgnoreCase() is defined.
                 // See String#regionMatches(boolean,int,String,int,int)
-                if (Character.toLowerCase(u1) == Character.toLowerCase(u2)) {
+                if (Character.toLowerCase(c1) == Character.toLowerCase(c2)) {
                     continue;
                 }
 
@@ -649,7 +649,7 @@ public final class TextUtil {
 
 
 
-    public static final boolean endsWith(
+    public static boolean endsWith(
             final boolean caseSensitive,
             final String text, final int textOffset, final int textLen,
             final String suffix, final int suffixOffset, final int suffixLen) {
@@ -678,15 +678,15 @@ public final class TextUtil {
 
             if (!caseSensitive) {
 
-                final char u1 = Character.toUpperCase(c1);
-                final char u2 = Character.toUpperCase(c2);
-                if (u1 == u2) {
+                c1 = Character.toUpperCase(c1);
+                c2 = Character.toUpperCase(c2);
+                if (c1 == c2) {
                     continue;
                 }
 
                 // We check both upper and lower case because that is how String#equalsIgnoreCase() is defined.
                 // See String#regionMatches(boolean,int,String,int,int)
-                if (Character.toLowerCase(u1) == Character.toLowerCase(u2)) {
+                if (Character.toLowerCase(c1) == Character.toLowerCase(c2)) {
                     continue;
                 }
 
@@ -708,7 +708,7 @@ public final class TextUtil {
 
 
 
-    public static final boolean contains(final boolean caseSensitive, final String text, final String fragment) {
+    public static boolean contains(final boolean caseSensitive, final String text, final String fragment) {
 
         if (text == null) {
             throw new IllegalArgumentException("Text cannot be null");
@@ -722,17 +722,17 @@ public final class TextUtil {
     }
 
 
-    public static final boolean contains(final boolean caseSensitive, final String text, final char[] fragment) {
+    public static boolean contains(final boolean caseSensitive, final String text, final char[] fragment) {
         return contains(caseSensitive, text, 0, text.length(), fragment, 0, fragment.length);
     }
 
-    public static final boolean contains(final boolean caseSensitive, final char[] text, final char[] fragment) {
+    public static boolean contains(final boolean caseSensitive, final char[] text, final char[] fragment) {
         return contains(caseSensitive, text, 0, text.length, fragment, 0, fragment.length);
     }
 
 
 
-    public static final boolean contains(
+    public static boolean contains(
             final boolean caseSensitive,
             final char[] text, final int textOffset, final int textLen,
             final char[] fragment, final int fragmentOffset, final int fragmentLen) {
@@ -767,9 +767,9 @@ public final class TextUtil {
 
             if (!caseSensitive) {
 
-                final char u1 = Character.toUpperCase(c1);
-                final char u2 = Character.toUpperCase(c2);
-                if (u1 == u2) {
+                c1 = Character.toUpperCase(c1);
+                c2 = Character.toUpperCase(c2);
+                if (c1 == c2) {
                     if (++j == fragmentLen) {
                         return true;
                     }
@@ -778,7 +778,7 @@ public final class TextUtil {
 
                 // We check both upper and lower case because that is how String#equalsIgnoreCase() is defined.
                 // See String#regionMatches(boolean,int,String,int,int)
-                if (Character.toLowerCase(u1) == Character.toLowerCase(u2)) {
+                if (Character.toLowerCase(c1) == Character.toLowerCase(c2)) {
                     if (++j == fragmentLen) {
                         return true;
                     }
@@ -797,7 +797,7 @@ public final class TextUtil {
 
 
 
-    public static final boolean contains(
+    public static boolean contains(
             final boolean caseSensitive,
             final String text, final int textOffset, final int textLen,
             final char[] fragment, final int fragmentOffset, final int fragmentLen) {
@@ -832,9 +832,9 @@ public final class TextUtil {
 
             if (!caseSensitive) {
 
-                final char u1 = Character.toUpperCase(c1);
-                final char u2 = Character.toUpperCase(c2);
-                if (u1 == u2) {
+                c1 = Character.toUpperCase(c1);
+                c2 = Character.toUpperCase(c2);
+                if (c1 == c2) {
                     if (++j == fragmentLen) {
                         return true;
                     }
@@ -843,7 +843,7 @@ public final class TextUtil {
 
                 // We check both upper and lower case because that is how String#equalsIgnoreCase() is defined.
                 // See String#regionMatches(boolean,int,String,int,int)
-                if (Character.toLowerCase(u1) == Character.toLowerCase(u2)) {
+                if (Character.toLowerCase(c1) == Character.toLowerCase(c2)) {
                     if (++j == fragmentLen) {
                         return true;
                     }
@@ -862,7 +862,7 @@ public final class TextUtil {
 
 
 
-    public static final boolean contains(
+    public static boolean contains(
             final boolean caseSensitive,
             final char[] text, final int textOffset, final int textLen,
             final String fragment, final int fragmentOffset, final int fragmentLen) {
@@ -897,9 +897,9 @@ public final class TextUtil {
 
             if (!caseSensitive) {
 
-                final char u1 = Character.toUpperCase(c1);
-                final char u2 = Character.toUpperCase(c2);
-                if (u1 == u2) {
+                c1 = Character.toUpperCase(c1);
+                c2 = Character.toUpperCase(c2);
+                if (c1 == c2) {
                     if (++j == fragmentLen) {
                         return true;
                     }
@@ -908,7 +908,7 @@ public final class TextUtil {
 
                 // We check both upper and lower case because that is how String#equalsIgnoreCase() is defined.
                 // See String#regionMatches(boolean,int,String,int,int)
-                if (Character.toLowerCase(u1) == Character.toLowerCase(u2)) {
+                if (Character.toLowerCase(c1) == Character.toLowerCase(c2)) {
                     if (++j == fragmentLen) {
                         return true;
                     }
@@ -927,7 +927,7 @@ public final class TextUtil {
 
 
 
-    public static final boolean contains(
+    public static boolean contains(
             final boolean caseSensitive,
             final String text, final int textOffset, final int textLen,
             final String fragment, final int fragmentOffset, final int fragmentLen) {
@@ -962,9 +962,9 @@ public final class TextUtil {
 
             if (!caseSensitive) {
 
-                final char u1 = Character.toUpperCase(c1);
-                final char u2 = Character.toUpperCase(c2);
-                if (u1 == u2) {
+                c1 = Character.toUpperCase(c1);
+                c2 = Character.toUpperCase(c2);
+                if (c1 == c2) {
                     if (++j == fragmentLen) {
                         return true;
                     }
@@ -973,7 +973,7 @@ public final class TextUtil {
 
                 // We check both upper and lower case because that is how String#equalsIgnoreCase() is defined.
                 // See String#regionMatches(boolean,int,String,int,int)
-                if (Character.toLowerCase(u1) == Character.toLowerCase(u2)) {
+                if (Character.toLowerCase(c1) == Character.toLowerCase(c2)) {
                     if (++j == fragmentLen) {
                         return true;
                     }
@@ -998,7 +998,7 @@ public final class TextUtil {
 
 
 
-    public static final int compareTo(final boolean caseSensitive, final String text1, final String text2) {
+    public static int compareTo(final boolean caseSensitive, final String text1, final String text2) {
 
         if (text1 == null) {
             throw new IllegalArgumentException("First text being compared cannot be null");
@@ -1012,17 +1012,17 @@ public final class TextUtil {
     }
 
 
-    public static final int compareTo(final boolean caseSensitive, final String text1, final char[] text2) {
+    public static int compareTo(final boolean caseSensitive, final String text1, final char[] text2) {
         return compareTo(caseSensitive, text1, 0, text1.length(), text2, 0, text2.length);
     }
 
-    public static final int compareTo(final boolean caseSensitive, final char[] text1, final char[] text2) {
+    public static int compareTo(final boolean caseSensitive, final char[] text1, final char[] text2) {
         return compareTo(caseSensitive, text1, 0, text1.length, text2, 0, text2.length);
     }
 
 
 
-    public static final int compareTo(
+    public static int compareTo(
             final boolean caseSensitive,
             final char[] text1, final int text1Offset, final int text1Len,
             final char[] text2, final int text2Offset, final int text2Len) {
@@ -1071,7 +1071,7 @@ public final class TextUtil {
 
 
 
-    public static final int compareTo(
+    public static int compareTo(
             final boolean caseSensitive,
             final String text1, final int text1Offset, final int text1Len,
             final char[] text2, final int text2Offset, final int text2Len) {
@@ -1120,7 +1120,7 @@ public final class TextUtil {
 
 
 
-    public static final int compareTo(
+    public static int compareTo(
             final boolean caseSensitive,
             final String text1, final int text1Offset, final int text1Len,
             final String text2, final int text2Offset, final int text2Len) {

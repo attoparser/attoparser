@@ -49,7 +49,7 @@ final class DocTypeMarkupParsingUtil {
 
     
     
-    static IAttoHandleResult parseDocType(
+    static void parseDocType(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col,
@@ -63,23 +63,22 @@ final class DocTypeMarkupParsingUtil {
                 findInternalSubsetEndChar(buffer, internalOffset, internalLen);
         
         if (internalSubsetLastChar == -1) {
-            return doParseDetailedDocTypeWithInternalSubset(
+            doParseDetailedDocTypeWithInternalSubset(
                     buffer, internalOffset, internalLen, offset, len, line, col, 
                     0, 0, 0, 0, eventProcessor);
+            return;
         }
 
         final int maxi = internalOffset + internalLen;
         
         final int[] locator = new int[] {line, col + 2};
         
-        int i = internalOffset;
-        
         /*
          * Extract the keyword 
          */
         
         final int internalSubsetStart =
-            findInternalSubsetStartCharWildcard(buffer, i, maxi, locator);
+            findInternalSubsetStartCharWildcard(buffer, internalOffset, maxi, locator);
         
         if (internalSubsetStart == -1) {
             // We identified this as having an internal subset, but it doesn't. Not valid.
@@ -87,7 +86,7 @@ final class DocTypeMarkupParsingUtil {
                     "Could not parse as a well-formed DOCTYPE clause: \"" + new String(buffer, offset, len) + "\"", line, col);
         }
         
-        return doParseDetailedDocTypeWithInternalSubset(
+        doParseDetailedDocTypeWithInternalSubset(
                 buffer, internalOffset, (internalSubsetStart - internalOffset), offset, len, line, col, 
                 internalSubsetStart + 1, (internalSubsetLastChar - internalSubsetStart) - 1, 
                 locator[0], locator[1], 
@@ -101,7 +100,7 @@ final class DocTypeMarkupParsingUtil {
     
 
     
-    private static IAttoHandleResult doParseDetailedDocTypeWithInternalSubset(
+    private static void doParseDetailedDocTypeWithInternalSubset(
             final char[] buffer,
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
@@ -127,7 +126,7 @@ final class DocTypeMarkupParsingUtil {
         if (keywordEnd == -1) {
             // The buffer only contains the DOCTYPE keyword. Weird but true.
             
-            return eventProcessor.processDocType(
+            eventProcessor.processDocType(
                     buffer, 
                     i, maxi - i,                                                // keyword 
                     line, col + 2,                                              // keyword
@@ -144,6 +143,7 @@ final class DocTypeMarkupParsingUtil {
                     Math.max(locator[1], internalSubsetCol),   // internalSubset
                     outerOffset, outerLen,                                      // outer 
                     line, col);                                                 // outer
+            return;
 
         }
         
@@ -170,7 +170,7 @@ final class DocTypeMarkupParsingUtil {
         if (elementNameStart == -1) {
             // There is no element name. Only whitespace until the end of the DOCTYPE structure
             
-            return eventProcessor.processDocType(
+            eventProcessor.processDocType(
                     buffer, 
                     keywordOffset, keywordLen,                                  // keyword 
                     keywordLine, keywordCol,                                    // keyword
@@ -187,6 +187,7 @@ final class DocTypeMarkupParsingUtil {
                     Math.max(currentDocTypeCol, internalSubsetCol),             // internalSubset
                     outerOffset, outerLen,                                      // outer 
                     line, col);                                                 // outer
+            return;
 
         }
 
@@ -208,7 +209,7 @@ final class DocTypeMarkupParsingUtil {
         if (elementNameEnd == -1) {
             // The element name is the last thing to appear in the structure
             
-            return eventProcessor.processDocType(
+            eventProcessor.processDocType(
                     buffer, 
                     keywordOffset, keywordLen,                                  // keyword 
                     keywordLine, keywordCol,                                    // keyword
@@ -225,6 +226,7 @@ final class DocTypeMarkupParsingUtil {
                     Math.max(locator[1], internalSubsetCol),   // internalSubset
                     outerOffset, outerLen,                                      // outer 
                     line, col);                                                 // outer
+            return;
 
         }
         
@@ -251,7 +253,7 @@ final class DocTypeMarkupParsingUtil {
         if (typeStart == -1) {
             // There is no type. Only whitespace until the end of the DOCTYPE structure
             
-            return eventProcessor.processDocType(
+            eventProcessor.processDocType(
                     buffer, 
                     keywordOffset, keywordLen,                                  // keyword 
                     keywordLine, keywordCol,                                    // keyword
@@ -268,6 +270,7 @@ final class DocTypeMarkupParsingUtil {
                     Math.max(locator[1], internalSubsetCol),   // internalSubset
                     outerOffset, outerLen,                                      // outer 
                     line, col);                                                 // outer
+            return;
 
         }
 
@@ -383,7 +386,7 @@ final class DocTypeMarkupParsingUtil {
             if (isTypePublic) {
                 // If type is PUBLIC and we only have one spec, it is the publicId
                 
-                return eventProcessor.processDocType(
+                eventProcessor.processDocType(
                         buffer, 
                         keywordOffset, keywordLen,                                  // keyword 
                         keywordLine, keywordCol,                                    // keyword
@@ -400,10 +403,11 @@ final class DocTypeMarkupParsingUtil {
                         Math.max(locator[1], internalSubsetCol),   // internalSubset
                         outerOffset, outerLen,                                      // outer 
                         line, col);                                                 // outer
+                return;
 
             }
             
-            return eventProcessor.processDocType(
+            eventProcessor.processDocType(
                     buffer, 
                     keywordOffset, keywordLen,                                  // keyword 
                     keywordLine, keywordCol,                                    // keyword
@@ -420,6 +424,7 @@ final class DocTypeMarkupParsingUtil {
                     Math.max(locator[1], internalSubsetCol),   // internalSubset
                     outerOffset, outerLen,                                      // outer 
                     line, col);                                                 // outer
+            return;
 
         }
 
@@ -461,7 +466,7 @@ final class DocTypeMarkupParsingUtil {
             if (isTypePublic) {
                 // If type is PUBLIC and we only have one spec, it is the publicId
                 
-                return eventProcessor.processDocType(
+                eventProcessor.processDocType(
                         buffer, 
                         keywordOffset, keywordLen,                                  // keyword 
                         keywordLine, keywordCol,                                    // keyword
@@ -478,10 +483,11 @@ final class DocTypeMarkupParsingUtil {
                         Math.max(locator[1], internalSubsetCol),   // internalSubset
                         outerOffset, outerLen,                                      // outer 
                         line, col);                                                 // outer
+                return;
 
             }
             
-            return eventProcessor.processDocType(
+            eventProcessor.processDocType(
                     buffer, 
                     keywordOffset, keywordLen,                                  // keyword 
                     keywordLine, keywordCol,                                    // keyword
@@ -498,6 +504,7 @@ final class DocTypeMarkupParsingUtil {
                     Math.max(locator[1], internalSubsetCol),   // internalSubset
                     outerOffset, outerLen,                                      // outer 
                     line, col);                                                 // outer
+            return;
 
         }
 
@@ -543,7 +550,7 @@ final class DocTypeMarkupParsingUtil {
 
             }
             
-            return eventProcessor.processDocType(
+            eventProcessor.processDocType(
                     buffer, 
                     keywordOffset, keywordLen,                                  // keyword 
                     keywordLine, keywordCol,                                    // keyword
@@ -560,6 +567,7 @@ final class DocTypeMarkupParsingUtil {
                     Math.max(locator[1], internalSubsetCol),   // internalSubset
                     outerOffset, outerLen,                                      // outer 
                     line, col);                                                 // outer
+            return;
 
         }
 
@@ -573,7 +581,7 @@ final class DocTypeMarkupParsingUtil {
         i = spec2End;
 
         
-        if (!isValidDocTypeSpec(buffer, spec2Offset, spec2Len)) {
+        if (!isValidDocTypeSpec(buffer, spec2Start, spec2Len)) {
             // The spec is not well-formed (surrounded by "'s)
             
             throw new AttoParseException(
@@ -603,8 +611,8 @@ final class DocTypeMarkupParsingUtil {
         
         currentDocTypeLine = locator[0];
         currentDocTypeCol = locator[1];
-        
-        final int clauseEndStart = 
+
+        final int clauseEndStart =
                 MarkupParsingUtil.findNextNonWhitespaceCharWildcard(buffer, i, maxi, locator);
 
         if (clauseEndStart != -1) {
@@ -622,7 +630,7 @@ final class DocTypeMarkupParsingUtil {
         
         // If everything we can find until the end of the clause is whitespace, we are fine
         
-        return eventProcessor.processDocType(
+        eventProcessor.processDocType(
                 buffer, 
                 keywordOffset, keywordLen,                                  // keyword 
                 keywordLine, keywordCol,                                    // keyword
@@ -635,12 +643,11 @@ final class DocTypeMarkupParsingUtil {
                 spec2Offset + 1, spec2Len - 2,                              // systemId
                 spec2Line, spec2Col,                                        // systemId
                 internalSubsetOffset, internalSubsetLen,                    // internalSubset
-                Math.max(locator[0], internalSubsetLine), // internalSubset
-                Math.max(locator[1], internalSubsetCol),   // internalSubset
+                Math.max(locator[0], internalSubsetLine),                   // internalSubset
+                Math.max(locator[1], internalSubsetCol),                    // internalSubset
                 outerOffset, outerLen,                                      // outer 
                 line, col);                                                 // outer
-        
-        
+
     }
 
     
@@ -702,13 +709,7 @@ final class DocTypeMarkupParsingUtil {
 
 
     private static boolean isValidDocTypeSpec(final char[] buffer, final int offset, final int len) {
-        
-        if (len < 2) {
-            return false;
-        }
-        return (buffer[offset] == '"' && buffer[offset + len - 1] == '"') ||
-               (buffer[offset] == '\'' && buffer[offset + len - 1] == '\'');
-        
+        return len >= 2 && ((buffer[offset] == '"' && buffer[offset + len - 1] == '"') || (buffer[offset] == '\'' && buffer[offset + len - 1] == '\''));
     }
     
 

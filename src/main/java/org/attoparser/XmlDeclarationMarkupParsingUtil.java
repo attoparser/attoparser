@@ -48,7 +48,7 @@ final class XmlDeclarationMarkupParsingUtil {
 
 
     
-    static IAttoHandleResult parseXmlDeclaration(
+    static void parseXmlDeclaration(
             final char[] buffer,
             final int internalOffset, final int internalLen,
             final int outerOffset, final int outerLen,
@@ -114,29 +114,25 @@ final class XmlDeclarationMarkupParsingUtil {
                 new XmlDeclarationAttributeProcessor(outerOffset, outerLen, line, col);
 
 
-        final IAttoHandleResult attrHandleResult =
-                AttributeSequenceMarkupParsingUtil.
-                        parseAttributeSequence(buffer, contentOffset, contentLen, locator, attHandling);
+        AttributeSequenceMarkupParsingUtil.
+                parseAttributeSequence(buffer, contentOffset, contentLen, locator, attHandling);
 
         attHandling.finalChecks(locator, buffer);
 
 
-        final IAttoHandleResult finalHandlerResult =
-                eventProcessor.processXmlDeclaration(
-                        buffer,
-                        keywordOffset, keywordLen,                                // keyword
-                        keywordLine, keywordCol,                                  // keyword
-                        attHandling.versionOffset, attHandling.versionLen,        // version
-                        attHandling.versionLine, attHandling.versionCol,          // version
-                        attHandling.encodingOffset, attHandling.encodingLen,      // encoding
-                        attHandling.encodingLine, attHandling.encodingCol,        // encoding
-                        attHandling.standaloneOffset, attHandling.standaloneLen,  // standalone
-                        attHandling.standaloneLine, attHandling.standaloneCol,    // standalone
-                        outerOffset, outerLen,                                    // outer
-                        line, col);                                               // outer
+        eventProcessor.processXmlDeclaration(
+                buffer,
+                keywordOffset, keywordLen,                                // keyword
+                keywordLine, keywordCol,                                  // keyword
+                attHandling.versionOffset, attHandling.versionLen,        // version
+                attHandling.versionLine, attHandling.versionCol,          // version
+                attHandling.encodingOffset, attHandling.encodingLen,      // encoding
+                attHandling.encodingLine, attHandling.encodingCol,        // encoding
+                attHandling.standaloneOffset, attHandling.standaloneLen,  // standalone
+                attHandling.standaloneLine, attHandling.standaloneCol,    // standalone
+                outerOffset, outerLen,                                    // outer
+                line, col);                                               // outer
 
-        return AttoHandleResultUtil.combinePriorityLast(attrHandleResult, finalHandlerResult);
-        
     }
     
     
@@ -162,7 +158,7 @@ final class XmlDeclarationMarkupParsingUtil {
 
     
     
-    private static class XmlDeclarationAttributeProcessor implements IMarkupEventAttributeProcessor {
+    private static class XmlDeclarationAttributeProcessor implements AttributeSequenceMarkupParsingUtil.IMarkupEventAttributeSequenceProcessor {
 
         private final int outerOffset;
         private final int outerLen;
@@ -204,7 +200,7 @@ final class XmlDeclarationMarkupParsingUtil {
             this.outerCol = outerCol;
         }
 
-        public IAttoHandleResult processAttribute(
+        public void processAttribute(
                 final char[] buffer, 
                 final int nameOffset, final int nameLen,
                 final int nameLine, final int nameCol, 
@@ -233,7 +229,7 @@ final class XmlDeclarationMarkupParsingUtil {
                 this.versionLine = valueLine;
                 this.versionCol = valueCol;
                 this.versionPresent = true;
-                return null;
+                return;
             }
             
             if (charArrayEquals(buffer, nameOffset, nameLen, ENCODING, 0, ENCODING.length)) {
@@ -260,7 +256,7 @@ final class XmlDeclarationMarkupParsingUtil {
                 this.encodingLine = valueLine;
                 this.encodingCol = valueCol;
                 this.encodingPresent = true;
-                return null;
+                return;
             }
             
             if (charArrayEquals(buffer, nameOffset, nameLen, STANDALONE, 0, STANDALONE.length)) {
@@ -275,7 +271,7 @@ final class XmlDeclarationMarkupParsingUtil {
                 this.standaloneLine = valueLine;
                 this.standaloneCol = valueCol;
                 this.standalonePresent = true;
-                return null;
+                return;
             }
             
             throw new AttoParseException(
@@ -287,13 +283,12 @@ final class XmlDeclarationMarkupParsingUtil {
         }
         
 
-        public IAttoHandleResult processInnerWhiteSpace(
+        public void processInnerWhiteSpace(
                 final char[] buffer, 
                 final int offset, final int len,
                 final int line, final int col)
                 throws AttoParseException {
             // We will ignore separators
-            return null;
         }
 
 

@@ -19,10 +19,10 @@
  */
 package org.attoparser.xml;
 
-import org.attoparser.AttoParseException;
-import org.attoparser.IAttoHandleResult;
 import org.attoparser.AbstractMarkupAttoHandler;
+import org.attoparser.AttoParseException;
 import org.attoparser.IMarkupAttoHandler;
+import org.attoparser.MarkupParsingController;
 
 
 /**
@@ -42,132 +42,131 @@ public final class XmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
 
     public XmlMarkupAttoHandler(final IMarkupAttoHandler handler) {
         super();
+        if (handler == null) {
+            throw new IllegalArgumentException("Delegate handler cannot be null");
+        }
         this.handler = handler;
     }
 
 
-    
 
-    /*
-     * ----------------------------------------------------------------------
-     * NOTE no implementation is needed at this level of:
-     *   handleDocumentStart(long, int, int, MarkupParsingConfiguration)
-     *   handleDocumentEnd(long, long, int, int, MarkupParsingConfiguration)
-     *   prepareForElement(char[],int,int,int,int)
-     * ----------------------------------------------------------------------
-     */
+    @Override
+    public void setMarkupParsingController(final MarkupParsingController parsingController) {
+        this.handler.setMarkupParsingController(parsingController);
+    }
+
 
 
 
     @Override
-    public final IAttoHandleResult handleStandaloneElementStart(
+    public void handleStandaloneElementStart(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final boolean minimized, final int line, final int col)
             throws AttoParseException {
-        return this.handler.handleStandaloneElementStart(buffer, nameOffset, nameLen, minimized, line, col);
+        this.handler.handleStandaloneElementStart(buffer, nameOffset, nameLen, minimized, line, col);
     }
 
 
     @Override
-    public final IAttoHandleResult handleStandaloneElementEnd(
+    public void handleStandaloneElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final boolean minimized, final int line, final int col)
             throws AttoParseException {
-        return this.handler.handleStandaloneElementEnd(buffer, nameOffset, nameLen, minimized, line, col);
+        this.handler.handleStandaloneElementEnd(buffer, nameOffset, nameLen, minimized, line, col);
     }
 
 
     @Override
-    public final IAttoHandleResult handleOpenElementStart(
+    public void handleOpenElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
-        return this.handler.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
+        this.handler.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
     }
 
 
     @Override
-    public final IAttoHandleResult handleOpenElementEnd(
+    public void handleOpenElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
-        return this.handler.handleOpenElementEnd(buffer, nameOffset, nameLen, line, col);
+        this.handler.handleOpenElementEnd(buffer, nameOffset, nameLen, line, col);
     }
 
 
     @Override
-    public final IAttoHandleResult handleCloseElementStart(
+    public void handleCloseElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
-        return this.handler.handleCloseElementStart(buffer, nameOffset, nameLen, line, col);
+        this.handler.handleCloseElementStart(buffer, nameOffset, nameLen, line, col);
     }
 
 
     @Override
-    public final IAttoHandleResult handleCloseElementEnd(
+    public void handleCloseElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
-        return this.handler.handleCloseElementEnd(buffer, nameOffset, nameLen, line, col);
+        this.handler.handleCloseElementEnd(buffer, nameOffset, nameLen, line, col);
     }
 
 
     @Override
-    public final IAttoHandleResult handleAutoCloseElementStart(
+    public void handleAutoCloseElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
         // Auto closing elements should not be happening in well-formed XML, that that's up to the handler to decide
         // by providing an adequate MarkupParsingConfiguration instance during construction.
-        return this.handler.handleAutoCloseElementStart(buffer, nameOffset, nameLen, line, col);
+        this.handler.handleAutoCloseElementStart(buffer, nameOffset, nameLen, line, col);
     }
 
     
     @Override
-    public final IAttoHandleResult handleAutoCloseElementEnd(
+    public void handleAutoCloseElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
         // Auto closing elements should not be happening in well-formed XML, that that's up to the handler to decide
         // by providing an adequate MarkupParsingConfiguration instance during construction.
-        return this.handler.handleAutoCloseElementEnd(buffer, nameOffset, nameLen, line, col);
+        this.handler.handleAutoCloseElementEnd(buffer, nameOffset, nameLen, line, col);
     }
 
 
     @Override
-    public final IAttoHandleResult handleUnmatchedCloseElementStart(
+    public void handleUnmatchedCloseElementStart(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
         // Parsing of unmatched close elements should not be happening in well-formed XML, that that's up to the handler to decide
         // by providing an adequate MarkupParsingConfiguration instance during construction.
-        return this.handler.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col);
+        this.handler.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col);
     }
 
     @Override
-    public final IAttoHandleResult handleUnmatchedCloseElementEnd(
+    public void handleUnmatchedCloseElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col)
             throws AttoParseException {
         // Parsing of unmatched close elements should not be happening in well-formed XML, that that's up to the handler to decide
         // by providing an adequate MarkupParsingConfiguration instance during construction.
-        return this.handler.handleUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col);
+        this.handler.handleUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col);
     }
 
 
     @Override
-    public final IAttoHandleResult handleAttribute(
+    public void handleAttribute(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol,
@@ -175,7 +174,7 @@ public final class XmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
             final int valueContentOffset, final int valueContentLen, final int valueOuterOffset, final int valueOuterLen,
             final int valueLine, final int valueCol)
             throws AttoParseException {
-        return this.handler.handleAttribute(
+        this.handler.handleAttribute(
                 buffer,
                 nameOffset, nameLen, nameLine, nameCol,
                 operatorOffset, operatorLen, operatorLine, operatorCol,
@@ -184,12 +183,12 @@ public final class XmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
     }
 
     @Override
-    public final IAttoHandleResult handleInnerWhiteSpace(
+    public void handleInnerWhiteSpace(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
-        return this.handler.handleInnerWhiteSpace(buffer, offset, len, line, col);
+        this.handler.handleInnerWhiteSpace(buffer, offset, len, line, col);
     }
 
     

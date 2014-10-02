@@ -42,7 +42,7 @@ import java.io.Serializable;
  * @since 1.1
  *
  */
-public final class MarkupParsingConfiguration implements Serializable {
+public final class MarkupParsingConfiguration implements Serializable, Cloneable {
     
     public static enum ElementBalancing { 
         REQUIRE_BALANCED, AUTO_CLOSE, AUTO_CLOSE_REQUIRE_NO_UNMATCHED_CLOSE, 
@@ -343,7 +343,7 @@ public final class MarkupParsingConfiguration implements Serializable {
     
     @Override
     public MarkupParsingConfiguration clone() throws CloneNotSupportedException {
-        final MarkupParsingConfiguration conf = new MarkupParsingConfiguration();
+        final MarkupParsingConfiguration conf = (MarkupParsingConfiguration) super.clone();
         conf.caseSensitive = this.caseSensitive;
         conf.elementBalancing = this.elementBalancing;
         conf.requireUniqueAttributesInElement = this.requireUniqueAttributesInElement;
@@ -449,7 +449,7 @@ public final class MarkupParsingConfiguration implements Serializable {
      *  
      * @since 1.1
      */
-    public static class PrologParsingConfiguration implements Serializable {
+    public static class PrologParsingConfiguration implements Serializable, Cloneable {
         
         private static final long serialVersionUID = -4291053503740751549L;
         
@@ -477,7 +477,6 @@ public final class MarkupParsingConfiguration implements Serializable {
          *   <li><tt>{@link #isRequireDoctypeKeywordsUpperCase()} = true</tt></li>
          * </ul>
          * 
-         * @return the new instance.
          */
         protected PrologParsingConfiguration() {
             super();
@@ -669,7 +668,7 @@ public final class MarkupParsingConfiguration implements Serializable {
         
         @Override
         public PrologParsingConfiguration clone() throws CloneNotSupportedException {
-            final PrologParsingConfiguration conf = new PrologParsingConfiguration();
+            final PrologParsingConfiguration conf = (PrologParsingConfiguration) super.clone();
             conf.validateProlog = this.validateProlog;
             conf.prologPresence = this.prologPresence;
             conf.doctypePresence = this.doctypePresence;

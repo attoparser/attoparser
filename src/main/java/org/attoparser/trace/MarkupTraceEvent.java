@@ -147,7 +147,7 @@ public abstract class MarkupTraceEvent {
 
 
 
-    boolean matchesTypeAndContent(final MarkupTraceEvent event) {
+    public boolean matchesTypeAndContent(final MarkupTraceEvent event) {
         if (this == event) {
             return true;
         }
@@ -176,10 +176,10 @@ public abstract class MarkupTraceEvent {
 
     @Override
     public int hashCode() {
-        int result = eventType.hashCode();
-        result = 31 * result + Arrays.hashCode(contents);
-        result = 31 * result + Arrays.hashCode(lines);
-        result = 31 * result + Arrays.hashCode(cols);
+        int result = this.eventType.hashCode();
+        result = 31 * result + Arrays.hashCode(this.contents);
+        result = 31 * result + Arrays.hashCode(this.lines);
+        result = 31 * result + Arrays.hashCode(this.cols);
         return result;
     }
 
@@ -195,20 +195,17 @@ public abstract class MarkupTraceEvent {
 
         final MarkupTraceEvent that = (MarkupTraceEvent) o;
 
-        if (!Arrays.equals(cols, that.cols)) {
+        if (!Arrays.equals(this.cols, that.cols)) {
             return false;
         }
-        if (!Arrays.equals(contents, that.contents)) {
+        if (!Arrays.equals(this.contents, that.contents)) {
             return false;
         }
-        if (!Arrays.equals(lines, that.lines)) {
-            return false;
-        }
-        if (eventType != that.eventType) {
+        if (!Arrays.equals(this.lines, that.lines)) {
             return false;
         }
 
-        return true;
+        return this.eventType == that.eventType;
 
     }
 

@@ -43,7 +43,7 @@ final class ElementMarkupParsingUtil {
 
 
 
-    static IAttoHandleResult parseOpenOrStandaloneElement(
+    static void parseOpenOrStandaloneElement(
             final char[] buffer,
             final int contentOffset, final int contentLen,
             @SuppressWarnings("unused") final int outerOffset, @SuppressWarnings("unused") final int outerLen,
@@ -68,81 +68,65 @@ final class ElementMarkupParsingUtil {
             
             if (isStandalone) {
 
-                final IAttoHandleResult handleResult1 =
-                        eventProcessor.processStandaloneElementStart(
-                            buffer, contentOffset, contentLen,
-                            true, line, col);
-                final IAttoHandleResult handleResult2 =
-                        eventProcessor.processStandaloneElementEnd(
-                            buffer, contentOffset, contentLen,
-                            true, locator[0], locator[1]);
+                eventProcessor.processStandaloneElementStart(
+                        buffer, contentOffset, contentLen,
+                        true, line, col);
 
-                return AttoHandleResultUtil.combinePriorityLast(handleResult1, handleResult2);
+                eventProcessor.processStandaloneElementEnd(
+                        buffer, contentOffset, contentLen,
+                        true, locator[0], locator[1]);
+
+                return;
 
             } else {
 
-                final IAttoHandleResult handleResult1 =
-                        eventProcessor.processOpenElementStart(
-                                buffer, contentOffset, contentLen,
-                                line, col);
-                final IAttoHandleResult handleResult2 =
-                        eventProcessor.processOpenElementEnd(
-                                buffer, contentOffset, contentLen,
-                                locator[0], locator[1]);
+                eventProcessor.processOpenElementStart(
+                        buffer, contentOffset, contentLen,
+                        line, col);
 
-                return AttoHandleResultUtil.combinePriorityLast(handleResult1, handleResult2);
+                eventProcessor.processOpenElementEnd(
+                        buffer, contentOffset, contentLen,
+                        locator[0], locator[1]);
+
+                return;
 
             }
 
         }
 
 
-        final IAttoHandleResult handleResult1;
         if (isStandalone) {
-            handleResult1 =
-                    eventProcessor.processStandaloneElementStart(
-                            buffer, contentOffset, (elementNameEnd - contentOffset),
-                            true, line, col);
+            eventProcessor.processStandaloneElementStart(
+                    buffer, contentOffset, (elementNameEnd - contentOffset),
+                    true, line, col);
         } else {
-            handleResult1 =
-                    eventProcessor.processOpenElementStart(
-                            buffer, contentOffset, (elementNameEnd - contentOffset),
-                            line, col);
+            eventProcessor.processOpenElementStart(
+                    buffer, contentOffset, (elementNameEnd - contentOffset),
+                    line, col);
         }
 
 
         // This parseAttributeSequence will take care of calling handleInnerWhitespace when appropriate.
-        final IAttoHandleResult handleResult2 =
-                AttributeSequenceMarkupParsingUtil.parseAttributeSequence(
-                        buffer, elementNameEnd, maxi - elementNameEnd, locator, eventProcessor);
+        AttributeSequenceMarkupParsingUtil.parseAttributeSequence(
+                buffer, elementNameEnd, maxi - elementNameEnd, locator, eventProcessor);
 
 
-
-        final IAttoHandleResult handleResult3;
         if (isStandalone) {
-            handleResult3 =
-                    eventProcessor.processStandaloneElementEnd(
-                            buffer, contentOffset, (elementNameEnd - contentOffset),
-                            true, locator[0], locator[1]);
+            eventProcessor.processStandaloneElementEnd(
+                    buffer, contentOffset, (elementNameEnd - contentOffset),
+                    true, locator[0], locator[1]);
         } else {
-            handleResult3 =
-                    eventProcessor.processOpenElementEnd(
-                            buffer, contentOffset, (elementNameEnd - contentOffset),
-                            locator[0], locator[1]);
+            eventProcessor.processOpenElementEnd(
+                    buffer, contentOffset, (elementNameEnd - contentOffset),
+                    locator[0], locator[1]);
         }
 
-
-
-        return AttoHandleResultUtil.combinePriorityLast(
-                        AttoHandleResultUtil.combinePriorityLast(handleResult1, handleResult2),
-                        handleResult3);
-        
     }
 
 
     
     
-    static IAttoHandleResult parseCloseElement(
+    static void parseCloseElement(
             final char[] buffer,
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
@@ -164,34 +148,29 @@ final class ElementMarkupParsingUtil {
         if (elementNameEnd == -1) {
             // The buffer only contains the element name
 
-            final IAttoHandleResult handleResult1 =
-                    eventProcessor.processCloseElementStart(
-                            buffer, contentOffset, contentLen,
-                            line, col);
-            final IAttoHandleResult handleResult2 =
-                    eventProcessor.processCloseElementEnd(
-                            buffer, contentOffset, contentLen,
-                            locator[0], locator[1]);
+            eventProcessor.processCloseElementStart(
+                    buffer, contentOffset, contentLen,
+                    line, col);
+
+            eventProcessor.processCloseElementEnd(
+                    buffer, contentOffset, contentLen,
+                    locator[0], locator[1]);
             
-            return AttoHandleResultUtil.combinePriorityLast(handleResult1,handleResult2);
+            return;
             
         }
 
 
-        final IAttoHandleResult handleResult1 =
-                eventProcessor.processCloseElementStart(
-                        buffer, contentOffset, (elementNameEnd - contentOffset),
-                        line, col);
+        eventProcessor.processCloseElementStart(
+                buffer, contentOffset, (elementNameEnd - contentOffset),
+                line, col);
         
                
-        int i = elementNameEnd;
-        int current = i;
-
         int currentArtifactLine = locator[0];
         int currentArtifactCol = locator[1];
         
         final int wsEnd = 
-            MarkupParsingUtil.findNextNonWhitespaceCharWildcard(buffer, i, maxi, locator);
+            MarkupParsingUtil.findNextNonWhitespaceCharWildcard(buffer, elementNameEnd, maxi, locator);
         
         if (wsEnd != -1) {
             // This is a close tag, so everything should be whitespace
@@ -201,23 +180,14 @@ final class ElementMarkupParsingUtil {
                     "\"" + new String(buffer, outerOffset, outerLen) + "\"" +
                     ": No attributes are allowed here", line, col);
         }
-        
-        final int wsOffset = current;
-        final int wsLen = maxi - current;
-
-        final IAttoHandleResult handleResult2 =
-                eventProcessor.processInnerWhiteSpace(buffer, wsOffset, wsLen, currentArtifactLine, currentArtifactCol);
 
 
-        final IAttoHandleResult handleResult3 =
-                eventProcessor.processCloseElementEnd(
-                        buffer, contentOffset, (elementNameEnd - contentOffset),
-                        locator[0], locator[1]);
+        eventProcessor.processInnerWhiteSpace(buffer, elementNameEnd, (maxi - elementNameEnd), currentArtifactLine, currentArtifactCol);
 
 
-        return AttoHandleResultUtil.combinePriorityLast(
-                AttoHandleResultUtil.combinePriorityLast(handleResult1, handleResult2),
-                handleResult3);
+        eventProcessor.processCloseElementEnd(
+                buffer, contentOffset, (elementNameEnd - contentOffset),
+                locator[0], locator[1]);
 
     }
     

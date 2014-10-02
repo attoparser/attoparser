@@ -30,6 +30,8 @@ public interface IMarkupAttoHandler {
 
 
 
+    public void setMarkupParsingController(final MarkupParsingController parsingController);
+
 
     /**
      * <p>
@@ -41,7 +43,7 @@ public interface IMarkupAttoHandler {
      * @param col the column of the document where parsing starts (usually number 1)
      * @throws AttoParseException
      */
-    public IAttoHandleResult handleDocumentStart(final long startTimeNanos, final int line, final int col)
+    public void handleDocumentStart(final long startTimeNanos, final int line, final int col)
             throws AttoParseException;
 
 
@@ -58,7 +60,7 @@ public interface IMarkupAttoHandler {
      * @param col the column of the document where the parsing ends (usually the last one)
      * @throws AttoParseException
      */
-    public IAttoHandleResult handleDocumentEnd(
+    public void handleDocumentEnd(
             final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
             throws AttoParseException;
 
@@ -111,7 +113,7 @@ public interface IMarkupAttoHandler {
      * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public IAttoHandleResult handleXmlDeclaration(
+    public void handleXmlDeclaration(
             final char[] buffer,
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -187,7 +189,7 @@ public interface IMarkupAttoHandler {
      * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public IAttoHandleResult handleDocType(
+    public void handleDocType(
             final char[] buffer,
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -239,7 +241,7 @@ public interface IMarkupAttoHandler {
      * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public IAttoHandleResult handleCDATASection(
+    public void handleCDATASection(
             final char[] buffer,
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
@@ -280,7 +282,7 @@ public interface IMarkupAttoHandler {
      * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public IAttoHandleResult handleComment(
+    public void handleComment(
             final char[] buffer,
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
@@ -318,7 +320,7 @@ public interface IMarkupAttoHandler {
      * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public IAttoHandleResult handleText(
+    public void handleText(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
@@ -373,7 +375,7 @@ public interface IMarkupAttoHandler {
      * @param col the column in the original document where this artifact starts.   @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public IAttoHandleResult handleStandaloneElementStart(
+    public void handleStandaloneElementStart(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final boolean minimized,
@@ -393,7 +395,7 @@ public interface IMarkupAttoHandler {
      * @param col the column in the original document where the element ending structure appears.   @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public IAttoHandleResult handleStandaloneElementEnd(
+    public void handleStandaloneElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final boolean minimized,
@@ -424,7 +426,7 @@ public interface IMarkupAttoHandler {
      * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public IAttoHandleResult handleOpenElementStart(
+    public void handleOpenElementStart(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col)
@@ -443,7 +445,7 @@ public interface IMarkupAttoHandler {
      * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public IAttoHandleResult handleOpenElementEnd(
+    public void handleOpenElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col)
@@ -473,7 +475,7 @@ public interface IMarkupAttoHandler {
      * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public IAttoHandleResult handleCloseElementStart(
+    public void handleCloseElementStart(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col)
@@ -492,7 +494,7 @@ public interface IMarkupAttoHandler {
      * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public IAttoHandleResult handleCloseElementEnd(
+    public void handleCloseElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col)
@@ -522,7 +524,7 @@ public interface IMarkupAttoHandler {
      * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public IAttoHandleResult handleAutoCloseElementStart(
+    public void handleAutoCloseElementStart(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col)
@@ -542,7 +544,7 @@ public interface IMarkupAttoHandler {
      * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public IAttoHandleResult handleAutoCloseElementEnd(
+    public void handleAutoCloseElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col)
@@ -572,7 +574,7 @@ public interface IMarkupAttoHandler {
      * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public IAttoHandleResult handleUnmatchedCloseElementStart(
+    public void handleUnmatchedCloseElementStart(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col)
@@ -591,7 +593,7 @@ public interface IMarkupAttoHandler {
      * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public IAttoHandleResult handleUnmatchedCloseElementEnd(
+    public void handleUnmatchedCloseElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col)
@@ -640,7 +642,7 @@ public interface IMarkupAttoHandler {
      * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public IAttoHandleResult handleAttribute(
+    public void handleAttribute(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol,
@@ -682,7 +684,7 @@ public interface IMarkupAttoHandler {
      * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public IAttoHandleResult handleInnerWhiteSpace(
+    public void handleInnerWhiteSpace(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
@@ -734,7 +736,7 @@ public interface IMarkupAttoHandler {
      * @return the result of handling the event, or null if no relevant result has to be returned.
      * @throws AttoParseException
      */
-    public IAttoHandleResult handleProcessingInstruction(
+    public void handleProcessingInstruction(
             final char[] buffer,
             final int targetOffset, final int targetLen,
             final int targetLine, final int targetCol,

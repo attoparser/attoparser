@@ -21,9 +21,8 @@ package org.attoparser.directoutput;
 
 import java.io.Writer;
 
-import org.attoparser.AttoParseException;
-import org.attoparser.IAttoHandleResult;
 import org.attoparser.AbstractMarkupAttoHandler;
+import org.attoparser.AttoParseException;
 
 
 /**
@@ -42,6 +41,9 @@ public final class DirectOutputMarkupAttoHandler extends AbstractMarkupAttoHandl
     
     public DirectOutputMarkupAttoHandler(final Writer writer) {
         super();
+        if (writer == null) {
+            throw new IllegalArgumentException("Writer cannot be null");
+        }
         this.writer = writer;
     }
 
@@ -51,7 +53,7 @@ public final class DirectOutputMarkupAttoHandler extends AbstractMarkupAttoHandl
 
 
     @Override
-    public IAttoHandleResult handleText(final char[] buffer, final int offset, final int len, final int line, final int col)
+    public void handleText(final char[] buffer, final int offset, final int len, final int line, final int col)
             throws AttoParseException {
         
         try {
@@ -59,14 +61,13 @@ public final class DirectOutputMarkupAttoHandler extends AbstractMarkupAttoHandl
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        return null;
 
     }
 
 
 
     @Override
-    public IAttoHandleResult handleComment(
+    public void handleComment(
             final char[] buffer, 
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
@@ -78,13 +79,12 @@ public final class DirectOutputMarkupAttoHandler extends AbstractMarkupAttoHandl
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        return null;
 
     }
 
     
     @Override
-    public IAttoHandleResult handleCDATASection(
+    public void handleCDATASection(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
@@ -96,7 +96,6 @@ public final class DirectOutputMarkupAttoHandler extends AbstractMarkupAttoHandl
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        return null;
 
     }
 
@@ -104,7 +103,7 @@ public final class DirectOutputMarkupAttoHandler extends AbstractMarkupAttoHandl
 
 
     @Override
-    public IAttoHandleResult handleStandaloneElementStart(
+    public void handleStandaloneElementStart(
             final char[] buffer, final int offset, final int len,
             final boolean minimized, final int line, final int col) throws AttoParseException {
         
@@ -114,7 +113,6 @@ public final class DirectOutputMarkupAttoHandler extends AbstractMarkupAttoHandl
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        return null;
 
     }
 
@@ -122,7 +120,7 @@ public final class DirectOutputMarkupAttoHandler extends AbstractMarkupAttoHandl
 
 
     @Override
-    public IAttoHandleResult handleStandaloneElementEnd(
+    public void handleStandaloneElementEnd(
             final char[] buffer, final int offset, final int len,
             final boolean minimized, final int line, final int col) throws AttoParseException {
         
@@ -131,7 +129,6 @@ public final class DirectOutputMarkupAttoHandler extends AbstractMarkupAttoHandl
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        return null;
 
     }
 
@@ -139,7 +136,7 @@ public final class DirectOutputMarkupAttoHandler extends AbstractMarkupAttoHandl
 
 
     @Override
-    public IAttoHandleResult handleOpenElementStart(final char[] buffer, final int offset, final int len, final int line,
+    public void handleOpenElementStart(final char[] buffer, final int offset, final int len, final int line,
             final int col) throws AttoParseException {
         
         try {
@@ -148,7 +145,6 @@ public final class DirectOutputMarkupAttoHandler extends AbstractMarkupAttoHandl
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        return null;
 
     }
 
@@ -156,7 +152,7 @@ public final class DirectOutputMarkupAttoHandler extends AbstractMarkupAttoHandl
 
 
     @Override
-    public IAttoHandleResult handleOpenElementEnd(
+    public void handleOpenElementEnd(
             final char[] buffer, final int offset, final int len,
             final int line, final int col) throws AttoParseException {
         
@@ -165,7 +161,6 @@ public final class DirectOutputMarkupAttoHandler extends AbstractMarkupAttoHandl
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        return null;
 
     }
 
@@ -173,7 +168,7 @@ public final class DirectOutputMarkupAttoHandler extends AbstractMarkupAttoHandl
 
 
     @Override
-    public IAttoHandleResult handleCloseElementStart(final char[] buffer, final int offset, final int len, final int line,
+    public void handleCloseElementStart(final char[] buffer, final int offset, final int len, final int line,
             final int col) throws AttoParseException {
         
         try {
@@ -182,7 +177,6 @@ public final class DirectOutputMarkupAttoHandler extends AbstractMarkupAttoHandl
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        return null;
 
     }
 
@@ -190,7 +184,7 @@ public final class DirectOutputMarkupAttoHandler extends AbstractMarkupAttoHandl
 
 
     @Override
-    public IAttoHandleResult handleCloseElementEnd(
+    public void handleCloseElementEnd(
             final char[] buffer, final int offset, final int len,
             final int line, final int col) throws AttoParseException {
         
@@ -199,7 +193,6 @@ public final class DirectOutputMarkupAttoHandler extends AbstractMarkupAttoHandl
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        return null;
 
     }
 
@@ -207,12 +200,11 @@ public final class DirectOutputMarkupAttoHandler extends AbstractMarkupAttoHandl
 
 
     @Override
-    public IAttoHandleResult handleAutoCloseElementStart(
+    public void handleAutoCloseElementStart(
             final char[] buffer, final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done... balanced elements were not present at the original template!
-        return null;
     }
 
 
@@ -220,43 +212,42 @@ public final class DirectOutputMarkupAttoHandler extends AbstractMarkupAttoHandl
 
 
     @Override
-    public IAttoHandleResult handleAutoCloseElementEnd(
+    public void handleAutoCloseElementEnd(
             final char[] buffer, final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         // Nothing to be done... balanced elements were not present at the original template!
-        return null;
     }
 
 
 
 
     @Override
-    public IAttoHandleResult handleUnmatchedCloseElementStart(
+    public void handleUnmatchedCloseElementStart(
             final char[] buffer, final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         // They were present at the original template, so simply output them.
-        return handleCloseElementStart(buffer, offset, len, line, col);
+        handleCloseElementStart(buffer, offset, len, line, col);
     }
 
 
 
 
     @Override
-    public IAttoHandleResult handleUnmatchedCloseElementEnd(
+    public void handleUnmatchedCloseElementEnd(
             final char[] buffer, final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         // They were present at the original template, so simply output them.
-        return handleCloseElementEnd(buffer, offset, len, line, col);
+        handleCloseElementEnd(buffer, offset, len, line, col);
     }
 
 
 
 
     @Override
-    public IAttoHandleResult handleAttribute(final char[] buffer, final int nameOffset, final int nameLen,
+    public void handleAttribute(final char[] buffer, final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol, final int operatorOffset, final int operatorLen,
             final int operatorLine, final int operatorCol, final int valueContentOffset,
             final int valueContentLen, final int valueOuterOffset, final int valueOuterLen,
@@ -269,7 +260,6 @@ public final class DirectOutputMarkupAttoHandler extends AbstractMarkupAttoHandl
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        return null;
 
     }
 
@@ -277,7 +267,7 @@ public final class DirectOutputMarkupAttoHandler extends AbstractMarkupAttoHandl
 
 
     @Override
-    public IAttoHandleResult handleInnerWhiteSpace(
+    public void handleInnerWhiteSpace(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col)
@@ -288,7 +278,6 @@ public final class DirectOutputMarkupAttoHandler extends AbstractMarkupAttoHandl
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        return null;
 
     }
 
@@ -296,7 +285,7 @@ public final class DirectOutputMarkupAttoHandler extends AbstractMarkupAttoHandl
 
 
     @Override
-    public IAttoHandleResult handleDocType(
+    public void handleDocType(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol, 
@@ -318,7 +307,6 @@ public final class DirectOutputMarkupAttoHandler extends AbstractMarkupAttoHandl
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-        return null;
 
     }
 
@@ -326,7 +314,7 @@ public final class DirectOutputMarkupAttoHandler extends AbstractMarkupAttoHandl
     
     
     @Override
-    public IAttoHandleResult handleXmlDeclaration(
+    public void handleXmlDeclaration(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -399,8 +387,6 @@ public final class DirectOutputMarkupAttoHandler extends AbstractMarkupAttoHandl
             throw new AttoParseException(e);
         }
 
-        return null;
-
     }
 
 
@@ -409,7 +395,7 @@ public final class DirectOutputMarkupAttoHandler extends AbstractMarkupAttoHandl
 
 
     @Override
-    public IAttoHandleResult handleProcessingInstruction(
+    public void handleProcessingInstruction(
             final char[] buffer, 
             final int targetOffset, final int targetLen, 
             final int targetLine, final int targetCol,
@@ -436,8 +422,6 @@ public final class DirectOutputMarkupAttoHandler extends AbstractMarkupAttoHandl
         } catch (final Exception e) {
             throw new AttoParseException(e);
         }
-
-        return null;
 
     }
 

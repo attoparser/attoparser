@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.attoparser.AbstractMarkupAttoHandler;
 import org.attoparser.AttoParseException;
-import org.attoparser.IAttoHandleResult;
 
 
 
@@ -59,26 +58,24 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
 
     
     @Override
-    public IAttoHandleResult handleDocumentStart(final long startTimeNanos, final int line, final int col)
+    public void handleDocumentStart(final long startTimeNanos, final int line, final int col)
             throws AttoParseException {
         this.trace.add(new MarkupTraceEvent.DocumentStartTraceEvent(startTimeNanos, line, col));
-        return null;
     }
 
     
     
     @Override
-    public IAttoHandleResult handleDocumentEnd(
+    public void handleDocumentEnd(
             final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
             throws AttoParseException {
         this.trace.add(new MarkupTraceEvent.DocumentEndTraceEvent(endTimeNanos, totalTimeNanos, line, col));
-        return null;
     }
 
 
 
     @Override
-    public IAttoHandleResult handleStandaloneElementStart(
+    public void handleStandaloneElementStart(
             final char[] buffer,
             final int offset, final int len,
             final boolean minimized, final int line, final int col)
@@ -89,13 +86,12 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
         } else {
             this.trace.add(new MarkupTraceEvent.NonMinimizedStandaloneElementStartTraceEvent(elementName, line, col));
         }
-        return null;
     }
 
 
 
     @Override
-    public IAttoHandleResult handleStandaloneElementEnd(
+    public void handleStandaloneElementEnd(
             final char[] buffer,
             final int offset, final int len,
             final boolean minimized, final int line, final int col)
@@ -106,126 +102,117 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
         } else {
             this.trace.add(new MarkupTraceEvent.NonMinimizedStandaloneElementEndTraceEvent(elementName, line, col));
         }
-        return null;
     }
     
     
 
     
     @Override
-    public IAttoHandleResult handleOpenElementStart(
+    public void handleOpenElementStart(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         final String elementName = new String(buffer, offset, len);
         this.trace.add(new MarkupTraceEvent.OpenElementStartTraceEvent(elementName, line, col));
-        return null;
     }
     
     
 
     
     @Override
-    public IAttoHandleResult handleOpenElementEnd(
+    public void handleOpenElementEnd(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         final String elementName = new String(buffer, offset, len);
         this.trace.add(new MarkupTraceEvent.OpenElementEndTraceEvent(elementName, line, col));
-        return null;
     }
     
     
 
     
     @Override
-    public IAttoHandleResult handleCloseElementStart(
+    public void handleCloseElementStart(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         final String elementName = new String(buffer, offset, len);
         this.trace.add(new MarkupTraceEvent.CloseElementStartTraceEvent(elementName, line, col));
-        return null;
     }
     
     
 
     
     @Override
-    public IAttoHandleResult handleCloseElementEnd(
+    public void handleCloseElementEnd(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         final String elementName = new String(buffer, offset, len);
         this.trace.add(new MarkupTraceEvent.CloseElementEndTraceEvent(elementName, line, col));
-        return null;
     }
     
     
 
     
     @Override
-    public IAttoHandleResult handleAutoCloseElementStart(
+    public void handleAutoCloseElementStart(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         final String elementName = new String(buffer, offset, len);
         this.trace.add(new MarkupTraceEvent.AutoCloseElementStartTraceEvent(elementName, line, col));
-        return null;
     }
     
     
 
     
     @Override
-    public IAttoHandleResult handleAutoCloseElementEnd(
+    public void handleAutoCloseElementEnd(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         final String elementName = new String(buffer, offset, len);
         this.trace.add(new MarkupTraceEvent.AutoCloseElementEndTraceEvent(elementName, line, col));
-        return null;
     }
     
     
 
     
     @Override
-    public IAttoHandleResult handleUnmatchedCloseElementStart(
+    public void handleUnmatchedCloseElementStart(
             final char[] buffer, 
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         final String elementName = new String(buffer, offset, len);
         this.trace.add(new MarkupTraceEvent.UnmatchedCloseElementStartTraceEvent(elementName, line, col));
-        return null;
     }
     
     
 
     
     @Override
-    public IAttoHandleResult handleUnmatchedCloseElementEnd(
+    public void handleUnmatchedCloseElementEnd(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         final String elementName = new String(buffer, offset, len);
         this.trace.add(new MarkupTraceEvent.UnmatchedCloseElementEndTraceEvent(elementName, line, col));
-        return null;
     }
 
     
     
     
     @Override
-    public IAttoHandleResult handleAttribute(
+    public void handleAttribute(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol,
@@ -242,25 +229,23 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
 
         this.trace.add(new MarkupTraceEvent.AttributeTraceEvent(
                 attributeName, nameLine, nameCol, operator, operatorLine, operatorCol, value, valueLine, valueCol));
-        return null;
 
     }
 
     
     
     @Override
-    public IAttoHandleResult handleText(final char[] buffer, final int offset, final int len,
+    public void handleText(final char[] buffer, final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
         final String content = new String(buffer, offset, len);
         this.trace.add(new MarkupTraceEvent.TextTraceEvent(content, line, col));
-        return null;
     }
 
 
     
     @Override
-    public IAttoHandleResult handleComment(
+    public void handleComment(
             final char[] buffer, 
             final int contentOffset, final int contentLen, 
             final int outerOffset, final int outerLen, 
@@ -268,12 +253,11 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
             throws AttoParseException {
         final String content = new String(buffer, contentOffset, contentLen);
         this.trace.add(new MarkupTraceEvent.CommentTraceEvent(content, line, col));
-        return null;
     }
 
     
     @Override
-    public IAttoHandleResult handleCDATASection(
+    public void handleCDATASection(
             final char[] buffer, 
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
@@ -281,14 +265,13 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
             throws AttoParseException {
         final String content = new String(buffer, contentOffset, contentLen);
         this.trace.add(new MarkupTraceEvent.CDATASectionTraceEvent(content, line, col));
-        return null;
     }
 
     
     
     
     @Override
-    public IAttoHandleResult handleXmlDeclaration(
+    public void handleXmlDeclaration(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -319,7 +302,6 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
                         version, versionLine, versionCol,
                         encoding, encodingLine, encodingCol,
                         standalone, standaloneLine, standaloneCol));
-        return null;
 
     }
 
@@ -331,20 +313,19 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
 
 
     @Override
-    public IAttoHandleResult handleInnerWhiteSpace(
+    public void handleInnerWhiteSpace(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col)
             throws AttoParseException {
         final String content = new String(buffer, offset, len);
         this.trace.add(new MarkupTraceEvent.InnerWhiteSpaceTraceEvent(content, line, col));
-        return null;
     }
 
 
 
     @Override
-    public IAttoHandleResult handleDocType(
+    public void handleDocType(
             final char[] buffer, 
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -376,7 +357,7 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
                 publicId, publicIdLine, publicIdCol,
                 systemId, systemIdLine, systemIdCol,
                 internalSubset, internalSubsetLine, internalSubsetCol));
-        return null;
+
     }
 
 
@@ -384,7 +365,7 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
 
 
     @Override
-    public IAttoHandleResult handleProcessingInstruction(
+    public void handleProcessingInstruction(
             final char[] buffer, 
             final int targetOffset, final int targetLen, 
             final int targetLine, final int targetCol,
@@ -401,7 +382,6 @@ public final class TraceBuilderMarkupAttoHandler extends AbstractMarkupAttoHandl
                 new MarkupTraceEvent.ProcessingInstructionTraceEvent(
                         target, targetLine, targetCol,
                         content, contentLine, contentCol));
-        return null;
 
     }
 

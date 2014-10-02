@@ -23,6 +23,7 @@ import org.attoparser.AttoParseException;
 import org.attoparser.ElementPreparationResult;
 import org.attoparser.IElementPreparationResult;
 import org.attoparser.IMarkupAttoHandler;
+import org.attoparser.MarkupParsingController;
 
 
 /**
@@ -71,7 +72,8 @@ final class AutoCloserHtmlElement extends BasicHtmlElement {
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col,
-            final IMarkupAttoHandler handler)
+            final IMarkupAttoHandler handler,
+            final MarkupParsingController parsingController)
             throws AttoParseException {
 
         return this.preparationResult;

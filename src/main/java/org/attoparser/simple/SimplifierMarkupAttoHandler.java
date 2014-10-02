@@ -22,9 +22,8 @@ package org.attoparser.simple;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.attoparser.AttoParseException;
-import org.attoparser.IAttoHandleResult;
 import org.attoparser.AbstractMarkupAttoHandler;
+import org.attoparser.AttoParseException;
 import org.attoparser.IElementPreparationResult;
 
 
@@ -64,38 +63,39 @@ public final class SimplifierMarkupAttoHandler extends AbstractMarkupAttoHandler
     
     public SimplifierMarkupAttoHandler(final ISimpleMarkupAttoHandler handler) {
         super();
+        if (handler == null) {
+            throw new IllegalArgumentException("Delegate handler cannot be null");
+        }
         this.handler = handler;
     }
 
 
     @Override
-    public IAttoHandleResult handleDocumentStart(
+    public void handleDocumentStart(
             final long startTimeNanos,
             final int line, final int col)
             throws AttoParseException {
 
         this.handler.handleDocumentStart(startTimeNanos, line, col);
-        return null;
 
     }
 
 
 
     @Override
-    public IAttoHandleResult handleDocumentEnd(
+    public void handleDocumentEnd(
             final long endTimeNanos, final long totalTimeNanos,
             final int line, final int col)
             throws AttoParseException {
 
         this.handler.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col);
-        return null;
 
     }
 
 
 
     @Override
-    public IAttoHandleResult handleXmlDeclaration(
+    public void handleXmlDeclaration(
             final char[] buffer,
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -120,14 +120,13 @@ public final class SimplifierMarkupAttoHandler extends AbstractMarkupAttoHandler
                         null);
 
         this.handler.handleXmlDeclaration(version, encoding, standalone, line, col);
-        return null;
 
     }
 
 
 
     @Override
-    public IAttoHandleResult handleDocType(
+    public void handleDocType(
             final char[] buffer,
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -151,14 +150,13 @@ public final class SimplifierMarkupAttoHandler extends AbstractMarkupAttoHandler
                 (systemIdOffset <= 0 ? null : new String(buffer, systemIdOffset, systemIdLen)),
                 (internalSubsetOffset <= 0 ? null : new String(buffer, internalSubsetOffset, internalSubsetLen)),
                 outerLine, outerCol);
-        return null;
 
     }
 
 
 
     @Override
-    public IAttoHandleResult handleCDATASection(
+    public void handleCDATASection(
             final char[] buffer,
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
@@ -166,14 +164,13 @@ public final class SimplifierMarkupAttoHandler extends AbstractMarkupAttoHandler
             throws AttoParseException {
 
         this.handler.handleCDATASection(buffer, contentOffset, contentLen, line, col);
-        return null;
 
     }
 
 
 
     @Override
-    public IAttoHandleResult handleComment(
+    public void handleComment(
             final char[] buffer,
             final int contentOffset, final int contentLen,
             final int outerOffset, final int outerLen,
@@ -181,21 +178,19 @@ public final class SimplifierMarkupAttoHandler extends AbstractMarkupAttoHandler
             throws AttoParseException {
 
         this.handler.handleComment(buffer, contentOffset, contentLen, line, col);
-        return null;
 
     }
 
 
 
     @Override
-    public IAttoHandleResult handleText(
+    public void handleText(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
 
         this.handler.handleText(buffer, offset, len, line, col);
-        return null;
 
     }
 
@@ -215,7 +210,7 @@ public final class SimplifierMarkupAttoHandler extends AbstractMarkupAttoHandler
 
 
     @Override
-    public IAttoHandleResult handleStandaloneElementStart(
+    public void handleStandaloneElementStart(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final boolean minimized, final int line, final int col)
@@ -226,14 +221,12 @@ public final class SimplifierMarkupAttoHandler extends AbstractMarkupAttoHandler
         this.currentElementLine = line;
         this.currentElementCol = col;
 
-        return null;
-
     }
 
     
     
     @Override
-    public IAttoHandleResult handleStandaloneElementEnd(
+    public void handleStandaloneElementEnd(
             final char[] buffer,
             final int offset, final int len,
             final boolean minimized, final int line, final int col)
@@ -241,14 +234,13 @@ public final class SimplifierMarkupAttoHandler extends AbstractMarkupAttoHandler
         
         this.handler.handleStandaloneElement(
                 this.currentElementName, this.currentElementAttributes, minimized, this.currentElementLine, this.currentElementCol);
-        return null;
-        
+
     }
 
     
     
     @Override
-    public IAttoHandleResult handleOpenElementStart(
+    public void handleOpenElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen, 
             final int line, final int col) 
@@ -259,28 +251,25 @@ public final class SimplifierMarkupAttoHandler extends AbstractMarkupAttoHandler
         this.currentElementLine = line;
         this.currentElementCol = col;
 
-        return null;
-
     }
 
     
     
     @Override
-    public IAttoHandleResult handleOpenElementEnd(
+    public void handleOpenElementEnd(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
 
         this.handler.handleOpenElement(this.currentElementName, this.currentElementAttributes, this.currentElementLine, this.currentElementCol);
-        return null;
-        
+
     }
 
     
     
     @Override
-    public IAttoHandleResult handleCloseElementStart(
+    public void handleCloseElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen, 
             final int line, final int col) 
@@ -291,29 +280,26 @@ public final class SimplifierMarkupAttoHandler extends AbstractMarkupAttoHandler
         this.currentElementLine = line;
         this.currentElementCol = col;
 
-        return null;
-        
     }
 
     
     
     @Override
-    public IAttoHandleResult handleCloseElementEnd(
+    public void handleCloseElementEnd(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
 
         this.handler.handleCloseElement(this.currentElementName, this.currentElementLine, this.currentElementCol);
-        return null;
-        
+
     }
 
     
     
     
     @Override
-    public IAttoHandleResult handleAutoCloseElementStart(
+    public void handleAutoCloseElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen, 
             final int line, final int col) 
@@ -324,21 +310,18 @@ public final class SimplifierMarkupAttoHandler extends AbstractMarkupAttoHandler
         this.currentElementLine = line;
         this.currentElementCol = col;
 
-        return null;
-
     }
 
     
     
     @Override
-    public IAttoHandleResult handleAutoCloseElementEnd(
+    public void handleAutoCloseElementEnd(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
 
         this.handler.handleAutoCloseElement(this.currentElementName, this.currentElementLine, this.currentElementCol);
-        return null;
 
     }
 
@@ -346,7 +329,7 @@ public final class SimplifierMarkupAttoHandler extends AbstractMarkupAttoHandler
     
     
     @Override
-    public IAttoHandleResult handleUnmatchedCloseElementStart(
+    public void handleUnmatchedCloseElementStart(
             final char[] buffer, 
             final int nameOffset, final int nameLen, 
             final int line, final int col) 
@@ -357,29 +340,26 @@ public final class SimplifierMarkupAttoHandler extends AbstractMarkupAttoHandler
         this.currentElementLine = line;
         this.currentElementCol = col;
 
-        return null;
-
     }
 
     
     
     @Override
-    public IAttoHandleResult handleUnmatchedCloseElementEnd(
+    public void handleUnmatchedCloseElementEnd(
             final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
             throws AttoParseException {
 
         this.handler.handleUnmatchedCloseElement(this.currentElementName, this.currentElementLine, this.currentElementCol);
-        return null;
-        
+
     }
 
     
     
     
     @Override
-    public IAttoHandleResult handleAttribute(
+    public void handleAttribute(
             final char[] buffer, 
             final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol, 
@@ -400,28 +380,25 @@ public final class SimplifierMarkupAttoHandler extends AbstractMarkupAttoHandler
 
         this.currentElementAttributes.put(attributeName, attributeValue);
 
-        return null;
-
     }
 
     
     
     @Override
-    public IAttoHandleResult handleInnerWhiteSpace(
+    public void handleInnerWhiteSpace(
             final char[] buffer, 
             final int offset, final int len, 
             final int line, final int col) 
             throws AttoParseException {
 
         // Nothing to be done here - we will ignore inner whitespace
-        return null;
-        
+
     }
 
     
     
     @Override
-    public IAttoHandleResult handleProcessingInstruction(
+    public void handleProcessingInstruction(
             final char[] buffer, 
             final int targetOffset, final int targetLen, 
             final int targetLine, final int targetCol,
@@ -435,8 +412,7 @@ public final class SimplifierMarkupAttoHandler extends AbstractMarkupAttoHandler
                 new String(buffer, targetOffset, targetLen),
                 (contentOffset <= 0 ? null : new String(buffer, contentOffset, contentLen)),
                 line, col);
-        return null;
-        
+
     }
 
 
