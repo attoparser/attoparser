@@ -22,7 +22,7 @@ package org.attoparser.xml;
 import org.attoparser.AbstractMarkupAttoHandler;
 import org.attoparser.AttoParseException;
 import org.attoparser.IMarkupAttoHandler;
-import org.attoparser.MarkupParsingController;
+import org.attoparser.MarkupParsingStatus;
 
 
 /**
@@ -51,8 +51,8 @@ public final class XmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
 
 
     @Override
-    public void setMarkupParsingController(final MarkupParsingController parsingController) {
-        this.handler.setMarkupParsingController(parsingController);
+    public void setMarkupParsingStatus(final MarkupParsingStatus status) {
+        this.handler.setMarkupParsingStatus(status);
     }
 
 

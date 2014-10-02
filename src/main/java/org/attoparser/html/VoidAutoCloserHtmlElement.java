@@ -23,7 +23,7 @@ import org.attoparser.AttoParseException;
 import org.attoparser.ElementPreparationResult;
 import org.attoparser.IElementPreparationResult;
 import org.attoparser.IMarkupAttoHandler;
-import org.attoparser.MarkupParsingController;
+import org.attoparser.MarkupParsingStatus;
 
 
 /**
@@ -73,7 +73,7 @@ final class VoidAutoCloserHtmlElement extends VoidHtmlElement {
             final int nameOffset, final int nameLen,
             final int line, final int col,
             final IMarkupAttoHandler handler,
-            final MarkupParsingController parsingController)
+            final MarkupParsingStatus status)
             throws AttoParseException {
 
         return this.preparationResult;

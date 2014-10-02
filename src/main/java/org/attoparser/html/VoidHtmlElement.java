@@ -23,7 +23,7 @@ import org.attoparser.AttoParseException;
 import org.attoparser.ElementPreparationResult;
 import org.attoparser.IElementPreparationResult;
 import org.attoparser.IMarkupAttoHandler;
-import org.attoparser.MarkupParsingController;
+import org.attoparser.MarkupParsingStatus;
 
 
 /**
@@ -49,7 +49,7 @@ class VoidHtmlElement extends BasicHtmlElement {
             final int nameOffset, final int nameLen,
             final int line, final int col,
             final IMarkupAttoHandler handler,
-            final MarkupParsingController parsingController)
+            final MarkupParsingStatus status)
             throws AttoParseException {
 
         return ElementPreparationResult.DONT_STACK;
@@ -63,7 +63,7 @@ class VoidHtmlElement extends BasicHtmlElement {
             final int nameOffset, final int nameLen, 
             final int line, final int col, 
             final IMarkupAttoHandler handler,
-            final MarkupParsingController parsingController)
+            final MarkupParsingStatus status)
             throws AttoParseException {
 
         handler.handleStandaloneElementStart(buffer, nameOffset, nameLen, false, line, col);
@@ -77,7 +77,7 @@ class VoidHtmlElement extends BasicHtmlElement {
             final int nameOffset, final int nameLen,
             final int line, final int col,
             final IMarkupAttoHandler handler,
-            final MarkupParsingController parsingController)
+            final MarkupParsingStatus status)
             throws AttoParseException {
 
         handler.handleStandaloneElementEnd(buffer, nameOffset, nameLen, false, line, col);
@@ -93,7 +93,7 @@ class VoidHtmlElement extends BasicHtmlElement {
             final int nameOffset, final int nameLen, 
             final int line, final int col, 
             final IMarkupAttoHandler handler,
-            final MarkupParsingController parsingController)
+            final MarkupParsingStatus status)
             throws AttoParseException {
 
         // Void elements have no closing tag, so these are always unmatched
@@ -108,7 +108,7 @@ class VoidHtmlElement extends BasicHtmlElement {
             final int nameOffset, final int nameLen,
             final int line, final int col,
             final IMarkupAttoHandler handler,
-            final MarkupParsingController parsingController)
+            final MarkupParsingStatus status)
             throws AttoParseException {
 
         // Void elements have no closing tag, so these are always unmatched
@@ -123,7 +123,7 @@ class VoidHtmlElement extends BasicHtmlElement {
             final int nameOffset, final int nameLen,
             final int line, final int col,
             final IMarkupAttoHandler handler,
-            final MarkupParsingController parsingController)
+            final MarkupParsingStatus status)
             throws AttoParseException {
 
         // Void elements have no closing tag, so these are always unmatched (note anyway that auto-closing for these
@@ -139,7 +139,7 @@ class VoidHtmlElement extends BasicHtmlElement {
             final int nameOffset, final int nameLen,
             final int line, final int col,
             final IMarkupAttoHandler handler,
-            final MarkupParsingController parsingController)
+            final MarkupParsingStatus status)
             throws AttoParseException {
 
         // Void elements have no closing tag, so these are always unmatched (note anyway that auto-closing for these

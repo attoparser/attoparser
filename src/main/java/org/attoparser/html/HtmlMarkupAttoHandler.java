@@ -23,7 +23,7 @@ import org.attoparser.AbstractMarkupAttoHandler;
 import org.attoparser.AttoParseException;
 import org.attoparser.IElementPreparationResult;
 import org.attoparser.IMarkupAttoHandler;
-import org.attoparser.MarkupParsingController;
+import org.attoparser.MarkupParsingStatus;
 
 
 /**
@@ -37,7 +37,7 @@ public class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
 
 
     private final IMarkupAttoHandler handler;
-    private MarkupParsingController parsingController = null; // Will be always set, but anyway we should initialize.
+    private MarkupParsingStatus status = null; // Will be always set, but anyway we should initialize.
 
     private IHtmlElement currentElement = null;
 
@@ -55,10 +55,10 @@ public class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
 
 
     @Override
-    public void setMarkupParsingController(final MarkupParsingController parsingController) {
+    public void setMarkupParsingStatus(final MarkupParsingStatus status) {
         // This will be ALWAYS called, so there is no need to actually check whether this property is null when using it
-        this.parsingController = parsingController;
-        this.handler.setMarkupParsingController(parsingController);
+        this.status = status;
+        this.handler.setMarkupParsingStatus(status);
     }
 
 
@@ -187,7 +187,7 @@ public class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
             throws AttoParseException {
 
         final IHtmlElement elementToPrepare = HtmlElements.forName(buffer, offset, len);
-        return elementToPrepare.prepareForElement(buffer, offset, len, line, col, this.handler, this.parsingController);
+        return elementToPrepare.prepareForElement(buffer, offset, len, line, col, this.handler, this.status);
 
     }
 
@@ -201,7 +201,7 @@ public class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
             throws AttoParseException {
         
         this.currentElement = HtmlElements.forName(buffer, offset, len);
-        this.currentElement.handleStandaloneElementStart(buffer, offset, len, minimized, line, col, this.handler, this.parsingController);
+        this.currentElement.handleStandaloneElementStart(buffer, offset, len, minimized, line, col, this.handler, this.status);
 
     }
 
@@ -220,7 +220,7 @@ public class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
         this.currentElement = null;
 
         // Hoping for better days in which tail calls might be optimized ;)
-        element.handleStandaloneElementEnd(buffer, offset, len, minimized, line, col, this.handler, this.parsingController);
+        element.handleStandaloneElementEnd(buffer, offset, len, minimized, line, col, this.handler, this.status);
 
     }
 
@@ -235,7 +235,7 @@ public class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
             throws AttoParseException {
         
         this.currentElement = HtmlElements.forName(buffer, offset, len);
-        this.currentElement.handleOpenElementStart(buffer, offset, len, line, col, this.handler, this.parsingController);
+        this.currentElement.handleOpenElementStart(buffer, offset, len, line, col, this.handler, this.status);
 
     }
 
@@ -254,7 +254,7 @@ public class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
         this.currentElement = null;
 
         // Hoping for better days in which tail calls might be optimized ;)
-        element.handleOpenElementEnd(buffer, offset, len, line, col, this.handler, this.parsingController);
+        element.handleOpenElementEnd(buffer, offset, len, line, col, this.handler, this.status);
 
     }
 
@@ -269,7 +269,7 @@ public class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
             throws AttoParseException {
         
         this.currentElement = HtmlElements.forName(buffer, offset, len);
-        this.currentElement.handleCloseElementStart(buffer, offset, len, line, col, this.handler, this.parsingController);
+        this.currentElement.handleCloseElementStart(buffer, offset, len, line, col, this.handler, this.status);
         
     }
 
@@ -288,7 +288,7 @@ public class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
         this.currentElement = null;
 
         // Hoping for better days in which tail calls might be optimized ;)
-        element.handleCloseElementEnd(buffer, offset, len, line, col, this.handler, this.parsingController);
+        element.handleCloseElementEnd(buffer, offset, len, line, col, this.handler, this.status);
 
     }
 
@@ -303,7 +303,7 @@ public class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
             throws AttoParseException {
         
         this.currentElement = HtmlElements.forName(buffer, offset, len);
-        this.currentElement.handleAutoCloseElementStart(buffer, offset, len, line, col, this.handler, this.parsingController);
+        this.currentElement.handleAutoCloseElementStart(buffer, offset, len, line, col, this.handler, this.status);
         
     }
 
@@ -322,7 +322,7 @@ public class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
         this.currentElement = null;
 
         // Hoping for better days in which tail calls might be optimized ;)
-        element.handleAutoCloseElementEnd(buffer, offset, len, line, col, this.handler, this.parsingController);
+        element.handleAutoCloseElementEnd(buffer, offset, len, line, col, this.handler, this.status);
 
     }
 
@@ -337,7 +337,7 @@ public class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
             throws AttoParseException {
         
         this.currentElement = HtmlElements.forName(buffer, offset, len);
-        this.currentElement.handleUnmatchedCloseElementStart(buffer, offset, len, line, col, this.handler, this.parsingController);
+        this.currentElement.handleUnmatchedCloseElementStart(buffer, offset, len, line, col, this.handler, this.status);
         
     }
 
@@ -356,7 +356,7 @@ public class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
         this.currentElement = null;
 
         // Hoping for better days in which tail calls might be optimized ;)
-        element.handleUnmatchedCloseElementEnd(buffer, offset, len, line, col, this.handler, this.parsingController);
+        element.handleUnmatchedCloseElementEnd(buffer, offset, len, line, col, this.handler, this.status);
 
     }
     
@@ -382,7 +382,7 @@ public class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
         this.currentElement.handleAttribute(buffer, nameOffset, nameLen, nameLine, nameCol,
                 operatorOffset, operatorLen, operatorLine, operatorCol,
                 valueContentOffset, valueContentLen, valueOuterOffset, valueOuterLen,
-                valueLine, valueCol, this.handler, this.parsingController);
+                valueLine, valueCol, this.handler, this.status);
         
     }
 
@@ -400,7 +400,7 @@ public class HtmlMarkupAttoHandler extends AbstractMarkupAttoHandler {
             throw new IllegalStateException("Cannot handle attribute: no current element");
         }
         
-        this.currentElement.handleInnerWhiteSpace(buffer, offset, len, line, col, this.handler, this.parsingController);
+        this.currentElement.handleInnerWhiteSpace(buffer, offset, len, line, col, this.handler, this.status);
         
     }
 

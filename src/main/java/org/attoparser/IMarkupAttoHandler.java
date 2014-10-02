@@ -30,7 +30,7 @@ public interface IMarkupAttoHandler {
 
 
 
-    public void setMarkupParsingController(final MarkupParsingController parsingController);
+    public void setMarkupParsingStatus(final MarkupParsingStatus status);
 
 
     /**

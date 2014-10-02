@@ -38,7 +38,7 @@ public abstract class AbstractMarkupAttoHandler implements IMarkupAttoHandler {
 
 
 
-    public void setMarkupParsingController(final MarkupParsingController parsingController) {
+    public void setMarkupParsingStatus(final MarkupParsingStatus status) {
         // Nothing to do. By default handlers will not be interested in using this object at all.
         // Implementations will have to explicitly override if they need to use it.
     }

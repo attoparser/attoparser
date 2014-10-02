@@ -21,7 +21,7 @@ package org.attoparser.html;
 
 import org.attoparser.AttoParseException;
 import org.attoparser.IMarkupAttoHandler;
-import org.attoparser.MarkupParsingController;
+import org.attoparser.MarkupParsingStatus;
 import org.attoparser.util.TextUtil;
 
 
@@ -65,14 +65,14 @@ final class CDATAContentHtmlElement extends BasicHtmlElement {
             final int nameOffset, final int nameLen,
             final int line, final int col,
             final IMarkupAttoHandler handler,
-            final MarkupParsingController parsingController)
+            final MarkupParsingStatus status)
             throws AttoParseException {
 
 
         handler.handleOpenElementEnd(buffer, nameOffset, nameLen, line, col);
 
         // This is an element with CDATA body, so we should disable parsing until we find the corresponding closing tag
-        parsingController.disableParsingAfterStructure(computeLimitSequence(buffer, nameOffset, nameLen));
+        status.disableParsingAfterStructure(computeLimitSequence(buffer, nameOffset, nameLen));
 
     }
 

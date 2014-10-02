@@ -28,12 +28,36 @@ package org.attoparser;
  * @since 2.0.0
  *
  */
-public final class MarkupParsingController {
+public final class MarkupParsingStatus {
 
+    /*
+     *   This class encapsulates the results of parsing a fragment
+     *   (a buffer) of a document.
+     *
+     *   It contains:
+     *
+     *     * offset: The current artifact position, initial position
+     *               of the last unfinished artifact found while parsing
+     *               a buffer segment.
+     *     * line, col: line and column number of the last unfinished
+     *                  artifact found while parsing a buffer segment.
+     *     * inStructure: signals whether the last unfinished artifact is
+     *                    suspected to be a structure (in contrast to a text).
+     *     * skipUntilSequence: whether we should skip parsing until the specified
+     *                          markup sequence is found.
+     *
+     */
+
+    int offset;
+    int line;
+    int col;
+    boolean inStructure;
     boolean parsingEnabled;
     char[] disabilityLimitSequence;
 
-    MarkupParsingController() {
+
+
+    MarkupParsingStatus() {
         super();
     }
 

@@ -22,7 +22,7 @@ package org.attoparser.html;
 import org.attoparser.AttoParseException;
 import org.attoparser.IElementPreparationResult;
 import org.attoparser.IMarkupAttoHandler;
-import org.attoparser.MarkupParsingController;
+import org.attoparser.MarkupParsingStatus;
 
 
 /**
@@ -47,7 +47,7 @@ class BasicHtmlElement extends AbstractHtmlElement {
             final int nameOffset, final int nameLen,
             final int line, final int col,
             final IMarkupAttoHandler handler,
-            final MarkupParsingController parsingController)
+            final MarkupParsingStatus status)
             throws AttoParseException {
 
         // No preparation to be done by default, no need to delegate this (it's the elements who know
@@ -63,7 +63,7 @@ class BasicHtmlElement extends AbstractHtmlElement {
             final boolean minimized,
             final int line, final int col, 
             final IMarkupAttoHandler handler,
-            final MarkupParsingController parsingController)
+            final MarkupParsingStatus status)
             throws AttoParseException {
 
         handler.handleStandaloneElementStart(buffer, nameOffset, nameLen, minimized, line, col);
@@ -77,7 +77,7 @@ class BasicHtmlElement extends AbstractHtmlElement {
             final boolean minimized,
             final int line, final int col,
             final IMarkupAttoHandler handler,
-            final MarkupParsingController parsingController)
+            final MarkupParsingStatus status)
             throws AttoParseException {
 
         handler.handleStandaloneElementEnd(buffer, nameOffset, nameLen, minimized, line, col);
@@ -92,7 +92,7 @@ class BasicHtmlElement extends AbstractHtmlElement {
             final int nameOffset, final int nameLen, 
             final int line, final int col, 
             final IMarkupAttoHandler handler,
-            final MarkupParsingController parsingController)
+            final MarkupParsingStatus status)
             throws AttoParseException {
         
         handler.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
@@ -105,7 +105,7 @@ class BasicHtmlElement extends AbstractHtmlElement {
             final int nameOffset, final int nameLen,
             final int line, final int col,
             final IMarkupAttoHandler handler,
-            final MarkupParsingController parsingController)
+            final MarkupParsingStatus status)
             throws AttoParseException {
         
         handler.handleOpenElementEnd(buffer, nameOffset, nameLen, line, col);
@@ -120,7 +120,7 @@ class BasicHtmlElement extends AbstractHtmlElement {
             final int nameOffset, final int nameLen, 
             final int line, final int col, 
             final IMarkupAttoHandler handler,
-            final MarkupParsingController parsingController)
+            final MarkupParsingStatus status)
             throws AttoParseException {
         
         handler.handleCloseElementStart(buffer, nameOffset, nameLen, line, col);
@@ -133,7 +133,7 @@ class BasicHtmlElement extends AbstractHtmlElement {
             final int nameOffset, final int nameLen,
             final int line, final int col,
             final IMarkupAttoHandler handler,
-            final MarkupParsingController parsingController)
+            final MarkupParsingStatus status)
             throws AttoParseException {
 
         handler.handleCloseElementEnd(buffer, nameOffset, nameLen, line, col);
@@ -148,7 +148,7 @@ class BasicHtmlElement extends AbstractHtmlElement {
             final int nameOffset, final int nameLen, 
             final int line, final int col, 
             final IMarkupAttoHandler handler,
-            final MarkupParsingController parsingController)
+            final MarkupParsingStatus status)
             throws AttoParseException {
 
         handler.handleAutoCloseElementStart(buffer, nameOffset, nameLen, line, col);
@@ -161,7 +161,7 @@ class BasicHtmlElement extends AbstractHtmlElement {
             final int nameOffset, final int nameLen,
             final int line, final int col,
             final IMarkupAttoHandler handler,
-            final MarkupParsingController parsingController)
+            final MarkupParsingStatus status)
             throws AttoParseException {
 
         handler.handleAutoCloseElementEnd(buffer, nameOffset, nameLen, line, col);
@@ -176,7 +176,7 @@ class BasicHtmlElement extends AbstractHtmlElement {
             final int nameOffset, final int nameLen, 
             final int line, final int col, 
             final IMarkupAttoHandler handler,
-            final MarkupParsingController parsingController)
+            final MarkupParsingStatus status)
             throws AttoParseException {
         
         handler.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col);
@@ -189,7 +189,7 @@ class BasicHtmlElement extends AbstractHtmlElement {
             final int nameOffset, final int nameLen,
             final int line, final int col,
             final IMarkupAttoHandler handler,
-            final MarkupParsingController parsingController)
+            final MarkupParsingStatus status)
             throws AttoParseException {
         
         handler.handleUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col);
@@ -209,7 +209,7 @@ class BasicHtmlElement extends AbstractHtmlElement {
             final int valueOuterOffset, final int valueOuterLen,
             final int valueLine, final int valueCol, 
             final IMarkupAttoHandler handler,
-            final MarkupParsingController parsingController)
+            final MarkupParsingStatus status)
             throws AttoParseException {
         
         handler.handleAttribute(
@@ -226,7 +226,7 @@ class BasicHtmlElement extends AbstractHtmlElement {
             final int offset, final int len,
             final int line, final int col, 
             final IMarkupAttoHandler handler,
-            final MarkupParsingController parsingController)
+            final MarkupParsingStatus status)
             throws AttoParseException {
         
         handler.handleInnerWhiteSpace(buffer, offset, len, line, col);
