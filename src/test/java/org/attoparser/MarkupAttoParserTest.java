@@ -25,14 +25,14 @@ import java.util.List;
 
 import junit.framework.ComparisonFailure;
 import junit.framework.TestCase;
-import org.attoparser.MarkupParsingConfiguration.ElementBalancing;
-import org.attoparser.MarkupParsingConfiguration.PrologPresence;
-import org.attoparser.MarkupParsingConfiguration.UniqueRootElementPresence;
-import org.attoparser.directoutput.DirectOutputMarkupAttoHandler;
-import org.attoparser.html.HtmlMarkupAttoHandler;
-import org.attoparser.simple.SimplifierMarkupAttoHandler;
+import org.attoparser.config.ParseConfiguration;
+import org.attoparser.config.ParseConfiguration.ElementBalancing;
+import org.attoparser.config.ParseConfiguration.PrologPresence;
+import org.attoparser.config.ParseConfiguration.UniqueRootElementPresence;
+import org.attoparser.directoutput.DirectOutputMarkupHandler;
+import org.attoparser.simple.SimplifierMarkupHandler;
 import org.attoparser.trace.MarkupTraceEvent;
-import org.attoparser.trace.TraceBuilderMarkupAttoHandler;
+import org.attoparser.trace.TraceBuilderMarkupHandler;
 
 
 /**
@@ -50,29 +50,29 @@ public class MarkupAttoParserTest extends TestCase {
     public void test() throws Exception {
         
         
-        final MarkupParsingConfiguration noRestrictions = MarkupParsingConfiguration.noRestrictions();
+        final ParseConfiguration noRestrictions = ParseConfiguration.noRestrictions();
         
-        final MarkupParsingConfiguration noRestrictionsUpperCaseDocType = noRestrictions.clone();
-        noRestrictionsUpperCaseDocType.getPrologParsingConfiguration().setValidateProlog(true);
-        noRestrictionsUpperCaseDocType.getPrologParsingConfiguration().setRequireDoctypeKeywordsUpperCase(true);
+        final ParseConfiguration noRestrictionsUpperCaseDocType = noRestrictions.clone();
+        noRestrictionsUpperCaseDocType.getPrologParseConfiguration().setValidateProlog(true);
+        noRestrictionsUpperCaseDocType.getPrologParseConfiguration().setRequireDoctypeKeywordsUpperCase(true);
         
-        final MarkupParsingConfiguration noRestrictionsAutoClose = MarkupParsingConfiguration.noRestrictions();
+        final ParseConfiguration noRestrictionsAutoClose = ParseConfiguration.noRestrictions();
         noRestrictionsAutoClose.setElementBalancing(ElementBalancing.AUTO_CLOSE);
         
-        final MarkupParsingConfiguration noUnbalacedClosed = MarkupParsingConfiguration.noRestrictions();
+        final ParseConfiguration noUnbalacedClosed = ParseConfiguration.noRestrictions();
         noUnbalacedClosed.setElementBalancing(ElementBalancing.AUTO_CLOSE_REQUIRE_NO_UNMATCHED_CLOSE);
         
-        final MarkupParsingConfiguration wellFormedXml = new MarkupParsingConfiguration();
+        final ParseConfiguration wellFormedXml = new ParseConfiguration();
         wellFormedXml.setElementBalancing(ElementBalancing.REQUIRE_BALANCED);
         wellFormedXml.setRequireUniqueAttributesInElement(true);
         wellFormedXml.setRequireXmlWellFormedAttributeValues(true);
-        wellFormedXml.getPrologParsingConfiguration().setValidateProlog(true);
-        wellFormedXml.getPrologParsingConfiguration().setPrologPresence(PrologPresence.ALLOWED);
-        wellFormedXml.getPrologParsingConfiguration().setXmlDeclarationPresence(PrologPresence.ALLOWED);
-        wellFormedXml.getPrologParsingConfiguration().setDoctypePresence(PrologPresence.ALLOWED);
+        wellFormedXml.getPrologParseConfiguration().setValidateProlog(true);
+        wellFormedXml.getPrologParseConfiguration().setPrologPresence(PrologPresence.ALLOWED);
+        wellFormedXml.getPrologParseConfiguration().setXmlDeclarationPresence(PrologPresence.ALLOWED);
+        wellFormedXml.getPrologParseConfiguration().setDoctypePresence(PrologPresence.ALLOWED);
         wellFormedXml.setUniqueRootElementPresence(UniqueRootElementPresence.DEPENDS_ON_PROLOG_DOCTYPE);
         
-        final MarkupParsingConfiguration wellFormedXmlCaseInsensitive = wellFormedXml.clone();
+        final ParseConfiguration wellFormedXmlCaseInsensitive = wellFormedXml.clone();
         wellFormedXmlCaseInsensitive.setCaseSensitive(false);
 
         
@@ -81,25 +81,25 @@ public class MarkupAttoParserTest extends TestCase {
         final String dt3 = "<!DOCTYPE html public \"lala\">"; 
         final String dt4 = "<!DOCTYPE html public \"aaa\" [<!ELEMENT>]>"; 
         
-        final IMarkupAttoParser p = new MarkupAttoParser(noRestrictions);
+        final IMarkupParser p = new MarkupParser(noRestrictions);
         
         StringWriter sw1 = new StringWriter();
-        IMarkupAttoHandler h = new SimplifierMarkupAttoHandler(new TextTracerSimpleMarkupAttoHandler(sw1));
+        IMarkupHandler h = new SimplifierMarkupHandler(new TextTracerSimpleMarkupHandler(sw1));
         p.parse(dt1, h);
         assertEquals("[DT()()()(){1,1}]", sw1.toString());
 
         StringWriter sw2 = new StringWriter();
-        h = new SimplifierMarkupAttoHandler(new TextTracerSimpleMarkupAttoHandler(sw2));
+        h = new SimplifierMarkupHandler(new TextTracerSimpleMarkupHandler(sw2));
         p.parse(dt2, h);
         assertEquals("[DT(html)()()(){1,1}]", sw2.toString());
 
         StringWriter sw3 = new StringWriter();
-        h = new SimplifierMarkupAttoHandler(new TextTracerSimpleMarkupAttoHandler(sw3));
+        h = new SimplifierMarkupHandler(new TextTracerSimpleMarkupHandler(sw3));
         p.parse(dt3, h);
         assertEquals("[DT(html)(lala)()(){1,1}]", sw3.toString());
 
         StringWriter sw4 = new StringWriter();
-        h = new SimplifierMarkupAttoHandler(new TextTracerSimpleMarkupAttoHandler(sw4));
+        h = new SimplifierMarkupHandler(new TextTracerSimpleMarkupHandler(sw4));
         p.parse(dt4, h);
         assertEquals("[DT(html)(aaa)()(<!ELEMENT>){1,1}]", sw4.toString());
 
@@ -121,6 +121,10 @@ public class MarkupAttoParserTest extends TestCase {
             "<ul><li>a</ul>",
             "[OES(ul){1,1}OEE(ul){1,4}OES(li){1,5}OEE(li){1,8}T(a){1,9}ACES(li){1,10}ACEE(li){1,10}CES(ul){1,10}CEE(ul){1,14}]",
             noRestrictionsAutoClose);
+        testHtmlDoc(
+            "<ul><li>a</ul>",
+            "[OES(ul){1,1}OEE(ul){1,4}OES(li){1,5}OEE(li){1,8}T(a){1,9}CES(ul){1,10}CEE(ul){1,14}]",
+            noRestrictions);
         testHtmlDoc(
             "<ul><li>a<li>b</ul>",
             "[OES(ul){1,1}OEE(ul){1,4}OES(li){1,5}OEE(li){1,8}T(a){1,9}ACES(li){1,10}ACEE(li){1,10}OES(li){1,10}OEE(li){1,13}T(b){1,14}ACES(li){1,15}ACEE(li){1,15}CES(ul){1,15}CEE(ul){1,19}]",
@@ -227,19 +231,19 @@ public class MarkupAttoParserTest extends TestCase {
         testHtmlDoc(
                 "<script> var a = \"<div>\" if (a < 0)</script>",
                 "[OES(script){1,1}OEE(script){1,8}T( var a = \"<div>\" if (a < 0)){1,9}CES(script){1,36}CEE(script){1,44}]",
-                MarkupParsingConfiguration.defaultHtmlConfiguration());
+                ParseConfiguration.defaultHtmlConfiguration());
         testHtmlDoc(
             "<style> a = \"<div>\" if (a < 0)</style>",
             "[OES(style){1,1}OEE(style){1,7}T( a = \"<div>\" if (a < 0)){1,8}CES(style){1,31}CEE(style){1,38}]",
-            MarkupParsingConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.defaultHtmlConfiguration());
         testHtmlDoc(
             "<script> var a = \"<div>\"\n\nif (a < 0)</script>",
             "[OES(script){1,1}OEE(script){1,8}T( var a = \"<div>\"\n\nif (a < 0)){1,9}CES(script){3,11}CEE(script){3,19}]",
-            MarkupParsingConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.defaultHtmlConfiguration());
         testHtmlDoc(
             "<style> a = \"<div>\"\n\nif (a < 0)</style>",
             "[OES(style){1,1}OEE(style){1,7}T( a = \"<div>\"\n\nif (a < 0)){1,8}CES(style){3,11}CEE(style){3,18}]",
-            MarkupParsingConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.defaultHtmlConfiguration());
         testDoc(
             "<SCRIPT> var a = \"<div>\" if (a < 0)</SCRIPT>",
             "[OES(SCRIPT){1,1}OEE(SCRIPT){1,8}T( var a = \"){1,9}OES(div){1,19}OEE(div){1,23}T(\" if (a < 0)){1,24}CES(SCRIPT){1,36}CEE(SCRIPT){1,44}]",
@@ -253,19 +257,19 @@ public class MarkupAttoParserTest extends TestCase {
         testHtmlDoc(
             "<SCRIPT> var a = \"<div>\" if (a < 0)</SCRIPT>",
             "[OES(SCRIPT){1,1}OEE(SCRIPT){1,8}T( var a = \"<div>\" if (a < 0)){1,9}CES(SCRIPT){1,36}CEE(SCRIPT){1,44}]",
-            MarkupParsingConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.defaultHtmlConfiguration());
         testHtmlDoc(
             "<STYLE> a = \"<div>\" if (a < 0)</STYLE>",
             "[OES(STYLE){1,1}OEE(STYLE){1,7}T( a = \"<div>\" if (a < 0)){1,8}CES(STYLE){1,31}CEE(STYLE){1,38}]",
-            MarkupParsingConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.defaultHtmlConfiguration());
         testHtmlDoc(
             "<SCRIPT> var a = \"<div>\"\n\nif (a < 0)</SCRIPT>",
             "[OES(SCRIPT){1,1}OEE(SCRIPT){1,8}T( var a = \"<div>\"\n\nif (a < 0)){1,9}CES(SCRIPT){3,11}CEE(SCRIPT){3,19}]",
-            MarkupParsingConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.defaultHtmlConfiguration());
         testHtmlDoc(
             "<STYLE> a = \"<div>\"\n\nif (a < 0)</STYLE>",
             "[OES(STYLE){1,1}OEE(STYLE){1,7}T( a = \"<div>\"\n\nif (a < 0)){1,8}CES(STYLE){3,11}CEE(STYLE){3,18}]",
-            MarkupParsingConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.defaultHtmlConfiguration());
         testDoc(
             "<script type=\"text/javascript\"> var a = \"<div>\" if (a < 0)</script>",
             "[OES(script){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE(script){1,31}T( var a = \"){1,32}OES(div){1,42}OEE(div){1,46}T(\" if (a < 0)){1,47}CES(script){1,59}CEE(script){1,67}]",
@@ -279,19 +283,19 @@ public class MarkupAttoParserTest extends TestCase {
         testHtmlDoc(
             "<script type=\"text/javascript\"> var a = \"<div>\" if (a < 0)</script>",
             "[OES(script){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE(script){1,31}T( var a = \"<div>\" if (a < 0)){1,32}CES(script){1,59}CEE(script){1,67}]",
-            MarkupParsingConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.defaultHtmlConfiguration());
         testHtmlDoc(
             "<style type=\"text/css\"> a = \"<div>\" if (a < 0)</style>",
             "[OES(style){1,1}IWS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE(style){1,23}T( a = \"<div>\" if (a < 0)){1,24}CES(style){1,47}CEE(style){1,54}]",
-            MarkupParsingConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.defaultHtmlConfiguration());
         testHtmlDoc(
             "<script type=\"text/javascript\"> var a = \"<div>\"\n\nif (a < 0)</script>",
             "[OES(script){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE(script){1,31}T( var a = \"<div>\"\n\nif (a < 0)){1,32}CES(script){3,11}CEE(script){3,19}]",
-            MarkupParsingConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.defaultHtmlConfiguration());
         testHtmlDoc(
             "<style type=\"text/css\"> a = \"<div>\"\n\nif (a < 0)</style>",
             "[OES(style){1,1}IWS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE(style){1,23}T( a = \"<div>\"\n\nif (a < 0)){1,24}CES(style){3,11}CEE(style){3,18}]",
-            MarkupParsingConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.defaultHtmlConfiguration());
         testDoc(
             "<SCRIPT type=\"text/javascript\"> var a = \"<div>\" if (a < 0)</SCRIPT>",
             "[OES(SCRIPT){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE(SCRIPT){1,31}T( var a = \"){1,32}OES(div){1,42}OEE(div){1,46}T(\" if (a < 0)){1,47}CES(SCRIPT){1,59}CEE(SCRIPT){1,67}]",
@@ -305,27 +309,27 @@ public class MarkupAttoParserTest extends TestCase {
         testHtmlDoc(
             "<SCRIPT type=\"text/javascript\"> var a = \"<div>\" if (a < 0)</SCRIPT>",
             "[OES(SCRIPT){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE(SCRIPT){1,31}T( var a = \"<div>\" if (a < 0)){1,32}CES(SCRIPT){1,59}CEE(SCRIPT){1,67}]",
-            MarkupParsingConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.defaultHtmlConfiguration());
         testHtmlDoc(
             "<STYLE type=\"text/css\"> a = \"<div>\" if (a < 0)</STYLE>",
             "[OES(STYLE){1,1}IWS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE(STYLE){1,23}T( a = \"<div>\" if (a < 0)){1,24}CES(STYLE){1,47}CEE(STYLE){1,54}]",
-            MarkupParsingConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.defaultHtmlConfiguration());
         testHtmlDoc(
             "<SCRIPT type=\"text/javascript\"> var a = \"<div>\"\n\nif (a < 0)</SCRIPT>",
             "[OES(SCRIPT){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE(SCRIPT){1,31}T( var a = \"<div>\"\n\nif (a < 0)){1,32}CES(SCRIPT){3,11}CEE(SCRIPT){3,19}]",
-            MarkupParsingConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.defaultHtmlConfiguration());
         testHtmlDoc(
             "<STYLE type=\"text/css\"> a = \"<div>\"\n\nif (a < 0)</STYLE>",
             "[OES(STYLE){1,1}IWS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE(STYLE){1,23}T( a = \"<div>\"\n\nif (a < 0)){1,24}CES(STYLE){3,11}CEE(STYLE){3,18}]",
-            MarkupParsingConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.defaultHtmlConfiguration());
         testHtmlDoc(
             "<ScripT type=\"text/javascript\"> var a = \"<div>\" if (a < 0)</ScripT>",
             "[OES(ScripT){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE(ScripT){1,31}T( var a = \"<div>\" if (a < 0)){1,32}CES(ScripT){1,59}CEE(ScripT){1,67}]",
-            MarkupParsingConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.defaultHtmlConfiguration());
         testHtmlDoc(
             "<StylE type=\"text/css\"> a = \"<div>\" if (a < 0)</StylE>",
             "[OES(StylE){1,1}IWS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE(StylE){1,23}T( a = \"<div>\" if (a < 0)){1,24}CES(StylE){1,47}CEE(StylE){1,54}]",
-            MarkupParsingConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.defaultHtmlConfiguration());
         testDoc(
             "<h1 a=\"if (a < 0)\">Hello</ h1>",
             "[OES(h1){1,1}IWS( ){1,4}A(a){1,5}(=){1,6}(\"if (a < 0)\"){1,7}OEE(h1){1,19}T(Hello</ h1>){1,20}ACES(h1){1,31}ACEE(h1){1,31}]",
@@ -1464,12 +1468,12 @@ public class MarkupAttoParserTest extends TestCase {
     
     
     
-    static void testDocError(final String input, final String outputBreakDown, final String outputSimple, final int errorLine, final int errorCol, final MarkupParsingConfiguration markupParsingConfiguration) {
+    static void testDocError(final String input, final String outputBreakDown, final String outputSimple, final int errorLine, final int errorCol, final ParseConfiguration parseConfiguration) {
         try {
-            testDoc(input, outputBreakDown, outputSimple, markupParsingConfiguration);
+            testDoc(input, outputBreakDown, outputSimple, parseConfiguration);
             throw new ComparisonFailure(null, "exception", "no exception");
             
-        } catch (final AttoParseException e) {
+        } catch (final ParseException e) {
             if (errorLine != -1) {
                 assertEquals(Integer.valueOf(errorLine), e.getLine());
             } else {
@@ -1484,12 +1488,12 @@ public class MarkupAttoParserTest extends TestCase {
     }
 
     
-    static void testDocError(final String input, final String outputBreakDown, final String outputSimple, final int offset, final int len, final int errorLine, final int errorCol, final MarkupParsingConfiguration markupParsingConfiguration) {
+    static void testDocError(final String input, final String outputBreakDown, final String outputSimple, final int offset, final int len, final int errorLine, final int errorCol, final ParseConfiguration parseConfiguration) {
         try {
-            testDoc(input, outputBreakDown, outputSimple, offset, len, markupParsingConfiguration);
+            testDoc(input, outputBreakDown, outputSimple, offset, len, parseConfiguration);
             throw new ComparisonFailure(null, "exception", "no exception");
             
-        } catch (final AttoParseException e) {
+        } catch (final ParseException e) {
             if (errorLine != -1 && errorCol != -1) {
                 assertEquals(Integer.valueOf(errorLine), e.getLine());
                 assertEquals(Integer.valueOf(errorCol), e.getCol());
@@ -1501,31 +1505,31 @@ public class MarkupAttoParserTest extends TestCase {
     }
     
     
-    static void testDoc(final String input, final String outputBreakDown, final String outputSimple, final MarkupParsingConfiguration markupParsingConfiguration) throws AttoParseException {
-        testDoc(input.toCharArray(), outputBreakDown, outputSimple, 0, input.length(), markupParsingConfiguration);
+    static void testDoc(final String input, final String outputBreakDown, final String outputSimple, final ParseConfiguration parseConfiguration) throws ParseException {
+        testDoc(input.toCharArray(), outputBreakDown, outputSimple, 0, input.length(), parseConfiguration);
     }
     
-    static void testDoc(String input, final String outputBreakDown, final String outputSimple, final int offset, final int len, final MarkupParsingConfiguration markupParsingConfiguration) throws AttoParseException {
-        testDoc(input.toCharArray(), outputBreakDown, outputSimple, offset, len, markupParsingConfiguration);
+    static void testDoc(String input, final String outputBreakDown, final String outputSimple, final int offset, final int len, final ParseConfiguration parseConfiguration) throws ParseException {
+        testDoc(input.toCharArray(), outputBreakDown, outputSimple, offset, len, parseConfiguration);
     }
     
-    static void testDoc(final String input, final String outputBreakDown, final String outputSimple, final int bufferSize, final MarkupParsingConfiguration markupParsingConfiguration) throws AttoParseException {
-        testDoc(input.toCharArray(), outputBreakDown, outputSimple, 0, input.length(), bufferSize, markupParsingConfiguration);
+    static void testDoc(final String input, final String outputBreakDown, final String outputSimple, final int bufferSize, final ParseConfiguration parseConfiguration) throws ParseException {
+        testDoc(input.toCharArray(), outputBreakDown, outputSimple, 0, input.length(), bufferSize, parseConfiguration);
     }
     
-    static void testDoc(String input, final String outputBreakDown, final String outputSimple, final int offset, final int len, final int bufferSize, final MarkupParsingConfiguration markupParsingConfiguration) throws AttoParseException {
-        testDoc(input.toCharArray(), outputBreakDown, outputSimple, offset, len, bufferSize, markupParsingConfiguration);
+    static void testDoc(String input, final String outputBreakDown, final String outputSimple, final int offset, final int len, final int bufferSize, final ParseConfiguration parseConfiguration) throws ParseException {
+        testDoc(input.toCharArray(), outputBreakDown, outputSimple, offset, len, bufferSize, parseConfiguration);
     }
     
     
     
     
     static void testDoc(final char[] input, final String outputBreakDown, final String outputSimple, 
-            final int offset, final int len, final MarkupParsingConfiguration markupParsingConfiguration) throws AttoParseException {
+            final int offset, final int len, final ParseConfiguration parseConfiguration) throws ParseException {
 
         final int maxBufferSize = 16384;
         for (int bufferSize = 1; bufferSize <= maxBufferSize; bufferSize++) {
-            testDoc(input, outputBreakDown, outputSimple, offset, len, bufferSize, markupParsingConfiguration);
+            testDoc(input, outputBreakDown, outputSimple, offset, len, bufferSize, parseConfiguration);
         }
         
     }
@@ -1535,20 +1539,20 @@ public class MarkupAttoParserTest extends TestCase {
             final char[] input, 
             final String outputBreakDown, final String outputSimple,
             final int offset, final int len, final int bufferSize,
-            final MarkupParsingConfiguration markupParsingConfiguration) 
-            throws AttoParseException {
+            final ParseConfiguration parseConfiguration)
+            throws ParseException {
 
         try {
 
-            final MarkupAttoParser parser = new MarkupAttoParser(markupParsingConfiguration);
+            final MarkupParser parser = new MarkupParser(parseConfiguration);
 
             // TEST WITH TRACING HANDLER
             {
 
-                final MarkupParsingStatus status = new MarkupParsingStatus();
-                final TraceBuilderMarkupAttoHandler handler = new TraceBuilderMarkupAttoHandler();
-                handler.setMarkupParsingStatus(status);
-                final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, markupParsingConfiguration);
+                final ParseStatus status = new ParseStatus();
+                final TraceBuilderMarkupHandler handler = new TraceBuilderMarkupHandler();
+                handler.setParserStatus(status);
+                final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
 
                 if (offset == 0 && len == input.length) {
                     parser.parseDocument(new CharArrayReader(input), eventProcessor, bufferSize, status);
@@ -1578,10 +1582,10 @@ public class MarkupAttoParserTest extends TestCase {
             // TEST WITH DUPLICATING MARKUP HANDLER (few events)
             {
                 final StringWriter sw = new StringWriter();
-                final MarkupParsingStatus status = new MarkupParsingStatus();
-                final IMarkupAttoHandler handler = new DirectOutputMarkupAttoHandler(sw);
-                handler.setMarkupParsingStatus(status);
-                final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, markupParsingConfiguration);
+                final ParseStatus status = new ParseStatus();
+                final IMarkupHandler handler = new DirectOutputMarkupHandler(sw);
+                handler.setParserStatus(status);
+                final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
                 if (offset == 0 && len == input.length) {
                     parser.parseDocument(new CharArrayReader(input), eventProcessor, bufferSize, status);
                 } else { 
@@ -1597,10 +1601,10 @@ public class MarkupAttoParserTest extends TestCase {
             // TEST WITH DUPLICATING MARKUP BREAKDOWN HANDLER (many events)
             {
                 final StringWriter sw = new StringWriter();
-                final MarkupParsingStatus status = new MarkupParsingStatus();
-                final IMarkupAttoHandler handler = new DirectOutputMarkupAttoHandler(sw);
-                handler.setMarkupParsingStatus(status);
-                final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, markupParsingConfiguration);
+                final ParseStatus status = new ParseStatus();
+                final IMarkupHandler handler = new DirectOutputMarkupHandler(sw);
+                handler.setParserStatus(status);
+                final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
                 if (offset == 0 && len == input.length) {
                     parser.parseDocument(new CharArrayReader(input), eventProcessor, bufferSize, status);
                 } else { 
@@ -1617,11 +1621,11 @@ public class MarkupAttoParserTest extends TestCase {
                 // TEST WITH TRACING SIMPLE MARKUP HANDLER (String literals)
                 {
                     final StringWriter sw = new StringWriter();
-                    final MarkupParsingStatus status = new MarkupParsingStatus();
-                    final IMarkupAttoHandler handler =
-                            new SimplifierMarkupAttoHandler(new TextTracerSimpleMarkupAttoHandler(sw));
-                    handler.setMarkupParsingStatus(status);
-                    final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, markupParsingConfiguration);
+                    final ParseStatus status = new ParseStatus();
+                    final IMarkupHandler handler =
+                            new SimplifierMarkupHandler(new TextTracerSimpleMarkupHandler(sw));
+                    handler.setParserStatus(status);
+                    final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
                     if (offset == 0 && len == input.length) {
                         parser.parseDocument(new CharArrayReader(input), eventProcessor, bufferSize, status);
                     } else { 
@@ -1639,7 +1643,7 @@ public class MarkupAttoParserTest extends TestCase {
             System.err.println("Error parsing text \"" + new String(input, offset, len) + "\" with buffer size: " + bufferSize);
             throw cf;
         } catch (final Exception e) {
-            throw new AttoParseException("Error parsing text \"" + new String(input, offset, len) + "\" with buffer size: " + bufferSize, e);
+            throw new ParseException("Error parsing text \"" + new String(input, offset, len) + "\" with buffer size: " + bufferSize, e);
         }
         
     }
@@ -1650,31 +1654,31 @@ public class MarkupAttoParserTest extends TestCase {
 
 
 
-    static void testHtmlDoc(final String input, final String outputBreakDown, final MarkupParsingConfiguration parsingConfiguration) throws AttoParseException {
-        testHtmlDoc(input.toCharArray(), outputBreakDown, 0, input.length(), parsingConfiguration);
+    static void testHtmlDoc(final String input, final String outputBreakDown, final ParseConfiguration parseConfiguration) throws ParseException {
+        testHtmlDoc(input.toCharArray(), outputBreakDown, 0, input.length(), parseConfiguration);
     }
 
-    static void testHtmlDoc(String input, final String outputBreakDown, final int offset, final int len, final MarkupParsingConfiguration parsingConfiguration) throws AttoParseException {
-        testHtmlDoc(input.toCharArray(), outputBreakDown, offset, len, parsingConfiguration);
+    static void testHtmlDoc(String input, final String outputBreakDown, final int offset, final int len, final ParseConfiguration parseConfiguration) throws ParseException {
+        testHtmlDoc(input.toCharArray(), outputBreakDown, offset, len, parseConfiguration);
     }
 
-    static void testHtmlDoc(final String input, final String outputBreakDown, final int bufferSize, final MarkupParsingConfiguration parsingConfiguration) throws AttoParseException {
-        testHtmlDoc(input.toCharArray(), outputBreakDown, 0, input.length(), bufferSize, parsingConfiguration);
+    static void testHtmlDoc(final String input, final String outputBreakDown, final int bufferSize, final ParseConfiguration parseConfiguration) throws ParseException {
+        testHtmlDoc(input.toCharArray(), outputBreakDown, 0, input.length(), bufferSize, parseConfiguration);
     }
 
-    static void testHtmlDoc(String input, final String outputBreakDown, final int offset, final int len, final int bufferSize, final MarkupParsingConfiguration parsingConfiguration) throws AttoParseException {
-        testHtmlDoc(input.toCharArray(), outputBreakDown, offset, len, bufferSize, parsingConfiguration);
+    static void testHtmlDoc(String input, final String outputBreakDown, final int offset, final int len, final int bufferSize, final ParseConfiguration parseConfiguration) throws ParseException {
+        testHtmlDoc(input.toCharArray(), outputBreakDown, offset, len, bufferSize, parseConfiguration);
     }
 
 
 
 
     static void testHtmlDoc(final char[] input, final String outputBreakDown,
-                        final int offset, final int len, final MarkupParsingConfiguration parsingConfiguration) throws AttoParseException {
+                        final int offset, final int len, final ParseConfiguration parseConfiguration) throws ParseException {
 
         final int maxBufferSize = 16384;
         for (int bufferSize = 1; bufferSize <= maxBufferSize; bufferSize++) {
-            testHtmlDoc(input, outputBreakDown, offset, len, bufferSize, parsingConfiguration);
+            testHtmlDoc(input, outputBreakDown, offset, len, bufferSize, parseConfiguration);
         }
 
     }
@@ -1684,20 +1688,20 @@ public class MarkupAttoParserTest extends TestCase {
             final char[] input,
             final String outputBreakDown,
             final int offset, final int len, final int bufferSize,
-            final MarkupParsingConfiguration parsingConfiguration)
-            throws AttoParseException {
+            final ParseConfiguration parseConfiguration)
+            throws ParseException {
 
         try {
 
-            final MarkupAttoParser parser = new MarkupAttoParser(parsingConfiguration);
+            final MarkupParser parser = new MarkupParser(parseConfiguration);
 
             // TEST WITH TRACING HTML DETAILED HANDLER
             {
-                final MarkupParsingStatus status = new MarkupParsingStatus();
-                final TraceBuilderMarkupAttoHandler traceHandler = new TraceBuilderMarkupAttoHandler();
-                final IMarkupAttoHandler handler = new HtmlMarkupAttoHandler(traceHandler);
-                handler.setMarkupParsingStatus(status);
-                final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, parsingConfiguration);
+                final ParseStatus status = new ParseStatus();
+                final TraceBuilderMarkupHandler traceHandler = new TraceBuilderMarkupHandler();
+                final IMarkupHandler handler = new HtmlMarkupHandler(traceHandler);
+                handler.setParserStatus(status);
+                final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
 
                 if (offset == 0 && len == input.length) {
                     parser.parseDocument(new CharArrayReader(input), eventProcessor, bufferSize, status);
@@ -1731,7 +1735,7 @@ public class MarkupAttoParserTest extends TestCase {
             System.err.println("Error parsing text \"" + new String(input, offset, len) + "\" with buffer size: " + bufferSize);
             throw cf;
         } catch (final Exception e) {
-            throw new AttoParseException("Error parsing text \"" + new String(input, offset, len) + "\" with buffer size: " + bufferSize, e);
+            throw new ParseException("Error parsing text \"" + new String(input, offset, len) + "\" with buffer size: " + bufferSize, e);
         }
 
     }

@@ -20,8 +20,6 @@
 package org.attoparser;
 
 import junit.framework.TestCase;
-import org.attoparser.MarkupEventProcessor;
-import org.attoparser.html.HtmlNames;
 
 
 /**
