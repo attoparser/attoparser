@@ -17,24 +17,16 @@
  * 
  * =============================================================================
  */
-package org.attoparser.dom.impl;
+package org.attoparser.dom;
 
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.attoparser.dom.IElement;
-import org.attoparser.dom.INestableNode;
-import org.attoparser.dom.INode;
-
-
 
 /**
- * <p>
- *   Default implementation of the {@link IElement} interface.
- * </p>
- * 
+ *
  * 
  * @author Daniel Fern&aacute;ndez
  * 
@@ -43,7 +35,7 @@ import org.attoparser.dom.INode;
  */
 public class Element 
         extends AbstractNestableNode
-        implements IElement, Serializable {
+        implements Serializable {
 
     private static final long serialVersionUID = -8980986739486971174L;
 
@@ -57,7 +49,9 @@ public class Element
 
     public Element(final String name) {
         super();
-        Validate.notNull(name, "Element name cannot be null");
+        if (name == null) {
+            throw new IllegalArgumentException("Element name cannot be null");
+        }
         this.elementName = name;
     }
 
@@ -69,7 +63,9 @@ public class Element
     }
     
     public void setElementName(final String name) {
-        Validate.notNull(name, "Element elementName cannot be null");
+        if (name == null) {
+            throw new IllegalArgumentException("Element name cannot be null");
+        }
         this.elementName = name;
     }
     

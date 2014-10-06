@@ -24,14 +24,6 @@ import java.util.Map;
 
 import org.attoparser.AbstractMarkupHandler;
 import org.attoparser.ParseException;
-import org.attoparser.dom.impl.CDATASection;
-import org.attoparser.dom.impl.Comment;
-import org.attoparser.dom.impl.DocType;
-import org.attoparser.dom.impl.Document;
-import org.attoparser.dom.impl.Element;
-import org.attoparser.dom.impl.ProcessingInstruction;
-import org.attoparser.dom.impl.Text;
-import org.attoparser.dom.impl.XmlDeclaration;
 
 
 /**

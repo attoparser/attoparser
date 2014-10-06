@@ -17,28 +17,18 @@
  * 
  * =============================================================================
  */
-package org.attoparser.dom.impl;
-
-import org.attoparser.dom.ICDATASection;
-import org.attoparser.dom.INestableNode;
-
-
-
+package org.attoparser.dom;
 
 
 /**
- * <p>
- *   Default implementation of the {@link ICDATASection} interface.
- * </p>
- * 
+ *
  * @author Daniel Fern&aacute;ndez
  * 
  * @since 1.1
  *
  */
 public class CDATASection 
-        extends Text
-        implements ICDATASection {
+        extends Text {
     
     private static final long serialVersionUID = -131121996532074777L;
 

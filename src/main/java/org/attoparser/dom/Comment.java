@@ -17,43 +17,39 @@
  * 
  * =============================================================================
  */
-package org.attoparser.dom.impl;
+package org.attoparser.dom;
 
 import java.io.Serializable;
-
-import org.attoparser.dom.INestableNode;
-import org.attoparser.dom.IText;
-
-
-
 
 
 /**
  * <p>
- *   Default implementation of the {@link IText} interface.
+ *   Default implementation of the {@link IComment} interface.
  * </p>
+ * 
  * 
  * @author Daniel Fern&aacute;ndez
  * 
  * @since 1.1
  *
  */
-public class Text 
+public class Comment 
         extends AbstractNode 
-        implements IText, Serializable {
-
-    private static final long serialVersionUID = -6449838157196892217L;
+        implements IComment, Serializable {
+    
+    private static final long serialVersionUID = -5222507854714214977L;
     
     
     private String content;
 
 
-    public Text(final String content) {
+    public Comment(final String content) {
         super();
         Validate.notNull(content, "Content cannot be null");
         this.content = content;
     }
 
+    
     
     
     public String getContent() {
@@ -73,13 +69,16 @@ public class Text
 
     
     
-    public Text cloneNode(final INestableNode parent) {
-        final Text text = new Text(this.content);
-        text.setLine(getLine());
-        text.setCol(getCol());
-        text.setParent(parent);
-        return text;
+    public Comment cloneNode(final INestableNode parent) {
+        final Comment comment = new Comment(this.content);
+        comment.setLine(getLine());
+        comment.setCol(getCol());
+        comment.setParent(parent);
+        return comment;
     }
+
+    
+
 
     
 }

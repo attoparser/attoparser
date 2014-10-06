@@ -17,71 +17,64 @@
  * 
  * =============================================================================
  */
-package org.attoparser.dom.impl;
+package org.attoparser.dom;
 
 import java.io.Serializable;
 
-import org.attoparser.dom.INestableNode;
-import org.attoparser.dom.IProcessingInstruction;
-
-
-
 
 /**
- * <p>
- *   Default implementation of the {@link IProcessingInstruction} interface.
- * </p>
- * 
+ *
  * @author Daniel Fern&aacute;ndez
  * 
  * @since 1.1
  *
  */
-public class ProcessingInstruction 
-        extends AbstractNode
-        implements IProcessingInstruction, Serializable {
+public class Text 
+        extends AbstractNode 
+        implements Serializable {
+
+    private static final long serialVersionUID = -6449838157196892217L;
     
-    private static final long serialVersionUID = 7832638382597687056L;
     
-    private String target;
     private String content;
 
 
-    public ProcessingInstruction(final String target, final String content) {
+    public Text(final String content) {
         super();
-        Validate.notNull(target, "Target cannot be null");
-        this.target = target;
+        if (content == null) {
+            throw new IllegalArgumentException("Content cannot be null");
+        }
         this.content = content;
     }
 
     
-    
-    public String getTarget() {
-        return this.target;
-    }
-    
-    public void setTarget(final String target) {
-        Validate.notNull(target, "Target cannot be null");
-        this.target = target;
-    }
-
     
     public String getContent() {
         return this.content;
     }
     
+
     public void setContent(final String content) {
+        if (content == null) {
+            throw new IllegalArgumentException("Content cannot be null");
+        }
         this.content = content;
     }
 
-
-    public ProcessingInstruction cloneNode(final INestableNode parent) {
-        final ProcessingInstruction processingInstruction = new ProcessingInstruction(this.target, this.content);
-        processingInstruction.setLine(getLine());
-        processingInstruction.setCol(getCol());
-        processingInstruction.setParent(parent);
-        return processingInstruction;
-    }
     
+    public void setContent(final char[] buffer, final int offset, final int len) {
+        this.content = new String(buffer, offset, len);
+    }
+
+    
+    
+    public Text cloneNode(final INestableNode parent) {
+        final Text text = new Text(this.content);
+        text.setLine(getLine());
+        text.setCol(getCol());
+        text.setParent(parent);
+        return text;
+    }
+
     
 }

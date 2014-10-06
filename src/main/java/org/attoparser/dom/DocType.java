@@ -17,19 +17,13 @@
  * 
  * =============================================================================
  */
-package org.attoparser.dom.impl;
+package org.attoparser.dom;
 
 import java.io.Serializable;
 
-import org.attoparser.dom.IDocType;
-import org.attoparser.dom.INestableNode;
-
 
 /**
- * <p>
- *   Default implementation of the {@link IDocType} interface.
- * </p>
- * 
+ *
  * @author Daniel Fern&aacute;ndez
  * 
  * @since 1.1
@@ -37,7 +31,7 @@ import org.attoparser.dom.INestableNode;
  */
 public class DocType 
         extends AbstractNode
-        implements IDocType, Serializable {
+        implements Serializable {
 
     private static final long serialVersionUID = 763084654353190744L;
     
@@ -53,7 +47,9 @@ public class DocType
     public DocType(final String rootElementName, final String publicId, final String systemId,
             final String internalSubset) {
         super();
-        Validate.notNull(rootElementName, "Root element name cannot be null");
+        if (rootElementName == null) {
+            throw new IllegalArgumentException("Root element name cannot be null");
+        }
         this.rootElementName = rootElementName;
         this.publicId = publicId;
         this.systemId = systemId;
@@ -68,7 +64,9 @@ public class DocType
     }
     
     public void setRootElementName(final String rootElementName) {
-        Validate.notNull(rootElementName, "Root element name cannot be null");
+        if (rootElementName == null) {
+            throw new IllegalArgumentException("Root element name cannot be null");
+        }
         this.rootElementName = rootElementName;
     }
     

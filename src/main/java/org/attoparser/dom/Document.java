@@ -19,24 +19,52 @@
  */
 package org.attoparser.dom;
 
-
-
+import java.io.Serializable;
 
 
 /**
- * <p>
- *   Common interface for Comment nodes in attoDOM trees.
- * </p>
+ *
  * 
  * @author Daniel Fern&aacute;ndez
  * 
  * @since 1.1
  *
  */
-public interface IComment extends INode {
+public class Document
+        extends AbstractNestableNode
+        implements Serializable {
     
-    public String getContent();
-    public void setContent(final String content);
-    public void setContent(final char[] buffer, final int offset, final int len);
+    private static final long serialVersionUID = 1L;
     
+    
+    private String documentName = null;
+    
+    
+    public Document(final String documentName) {
+        super();
+        this.documentName = documentName;
+    }
+
+
+    public String getDocumentName() {
+        return this.documentName;
+    }
+
+
+    public void setDocumentName(final String documentName) {
+        this.documentName = documentName;
+    }
+
+
+    
+    
+    public Document cloneNode(INestableNode parent) {
+        final Document document = new Document(this.documentName);
+        document.setLine(getLine());
+        document.setCol(getCol());
+        document.setParent(parent);
+        return document;
+    }
+    
+
 }

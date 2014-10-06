@@ -19,37 +19,72 @@
  */
 package org.attoparser.dom;
 
-import java.util.Map;
-
-
 
 /**
  * <p>
- *   Common interface for all nodes in attoDOM trees that
- *   can serve as attribute containers.
+ *   Base abstract class for all nodes in a attoDOM tree.
  * </p>
  * 
  * @author Daniel Fern&aacute;ndez
  * 
- * @since 1.1
+ * @since 1.0
  *
  */
-public interface IAttributeContainerNode extends INode {
+public abstract class AbstractNode implements INode {
     
     
-    public int numAttributes();
-    public boolean hasAttributes();
+    private Integer line = null;
+    private Integer col = null;
     
-    public boolean hasAttribute(final String name);
-    public String getAttributeValue(final String name);
+    private INestableNode parent;
     
-    public Map<String,String> getAttributeMap();
-
-    public void addAttribute(final String name, final String value);
-    public void addAttributes(final Map<String,String> newAttributes);
-    
-    public void removeAttribute(final String attributeName);
-    public void clearAttributes();
     
 
+    protected AbstractNode() {
+        super();
+    }
+
+
+
+    public boolean hasLine() {
+        return this.line != null;
+    }
+
+    public Integer getLine() {
+        return this.line;
+    }
+
+    public void setLine(final Integer line) {
+        this.line = line;
+    }
+
+    
+    
+    public boolean hasCol() {
+        return this.col != null;
+    }
+
+    public Integer getCol() {
+        return this.col;
+    }
+
+    public void setCol(final Integer col) {
+        this.col = col;
+    }
+
+
+    
+    public boolean hasParent() {
+        return this.parent != null;
+    }
+    
+    public INestableNode getParent() {
+        return this.parent;
+    }
+
+    public void setParent(final INestableNode parent) {
+        this.parent = parent;
+    }
+
+    
 }

@@ -17,16 +17,12 @@
  * 
  * =============================================================================
  */
-package org.attoparser.dom.impl;
+package org.attoparser.dom;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-
-import org.attoparser.dom.INestableNode;
-import org.attoparser.dom.INode;
-
 
 
 /**
@@ -84,7 +80,7 @@ public abstract class AbstractNestableNode
         if (this.childrenLen == 0) {
             return Collections.emptyList();
         }
-        final List<T> selectedChildren = new ArrayList<T>();
+        final List<T> selectedChildren = new ArrayList<T>(5);
         for (final INode child : this.children) {
             if (type.isInstance(child)) {
                 selectedChildren.add((T)child);
@@ -124,7 +120,7 @@ public abstract class AbstractNestableNode
         if (newChild != null) {
             
             if (this.childrenLen == 0) {
-                this.children = new ArrayList<INode>();
+                this.children = new ArrayList<INode>(5);
             }
             this.children.add(newChild);
             this.childrenLen++;
@@ -141,7 +137,7 @@ public abstract class AbstractNestableNode
         if (newChild != null) {
             
             if (this.childrenLen == 0) {
-                this.children = new ArrayList<INode>();
+                this.children = new ArrayList<INode>(5);
             }
             
             if (index <= this.childrenLen) {

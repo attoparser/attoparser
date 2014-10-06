@@ -17,19 +17,13 @@
  * 
  * =============================================================================
  */
-package org.attoparser.dom.impl;
+package org.attoparser.dom;
 
 import java.io.Serializable;
 
-import org.attoparser.dom.INestableNode;
-import org.attoparser.dom.IXmlDeclaration;
-
 
 /**
- * <p>
- *   Default implementation of the {@link IXmlDeclaration} interface.
- * </p>
- * 
+ *
  * @author Daniel Fern&aacute;ndez
  * 
  * @since 1.1
@@ -37,7 +31,7 @@ import org.attoparser.dom.IXmlDeclaration;
  */
 public class XmlDeclaration 
         extends AbstractNode
-        implements IXmlDeclaration, Serializable {
+        implements Serializable {
     
     private static final long serialVersionUID = 8210232665354213283L;
     
@@ -51,7 +45,9 @@ public class XmlDeclaration
 
     public XmlDeclaration(final String version, final String encoding, final String standalone) {
         super();
-        Validate.notNull(version, "Version cannot be null");
+        if (version == null) {
+            throw new IllegalArgumentException("Version cannot be null");
+        }
         this.version = version;
         this.encoding = encoding;
         this.standalone = standalone;
@@ -65,7 +61,9 @@ public class XmlDeclaration
     }
     
     public void setVersion(final String version) {
-        Validate.notNull(version, "Version cannot be null");
+        if (version == null) {
+            throw new IllegalArgumentException("Version cannot be null");
+        }
         this.version = version;
     }
     

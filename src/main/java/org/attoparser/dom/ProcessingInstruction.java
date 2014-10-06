@@ -17,73 +17,67 @@
  * 
  * =============================================================================
  */
-package org.attoparser.dom.impl;
+package org.attoparser.dom;
 
 import java.io.Serializable;
 
-import org.attoparser.dom.IComment;
-import org.attoparser.dom.INestableNode;
-
-
-
 
 /**
- * <p>
- *   Default implementation of the {@link IComment} interface.
- * </p>
- * 
- * 
+ *
  * @author Daniel Fern&aacute;ndez
  * 
  * @since 1.1
  *
  */
-public class Comment 
-        extends AbstractNode 
-        implements IComment, Serializable {
+public class ProcessingInstruction 
+        extends AbstractNode
+        implements Serializable {
     
-    private static final long serialVersionUID = -5222507854714214977L;
+    private static final long serialVersionUID = 7832638382597687056L;
     
-    
+    private String target;
     private String content;
 
 
-    public Comment(final String content) {
+    public ProcessingInstruction(final String target, final String content) {
         super();
-        Validate.notNull(content, "Content cannot be null");
+        if (target == null) {
+            throw new IllegalArgumentException("Target cannot be null");
+        }
+        this.target = target;
         this.content = content;
     }
 
     
     
+    public String getTarget() {
+        return this.target;
+    }
+    
+    public void setTarget(final String target) {
+        if (target == null) {
+            throw new IllegalArgumentException("Target cannot be null");
+        }
+        this.target = target;
+    }
+
     
     public String getContent() {
         return this.content;
     }
     
-
     public void setContent(final String content) {
-        Validate.notNull(content, "Content cannot be null");
         this.content = content;
     }
 
-    
-    public void setContent(final char[] buffer, final int offset, final int len) {
-        this.content = new String(buffer, offset, len);
+
+    public ProcessingInstruction cloneNode(final INestableNode parent) {
+        final ProcessingInstruction processingInstruction = new ProcessingInstruction(this.target, this.content);
+        processingInstruction.setLine(getLine());
+        processingInstruction.setCol(getCol());
+        processingInstruction.setParent(parent);
+        return processingInstruction;
     }
-
     
-    
-    public Comment cloneNode(final INestableNode parent) {
-        final Comment comment = new Comment(this.content);
-        comment.setLine(getLine());
-        comment.setCol(getCol());
-        comment.setParent(parent);
-        return comment;
-    }
-
-    
-
-
     
 }
