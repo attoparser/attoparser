@@ -19,21 +19,19 @@
  */
 package org.attoparser;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 
-/**
+/*
+ * Constant-repository static class containing all the standard HTML element and attribute names, which allows easy
+ * building and maintenance of repository structures for use in HTML-based scenarios in other parts of the library.
  * 
- * @author Daniel Fern&aacute;ndez
- * 
+ * @author Daniel Fernandez
  * @since 2.0.0
- *
  */
 final class HtmlNames {
 
@@ -86,16 +84,6 @@ final class HtmlNames {
                         "tabindex", "title", "translate", "type", "usemap", "valign", "value", "valuetype",
                         "width", "xml:lang", "xml:space", "xmlns"
                 })));
-
-
-        /*
-         * Initialize the repository
-         */
-
-        final List<String> names = new ArrayList<String>();
-        names.addAll(ALL_STANDARD_ELEMENT_NAMES);
-        names.addAll(ALL_STANDARD_ATTRIBUTE_NAMES);
-        Collections.sort(names);
 
     }
 

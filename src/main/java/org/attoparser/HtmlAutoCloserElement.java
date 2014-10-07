@@ -20,12 +20,14 @@
 package org.attoparser;
 
 
-/**
+/*
+ * Implementation of IHtmlElement for HTML elements that might require some open
+ * elements to be closed before they are opened, as per the HTML specification.
+ * For example, an opening <li> will force the auto-close of a previous <li> if
+ * they are siblings.
  * 
- * @author Daniel Fern&aacute;ndez
- * 
- * @since 1.1
- *
+ * @author Daniel Fernandez
+ * @since 2.0.0
  */
 final class HtmlAutoCloserElement extends HtmlBasicElement {
 
@@ -34,7 +36,7 @@ final class HtmlAutoCloserElement extends HtmlBasicElement {
     private final char[][] autoCloseLimits;
 
 
-    public HtmlAutoCloserElement(final String name, final String[] autoCloseElements, final String[] autoCloseLimits) {
+    HtmlAutoCloserElement(final String name, final String[] autoCloseElements, final String[] autoCloseLimits) {
 
         super(name);
 

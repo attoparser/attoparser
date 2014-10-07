@@ -31,12 +31,17 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
-/**
- * 
- * @author Daniel Fern&aacute;ndez
- * 
- * @since 1.1
+/*
+ * Repository class for all the standard HTML elements, modeled as objects implementing
+ * the IHtmlElement by means of one of its concrete implementations.
  *
+ * By using one specific implementation for each element, that HTML element is given
+ * some behaviour. E.g., <script> tags should consider their body as CDATA and
+ * not PCDATA (i.e. their body should not be parsed), and that's why the SCRIPT
+ * constant object is an implementation of HtmlCDATAContentElement.
+ * 
+ * @author Daniel Fernandez
+ * @since 2.0.0
  */
 final class HtmlElements {
 
@@ -212,7 +217,9 @@ final class HtmlElements {
     }
 
 
-
+    /*
+     * Note this will always be case-insensitive, because we are dealing with HTML.
+     */
     static IHtmlElement forName(final char[] elementNameBuffer, final int offset, final int len) {
         if (elementNameBuffer == null) {
             throw new IllegalArgumentException("Buffer cannot be null");
@@ -232,12 +239,10 @@ final class HtmlElements {
     
 
     /*
-     * <p>
-     *     This class is <strong>thread-safe</strong>. The reason for this is that it not only contains the
-     *     standard elements, but will also contain new instances of IHtmlElement created during parsing (created
-     *     when asking the repository for them when they do not exist yet. As any thread can create a new element,
-     *     this has to be lock-protected.
-     * </p>
+     * This repository class is thread-safe. The reason for this is that it not only contains the
+     * standard elements, but will also contain new instances of IHtmlElement created during parsing (created
+     * when asking the repository for them when they do not exist yet. As any thread can create a new element,
+     * this has to be lock-protected.
      */
     static final class HtmlElementRepository {
 
@@ -261,7 +266,7 @@ final class HtmlElements {
 
                 final int index = binarySearch(this.repository, text, offset, len);
 
-                if (index != -1) {
+                if (index >= 0) {
                     return this.repository.get(index);
                 }
 
@@ -286,7 +291,7 @@ final class HtmlElements {
         private IHtmlElement storeElement(final char[] text, final int offset, final int len) {
 
             final int index = binarySearch(this.repository, text, offset, len);
-            if (index != -1) {
+            if (index >= 0) {
                 // It was already added while we were waiting for the lock!
                 return this.repository.get(index);
             }

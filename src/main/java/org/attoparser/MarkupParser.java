@@ -51,7 +51,7 @@ import org.attoparser.config.ParseConfiguration;
  * 
  * @author Daniel Fern&aacute;ndez
  * 
- * @since 1.0
+ * @since 2.0.0
  *
  */
 public final class MarkupParser implements IMarkupParser {

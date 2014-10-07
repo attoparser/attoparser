@@ -20,12 +20,14 @@
 package org.attoparser;
 
 
-/**
- * 
- * @author Daniel Fern&aacute;ndez
- * 
- * @since 1.1
+/*
+ * Common interface for all different implementations of the logic inherent to each HTML element.
  *
+ * Instances of this interface are called from the HtmlMarkupHandler in order to perform the
+ * element-specific operations required to correctly handle their events.
+ *
+ * @author Daniel Fernandez
+ * @since 2.0.0
  */
 interface IHtmlElement {
     

@@ -20,12 +20,11 @@
 package org.attoparser;
 
 
-/**
+/*
+ * Base abstract class for all implementations of IHtmlElement.
  * 
- * @author Daniel Fern&aacute;ndez
- * 
- * @since 1.1
- *
+ * @author Daniel Fernandez
+ * @since 2.0.0
  */
 abstract class HtmlAbstractElement implements IHtmlElement {
 
@@ -33,9 +32,6 @@ abstract class HtmlAbstractElement implements IHtmlElement {
     private final String name;
 
 
-
-    
-    
     
     protected HtmlAbstractElement(final String name) {
         

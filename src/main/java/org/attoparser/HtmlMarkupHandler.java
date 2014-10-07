@@ -20,12 +20,15 @@
 package org.attoparser;
 
 
-/**
+/*
+ * Special implementation of the IMarkupHandler interface which implements the logic required to parse HTML
+ * markup. It acts as a bridge and ends up delegating most of its events to another IMarkupHandler instance,
+ * but resolving first the HTML elements that are being referenced in parsing events and allowing these elements
+ * to introduce their inner logic in the parsing process; like e.g. letting VOID elements declare they are
+ * 'standalone' elements even if they are specified as 'open' ones in markup code.
  * 
- * @author Daniel Fern&aacute;ndez
- * 
- * @since 1.1
- *
+ * @author Daniel Fernandez
+ * @since 2.0.0
  */
 final class HtmlMarkupHandler extends AbstractMarkupHandler {
 

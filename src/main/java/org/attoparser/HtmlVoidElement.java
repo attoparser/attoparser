@@ -20,11 +20,18 @@
 package org.attoparser;
 
 
-/**
- * 
- * @author Daniel Fern&aacute;ndez
- * 
- * @since 1.1
+/*
+ * Implementation of IHtmlElement for void HTML elements. Void elements are those
+ * that should never have a body, and which can be specified in markup code both
+ * as minimized standalone tags (<meta/>) or as open tags (<meta>) which are not really
+ * open tags, but non-minimized standalone ones.
+ *
+ * These elements will redirect their 'open element' events to 'standalone element' events,
+ * and also will consider any 'close element' events as UNMATCHED, because these elements
+ * should never appear in closing form.
+ *
+ * @author Daniel Fernandez
+ * @since 2.0.0
  *
  */
 class HtmlVoidElement extends HtmlBasicElement {

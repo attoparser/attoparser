@@ -26,7 +26,7 @@ import java.util.Arrays;
  * 
  * @author Daniel Fern&aacute;ndez
  * 
- * @since 1.2
+ * @since 2.0.0
  *
  */
 public abstract class MarkupTraceEvent {

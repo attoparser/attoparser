@@ -39,7 +39,7 @@ import java.io.Serializable;
  * 
  * @author Daniel Fern&aacute;ndez
  * 
- * @since 1.1
+ * @since 2.0.0
  *
  */
 public final class ParseConfiguration implements Serializable, Cloneable {
@@ -470,7 +470,7 @@ public final class ParseConfiguration implements Serializable, Cloneable {
      * 
      * @author Daniel Fern&aacute;ndez
      *  
-     * @since 1.1
+     * @since 2.0.0
      */
     public static class PrologParseConfiguration implements Serializable, Cloneable {
         

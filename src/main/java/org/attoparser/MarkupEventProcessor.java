@@ -27,12 +27,19 @@ import java.util.List;
 import org.attoparser.config.ParseConfiguration;
 
 
-/**
+/*
+ * Objects of this class are the first ones to receive events from the parser, and they are in charge of transmitting
+ * these events to the markup handlers.
  *
- * @author Daniel Fern&aacute;ndez
- * 
+ * This MarkupEventProcessor implements logic that allows the application of several features and restrictions in
+ * XML and (especially) HTML markup. For this, it builds an element stack during parsing, which it uses to reference
+ * events to their specific position in the original document.
+ *
+ * Note that, although MarkupParser's are stateless, objects of this class are STATEFUL just like markup handlers can
+ * potentially be, and therefore a new MarkupEventProcessor object will be built for each parsing operation.
+ *
+ * @author Daniel Fernandez
  * @since 2.0.0
- *
  */
 final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkupEventAttributeSequenceProcessor {
 
@@ -854,7 +861,6 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
             growStack();
         }
 
-
         this.elementStack[this.elementStackSize] =
                 this.structureNamesRepository.getStructureName(buffer, offset, len);
 
@@ -898,8 +904,10 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
 
 
     /*
-     *     This class is <strong>NOT thread-safe</strong>. Should only be used inside a specific handler
-     *     instance/thread and only during a single execution.
+     * In-instance repository for structure names (element + attribute names).
+     *
+     * This class is NOT thread-safe. Should only be used inside a specific handler
+     * instance/thread and only during a single execution.
      */
     static final class StructureNamesRepository {
 
@@ -907,7 +915,7 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
 
 
         StructureNamesRepository() {
-            this.repository = new ArrayList<char[]>(5);
+            this.repository = new ArrayList<char[]>(50);
         }
 
 
@@ -915,10 +923,9 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
 
             final int index = binarySearch(this.repository, text, offset, len);
 
-            if (index != -1) {
+            if (index >= 0) {
                 return this.repository.get(index);
             }
-
 
             /*
              * NOT FOUND. We need to store the text
@@ -931,7 +938,7 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
         private char[] storeStructureName(final char[] text, final int offset, final int len) {
 
             final int index = binarySearch(this.repository, text, offset, len);
-            if (index != -1) {
+            if (index >= 0) {
                 // It was already added while we were waiting for the lock!
                 return this.repository.get(index);
             }
@@ -1035,7 +1042,7 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
 
             final int index = binarySearch(REPOSITORY, text, offset, len);
 
-            if (index == -1) {
+            if (index < 0) {
                 final char[] structureName = new char[len];
                 System.arraycopy(text, offset, structureName, 0, len);
                 return structureName;

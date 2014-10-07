@@ -20,12 +20,16 @@
 package org.attoparser;
 
 
-/**
- * 
- * @author Daniel Fern&aacute;ndez
- * 
- * @since 1.1
+/*
+ * Implementation of IHtmlElement for HTML elements which body should not
+ * be considered 'parseable', and therefore should be treated as CDATA
+ * (instead of PCDATA). For example, <script> or <style> elements.
  *
+ * These elements will disable parsing at the ParseStatus objects, until
+ * their closing correspondent is found.
+ * 
+ * @author Daniel Fernandez
+ * @since 2.0.0
  */
 final class HtmlCDATAContentElement extends HtmlBasicElement {
 

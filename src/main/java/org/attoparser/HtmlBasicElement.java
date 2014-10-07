@@ -20,12 +20,13 @@
 package org.attoparser;
 
 
-/**
+/*
+ * Basic implementation of IHtmlElement. Instances of this
+ * class will simply forward events to the passed handler, which is the
+ * desirable behaviour for most HTML elements.
  * 
- * @author Daniel Fern&aacute;ndez
- * 
- * @since 1.1
- *
+ * @author Daniel Fernandez
+ * @since 2.0.0
  */
 class HtmlBasicElement extends HtmlAbstractElement {
 

@@ -20,11 +20,14 @@
 package org.attoparser;
 
 
-/**
+/*
+ * Implementation of IHtmlElement for void HTML elements which also require some open
+ * elements to be closed before they appear, as per the HTML specification.
+ * For example, an <hr> element will force the auto-close of a previous <p> if
+ * they are siblings.
  * 
- * @author Daniel Fern&aacute;ndez
- * 
- * @since 1.1
+ * @author Daniel Fernandez
+ * @since 2.0.0
  *
  */
 final class HtmlVoidAutoCloserElement extends HtmlVoidElement {
