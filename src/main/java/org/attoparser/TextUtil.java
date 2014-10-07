@@ -20,6 +20,8 @@
 package org.attoparser;
 
 
+import java.util.List;
+
 /**
  * <p>
  *   Utility class for <kbd>char[]</kbd> operations (mainly matching/comparing)
@@ -1120,6 +1122,7 @@ final class TextUtil {
 
 
 
+
     public static int compareTo(
             final boolean caseSensitive,
             final String text1, final int text1Offset, final int text1Len,
@@ -1166,6 +1169,288 @@ final class TextUtil {
         return text1Len - text2Len;
 
     }
+
+
+
+
+
+
+
+
+
+    public static int binarySearchCharArray(
+            final boolean caseSensitive, final List<char[]> values, final char[] text, final int offset, final int len) {
+
+        int low = 0;
+        int high = values.size() - 1;
+
+        int mid, cmp;
+        char[] midVal;
+
+        while (low <= high) {
+
+            mid = (low + high) >>> 1;
+            midVal = values.get(mid);
+
+            cmp = TextUtil.compareTo(caseSensitive, midVal, 0, midVal.length, text, offset, len);
+
+            if (cmp < 0) {
+                low = mid + 1;
+            } else if (cmp > 0) {
+                high = mid - 1;
+            } else {
+                // Found!!
+                return mid;
+            }
+
+        }
+
+        return -(low + 1);  // Not Found!! We return (-(insertion point) - 1), to guarantee all non-founds are < 0
+
+    }
+
+
+
+
+    public static int binarySearchCharArray(
+            final boolean caseSensitive, final List<char[]> values, final String text, final int offset, final int len) {
+
+        int low = 0;
+        int high = values.size() - 1;
+
+        int mid, cmp;
+        char[] midVal;
+
+        while (low <= high) {
+
+            mid = (low + high) >>> 1;
+            midVal = values.get(mid);
+
+            cmp = TextUtil.compareTo(caseSensitive, text, offset, len, midVal, 0, midVal.length);
+
+            if (cmp > 0) {
+                low = mid + 1;
+            } else if (cmp < 0) {
+                high = mid - 1;
+            } else {
+                // Found!!
+                return mid;
+            }
+
+        }
+
+        return -(low + 1);  // Not Found!! We return (-(insertion point) - 1), to guarantee all non-founds are < 0
+
+    }
+
+
+
+
+    public static int binarySearchString(
+            final boolean caseSensitive, final List<String> values, final char[] text, final int offset, final int len) {
+
+        int low = 0;
+        int high = values.size() - 1;
+
+        int mid, cmp;
+        String midVal;
+
+        while (low <= high) {
+
+            mid = (low + high) >>> 1;
+            midVal = values.get(mid);
+
+            cmp = TextUtil.compareTo(caseSensitive, midVal, 0, midVal.length(), text, offset, len);
+
+            if (cmp < 0) {
+                low = mid + 1;
+            } else if (cmp > 0) {
+                high = mid - 1;
+            } else {
+                // Found!!
+                return mid;
+            }
+
+        }
+
+        return -(low + 1);  // Not Found!! We return (-(insertion point) - 1), to guarantee all non-founds are < 0
+
+    }
+
+
+
+
+    public static int binarySearchString(
+            final boolean caseSensitive, final List<String> values, final String text, final int offset, final int len) {
+
+        int low = 0;
+        int high = values.size() - 1;
+
+        int mid, cmp;
+        String midVal;
+
+        while (low <= high) {
+
+            mid = (low + high) >>> 1;
+            midVal = values.get(mid);
+
+            cmp = TextUtil.compareTo(caseSensitive, text, offset, len, midVal, 0, midVal.length());
+
+            if (cmp > 0) {
+                low = mid + 1;
+            } else if (cmp < 0) {
+                high = mid - 1;
+            } else {
+                // Found!!
+                return mid;
+            }
+
+        }
+
+        return -(low + 1);  // Not Found!! We return (-(insertion point) - 1), to guarantee all non-founds are < 0
+
+    }
+
+
+
+
+    public static int binarySearchCharArray(
+            final boolean caseSensitive, final char[][] values, final char[] text, final int offset, final int len) {
+
+        int low = 0;
+        int high = values.length - 1;
+
+        int mid, cmp;
+        char[] midVal;
+
+        while (low <= high) {
+
+            mid = (low + high) >>> 1;
+            midVal = values[mid];
+
+            cmp = TextUtil.compareTo(caseSensitive, midVal, 0, midVal.length, text, offset, len);
+
+            if (cmp < 0) {
+                low = mid + 1;
+            } else if (cmp > 0) {
+                high = mid - 1;
+            } else {
+                // Found!!
+                return mid;
+            }
+
+        }
+
+        return -(low + 1);  // Not Found!! We return (-(insertion point) - 1), to guarantee all non-founds are < 0
+
+    }
+
+
+
+
+    public static int binarySearchCharArray(
+            final boolean caseSensitive, final char[][] values, final String text, final int offset, final int len) {
+
+        int low = 0;
+        int high = values.length - 1;
+
+        int mid, cmp;
+        char[] midVal;
+
+        while (low <= high) {
+
+            mid = (low + high) >>> 1;
+            midVal = values[mid];
+
+            cmp = TextUtil.compareTo(caseSensitive, text, offset, len, midVal, 0, midVal.length);
+
+            if (cmp > 0) {
+                low = mid + 1;
+            } else if (cmp < 0) {
+                high = mid - 1;
+            } else {
+                // Found!!
+                return mid;
+            }
+
+        }
+
+        return -(low + 1);  // Not Found!! We return (-(insertion point) - 1), to guarantee all non-founds are < 0
+
+    }
+
+
+
+
+    public static int binarySearchString(
+            final boolean caseSensitive, final String[] values, final char[] text, final int offset, final int len) {
+
+        int low = 0;
+        int high = values.length - 1;
+
+        int mid, cmp;
+        String midVal;
+
+        while (low <= high) {
+
+            mid = (low + high) >>> 1;
+            midVal = values[mid];
+
+            cmp = TextUtil.compareTo(caseSensitive, midVal, 0, midVal.length(), text, offset, len);
+
+            if (cmp < 0) {
+                low = mid + 1;
+            } else if (cmp > 0) {
+                high = mid - 1;
+            } else {
+                // Found!!
+                return mid;
+            }
+
+        }
+
+        return -(low + 1);  // Not Found!! We return (-(insertion point) - 1), to guarantee all non-founds are < 0
+
+    }
+
+
+
+
+    public static int binarySearchString(
+            final boolean caseSensitive, final String[] values, final String text, final int offset, final int len) {
+
+        int low = 0;
+        int high = values.length - 1;
+
+        int mid, cmp;
+        String midVal;
+
+        while (low <= high) {
+
+            mid = (low + high) >>> 1;
+            midVal = values[mid];
+
+            cmp = TextUtil.compareTo(caseSensitive, text, offset, len, midVal, 0, midVal.length());
+
+            if (cmp > 0) {
+                low = mid + 1;
+            } else if (cmp < 0) {
+                high = mid - 1;
+            } else {
+                // Found!!
+                return mid;
+            }
+
+        }
+
+        return -(low + 1);  // Not Found!! We return (-(insertion point) - 1), to guarantee all non-founds are < 0
+
+    }
+
+
+
+
+
 
 
 

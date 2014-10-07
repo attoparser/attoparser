@@ -914,13 +914,14 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
 
 
         StructureNamesRepository() {
+            super();
             this.repository = new ArrayList<char[]>(50);
         }
 
 
         char[] getStructureName(final char[] text, final int offset, final int len) {
 
-            final int index = binarySearch(this.repository, text, offset, len);
+            final int index = TextUtil.binarySearchCharArray(true, this.repository, text, offset, len);
 
             if (index >= 0) {
                 return this.repository.get(index);
@@ -929,18 +930,12 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
             /*
              * NOT FOUND. We need to store the text
              */
-            return storeStructureName(text, offset, len);
+            return storeStructureName(index, text, offset, len);
 
         }
 
 
-        private char[] storeStructureName(final char[] text, final int offset, final int len) {
-
-            final int index = binarySearch(this.repository, text, offset, len);
-            if (index >= 0) {
-                // It was already added while we were waiting for the lock!
-                return this.repository.get(index);
-            }
+        private char[] storeStructureName(final int index, final char[] text, final int offset, final int len) {
 
             // We rely on the static structure name cache, just in case it is a standard HTML structure name.
             // Note the StandardNamesRepository will create the new char[] if not found, so no need to null-check.
@@ -950,38 +945,6 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
             this.repository.add(((index + 1) * -1), structureName);
 
             return structureName;
-
-        }
-
-
-        private static int binarySearch(final List<char[]> values,
-                                        final char[] text, final int offset, final int len) {
-
-            int low = 0;
-            int high = values.size() - 1;
-
-            int mid, cmp;
-            char[] midVal;
-
-            while (low <= high) {
-
-                mid = (low + high) >>> 1;
-                midVal = values.get(mid);
-
-                cmp = TextUtil.compareTo(true, midVal, 0, midVal.length, text, offset, len);
-
-                if (cmp < 0) {
-                    low = mid + 1;
-                } else if (cmp > 0) {
-                    high = mid - 1;
-                } else {
-                    // Found!!
-                    return mid;
-                }
-
-            }
-
-            return -(low + 1);  // Not Found!! We return (-(insertion point) - 1), to guarantee all non-founds are < 0
 
         }
 
@@ -1002,7 +965,7 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
 
         static {
 
-            final List<String> names = new ArrayList<String>();
+            final List<String> names = new ArrayList<String>(150);
             // Add all the standard HTML element (tag) names
             names.addAll(HtmlNames.ALL_STANDARD_ELEMENT_NAMES);
             // We know all standard element names are lowercase, so let's cache them uppercase too
@@ -1029,7 +992,7 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
 
         static char[] getStructureName(final char[] text, final int offset, final int len) {
 
-            final int index = binarySearch(REPOSITORY, text, offset, len);
+            final int index = TextUtil.binarySearchCharArray(true, REPOSITORY, text, offset, len);
 
             if (index < 0) {
                 final char[] structureName = new char[len];
@@ -1042,35 +1005,8 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
         }
 
 
-        static int binarySearch(final char[][] values,
-                                final char[] text, final int offset, final int len) {
-
-            int low = 0;
-            int high = values.length - 1;
-
-            int mid, cmp;
-            char[] midVal;
-
-            while (low <= high) {
-
-                mid = (low + high) >>> 1;
-                midVal = values[mid];
-
-                cmp = TextUtil.compareTo(true, midVal, 0, midVal.length, text, offset, len);
-
-                if (cmp < 0) {
-                    low = mid + 1;
-                } else if (cmp > 0) {
-                    high = mid - 1;
-                } else {
-                    // Found!!
-                    return mid;
-                }
-
-            }
-
-            return -(low + 1);  // Not Found!! We return (-(insertion point) - 1), to guarantee all non-founds are < 0
-
+        private StandardNamesRepository() {
+            super();
         }
 
     }
