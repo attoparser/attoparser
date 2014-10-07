@@ -46,8 +46,8 @@ final class HtmlNames {
 
 
         final Set<String> allStandardElementNamesAux = new LinkedHashSet<String>(HtmlElements.ALL_STANDARD_ELEMENTS.size() + 3);
-        for (final IHtmlElement element : HtmlElements.ALL_STANDARD_ELEMENTS) {
-            allStandardElementNamesAux.add(element.getName());
+        for (final HtmlElement element : HtmlElements.ALL_STANDARD_ELEMENTS) {
+            allStandardElementNamesAux.add(new String(element.name));
         }
         ALL_STANDARD_ELEMENT_NAMES = Collections.unmodifiableSet(allStandardElementNamesAux);
 

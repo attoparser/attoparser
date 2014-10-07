@@ -29,7 +29,7 @@ package org.attoparser;
  * @author Daniel Fernandez
  * @since 2.0.0
  */
-final class HtmlAutoCloserElement extends HtmlBasicElement {
+final class HtmlAutoCloserElement extends HtmlElement {
 
 
     private final char[][] autoCloseRequired;

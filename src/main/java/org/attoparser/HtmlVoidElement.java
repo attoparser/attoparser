@@ -34,7 +34,7 @@ package org.attoparser;
  * @since 2.0.0
  *
  */
-class HtmlVoidElement extends HtmlBasicElement {
+class HtmlVoidElement extends HtmlElement {
 
     
     

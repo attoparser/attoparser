@@ -36,7 +36,7 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
     private final IMarkupHandler handler;
     private ParseStatus status = null; // Will be always set, but anyway we should initialize.
 
-    private IHtmlElement currentElement = null;
+    private HtmlElement currentElement = null;
 
 
 
@@ -199,7 +199,7 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
             throw new IllegalStateException("Cannot end element: no current element");
         }
 
-        final IHtmlElement element = this.currentElement;
+        final HtmlElement element = this.currentElement;
         this.currentElement = null;
 
         // Hoping for better days in which tail calls might be optimized ;)
@@ -233,7 +233,7 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
             throw new IllegalStateException("Cannot end element: no current element");
         }
 
-        final IHtmlElement element = this.currentElement;
+        final HtmlElement element = this.currentElement;
         this.currentElement = null;
 
         // Hoping for better days in which tail calls might be optimized ;)
@@ -267,7 +267,7 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
             throw new IllegalStateException("Cannot end element: no current element");
         }
 
-        final IHtmlElement element = this.currentElement;
+        final HtmlElement element = this.currentElement;
         this.currentElement = null;
 
         // Hoping for better days in which tail calls might be optimized ;)
@@ -301,7 +301,7 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
             throw new IllegalStateException("Cannot end element: no current element");
         }
 
-        final IHtmlElement element = this.currentElement;
+        final HtmlElement element = this.currentElement;
         this.currentElement = null;
 
         // Hoping for better days in which tail calls might be optimized ;)
@@ -335,7 +335,7 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
             throw new IllegalStateException("Cannot end element: no current element");
         }
 
-        final IHtmlElement element = this.currentElement;
+        final HtmlElement element = this.currentElement;
         this.currentElement = null;
 
         // Hoping for better days in which tail calls might be optimized ;)

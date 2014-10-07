@@ -28,14 +28,27 @@ package org.attoparser;
  * @author Daniel Fernandez
  * @since 2.0.0
  */
-class HtmlBasicElement extends HtmlAbstractElement {
+class HtmlElement {
 
+
+    final char[] name;
 
 
     
-    public HtmlBasicElement(final String name) {
-        super(name);
+    public HtmlElement(final String name) {
+
+        super();
+
+        if (name == null) {
+            throw new IllegalArgumentException("Name cannot be null");
+        }
+
+        this.name = name.toLowerCase().toCharArray();
+
     }
+
+
+
 
 
     public void handleStandaloneElementStart(
@@ -213,6 +226,17 @@ class HtmlBasicElement extends HtmlAbstractElement {
         handler.handleInnerWhiteSpace(buffer, offset, len, line, col);
         
     }
-    
-    
+
+
+
+    @Override
+    public String toString() {
+        final StringBuilder strBuilder = new StringBuilder();
+        strBuilder.append('<');
+        strBuilder.append(this.name);
+        strBuilder.append('>');
+        return strBuilder.toString();
+    }
+
+
 }

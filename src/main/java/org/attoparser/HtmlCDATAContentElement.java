@@ -31,7 +31,7 @@ package org.attoparser;
  * @author Daniel Fernandez
  * @since 2.0.0
  */
-final class HtmlCDATAContentElement extends HtmlBasicElement {
+final class HtmlCDATAContentElement extends HtmlElement {
 
 
     private final char[] nameLower;

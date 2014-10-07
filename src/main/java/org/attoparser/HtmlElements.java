@@ -33,7 +33,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /*
  * Repository class for all the standard HTML elements, modeled as objects implementing
- * the IHtmlElement by means of one of its concrete implementations.
+ * the HtmlElement by means of one of its concrete implementations.
  *
  * By using one specific implementation for each element, that HTML element is given
  * some behaviour. E.g., <script> tags should consider their body as CDATA and
@@ -49,151 +49,151 @@ final class HtmlElements {
 
 
     // Set containing all the standard elements, for posible external reference
-    static final Set<IHtmlElement> ALL_STANDARD_ELEMENTS;
+    static final Set<HtmlElement> ALL_STANDARD_ELEMENTS;
 
 
     // Root
-    static final IHtmlElement HTML = new HtmlBasicElement("html");
+    static final HtmlElement HTML = new HtmlElement("html");
     
     // Document metadata
-    static final IHtmlElement HEAD = new HtmlBasicElement("head");
-    static final IHtmlElement TITLE = new HtmlBasicElement("title");
-    static final IHtmlElement BASE = new HtmlVoidElement("base");
-    static final IHtmlElement LINK = new HtmlVoidElement("link");
-    static final IHtmlElement META = new HtmlVoidElement("meta");
-    static final IHtmlElement STYLE = new HtmlCDATAContentElement("style");
+    static final HtmlElement HEAD = new HtmlElement("head");
+    static final HtmlElement TITLE = new HtmlElement("title");
+    static final HtmlElement BASE = new HtmlVoidElement("base");
+    static final HtmlElement LINK = new HtmlVoidElement("link");
+    static final HtmlElement META = new HtmlVoidElement("meta");
+    static final HtmlElement STYLE = new HtmlCDATAContentElement("style");
     
     // Scripting
-    static final IHtmlElement SCRIPT = new HtmlCDATAContentElement("script");
-    static final IHtmlElement NOSCRIPT = new HtmlBasicElement("noscript");
+    static final HtmlElement SCRIPT = new HtmlCDATAContentElement("script");
+    static final HtmlElement NOSCRIPT = new HtmlElement("noscript");
     
     // Sections
-    static final IHtmlElement BODY = new HtmlBasicElement("body");
-    static final IHtmlElement ARTICLE = new HtmlAutoCloserElement("article", new String[] { "p" }, null);
-    static final IHtmlElement SECTION = new HtmlAutoCloserElement("section", new String[] { "p" }, null);
-    static final IHtmlElement NAV = new HtmlAutoCloserElement("nav", new String[] { "p" }, null);
-    static final IHtmlElement ASIDE = new HtmlAutoCloserElement("aside", new String[] { "p" }, null);
-    static final IHtmlElement H1 = new HtmlAutoCloserElement("h1", new String[] { "p" }, null);
-    static final IHtmlElement H2 = new HtmlAutoCloserElement("h2", new String[] { "p" }, null);
-    static final IHtmlElement H3 = new HtmlAutoCloserElement("h3", new String[] { "p" }, null);
-    static final IHtmlElement H4 = new HtmlAutoCloserElement("h4", new String[] { "p" }, null);
-    static final IHtmlElement H5 = new HtmlAutoCloserElement("h5", new String[] { "p" }, null);
-    static final IHtmlElement H6 = new HtmlAutoCloserElement("h6", new String[] { "p" }, null);
-    static final IHtmlElement HGROUP = new HtmlAutoCloserElement("hgroup", new String[] { "p" }, null);
-    static final IHtmlElement HEADER = new HtmlAutoCloserElement("header", new String[] { "p" }, null);
-    static final IHtmlElement FOOTER = new HtmlAutoCloserElement("footer", new String[] { "p" }, null);
-    static final IHtmlElement ADDRESS = new HtmlAutoCloserElement("address", new String[] { "p" }, null);
-    static final IHtmlElement MAIN = new HtmlAutoCloserElement("main", new String[] { "p" }, null);
+    static final HtmlElement BODY = new HtmlElement("body");
+    static final HtmlElement ARTICLE = new HtmlAutoCloserElement("article", new String[] { "p" }, null);
+    static final HtmlElement SECTION = new HtmlAutoCloserElement("section", new String[] { "p" }, null);
+    static final HtmlElement NAV = new HtmlAutoCloserElement("nav", new String[] { "p" }, null);
+    static final HtmlElement ASIDE = new HtmlAutoCloserElement("aside", new String[] { "p" }, null);
+    static final HtmlElement H1 = new HtmlAutoCloserElement("h1", new String[] { "p" }, null);
+    static final HtmlElement H2 = new HtmlAutoCloserElement("h2", new String[] { "p" }, null);
+    static final HtmlElement H3 = new HtmlAutoCloserElement("h3", new String[] { "p" }, null);
+    static final HtmlElement H4 = new HtmlAutoCloserElement("h4", new String[] { "p" }, null);
+    static final HtmlElement H5 = new HtmlAutoCloserElement("h5", new String[] { "p" }, null);
+    static final HtmlElement H6 = new HtmlAutoCloserElement("h6", new String[] { "p" }, null);
+    static final HtmlElement HGROUP = new HtmlAutoCloserElement("hgroup", new String[] { "p" }, null);
+    static final HtmlElement HEADER = new HtmlAutoCloserElement("header", new String[] { "p" }, null);
+    static final HtmlElement FOOTER = new HtmlAutoCloserElement("footer", new String[] { "p" }, null);
+    static final HtmlElement ADDRESS = new HtmlAutoCloserElement("address", new String[] { "p" }, null);
+    static final HtmlElement MAIN = new HtmlAutoCloserElement("main", new String[] { "p" }, null);
 
     // Grouping content
-    static final IHtmlElement P = new HtmlAutoCloserElement("p", new String[] { "p" }, null);
-    static final IHtmlElement HR = new HtmlVoidAutoCloserElement("hr", new String[] { "p" }, null);
-    static final IHtmlElement PRE = new HtmlAutoCloserElement("pre", new String[] { "p" }, null);
-    static final IHtmlElement BLOCKQUOTE = new HtmlAutoCloserElement("blockquote", new String[] { "p" }, null);
-    static final IHtmlElement OL = new HtmlAutoCloserElement("ol", new String[] { "p" }, null);
-    static final IHtmlElement UL = new HtmlAutoCloserElement("ul", new String[] { "p" }, null);
-    static final IHtmlElement LI = new HtmlAutoCloserElement("li", new String[] { "li" }, new String[] { "ul", "ol" });
-    static final IHtmlElement DL = new HtmlAutoCloserElement("dl", new String[] { "p" }, null);
-    static final IHtmlElement DT = new HtmlAutoCloserElement("dt", new String[] { "dt", "dd" }, new String[] { "dl" });
-    static final IHtmlElement DD = new HtmlAutoCloserElement("dd", new String[] { "dt", "dd" }, new String[] { "dl" });
-    static final IHtmlElement FIGURE = new HtmlBasicElement("figure");
-    static final IHtmlElement FIGCAPTION = new HtmlBasicElement("figcaption");
-    static final IHtmlElement DIV = new HtmlAutoCloserElement("div", new String[] { "p" }, null);
+    static final HtmlElement P = new HtmlAutoCloserElement("p", new String[] { "p" }, null);
+    static final HtmlElement HR = new HtmlVoidAutoCloserElement("hr", new String[] { "p" }, null);
+    static final HtmlElement PRE = new HtmlAutoCloserElement("pre", new String[] { "p" }, null);
+    static final HtmlElement BLOCKQUOTE = new HtmlAutoCloserElement("blockquote", new String[] { "p" }, null);
+    static final HtmlElement OL = new HtmlAutoCloserElement("ol", new String[] { "p" }, null);
+    static final HtmlElement UL = new HtmlAutoCloserElement("ul", new String[] { "p" }, null);
+    static final HtmlElement LI = new HtmlAutoCloserElement("li", new String[] { "li" }, new String[] { "ul", "ol" });
+    static final HtmlElement DL = new HtmlAutoCloserElement("dl", new String[] { "p" }, null);
+    static final HtmlElement DT = new HtmlAutoCloserElement("dt", new String[] { "dt", "dd" }, new String[] { "dl" });
+    static final HtmlElement DD = new HtmlAutoCloserElement("dd", new String[] { "dt", "dd" }, new String[] { "dl" });
+    static final HtmlElement FIGURE = new HtmlElement("figure");
+    static final HtmlElement FIGCAPTION = new HtmlElement("figcaption");
+    static final HtmlElement DIV = new HtmlAutoCloserElement("div", new String[] { "p" }, null);
     
     // Text-level semantics
-    static final IHtmlElement A = new HtmlBasicElement("a");
-    static final IHtmlElement EM = new HtmlBasicElement("em");
-    static final IHtmlElement STRONG = new HtmlBasicElement("strong");
-    static final IHtmlElement SMALL = new HtmlBasicElement("small");
-    static final IHtmlElement S = new HtmlBasicElement("s");
-    static final IHtmlElement CITE = new HtmlBasicElement("cite");
-    static final IHtmlElement G = new HtmlBasicElement("g");
-    static final IHtmlElement DFN = new HtmlBasicElement("dfn");
-    static final IHtmlElement ABBR = new HtmlBasicElement("abbr");
-    static final IHtmlElement TIME = new HtmlBasicElement("time");
-    static final IHtmlElement CODE = new HtmlBasicElement("code");
-    static final IHtmlElement VAR = new HtmlBasicElement("var");
-    static final IHtmlElement SAMP = new HtmlBasicElement("samp");
-    static final IHtmlElement KBD = new HtmlBasicElement("kbd");
-    static final IHtmlElement SUB = new HtmlBasicElement("sub");
-    static final IHtmlElement SUP = new HtmlBasicElement("sup");
-    static final IHtmlElement I = new HtmlBasicElement("i");
-    static final IHtmlElement B = new HtmlBasicElement("b");
-    static final IHtmlElement U = new HtmlBasicElement("u");
-    static final IHtmlElement MARK = new HtmlBasicElement("mark");
-    static final IHtmlElement RUBY = new HtmlBasicElement("ruby");
-    static final IHtmlElement RB = new HtmlAutoCloserElement("rb", new String[] { "rb", "rt", "rtc", "rp" }, new String[] { "ruby" });
-    static final IHtmlElement RT = new HtmlAutoCloserElement("rt", new String[] { "rb", "rt", "rp" }, new String[] { "ruby", "rtc" });
-    static final IHtmlElement RTC = new HtmlAutoCloserElement("rtc", new String[] { "rb", "rt", "rtc", "rp" }, new String[] { "ruby" });
-    static final IHtmlElement RP = new HtmlAutoCloserElement("rp", new String[] { "rb", "rt", "rp" }, new String[] { "ruby", "rtc" });
-    static final IHtmlElement BDI = new HtmlBasicElement("bdi");
-    static final IHtmlElement BDO = new HtmlBasicElement("bdo");
-    static final IHtmlElement SPAN = new HtmlBasicElement("span");
-    static final IHtmlElement BR = new HtmlVoidElement("br");
-    static final IHtmlElement WBR = new HtmlVoidElement("wbr");
+    static final HtmlElement A = new HtmlElement("a");
+    static final HtmlElement EM = new HtmlElement("em");
+    static final HtmlElement STRONG = new HtmlElement("strong");
+    static final HtmlElement SMALL = new HtmlElement("small");
+    static final HtmlElement S = new HtmlElement("s");
+    static final HtmlElement CITE = new HtmlElement("cite");
+    static final HtmlElement G = new HtmlElement("g");
+    static final HtmlElement DFN = new HtmlElement("dfn");
+    static final HtmlElement ABBR = new HtmlElement("abbr");
+    static final HtmlElement TIME = new HtmlElement("time");
+    static final HtmlElement CODE = new HtmlElement("code");
+    static final HtmlElement VAR = new HtmlElement("var");
+    static final HtmlElement SAMP = new HtmlElement("samp");
+    static final HtmlElement KBD = new HtmlElement("kbd");
+    static final HtmlElement SUB = new HtmlElement("sub");
+    static final HtmlElement SUP = new HtmlElement("sup");
+    static final HtmlElement I = new HtmlElement("i");
+    static final HtmlElement B = new HtmlElement("b");
+    static final HtmlElement U = new HtmlElement("u");
+    static final HtmlElement MARK = new HtmlElement("mark");
+    static final HtmlElement RUBY = new HtmlElement("ruby");
+    static final HtmlElement RB = new HtmlAutoCloserElement("rb", new String[] { "rb", "rt", "rtc", "rp" }, new String[] { "ruby" });
+    static final HtmlElement RT = new HtmlAutoCloserElement("rt", new String[] { "rb", "rt", "rp" }, new String[] { "ruby", "rtc" });
+    static final HtmlElement RTC = new HtmlAutoCloserElement("rtc", new String[] { "rb", "rt", "rtc", "rp" }, new String[] { "ruby" });
+    static final HtmlElement RP = new HtmlAutoCloserElement("rp", new String[] { "rb", "rt", "rp" }, new String[] { "ruby", "rtc" });
+    static final HtmlElement BDI = new HtmlElement("bdi");
+    static final HtmlElement BDO = new HtmlElement("bdo");
+    static final HtmlElement SPAN = new HtmlElement("span");
+    static final HtmlElement BR = new HtmlVoidElement("br");
+    static final HtmlElement WBR = new HtmlVoidElement("wbr");
 
     // Edits
-    static final IHtmlElement INS = new HtmlBasicElement("ins");
-    static final IHtmlElement DEL = new HtmlBasicElement("del");
+    static final HtmlElement INS = new HtmlElement("ins");
+    static final HtmlElement DEL = new HtmlElement("del");
     
     // Embedded content
-    static final IHtmlElement IMG = new HtmlVoidElement("img");
-    static final IHtmlElement IFRAME = new HtmlBasicElement("iframe");
-    static final IHtmlElement EMBED = new HtmlVoidElement("embed");
-    static final IHtmlElement OBJECT = new HtmlBasicElement("object");
-    static final IHtmlElement PARAM = new HtmlVoidElement("param");
-    static final IHtmlElement VIDEO = new HtmlBasicElement("video");
-    static final IHtmlElement AUDIO = new HtmlBasicElement("audio");
-    static final IHtmlElement SOURCE = new HtmlVoidElement("source");
-    static final IHtmlElement TRACK = new HtmlVoidElement("track");
-    static final IHtmlElement CANVAS = new HtmlBasicElement("canvas");
-    static final IHtmlElement MAP = new HtmlBasicElement("map");
-    static final IHtmlElement AREA = new HtmlVoidElement("area");
+    static final HtmlElement IMG = new HtmlVoidElement("img");
+    static final HtmlElement IFRAME = new HtmlElement("iframe");
+    static final HtmlElement EMBED = new HtmlVoidElement("embed");
+    static final HtmlElement OBJECT = new HtmlElement("object");
+    static final HtmlElement PARAM = new HtmlVoidElement("param");
+    static final HtmlElement VIDEO = new HtmlElement("video");
+    static final HtmlElement AUDIO = new HtmlElement("audio");
+    static final HtmlElement SOURCE = new HtmlVoidElement("source");
+    static final HtmlElement TRACK = new HtmlVoidElement("track");
+    static final HtmlElement CANVAS = new HtmlElement("canvas");
+    static final HtmlElement MAP = new HtmlElement("map");
+    static final HtmlElement AREA = new HtmlVoidElement("area");
     
     // Tabular data
-    static final IHtmlElement TABLE = new HtmlAutoCloserElement("table", new String[] { "p" }, null);
-    static final IHtmlElement CAPTION = new HtmlAutoCloserElement("caption", new String[] { "tr", "td", "thead", "tfoot", "tbody", "caption", "colgroup" }, new String[] { "table" });
-    static final IHtmlElement COLGROUP = new HtmlAutoCloserElement("colgroup", new String[] { "tr", "td", "thead", "tfoot", "tbody", "caption", "colgroup" }, new String[] { "table" });
-    static final IHtmlElement COL = new HtmlVoidElement("col");
-    static final IHtmlElement TBODY = new HtmlAutoCloserElement("tbody", new String[] { "tr", "td", "thead", "tfoot", "tbody", "caption", "colgroup" }, new String[] { "table" });
-    static final IHtmlElement THEAD = new HtmlAutoCloserElement("thead", new String[] { "tr", "td", "thead", "tfoot", "tbody", "caption", "colgroup" }, new String[] { "table" });
-    static final IHtmlElement TFOOT = new HtmlAutoCloserElement("tfoot", new String[] { "tr", "td", "thead", "tfoot", "tbody", "caption", "colgroup" }, new String[] { "table" });
-    static final IHtmlElement TR = new HtmlAutoCloserElement("tr", new String[] { "tr", "caption", "colgroup" }, new String[] { "table", "thead", "tbody", "tfoot" });
-    static final IHtmlElement TD = new HtmlAutoCloserElement("td", new String[] { "td", "th" }, new String[] { "tr" });
-    static final IHtmlElement TH = new HtmlAutoCloserElement("th", new String[] { "td", "th" }, new String[] { "tr" });
+    static final HtmlElement TABLE = new HtmlAutoCloserElement("table", new String[] { "p" }, null);
+    static final HtmlElement CAPTION = new HtmlAutoCloserElement("caption", new String[] { "tr", "td", "thead", "tfoot", "tbody", "caption", "colgroup" }, new String[] { "table" });
+    static final HtmlElement COLGROUP = new HtmlAutoCloserElement("colgroup", new String[] { "tr", "td", "thead", "tfoot", "tbody", "caption", "colgroup" }, new String[] { "table" });
+    static final HtmlElement COL = new HtmlVoidElement("col");
+    static final HtmlElement TBODY = new HtmlAutoCloserElement("tbody", new String[] { "tr", "td", "thead", "tfoot", "tbody", "caption", "colgroup" }, new String[] { "table" });
+    static final HtmlElement THEAD = new HtmlAutoCloserElement("thead", new String[] { "tr", "td", "thead", "tfoot", "tbody", "caption", "colgroup" }, new String[] { "table" });
+    static final HtmlElement TFOOT = new HtmlAutoCloserElement("tfoot", new String[] { "tr", "td", "thead", "tfoot", "tbody", "caption", "colgroup" }, new String[] { "table" });
+    static final HtmlElement TR = new HtmlAutoCloserElement("tr", new String[] { "tr", "caption", "colgroup" }, new String[] { "table", "thead", "tbody", "tfoot" });
+    static final HtmlElement TD = new HtmlAutoCloserElement("td", new String[] { "td", "th" }, new String[] { "tr" });
+    static final HtmlElement TH = new HtmlAutoCloserElement("th", new String[] { "td", "th" }, new String[] { "tr" });
     
     // Forms
-    static final IHtmlElement FORM = new HtmlAutoCloserElement("form", new String[] { "p" }, null);
-    static final IHtmlElement FIELDSET = new HtmlAutoCloserElement("fieldset", new String[] { "p" }, null);
-    static final IHtmlElement LEGEND = new HtmlBasicElement("legend");
-    static final IHtmlElement LABEL = new HtmlBasicElement("label");
-    static final IHtmlElement INPUT = new HtmlVoidElement("input");
-    static final IHtmlElement BUTTON = new HtmlBasicElement("button");
-    static final IHtmlElement SELECT = new HtmlBasicElement("select");
-    static final IHtmlElement DATALIST = new HtmlBasicElement("datalist");
-    static final IHtmlElement OPTGROUP = new HtmlAutoCloserElement("optgroup", new String[] { "optgroup", "option" }, new String[] { "select" });
-    static final IHtmlElement OPTION = new HtmlAutoCloserElement("option", new String[] { "option" }, new String[] { "select", "optgroup", "datalist" });
-    static final IHtmlElement TEXTAREA = new HtmlBasicElement("textarea");
-    static final IHtmlElement KEYGEN = new HtmlVoidElement("keygen");
-    static final IHtmlElement OUTPUT = new HtmlBasicElement("output");
-    static final IHtmlElement PROGRESS = new HtmlBasicElement("progress");
-    static final IHtmlElement METER = new HtmlBasicElement("meter");
+    static final HtmlElement FORM = new HtmlAutoCloserElement("form", new String[] { "p" }, null);
+    static final HtmlElement FIELDSET = new HtmlAutoCloserElement("fieldset", new String[] { "p" }, null);
+    static final HtmlElement LEGEND = new HtmlElement("legend");
+    static final HtmlElement LABEL = new HtmlElement("label");
+    static final HtmlElement INPUT = new HtmlVoidElement("input");
+    static final HtmlElement BUTTON = new HtmlElement("button");
+    static final HtmlElement SELECT = new HtmlElement("select");
+    static final HtmlElement DATALIST = new HtmlElement("datalist");
+    static final HtmlElement OPTGROUP = new HtmlAutoCloserElement("optgroup", new String[] { "optgroup", "option" }, new String[] { "select" });
+    static final HtmlElement OPTION = new HtmlAutoCloserElement("option", new String[] { "option" }, new String[] { "select", "optgroup", "datalist" });
+    static final HtmlElement TEXTAREA = new HtmlElement("textarea");
+    static final HtmlElement KEYGEN = new HtmlVoidElement("keygen");
+    static final HtmlElement OUTPUT = new HtmlElement("output");
+    static final HtmlElement PROGRESS = new HtmlElement("progress");
+    static final HtmlElement METER = new HtmlElement("meter");
     
     // Interactive elements
-    static final IHtmlElement DETAILS = new HtmlBasicElement("details");
-    static final IHtmlElement SUMMARY = new HtmlBasicElement("summary");
-    static final IHtmlElement COMMAND = new HtmlBasicElement("command");
-    static final IHtmlElement MENU = new HtmlAutoCloserElement("menu", new String[] { "p" }, null);
-    static final IHtmlElement MENUITEM = new HtmlVoidElement("menuitem");
-    static final IHtmlElement DIALOG = new HtmlBasicElement("dialog");
+    static final HtmlElement DETAILS = new HtmlElement("details");
+    static final HtmlElement SUMMARY = new HtmlElement("summary");
+    static final HtmlElement COMMAND = new HtmlElement("command");
+    static final HtmlElement MENU = new HtmlAutoCloserElement("menu", new String[] { "p" }, null);
+    static final HtmlElement MENUITEM = new HtmlVoidElement("menuitem");
+    static final HtmlElement DIALOG = new HtmlElement("dialog");
     
     
 
     static {
 
         ALL_STANDARD_ELEMENTS =
-                Collections.unmodifiableSet(new LinkedHashSet<IHtmlElement>(Arrays.asList(
-                        new IHtmlElement[] {
+                Collections.unmodifiableSet(new LinkedHashSet<HtmlElement>(Arrays.asList(
+                        new HtmlElement[] {
                                 HTML, HEAD, TITLE, BASE, LINK, META, STYLE, SCRIPT, NOSCRIPT, BODY, ARTICLE,
                                 SECTION, NAV, ASIDE, H1, H2, H3, H4, H5, H6, HGROUP, HEADER, FOOTER,
                                 ADDRESS, P, HR, PRE, BLOCKQUOTE, OL, UL, LI, DL, DT, DD, FIGURE,
@@ -209,7 +209,7 @@ final class HtmlElements {
         /*
          * Register the standard elements at the element repository, in order to initialize it
          */
-        for (final IHtmlElement element : ALL_STANDARD_ELEMENTS) {
+        for (final HtmlElement element : ALL_STANDARD_ELEMENTS) {
             ELEMENTS.storeElement(element);
         }
 
@@ -220,7 +220,7 @@ final class HtmlElements {
     /*
      * Note this will always be case-insensitive, because we are dealing with HTML.
      */
-    static IHtmlElement forName(final char[] elementNameBuffer, final int offset, final int len) {
+    static HtmlElement forName(final char[] elementNameBuffer, final int offset, final int len) {
         if (elementNameBuffer == null) {
             throw new IllegalArgumentException("Buffer cannot be null");
         }
@@ -240,13 +240,13 @@ final class HtmlElements {
 
     /*
      * This repository class is thread-safe. The reason for this is that it not only contains the
-     * standard elements, but will also contain new instances of IHtmlElement created during parsing (created
+     * standard elements, but will also contain new instances of HtmlElement created during parsing (created
      * when asking the repository for them when they do not exist yet. As any thread can create a new element,
      * this has to be lock-protected.
      */
     static final class HtmlElementRepository {
 
-        private final List<IHtmlElement> repository;
+        private final List<HtmlElement> repository;
 
         private final ReadWriteLock lock = new ReentrantReadWriteLock(true);
         private final Lock readLock = this.lock.readLock();
@@ -254,12 +254,12 @@ final class HtmlElements {
 
 
         HtmlElementRepository() {
-            this.repository = new ArrayList<IHtmlElement>(40);
+            this.repository = new ArrayList<HtmlElement>(150);
         }
 
 
 
-        IHtmlElement getElement(final char[] text, final int offset, final int len) {
+        HtmlElement getElement(final char[] text, final int offset, final int len) {
 
             this.readLock.lock();
             try {
@@ -288,7 +288,7 @@ final class HtmlElements {
         }
 
 
-        private IHtmlElement storeElement(final char[] text, final int offset, final int len) {
+        private HtmlElement storeElement(final char[] text, final int offset, final int len) {
 
             final int index = binarySearch(this.repository, text, offset, len);
             if (index >= 0) {
@@ -296,7 +296,7 @@ final class HtmlElements {
                 return this.repository.get(index);
             }
 
-            final IHtmlElement element = new HtmlBasicElement(new String(text, offset, len).toLowerCase());
+            final HtmlElement element = new HtmlElement(new String(text, offset, len).toLowerCase());
 
             // binary Search returned (-(insertion point) - 1)
             this.repository.add(((index + 1) * -1), element);
@@ -306,7 +306,7 @@ final class HtmlElements {
         }
 
 
-        private IHtmlElement storeElement(final IHtmlElement element) {
+        private HtmlElement storeElement(final HtmlElement element) {
 
             // This method will only be called from within the HtmlElements class itself, during initialization of
             // standard elements.
@@ -320,21 +320,21 @@ final class HtmlElements {
 
 
 
-        private static int binarySearch(final List<IHtmlElement> values,
+        private static int binarySearch(final List<HtmlElement> values,
                                         final char[] text, final int offset, final int len) {
 
             int low = 0;
             int high = values.size() - 1;
 
             int mid, cmp;
-            String midVal;
+            char[] midVal;
 
             while (low <= high) {
 
                 mid = (low + high) >>> 1;
-                midVal = values.get(mid).getName();
+                midVal = values.get(mid).name;
 
-                cmp = TextUtil.compareTo(false, midVal, 0, midVal.length(), text, offset, len);
+                cmp = TextUtil.compareTo(false, midVal, 0, midVal.length, text, offset, len);
 
                 if (cmp < 0) {
                     low = mid + 1;
@@ -352,12 +352,12 @@ final class HtmlElements {
         }
 
 
-        private static class ElementComparator implements Comparator<IHtmlElement> {
+        private static class ElementComparator implements Comparator<HtmlElement> {
 
             private static ElementComparator INSTANCE = new ElementComparator();
 
-            public int compare(final IHtmlElement o1, final IHtmlElement o2) {
-                return TextUtil.compareTo(false, o1.getName(), o2.getName());
+            public int compare(final HtmlElement o1, final HtmlElement o2) {
+                return TextUtil.compareTo(false, o1.name, o2.name);
             }
         }
 

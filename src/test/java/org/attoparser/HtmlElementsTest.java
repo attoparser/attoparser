@@ -20,9 +20,7 @@
 package org.attoparser;
 
 import junit.framework.TestCase;
-import org.attoparser.HtmlElements;
-import org.attoparser.HtmlNames;
-import org.attoparser.IHtmlElement;
+import org.attoparser.HtmlElement;
 
 
 /**
@@ -38,38 +36,38 @@ public class HtmlElementsTest extends TestCase {
     public void test() throws Exception {
 
         {
-            final IHtmlElement element1 = HtmlElements.forName("something".toCharArray(), 0, "something".length());
-            final IHtmlElement element2 = HtmlElements.forName("Something".toCharArray(), 0, "Something".length());
+            final HtmlElement element1 = HtmlElements.forName("something".toCharArray(), 0, "something".length());
+            final HtmlElement element2 = HtmlElements.forName("Something".toCharArray(), 0, "Something".length());
             assertSame(element1, element2);
         }
 
         {
 
-            final IHtmlElement element1 = HtmlElements.forName("something2".toCharArray(), 0, "something2".length());
-            final IHtmlElement element2 = HtmlElements.forName("Something2".toCharArray(), 0, "Something2".length());
+            final HtmlElement element1 = HtmlElements.forName("something2".toCharArray(), 0, "something2".length());
+            final HtmlElement element2 = HtmlElements.forName("Something2".toCharArray(), 0, "Something2".length());
             assertSame(element1, element2);
         }
 
         {
-            final IHtmlElement element1 = HtmlElements.forName("somethiNG".toCharArray(), 0, "something".length());
-            final IHtmlElement element2 = HtmlElements.forName("something".toCharArray(), 0, "something".length());
-            final IHtmlElement element3 = HtmlElements.forName("Something".toCharArray(), 0, "Something".length());
+            final HtmlElement element1 = HtmlElements.forName("somethiNG".toCharArray(), 0, "something".length());
+            final HtmlElement element2 = HtmlElements.forName("something".toCharArray(), 0, "something".length());
+            final HtmlElement element3 = HtmlElements.forName("Something".toCharArray(), 0, "Something".length());
             assertSame(element1, element2);
             assertSame(element2, element3);
         }
 
         {
 
-            final IHtmlElement element1 = HtmlElements.forName("somethiNG2".toCharArray(), 0, "somethiNG2".length());
-            final IHtmlElement element2 = HtmlElements.forName("something2".toCharArray(), 0, "Something2".length());
-            final IHtmlElement element3 = HtmlElements.forName("Something2".toCharArray(), 0, "Something2".length());
+            final HtmlElement element1 = HtmlElements.forName("somethiNG2".toCharArray(), 0, "somethiNG2".length());
+            final HtmlElement element2 = HtmlElements.forName("something2".toCharArray(), 0, "Something2".length());
+            final HtmlElement element3 = HtmlElements.forName("Something2".toCharArray(), 0, "Something2".length());
             assertSame(element1, element2);
             assertSame(element2, element3);
         }
 
         for (final String elementName : HtmlNames.ALL_STANDARD_ELEMENT_NAMES) {
-            final IHtmlElement element1 = HtmlElements.forName(elementName.toCharArray(), 0, elementName.length());
-            final IHtmlElement element2 = HtmlElements.forName(elementName.toUpperCase().toCharArray(), 0, elementName.toUpperCase().length());
+            final HtmlElement element1 = HtmlElements.forName(elementName.toCharArray(), 0, elementName.length());
+            final HtmlElement element2 = HtmlElements.forName(elementName.toUpperCase().toCharArray(), 0, elementName.toUpperCase().length());
             assertSame(element1, element2);
         }
 
