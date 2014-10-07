@@ -20,17 +20,13 @@
 package org.attoparser.dom;
 
 
-/**
- * <p>
- *   Base abstract class for all nodes in a attoDOM tree.
- * </p>
- * 
- * @author Daniel Fern&aacute;ndez
- * 
- * @since 1.0
+/*
+ * Base abstract class for all nodes in a DOM tree.
  *
+ * @author Daniel Fernandez
+ * @since 2.0.0
  */
-public abstract class AbstractNode implements INode {
+abstract class AbstractNode implements INode {
     
     
     private Integer line = null;

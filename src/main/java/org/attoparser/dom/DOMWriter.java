@@ -26,16 +26,16 @@ import java.util.Map;
 
 /**
  * <p>
- *   Specialization of {@link XmlDOMWriter} for writing attoDOM trees
+ *   Specialization of {@link DOMWriter} for writing attoDOM trees
  *   as XML markup. 
  * </p>
  * 
  * @author Daniel Fern&aacute;ndez
  * 
- * @since 1.1
+ * @since 2.0.0
  *
  */
-public final class XmlDOMWriter extends AbstractDOMWriter {
+public final class DOMWriter {
 
     
     
@@ -45,15 +45,56 @@ public final class XmlDOMWriter extends AbstractDOMWriter {
      *   Create a new instance of this DOM writer.
      * </p>
      */
-    public XmlDOMWriter() {
+    public DOMWriter() {
         super();
     }
+
+
+
+    public void write(final INode node, final Writer writer) throws IOException {
+
+        if (node == null) {
+            return;
+        }
+
+        if (node instanceof Text) {
+            writeText((Text)node, writer);
+            return;
+        }
+        if (node instanceof Element) {
+            writeElement((Element)node, writer);
+            return;
+        }
+        if (node instanceof Comment) {
+            writeComment((Comment)node, writer);
+            return;
+        }
+        if (node instanceof CDATASection) {
+            writeCDATASection((CDATASection)node, writer);
+            return;
+        }
+        if (node instanceof DocType) {
+            writeDocType((DocType)node, writer);
+            return;
+        }
+        if (node instanceof Document) {
+            writeDocument((Document)node, writer);
+            return;
+        }
+        if (node instanceof XmlDeclaration) {
+            writeXmlDeclaration((XmlDeclaration)node, writer);
+            return;
+        }
+        if (node instanceof ProcessingInstruction) {
+            writeProcessingInstruction((ProcessingInstruction)node, writer);
+            return;
+        }
+
+    }
+
     
     
-    
-    
-    @Override
-    public void writeCDATASection(final ICDATASection cdataSection, final Writer writer)
+    public void writeCDATASection(final CDATASection cdataSection, final Writer writer)
             throws IOException{
         
         writer.write("<![CDATA[");
@@ -64,8 +105,7 @@ public final class XmlDOMWriter extends AbstractDOMWriter {
 
     
 
-    @Override
-    public void writeComment(final IComment comment, final Writer writer) throws IOException {
+    public void writeComment(final Comment comment, final Writer writer) throws IOException {
         
         writer.write("<!--");
         writer.write(comment.getContent());
@@ -75,8 +115,7 @@ public final class XmlDOMWriter extends AbstractDOMWriter {
 
     
 
-    @Override
-    public void writeDocType(final IDocType docType, final Writer writer) throws IOException {
+    public void writeDocType(final DocType docType, final Writer writer) throws IOException {
         
         writer.write("<!DOCTYPE ");
         writer.write(docType.getRootElementName());
@@ -121,8 +160,7 @@ public final class XmlDOMWriter extends AbstractDOMWriter {
 
     
 
-    @Override
-    public void writeDocument(final IDocument document, final Writer writer) throws IOException {
+    public void writeDocument(final Document document, final Writer writer) throws IOException {
 
         if (!document.hasChildren()) {
             return;
@@ -136,8 +174,7 @@ public final class XmlDOMWriter extends AbstractDOMWriter {
 
 
     
-    @Override
-    public void writeElement(final IElement element, final Writer writer) throws IOException {
+    public void writeElement(final Element element, final Writer writer) throws IOException {
         
         writer.write('<');
         writer.write(element.getElementName());
@@ -175,9 +212,8 @@ public final class XmlDOMWriter extends AbstractDOMWriter {
     }
 
 
-    @Override
     public void writeProcessingInstruction(
-            final IProcessingInstruction processingInstruction, final Writer writer)
+            final ProcessingInstruction processingInstruction, final Writer writer)
             throws IOException {
         
         writer.write('<');
@@ -197,8 +233,7 @@ public final class XmlDOMWriter extends AbstractDOMWriter {
 
     
 
-    @Override
-    public void writeText(final IText text, final Writer writer) throws IOException {
+    public void writeText(final Text text, final Writer writer) throws IOException {
 
         validateNotNull(text, "Text node cannot be null");
         validateNotNull(writer, "Writer cannot be null");
@@ -209,8 +244,7 @@ public final class XmlDOMWriter extends AbstractDOMWriter {
 
 
     
-    @Override
-    public void writeXmlDeclaration(final IXmlDeclaration xmlDeclaration, final Writer writer) throws IOException {
+    public void writeXmlDeclaration(final XmlDeclaration xmlDeclaration, final Writer writer) throws IOException {
 
         validateNotNull(xmlDeclaration, "XML declaration cannot be null");
         validateNotNull(writer, "Writer cannot be null");

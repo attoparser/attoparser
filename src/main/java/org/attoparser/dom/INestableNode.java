@@ -31,7 +31,7 @@ import java.util.List;
  * 
  * @author Daniel Fern&aacute;ndez
  * 
- * @since 1.1
+ * @since 2.0.0
  *
  */
 public interface INestableNode extends INode {

@@ -25,17 +25,13 @@ import java.util.Iterator;
 import java.util.List;
 
 
-/**
- * <p>
- *   Abstract base class for all implementation of {@link INestableNode}.
- * </p>
- * 
- * @author Daniel Fern&aacute;ndez
- * 
- * @since 1.1
+/*
+ * Abstract base class for all implementations of INestableNode.
  *
+ * @author Daniel Fernandez
+ * @since 2.0.0
  */
-public abstract class AbstractNestableNode 
+abstract class AbstractNestableNode
         extends AbstractNode
         implements INestableNode {
 

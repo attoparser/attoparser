@@ -23,19 +23,16 @@ import java.io.Serializable;
 
 
 /**
- * <p>
- *   Default implementation of the {@link IComment} interface.
- * </p>
- * 
+ *
  * 
  * @author Daniel Fern&aacute;ndez
  * 
- * @since 1.1
+ * @since 2.0.0
  *
  */
 public class Comment 
         extends AbstractNode 
-        implements IComment, Serializable {
+        implements Serializable {
     
     private static final long serialVersionUID = -5222507854714214977L;
     
@@ -45,7 +42,9 @@ public class Comment
 
     public Comment(final String content) {
         super();
-        Validate.notNull(content, "Content cannot be null");
+        if (content == null) {
+            throw new IllegalArgumentException("Content cannot be null");
+        }
         this.content = content;
     }
 
@@ -58,7 +57,9 @@ public class Comment
     
 
     public void setContent(final String content) {
-        Validate.notNull(content, "Content cannot be null");
+        if (content == null) {
+            throw new IllegalArgumentException("Content cannot be null");
+        }
         this.content = content;
     }
 

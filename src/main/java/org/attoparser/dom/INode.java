@@ -29,7 +29,7 @@ package org.attoparser.dom;
  * 
  * @author Daniel Fern&aacute;ndez
  * 
- * @since 1.1
+ * @since 2.0.0
  *
  */
 public interface INode {
