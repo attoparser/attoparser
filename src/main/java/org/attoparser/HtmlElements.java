@@ -298,8 +298,8 @@ final class HtmlElements {
 
             final IHtmlElement element = new HtmlBasicElement(new String(text, offset, len).toLowerCase());
 
-            this.repository.add(element);
-            Collections.sort(this.repository, ElementComparator.INSTANCE);
+            // binary Search returned (-(insertion point) - 1)
+            this.repository.add(((index + 1) * -1), element);
 
             return element;
 
@@ -347,7 +347,7 @@ final class HtmlElements {
 
             }
 
-            return -1;  // Not Found!!
+            return -(low + 1);  // Not Found!! We return (-(insertion point) - 1), to guarantee all non-founds are < 0
 
         }
 

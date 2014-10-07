@@ -21,7 +21,6 @@ package org.attoparser;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.attoparser.config.ParseConfiguration;
@@ -947,8 +946,8 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
             // Note the StandardNamesRepository will create the new char[] if not found, so no need to null-check.
             final char[] structureName = StandardNamesRepository.getStructureName(text, offset, len);
 
-            this.repository.add(structureName);
-            Collections.sort(this.repository, CharArrayComparator.INSTANCE);
+            // binary Search returned (-(insertion point) - 1)
+            this.repository.add(((index + 1) * -1), structureName);
 
             return structureName;
 
@@ -982,18 +981,8 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
 
             }
 
-            return -1;  // Not Found!!
+            return -(low + 1);  // Not Found!! We return (-(insertion point) - 1), to guarantee all non-founds are < 0
 
-        }
-
-
-        private static class CharArrayComparator implements Comparator<char[]> {
-
-            private static CharArrayComparator INSTANCE = new CharArrayComparator();
-
-            public int compare(final char[] o1, final char[] o2) {
-                return TextUtil.compareTo(true, o1, o2);
-            }
         }
 
     }
@@ -1080,7 +1069,7 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
 
             }
 
-            return -1;  // Not Found!!
+            return -(low + 1);  // Not Found!! We return (-(insertion point) - 1), to guarantee all non-founds are < 0
 
         }
 
