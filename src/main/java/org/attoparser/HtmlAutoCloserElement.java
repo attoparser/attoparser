@@ -21,7 +21,7 @@ package org.attoparser;
 
 
 /*
- * Implementation of IHtmlElement for HTML elements that might require some open
+ * Specialization of HtmlElement for HTML elements that might require some open
  * elements to be closed before they are opened, as per the HTML specification.
  * For example, an opening <li> will force the auto-close of a previous <li> if
  * they are siblings.

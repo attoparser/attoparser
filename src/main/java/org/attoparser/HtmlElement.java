@@ -21,7 +21,7 @@ package org.attoparser;
 
 
 /*
- * Basic implementation of IHtmlElement. Instances of this
+ * Basic implementation of an HTML Element. Instances of this
  * class will simply forward events to the passed handler, which is the
  * desirable behaviour for most HTML elements.
  * 

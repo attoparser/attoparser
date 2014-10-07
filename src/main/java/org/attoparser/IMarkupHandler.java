@@ -20,6 +20,22 @@
 package org.attoparser;
 
 /**
+ * <p>
+ *   Interface to be implemented by all Markup Handlers.
+ * </p>
+ * <p>
+ *   Markup handlers are the objects that receive the events produced during parsing and perform the operations
+ *   the users need. This interface is the basic point of extension of AttoParser.
+ * </p>
+ * <p>
+ *   Markup handlers can be <strong>stateful</strong>, and in such case a new instance of the markup handler
+ *   class should be created for each parsing operation. In such case, it is not required that this implementations
+ *   are <em>thread-safe</em>.
+ * </p>
+ * <p>
+ *   There is an abstract, basic, no-op implementation of this interface called
+ *   {@link org.attoparser.AbstractMarkupHandler}.
+ * </p>
  *
  * @author Daniel Fern&aacute;ndez
  *

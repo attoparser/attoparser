@@ -21,7 +21,7 @@ package org.attoparser;
 
 
 /*
- * Implementation of IHtmlElement for void HTML elements. Void elements are those
+ * Specialization of HtmlElement for void HTML elements. Void elements are those
  * that should never have a body, and which can be specified in markup code both
  * as minimized standalone tags (<meta/>) or as open tags (<meta>) which are not really
  * open tags, but non-minimized standalone ones.

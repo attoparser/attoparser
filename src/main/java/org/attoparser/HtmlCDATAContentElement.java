@@ -21,7 +21,7 @@ package org.attoparser;
 
 
 /*
- * Implementation of IHtmlElement for HTML elements which body should not
+ * Specialization of HtmlElement for HTML elements which body should not
  * be considered 'parseable', and therefore should be treated as CDATA
  * (instead of PCDATA). For example, <script> or <style> elements.
  *
