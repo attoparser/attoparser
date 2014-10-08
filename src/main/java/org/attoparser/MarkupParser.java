@@ -19,7 +19,6 @@
  */
 package org.attoparser;
 
-import java.io.CharArrayReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Arrays;
@@ -149,13 +148,19 @@ public final class MarkupParser implements IMarkupParser {
 
     public void parse(final String document, final IMarkupHandler handler)
             throws ParseException {
+        if (document == null) {
+            throw new IllegalArgumentException("Document cannot be null");
+        }
         parse(new StringReader(document), handler);
     }
 
 
     public void parse(final char[] document, final IMarkupHandler handler)
             throws ParseException {
-        parse(new CharArrayReader(document), handler);
+        if (document == null) {
+            throw new IllegalArgumentException("Document cannot be null");
+        }
+        parse(document, 0, document.length, handler);
     }
 
 
@@ -163,15 +168,36 @@ public final class MarkupParser implements IMarkupParser {
             final char[] document, final int offset, final int len, final IMarkupHandler handler)
             throws ParseException {
 
+        if (document == null) {
+            throw new IllegalArgumentException("Document cannot be null");
+        }
         if (offset < 0 || len < 0) {
             throw new IllegalArgumentException(
                     "Neither document offset (" + offset + ") nor document length (" +
                             len + ") can be less than zero");
         }
 
-        parse(new CharArrayReader(document, offset, len), handler);
+        if (handler == null) {
+            throw new IllegalArgumentException("Handler cannot be null");
+        }
+
+        final IMarkupHandler markupHandler =
+                (ParseConfiguration.ParsingMode.HTML.equals(this.configuration.getMode()) ?
+                        new HtmlMarkupHandler(handler) : handler);
+
+        final ParseStatus status = new ParseStatus();
+        markupHandler.setParserStatus(status);
+
+        // We will not report directly to the handler, but instead to an intermediate class that will be in
+        // charge of applying the required markup logic and rules, according to the specified configuration
+        final MarkupEventProcessor eventProcessor =
+                new MarkupEventProcessor(markupHandler, status, this.configuration);
+
+        // We already have a suitable char[] buffer, so there is no need to use one from the pool.
+        parseDocument(document, offset, len, eventProcessor, status);
 
     }
+
 
 
     public void parse(
@@ -198,7 +224,9 @@ public final class MarkupParser implements IMarkupParser {
         final MarkupEventProcessor eventProcessor =
                 new MarkupEventProcessor(markupHandler, status, this.configuration);
 
-        parseDocument(reader, eventProcessor, this.pool.defaultBufferSize, status);
+        // We don't already have a suitable char[] buffer, so we specify null for it and expect the parser
+        // to use one of its pooled buffers.
+        parseDocument(reader, this.pool.poolBufferSize, eventProcessor, status);
 
     }
 
@@ -211,8 +239,8 @@ public final class MarkupParser implements IMarkupParser {
      * testing different buffer sizes.
      */
     void parseDocument(
-            final Reader reader, final MarkupEventProcessor eventProcessor, final int initialBufferSize,
-            final ParseStatus status)
+            final Reader reader, final int suggestedBufferSize,
+            final MarkupEventProcessor eventProcessor, final ParseStatus status)
             throws ParseException {
 
 
@@ -224,10 +252,11 @@ public final class MarkupParser implements IMarkupParser {
 
             eventProcessor.processDocumentStart(parsingStartTimeNanos, 1, 1);
 
-            int bufferSize = initialBufferSize;
+            int bufferSize = suggestedBufferSize;
             buffer = this.pool.allocateBuffer(bufferSize);
 
             int bufferContentSize = reader.read(buffer);
+
             boolean cont = (bufferContentSize != -1);
 
             status.offset = -1;
@@ -295,6 +324,8 @@ public final class MarkupParser implements IMarkupParser {
 
             }
 
+            // Iteration done, now it's time to clean up in case we still have some text to be notified
+
             int lastLine = status.line;
             int lastCol = status.col;
 
@@ -339,6 +370,84 @@ public final class MarkupParser implements IMarkupParser {
             } catch (final Throwable ignored) {
                 // This exception can be safely ignored
             }
+        }
+
+    }
+
+
+
+
+
+
+
+
+
+    /*
+     * This method is roughly equivalent to the one receiving a Reader, but oriented to parsing an already-existing
+     * buffer without the need to allocate one from the pool.
+     */
+    void parseDocument(
+            final char[] buffer, final int offset, final int len,
+            final MarkupEventProcessor eventProcessor, final ParseStatus status)
+            throws ParseException {
+
+
+        final long parsingStartTimeNanos = System.nanoTime();
+
+        try {
+
+            eventProcessor.processDocumentStart(parsingStartTimeNanos, 1, 1);
+
+            status.offset = -1;
+            status.line = 1;
+            status.col = 1;
+            status.inStructure = false;
+            status.parsingDisabled = true;
+            status.parsingDisabledLimitSequence = null;
+            status.autoCloseRequired = null;
+            status.autoCloseLimits = null;
+
+            parseBuffer(buffer, offset, len, eventProcessor, status);
+
+            // First parse done, now it's time to clean up in case we still have some text to be notified
+
+            int lastLine = status.line;
+            int lastCol = status.col;
+
+            final int lastStart = status.offset;
+            final int lastLen = (offset + len) - lastStart;
+
+            if (lastLen > 0) {
+
+                if (status.inStructure) {
+                    throw new ParseException(
+                            "Incomplete structure: \"" + new String(buffer, lastStart, lastLen) + "\"", status.line, status.col);
+                }
+
+                eventProcessor.processText(buffer, lastStart, lastLen, status.line, status.col);
+
+                // As we have produced an additional text event, we need to fast-forward the
+                // lastLine and lastCol position to include the last text structure.
+                for (int i = lastStart; i < (lastStart + lastLen); i++) {
+                    final char c = buffer[i];
+                    if (c == '\n') {
+                        lastLine++;
+                        lastCol = 1;
+                    } else {
+                        lastCol++;
+                    }
+
+                }
+
+            }
+
+            final long parsingEndTimeNanos = System.nanoTime();
+            eventProcessor.processDocumentEnd(parsingEndTimeNanos, (parsingEndTimeNanos - parsingStartTimeNanos), lastLine, lastCol);
+
+        } catch (final ParseException e) {
+            throw e;
+        } catch (final Exception e) {
+            throw new ParseException(e);
         }
 
     }
@@ -744,26 +853,27 @@ public final class MarkupParser implements IMarkupParser {
 
         private final char[][] pool;
         private final boolean[] allocated;
-        private final int defaultBufferSize;
+        private final int poolBufferSize;
 
-        private BufferPool(final int poolSize, final int defaultBufferSize) {
+        private BufferPool(final int poolSize, final int poolBufferSize) {
 
             super();
 
             this.pool = new char[poolSize][];
             this.allocated = new boolean[poolSize];
-            this.defaultBufferSize = defaultBufferSize;
+            this.poolBufferSize = poolBufferSize;
 
             for (int i = 0; i < this.pool.length; i++) {
-                this.pool[i] = new char[this.defaultBufferSize];
+                this.pool[i] = new char[this.poolBufferSize];
             }
             Arrays.fill(this.allocated, false);
 
         }
 
         private synchronized char[] allocateBuffer(final int bufferSize) {
-            if (bufferSize != this.defaultBufferSize) {
-                // We will only allocate buffers of the default size
+            if (bufferSize != this.poolBufferSize) {
+                // We will only pool buffers of the default size. If a different size is required, we just
+                // create it without pooling.
                 return new char[bufferSize];
             }
             for (int i = 0; i < this.pool.length; i++) {
@@ -779,8 +889,8 @@ public final class MarkupParser implements IMarkupParser {
             if (buffer == null) {
                 return;
             }
-            if (buffer.length != this.defaultBufferSize) {
-                // This buffer is not part of the pool
+            if (buffer.length != this.poolBufferSize) {
+                // This buffer cannot be part of the pool - only buffers with a specific size are contained
                 return;
             }
             for (int i = 0; i < this.pool.length; i++) {
