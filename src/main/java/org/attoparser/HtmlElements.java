@@ -210,7 +210,7 @@ final class HtmlElements {
          * Register the standard elements at the element repository, in order to initialize it
          */
         for (final HtmlElement element : ALL_STANDARD_ELEMENTS) {
-            ELEMENTS.storeElement(element);
+            ELEMENTS.storeStandardElement(element);
         }
 
 
@@ -246,7 +246,8 @@ final class HtmlElements {
      */
     static final class HtmlElementRepository {
 
-        private final List<HtmlElement> repository;
+        private final List<HtmlElement> standardRepository; // read-only, no sync needed
+        private final List<HtmlElement> repository;  // read-write, sync will be needed
 
         private final ReadWriteLock lock = new ReentrantReadWriteLock(true);
         private final Lock readLock = this.lock.readLock();
@@ -254,6 +255,7 @@ final class HtmlElements {
 
 
         HtmlElementRepository() {
+            this.standardRepository = new ArrayList<HtmlElement>(150);
             this.repository = new ArrayList<HtmlElement>(150);
         }
 
@@ -261,10 +263,25 @@ final class HtmlElements {
 
         HtmlElement getElement(final char[] text, final int offset, final int len) {
 
+            /*
+             * We first try to find it in the repository containing the standard elements, which does not need
+             * any synchronization.
+             */
+            int index = binarySearch(this.standardRepository, text, offset, len);
+
+            if (index >= 0) {
+                return this.standardRepository.get(index);
+            }
+
+            /*
+             * We did not find it in the repository of standard elements, so let's try in the read+write one,
+             * which does require synchronization through a readwrite lock.
+             */
+
             this.readLock.lock();
             try {
 
-                final int index = binarySearch(this.repository, text, offset, len);
+                index = binarySearch(this.repository, text, offset, len);
 
                 if (index >= 0) {
                     return this.repository.get(index);
@@ -306,12 +323,14 @@ final class HtmlElements {
         }
 
 
-        private HtmlElement storeElement(final HtmlElement element) {
+        private HtmlElement storeStandardElement(final HtmlElement element) {
 
             // This method will only be called from within the HtmlElements class itself, during initialization of
             // standard elements.
 
+            this.standardRepository.add(element);
             this.repository.add(element);
+            Collections.sort(this.standardRepository,ElementComparator.INSTANCE);
             Collections.sort(this.repository,ElementComparator.INSTANCE);
 
             return element;
