@@ -22,15 +22,11 @@ package org.attoparser;
 
 
 
-/**
- * <p>
- *   Class containing utility methods for general markup parsing.
- * </p>
- * 
- * @author Daniel Fern&aacute;ndez
- * 
- * @since 2.0.0
+/*
+ * Class containing utility methods for general markup parsing.
  *
+ * @author Daniel Fernandez
+ * @since 2.0.0
  */
 final class ParsingMarkupUtil {
 

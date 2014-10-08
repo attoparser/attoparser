@@ -22,6 +22,9 @@ package org.attoparser;
 
 
 /**
+ * <p>
+ *   General exception for parsing errors, thrown primarily by event handlers.
+ * </p>
  * 
  * @author Daniel Fern&aacute;ndez
  * 

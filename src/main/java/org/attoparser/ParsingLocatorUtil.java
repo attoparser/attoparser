@@ -21,12 +21,11 @@ package org.attoparser;
 
 
 
-/**
+/*
+ * Class containing utility methods for counting lines and columns during parsing.
  * 
- * @author Daniel Fern&aacute;ndez
- * 
+ * @author Daniel Fernandez
  * @since 2.0.0
- *
  */
 final class ParsingLocatorUtil {
 

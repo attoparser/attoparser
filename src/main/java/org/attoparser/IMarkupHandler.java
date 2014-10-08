@@ -25,17 +25,55 @@ package org.attoparser;
  * </p>
  * <p>
  *   Markup handlers are the objects that receive the events produced during parsing and perform the operations
- *   the users need. This interface is the basic point of extension of AttoParser.
+ *   the users need. <strong>This interface is the basic point of extension in AttoParser</strong>.
  * </p>
  * <p>
- *   Markup handlers can be <strong>stateful</strong>, and in such case a new instance of the markup handler
- *   class should be created for each parsing operation. In such case, it is not required that this implementations
+ *   Markup handlers can be <strong>stateful</strong>, which means that a new instance of the markup handler
+ *   class should be created for each parsing operation. In such case, it is not required that these implementations
  *   are <em>thread-safe</em>.
  * </p>
  * <p>
  *   There is an abstract, basic, no-op implementation of this interface called
- *   {@link org.attoparser.AbstractMarkupHandler}.
+ *   {@link org.attoparser.AbstractMarkupHandler} which can be used for easily creating new handlers by overriding
+ *   only the relevant event handling methods.
  * </p>
+ * <p>
+ *   Note also there is a <strong>simplified</strong> version of this interface that reduces the number of events
+ *   and also simplifies the operations on textual buffers, called {@link org.attoparser.simple.ISimpleMarkupHandler},
+ *   which can be easily used with the convenience ad-hoc parser class
+ *   {@link org.attoparser.simple.SimpleMarkupParser}.
+ * </p>
+ * <p>
+ *   AttoParser provides several useful implementations of this interface out-of-the-box, like:
+ * </p>
+ * <ul>
+ *   <li>Conversion to other formats:
+ *     <ul>
+ *       <li>{@link org.attoparser.dom.DOMBuilderMarkupHandler}: for building a DOM tree as a result of parsing
+ *           a document. This DOM tree will be created using the classes at the <tt>org.attoparser.dom</tt> package.
+ *           This handler can be more easily applied by using the convenience ad-hoc parser
+ *           class {@link org.attoparser.dom.DOMMarkupParser}.
+ *       <li>{@link org.attoparser.simple.SimplifierMarkupHandler}: for transforming the produced markup
+ *           parsing events into a much simpler format, removing much of the complexity of these parsing events
+ *           and allowing users to create their handlers by means of the
+ *           {@link org.attoparser.simple.ISimpleMarkupHandler} interface. Note this handler can be more easily
+ *           applied by using the convenience ad-hob parser class {@link org.attoparser.simple.SimpleMarkupParser}.
+ *     </ul>
+ *   </li>
+ *   <li>Testing and Debugging:
+ *     <ul>
+ *       <li>{@link org.attoparser.directoutput.DirectOutputMarkupHandler}: for writing the parsed markup to a
+ *           specified {@link java.io.Writer} object, without any loss of information due to parsing.</li>
+ *       <li>{@link org.attoparser.prettyhtmldisplay.PrettyHtmlDisplayMarkupHandler}: for creating an HTML
+ *           document visually explaining all the events happened during the parsing of a document:
+ *           elements, attributes, auto-closing of elements, unmatched artifacts, etc.</li>
+ *       <li>{@link org.attoparser.trace.TraceBuilderMarkupHandler}: for building a trace of parsing events (a
+ *           list of {@link org.attoparser.trace.MarkupTraceEvent} objects) detailing all the events launched
+ *           during the parsing of a document.</li>
+ *     </ul>
+ *   </li>
+ * </ul>
+ *
  *
  * @author Daniel Fern&aacute;ndez
  *
@@ -45,7 +83,23 @@ package org.attoparser;
 public interface IMarkupHandler {
 
 
-
+    /**
+     * <p>
+     *   Sets the {@link org.attoparser.ParseStatus} object that will be used during the parsing operation. This
+     *   object can be used for instructing the parser about specific low-level conditions arisen during event
+     *   handling.
+     * </p>
+     * <p>
+     *   This method is always called by the parser <strong>before</strong> calling any other event handling method.
+     * </p>
+     * <p>
+     *   Note that this method can be <strong>safely ignored by most implementations</strong>, as there are
+     *   very few and very specific scenarios in which this kind of interaction with the parser would be needed.
+     *   It is therefore mainly for internal use.
+     * </p>
+     *
+     * @param status the status object.
+     */
     public void setParserStatus(final ParseStatus status);
 
 
@@ -55,9 +109,9 @@ public interface IMarkupHandler {
      * </p>
      *
      * @param startTimeNanos the current time (in nanoseconds) obtained when parsing starts.
-     * @param line the line of the document where parsing starts (usually number 1)
-     * @param col the column of the document where parsing starts (usually number 1)
-     * @throws ParseException
+     * @param line the line of the document where parsing starts (usually number 1).
+     * @param col the column of the document where parsing starts (usually number 1).
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleDocumentStart(final long startTimeNanos, final int line, final int col)
             throws ParseException;
@@ -71,10 +125,10 @@ public interface IMarkupHandler {
      *
      * @param endTimeNanos the current time (in nanoseconds) obtained when parsing ends.
      * @param totalTimeNanos the difference between current times at the start and end of
-     *        parsing (in nanoseconds)
-     * @param line the line of the document where parsing ends (usually the last one)
-     * @param col the column of the document where the parsing ends (usually the last one)
-     * @throws ParseException
+     *        parsing (in nanoseconds).
+     * @param line the line of the document where parsing ends (usually the last one).
+     * @param col the column of the document where the parsing ends (usually the last one).
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleDocumentEnd(
             final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
@@ -91,8 +145,8 @@ public interface IMarkupHandler {
      *   <i>keyword</i>, <i>version</i>, <i>encoding</i> and <i>standalone</i>):
      * </p>
      * <p>
-     *   <tt>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;</tt><br />
-     *   <tt><b>|&nbsp;[K]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[V]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ENC]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[S]&nbsp;&nbsp;|</b></tt><br />
+     *   <tt>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;</tt><br>
+     *   <tt><b>|&nbsp;[K]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[V]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ENC]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[S]&nbsp;&nbsp;|</b></tt><br>
      *   <tt><b>[OUTER------------------------------------------------]</b></tt>
      * </p>
      * <p>
@@ -126,8 +180,7 @@ public interface IMarkupHandler {
      * @param outerLen length of the <i>outer</i> partition.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws ParseException
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleXmlDeclaration(
             final char[] buffer,
@@ -159,8 +212,8 @@ public interface IMarkupHandler {
      *   <i>systemId</i> and <i>internalSubset</i>) of the DOCTYPE clause:
      * </p>
      * <p>
-     *   <tt>&lt;!DOCTYPE html PUBLIC ".........." ".........." [................]&gt;</tt><br />
-     *   <tt><b>|&nbsp;[KEYWO]&nbsp;[EN]&nbsp;[TYPE]&nbsp;&nbsp;[PUBLICID]&nbsp;&nbsp;&nbsp;[SYSTEMID]&nbsp;&nbsp;&nbsp;[INTERNALSUBSET]&nbsp;|</b></tt><br />
+     *   <tt>&lt;!DOCTYPE html PUBLIC ".........." ".........." [................]&gt;</tt><br>
+     *   <tt><b>|&nbsp;[KEYWO]&nbsp;[EN]&nbsp;[TYPE]&nbsp;&nbsp;[PUBLICID]&nbsp;&nbsp;&nbsp;[SYSTEMID]&nbsp;&nbsp;&nbsp;[INTERNALSUBSET]&nbsp;|</b></tt><br>
      *   <tt><b>[OUTER------------------------------------------------------------]</b></tt>
      * </p>
      * <p>
@@ -202,8 +255,7 @@ public interface IMarkupHandler {
      * @param outerLen length of the <i>outer</i> partition.
      * @param outerLine the line in the original document where this artifact starts.
      * @param outerCol the column in the original document where this artifact starts.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws ParseException
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleDocType(
             final char[] buffer,
@@ -233,8 +285,8 @@ public interface IMarkupHandler {
      *   Two [offset, len] pairs are provided for two partitions (<i>outer</i> and <i>content</i>):
      * </p>
      * <p>
-     *   <tt>&lt;![CDATA[ this is a CDATA section ]]&gt;</tt><br />
-     *   <tt><b>|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[CONTENT----------------]&nbsp;&nbsp;|</b></tt><br />
+     *   <tt>&lt;![CDATA[ this is a CDATA section ]]&gt;</tt><br>
+     *   <tt><b>|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[CONTENT----------------]&nbsp;&nbsp;|</b></tt><br>
      *   <tt><b>[OUTER------------------------------]</b></tt>
      * </p>
      * <p>
@@ -254,8 +306,7 @@ public interface IMarkupHandler {
      * @param outerLen length of the <i>outer</i> partition.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws ParseException
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleCDATASection(
             final char[] buffer,
@@ -274,8 +325,8 @@ public interface IMarkupHandler {
      *   Two [offset, len] pairs are provided for two partitions (<i>outer</i> and <i>content</i>):
      * </p>
      * <p>
-     *   <tt>&lt;!-- this is a comment --&gt;</tt><br />
-     *   <tt><b>|&nbsp;&nbsp;&nbsp;[CONTENT----------]&nbsp;&nbsp;|</b></tt><br />
+     *   <tt>&lt;!-- this is a comment --&gt;</tt><br>
+     *   <tt><b>|&nbsp;&nbsp;&nbsp;[CONTENT----------]&nbsp;&nbsp;|</b></tt><br>
      *   <tt><b>[OUTER-------------------]</b></tt>
      * </p>
      * <p>
@@ -295,8 +346,7 @@ public interface IMarkupHandler {
      * @param outerLen length of the <i>outer</i> partition.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws ParseException
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleComment(
             final char[] buffer,
@@ -333,8 +383,7 @@ public interface IMarkupHandler {
      * @param len the length (in chars) of the text artifact, starting in offset.
      * @param line the line in the original document where this text artifact starts.
      * @param col the column in the original document where this text artifact starts.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws ParseException
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleText(
             final char[] buffer,
@@ -345,7 +394,7 @@ public interface IMarkupHandler {
 
     /**
      * <p>
-     *   Called when a standalone element (a <i>minimized tag</i>) is found. The name of
+     *   Called when a standalone element (an element with no closing tag) is found. The name of
      *   the element is also reported.
      * </p>
      * <p>
@@ -363,8 +412,8 @@ public interface IMarkupHandler {
      * @param nameLen the length (in chars) of the element name.
      * @param minimized whether the element has been found minimized (&lt;element/&gt;)in code or not.
      * @param line the line in the original document where this artifact starts.
-     * @param col the column in the original document where this artifact starts.   @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws ParseException
+     * @param col the column in the original document where this artifact starts.
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleStandaloneElementStart(
             final char[] buffer,
@@ -375,7 +424,7 @@ public interface IMarkupHandler {
 
     /**
      * <p>
-     *   Called when the end of a standalone element (a <i>minimized tag</i>) is found
+     *   Called when the end of a standalone element (an element with no closing tag) is found
      * </p>
      *
      * @param buffer the document buffer (not copied)
@@ -383,8 +432,8 @@ public interface IMarkupHandler {
      * @param nameLen the length (in chars) of the element name.
      * @param minimized whether the element has been found minimized (&lt;element/&gt;)in code or not.
      * @param line the line in the original document where the element ending structure appears.
-     * @param col the column in the original document where the element ending structure appears.   @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws ParseException
+     * @param col the column in the original document where the element ending structure appears.
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleStandaloneElementEnd(
             final char[] buffer,
@@ -414,8 +463,7 @@ public interface IMarkupHandler {
      * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws ParseException
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleOpenElementStart(
             final char[] buffer,
@@ -433,8 +481,7 @@ public interface IMarkupHandler {
      * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where the element ending structure appears.
      * @param col the column in the original document where the element ending structure appears.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws ParseException
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleOpenElementEnd(
             final char[] buffer,
@@ -463,8 +510,7 @@ public interface IMarkupHandler {
      * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws ParseException
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleCloseElementStart(
             final char[] buffer,
@@ -482,8 +528,7 @@ public interface IMarkupHandler {
      * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where the element ending structure appears.
      * @param col the column in the original document where the element ending structure appears.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws ParseException
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleCloseElementEnd(
             final char[] buffer,
@@ -512,8 +557,7 @@ public interface IMarkupHandler {
      * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws ParseException
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleAutoCloseElementStart(
             final char[] buffer,
@@ -532,8 +576,7 @@ public interface IMarkupHandler {
      * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where the element ending structure appears.
      * @param col the column in the original document where the element ending structure appears.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws ParseException
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleAutoCloseElementEnd(
             final char[] buffer,
@@ -562,8 +605,7 @@ public interface IMarkupHandler {
      * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws ParseException
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleUnmatchedCloseElementStart(
             final char[] buffer,
@@ -581,8 +623,7 @@ public interface IMarkupHandler {
      * @param nameLen the length (in chars) of the element name.
      * @param line the line in the original document where the element ending structure appears.
      * @param col the column in the original document where the element ending structure appears.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws ParseException
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleUnmatchedCloseElementEnd(
             final char[] buffer,
@@ -600,9 +641,9 @@ public interface IMarkupHandler {
      *   <i>operator</i>, <i>valueContent</i> and <i>valueOuter</i>):
      * </p>
      * <p>
-     *   <tt>class="basic_column"</tt><br />
-     *   <tt><b>[NAM]*&nbsp;[VALUECONTE]|   (*) = [OPERATOR]</b></tt><br />
-     *   <tt><b>|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[VALUEOUTER--]</b></tt><br />
+     *   <tt>class="basic_column"</tt><br>
+     *   <tt><b>[NAM]*&nbsp;[VALUECONTE]|   (*) = [OPERATOR]</b></tt><br>
+     *   <tt><b>|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[VALUEOUTER--]</b></tt><br>
      *   <tt><b>[OUTER-------------]</b></tt>
      * </p>
      * <p>
@@ -630,8 +671,7 @@ public interface IMarkupHandler {
      * @param valueOuterLen length of the <i>valueOuter</i> partition.
      * @param valueLine the line in the original document where the <i>value</i> (outer) partition starts.
      * @param valueCol the column in the original document where the <i>value</i> (outer) partition starts.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws ParseException
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleAttribute(
             final char[] buffer,
@@ -654,8 +694,8 @@ public interface IMarkupHandler {
      *   line feeds:
      * </p>
      * <p>
-     *   <tt>&lt;div id="main"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;class="basic_column"&gt;</tt><br />
-     *   <tt><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ATTSEP]</b></tt><br />
+     *   <tt>&lt;div id="main"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;class="basic_column"&gt;</tt><br>
+     *   <tt><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[INNWSP]</b></tt><br>
      * </p>
      * <p>
      *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer
@@ -672,8 +712,7 @@ public interface IMarkupHandler {
      * @param len length of the artifact.
      * @param line the line in the original document where the artifact starts.
      * @param col the column in the original document where the artifact starts.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws ParseException
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleInnerWhiteSpace(
             final char[] buffer,
@@ -692,8 +731,8 @@ public interface IMarkupHandler {
      *   <i>target</i> and <i>content</i>):
      * </p>
      * <p>
-     *   <tt>&lt;?xls-stylesheet somePar1="a" somePar2="b"?&gt;</tt><br />
-     *   <tt><b>|&nbsp;[TARGET------]&nbsp;[CONTENT----------------]&nbsp;|</b></tt><br />
+     *   <tt>&lt;?xls-stylesheet somePar1="a" somePar2="b"?&gt;</tt><br>
+     *   <tt><b>|&nbsp;[TARGET------]&nbsp;[CONTENT----------------]&nbsp;|</b></tt><br>
      *   <tt><b>[OUTER-------------------------------------]</b></tt>
      * </p>
      * <p>
@@ -724,8 +763,7 @@ public interface IMarkupHandler {
      * @param outerLen length of the <i>outer</i> partition.
      * @param line the line in the original document where this artifact starts.
      * @param col the column in the original document where this artifact starts.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws ParseException
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleProcessingInstruction(
             final char[] buffer,

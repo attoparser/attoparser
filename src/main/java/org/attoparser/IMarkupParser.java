@@ -24,34 +24,50 @@ import java.io.Reader;
 
 /**
  * <p>
- *   Common interface for all <i>attoparser</i> instances.
- *   Default implementation is {@link MarkupParser}.
+ *   Interface to be implemented by all Markup Parsers.
+ *   Default implementation is {@link org.attoparser.MarkupParser}.
  * </p>
  * <p>
- *   <i>Attoparser</i> implementations work as SAX-style parsers that need 
- *   an <i>attohandler</i> instance for handling parsing events. Depending
- *   on the desired level of detail in these events, several handler 
- *   abstract and concrete implementations are offered out-of-the-box:
+ *   <i>AttoParser</i> markup parsers work as SAX-style parsers that need
+ *   a <i>markup handler</i> object for handling parsing events. These handlers implement
+ *   the {@link org.attoparser.IMarkupHandler} interface, and are normally developed by
+ *   users in order to perform the operations they require for their applications.
  * </p>
- * <ul>
- *   <li>{@link AbstractMarkupHandler}: basic implementation only differentiating
- *       between <i>text</i> and <i>structures</i></li>
- *   <li>{@link MarkupEventProcessor}: markup-specialized
- *       (XML and HTML) abstract handler able not only to differentiate among different
- *       types of markup structures, but also of reporting lowel-level detail inside
- *       elements (name, attributes, inner whitespace) and DOCTYPE clauses.</li>
- *   <li>{@link org.attoparser.simple.SimplifierMarkupHandler}: higher-level
- *       markup-specialized (XML and HTML) abstract handler that offers an interface
- *       more similar to the Standard SAX ContentHandlers (use of Strings instead of
- *       char[]'s, attribute maps, etc).</li>
- *   <li>{@link org.attoparser.xml.XmlMarkupAttoHandler}: XML-specialized
- *       abstract handler equivalent to {@link MarkupEventProcessor}
- *       but only allowing XML markup.</li>
- *   <li>{@link org.attoparser.dom.DOMBuilderMarkupHandler}: handler implementation
- *       (non-abstract) for building an attoDOM tree (DOM node tres based on classes
- *       from the <tt>org.attoparser.markup.dom</tt> package) from XML markup.</li> 
- * </ul>
- * 
+ * <p>
+ *   See the documentation of the {@link org.attoparser.IMarkupHandler} interface for more
+ *   information on the event handler methods, and also on the handler implementations
+ *   AttoParser provides out-of-the-box.
+ * </p>
+ * <p>
+ *   Also, note there are two different specialized parsers that use
+ *   {@link org.attoparser.MarkupParser} underneath, but which are oriented towards allowing
+ *   an easy use of specific parsing features: {@link org.attoparser.dom.IDOMMarkupParser} for
+ *   DOM-oriented parsing and {@link org.attoparser.simple.ISimpleMarkupParser} for using
+ *   a simplified version of the handler interface ({@link org.attoparser.simple.ISimpleMarkupHandler}).
+ * </p>
+ * <p>
+ *   Sample usage:
+ * </p>
+ * <pre><code>
+ *   // Obtain a java.io.Reader on the document to be parsed
+ *   final Reader documentReader = ...;
+ *
+ *   // Create the handler instance. Extending the no-op AbstractMarkupHandler is a good start
+ *   final IMarkupHandler handler = new AbstractMarkupHandler() {
+ *       ... // some events implemented
+ *   };
+ *
+ *   // Create or obtain the parser instance (can be reused). Example uses the default configuration for HTML
+ *   final IMarkupParser parser = new MarkupParser(ParseConfiguration.defaultHtmlConfiguration());
+ *
+ *   // Parse it!
+ *   parser.parse(documentReader, handler);
+ * </code></pre>
+ * <p>
+ *   Note that implementations of this interface should be <strong>thread-safe</strong>, and therefore parsers
+ *   should be reusable through several parsing operations and any number of concurrent threads.
+ * </p>
+ *
  * @author Daniel Fern&aacute;ndez
  * 
  * @since 2.0.0
@@ -64,7 +80,7 @@ public interface IMarkupParser {
      * <p>
      *   Parse a document using the specified {@link IMarkupHandler}.
      * </p>
-     * 
+     *
      * @param document the document to be parsed, as a String.
      * @param handler the handler to be used, an {@link IMarkupHandler} implementation.
      * @throws ParseException if the document cannot be parsed.

@@ -28,26 +28,61 @@ import org.attoparser.config.ParseConfiguration;
 
 /**
  * <p>
- *   Default implementation of the {@link IMarkupParser} interface, able of
- *   parsing XML and HTML markup.
+ *   Default implementation of the {@link IMarkupParser} interface.
  * </p>
  * <p>
- *   This parser reports as <i>structures</i>:
+ *   <i>AttoParser</i> markup parsers work as SAX-style parsers that need
+ *   a <i>markup handler</i> object for handling parsing events. These handlers implement
+ *   the {@link org.attoparser.IMarkupHandler} interface, and are normally developed by
+ *   users in order to perform the operations they require for their applications.
  * </p>
- * <ul>
- *   <li><b>Tags (a.k.a. <i>elements</i>)</b>: <tt>&lt;body&gt;</tt>, <tt>&lt;img/&gt;</tt>, 
- *       <tt>&lt;div class="content"&gt;</tt>, etc.</li>
- *   <li><b>Comments</b>: <tt>&lt;!-- this is a comment --&gt;</tt></li>
- *   <li><b>CDATA sections</b>: <tt>&lt;![CDATA[ ... ]]&gt;</tt></li>
- *   <li><b>DOCTYPE clauses</b>: <tt>&lt;!DOCTYPE html&gt;</tt></li>
- *   <li><b>XML Declarations</b>: <tt>&lt;?xml version="1.0"?&gt;</tt></li>
- *   <li><b>Processing Instructions</b>: <tt>&lt;?xsl-stylesheet ...?&gt;</tt></li>
- * </ul>
  * <p>
- *   This parser class is <b>thread-safe</b>. But take into account that, usually, the 
- *   {@link IMarkupHandler} implementations passed to parsers for event handling are not.
+ *   See the documentation of the {@link org.attoparser.IMarkupHandler} interface for more
+ *   information on the event handler methods, and also on the handler implementations
+ *   AttoParser provides out-of-the-box.
  * </p>
- * 
+ * <p>
+ *   Also, note there are two different specialized parsers that use
+ *   {@link org.attoparser.MarkupParser} underneath, but which are oriented towards allowing
+ *   an easy use of specific parsing features: {@link org.attoparser.dom.IDOMMarkupParser} for
+ *   DOM-oriented parsing and {@link org.attoparser.simple.ISimpleMarkupParser} for using
+ *   a simplified version of the handler interface ({@link org.attoparser.simple.ISimpleMarkupHandler}).
+ * </p>
+ * <p>
+ *   Sample usage:
+ * </p>
+ * <pre><code>
+ *   // Obtain a java.io.Reader on the document to be parsed
+ *   final Reader documentReader = ...;
+ *
+ *   // Create the handler instance. Extending the no-op AbstractMarkupHandler is a good start
+ *   final IMarkupHandler handler = new AbstractMarkupHandler() {
+ *       ... // some events implemented
+ *   };
+ *
+ *   // Create or obtain the parser instance (can be reused). Example uses the default configuration for HTML
+ *   final IMarkupParser parser = new MarkupParser(ParseConfiguration.defaultHtmlConfiguration());
+ *
+ *   // Parse it!
+ *   parser.parse(documentReader, handler);
+ * </code></pre>
+ * <p>
+ *   This parser class is <b>thread-safe</b>. However, take into account that, normally,
+ *   {@link IMarkupHandler} implementations are not. So, even if parsers can be reused, handler objects
+ *   usually cannot.
+ * </p>
+ * <p>
+ *   This parser class uses a (configurable) pool of <tt>char[]</tt> buffers, in order to reduce the amount of
+ *   memory used for parsing (buffers are large structures). This pool works in a non-blocking mode,
+ *   so if a new buffer is needed and all are currently allocated, a new (unpooled) <tt>char[]</tt> object
+ *   is created and returned without waiting for a pooled buffer to be available.
+ * </p>
+ * <p>
+ *   <em>(Note that these pooled buffers will not be used when parsing documents specified as <tt>char[]</tt>
+ *   objects. In such case, the <tt>char[]</tt> documents themselves will be used as buffers, avoiding the need
+ *   to allocate pooled buffers or use any additional amount of memory.)</em>
+ * </p>
+ *
  * @author Daniel Fern&aacute;ndez
  * 
  * @since 2.0.0
@@ -68,12 +103,10 @@ public final class MarkupParser implements IMarkupParser {
      * <p>
      *   Default pool size to be used. Buffers will be kept in a pool and
      *   reused in order to increase performance. Pool will be non-exclusive
-     *   so that if pool size = 3 and a 4th request arrives, it is assigned
+     *   so that if pool size = 2 and a 3rd request arrives, it is assigned
      *   a new buffer object (not linked to the pool, and therefore GC-ed
-     *   at the end).
+     *   at the end). Value: 2.
      * </p>
-     *
-     * @since 2.0.0
      */
     public static final int DEFAULT_POOL_SIZE = 2;
 
@@ -86,27 +119,13 @@ public final class MarkupParser implements IMarkupParser {
 
     /**
      * <p>
-     *   Creates a new instance of this parser.
+     *   Creates a new instance of this parser, using the specified configuration and default
+     *   sizes for pool ({@link #DEFAULT_POOL_SIZE}) and pooled buffers ({@link #DEFAULT_BUFFER_SIZE}).
      * </p>
      *
      * @param configuration the parsing configuration to be used.
-     *
-     * @since 2.0.0
      */
     public MarkupParser(final ParseConfiguration configuration) {
-
-
-    /**
-     * <p>
-     *   Creates a new instance of this parser.
-     * </p>
-     *
-     * @param configuration the parsing configuration to be used.
-     * @param canSplitText if {@code true}, text nodes may be split and sent to the handler as multiple text nodes.  The
-     *                     default is {@code false}.
-     *
-     * @since 2.0.0
-     */
         this(configuration, DEFAULT_POOL_SIZE, DEFAULT_BUFFER_SIZE);
     }
 
@@ -116,24 +135,25 @@ public final class MarkupParser implements IMarkupParser {
      *   Creates a new instance of this parser, specifying the pool and buffer size.
      * </p>
      * <p>
-     *   Buffer size (in char's) will be the size of the <kbd>char[]</kbd> structures used as buffers for parsing,
+     *   Buffer size (in chars) will be the size of the <tt>char[]</tt> structures used as buffers for parsing,
      *   which might grow if a certain markup structure does not fit inside (e.g. a text). Default size is
      *   {@link MarkupParser#DEFAULT_BUFFER_SIZE}.
      * </p>
      * <p>
-     *   Pool size is the size of the pool of <kbd>char[]</kbd> buffers that will be kept in memory in order to
+     *   Pool size is the size of the pool of <tt>char[]</tt> buffers that will be kept in memory in order to
      *   allow their reuse. This pool works in a non-exclusive mode, so that if pool size is 3 and a 4th request
      *   arrives, it is served a new non-pooled buffer without the need to block waiting for one of the pooled
      *   instances. Default size is {@link MarkupParser#DEFAULT_POOL_SIZE}.
      * </p>
+     * <p>
+     *   Note that these pooled buffers will not be used when parsing documents specified as <tt>char[]</tt>
+     *   objects. In such case, the <tt>char[]</tt> documents themselves will be used as buffers, avoiding the need
+     *   to allocate buffers or use any additional amount of memory.
+     * </p>
      *
      * @param configuration the parsing configuration to be used.
-     * @param canSplitText if {@code true}, text nodes may be split and sent to the handler as multiple text nodes.  The
-     *                     default is {@code false}.
      * @param poolSize the size of the pool of buffers to be used.
      * @param bufferSize the default size of the buffers to be instanced for this parser.
-     *
-     * @since 2.0.0
      */
     public MarkupParser(final ParseConfiguration configuration, final int poolSize, final int bufferSize) {
         super();

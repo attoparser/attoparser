@@ -20,15 +20,11 @@
 package org.attoparser;
 
 
-/**
- * <p>
- *   Class containing utility methods for parsing attribute sequences.
- * </p>
- * 
- * @author Daniel Fern&aacute;ndez
- * 
- * @since 2.0.0
+/*
+ * Class containing utility methods for parsing attribute sequences.
  *
+ * @author Daniel Fernandez
+ * @since 2.0.0
  */
 final class ParsingAttributeSequenceUtil {
 
@@ -45,7 +41,6 @@ final class ParsingAttributeSequenceUtil {
     
     
     
-    
     static void parseAttributeSequence(
             final char[] buffer,
             final int offset, final int len,
@@ -55,8 +50,7 @@ final class ParsingAttributeSequenceUtil {
 
         // Any string will be recognized as an "attribute sequence", so this will always either return a not-null result
         // or raise an exception.
-        
-        
+
         final int maxi = offset + len;
 
         int i = offset;
