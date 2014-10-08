@@ -54,8 +54,12 @@ final class ParsingMarkupUtil {
         char c;
 
         int colIndex = offset;
-        for (int i = offset; i < maxi; i++) {
-            
+
+        int i = offset;
+        int n = (maxi - offset);
+
+        while (n-- != 0) {
+
             c = text[i];
 
             if (c == '\n') {
@@ -70,6 +74,8 @@ final class ParsingMarkupUtil {
                 locator[1] += (i - colIndex);
                 return i;
             }
+
+            i++;
             
         }
             
@@ -86,8 +92,12 @@ final class ParsingMarkupUtil {
         char c;
 
         int colIndex = offset;
-        for (int i = offset; i < maxi; i++) {
-            
+
+        int i = offset;
+        int n = (maxi - offset);
+
+        while (n-- != 0) {
+
             c = text[i];
             
             if (c == '\n') {
@@ -98,7 +108,9 @@ final class ParsingMarkupUtil {
                 locator[1] += (i - colIndex);
                 return i;
             }
-            
+
+            i++;
+
         }
             
         locator[1] += (maxi - colIndex);
@@ -114,8 +126,12 @@ final class ParsingMarkupUtil {
         char c;
 
         int colIndex = offset;
-        for (int i = offset; i < maxi; i++) {
-            
+
+        int i = offset;
+        int n = (maxi - offset);
+
+        while (n-- != 0) {
+
             c = text[i];
             
             if (c == '\n') {
@@ -126,7 +142,9 @@ final class ParsingMarkupUtil {
                 locator[1] += (i - colIndex);
                 return i;
             }
-            
+
+            i++;
+
         }
             
         locator[1] += (maxi - colIndex);
@@ -144,8 +162,11 @@ final class ParsingMarkupUtil {
 
         char c;
 
-        for (int i = offset; i < maxi; i++) {
-            
+        int i = offset;
+        int n = (maxi - offset);
+
+        while (n-- != 0) {
+
             c = text[i];
             
             if (avoidQuotes && !inApos && c == '"') {
@@ -157,6 +178,8 @@ final class ParsingMarkupUtil {
             }
 
             ParsingLocatorUtil.countChar(locator, c);
+
+            i++;
             
         }
             
@@ -172,8 +195,11 @@ final class ParsingMarkupUtil {
         char c;
         boolean isWhitespace;
 
-        for (int i = offset; i < maxi; i++) {
-            
+        int i = offset;
+        int n = (maxi - offset);
+
+        while (n-- != 0) {
+
             c = text[i];
             isWhitespace = (c == ' ' || c == '\n' || Character.isWhitespace(c));
             
@@ -182,7 +208,9 @@ final class ParsingMarkupUtil {
             }
 
             ParsingLocatorUtil.countChar(locator, c);
-            
+
+            i++;
+
         }
             
         return -1;
@@ -196,8 +224,11 @@ final class ParsingMarkupUtil {
 
         char c;
 
-        for (int i = offset; i < maxi; i++) {
-            
+        int i = offset;
+        int n = (maxi - offset);
+
+        while (n-- != 0) {
+
             c = text[i];
             
             if (c == '=' || (c == ' ' || c == '\n' || Character.isWhitespace(c))) {
@@ -205,7 +236,9 @@ final class ParsingMarkupUtil {
             }
 
             ParsingLocatorUtil.countChar(locator, c);
-            
+
+            i++;
+
         }
             
         return -1;
@@ -219,8 +252,11 @@ final class ParsingMarkupUtil {
 
         char c;
 
-        for (int i = offset; i < maxi; i++) {
-            
+        int i = offset;
+        int n = (maxi - offset);
+
+        while (n-- != 0) {
+
             c = text[i];
             
             if (c != '=' && !(c == ' ' || c == '\n' || Character.isWhitespace(c))) {
@@ -228,6 +264,8 @@ final class ParsingMarkupUtil {
             }
 
             ParsingLocatorUtil.countChar(locator, c);
+
+            i++;
             
         }
             
@@ -245,8 +283,11 @@ final class ParsingMarkupUtil {
 
         char c;
 
-        for (int i = offset; i < maxi; i++) {
-            
+        int i = offset;
+        int n = (maxi - offset);
+
+        while (n-- != 0) {
+
             c = text[i];
             
             if (!inApos && c == '"') {
@@ -268,6 +309,8 @@ final class ParsingMarkupUtil {
             }
 
             ParsingLocatorUtil.countChar(locator, c);
+
+            i++;
             
         }
             
@@ -289,7 +332,10 @@ final class ParsingMarkupUtil {
         final char c1 = charSeq[0];
         char c;
 
-        for (int i = offset; i < maxi; i++) {
+        int i = offset;
+        int n = (maxi - offset);
+
+        while (n-- != 0) {
 
             c = text[i];
 
@@ -309,6 +355,8 @@ final class ParsingMarkupUtil {
             }
 
             ParsingLocatorUtil.countChar(locator, c);
+
+            i++;
 
         }
 
