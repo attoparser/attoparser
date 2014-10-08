@@ -20,7 +20,6 @@
 package org.attoparser;
 
 import junit.framework.TestCase;
-import org.attoparser.HtmlElement;
 
 
 /**
