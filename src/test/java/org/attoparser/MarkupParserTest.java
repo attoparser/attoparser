@@ -30,6 +30,9 @@ import org.attoparser.config.ParseConfiguration.ElementBalancing;
 import org.attoparser.config.ParseConfiguration.PrologPresence;
 import org.attoparser.config.ParseConfiguration.UniqueRootElementPresence;
 import org.attoparser.directoutput.DirectOutputMarkupHandler;
+import org.attoparser.simple.ISimpleMarkupHandler;
+import org.attoparser.simple.ISimpleMarkupParser;
+import org.attoparser.simple.SimpleMarkupParser;
 import org.attoparser.simple.SimplifierMarkupHandler;
 import org.attoparser.trace.MarkupTraceEvent;
 import org.attoparser.trace.TraceBuilderMarkupHandler;
@@ -42,7 +45,7 @@ import org.attoparser.trace.TraceBuilderMarkupHandler;
  * @since 1.0
  *
  */
-public class MarkupAttoParserTest extends TestCase {
+public class MarkupParserTest extends TestCase {
 
     private static int totalTestExecutions = 0;
     
@@ -64,8 +67,8 @@ public class MarkupAttoParserTest extends TestCase {
         
         final ParseConfiguration wellFormedXml = new ParseConfiguration();
         wellFormedXml.setElementBalancing(ElementBalancing.REQUIRE_BALANCED);
-        wellFormedXml.setRequireUniqueAttributesInElement(true);
-        wellFormedXml.setRequireXmlWellFormedAttributeValues(true);
+        wellFormedXml.setUniqueAttributesInElementRequired(true);
+        wellFormedXml.setXmlWellFormedAttributeValuesRequired(true);
         wellFormedXml.getPrologParseConfiguration().setValidateProlog(true);
         wellFormedXml.getPrologParseConfiguration().setPrologPresence(PrologPresence.ALLOWED);
         wellFormedXml.getPrologParseConfiguration().setXmlDeclarationPresence(PrologPresence.ALLOWED);
@@ -81,30 +84,40 @@ public class MarkupAttoParserTest extends TestCase {
         final String dt3 = "<!DOCTYPE html public \"lala\">"; 
         final String dt4 = "<!DOCTYPE html public \"aaa\" [<!ELEMENT>]>"; 
         
-        final IMarkupParser p = new MarkupParser(noRestrictions);
-        
+        final ISimpleMarkupParser p = new SimpleMarkupParser(noRestrictions);
+
         StringWriter sw1 = new StringWriter();
-        IMarkupHandler h = new SimplifierMarkupHandler(new TextTracerSimpleMarkupHandler(sw1));
+        ISimpleMarkupHandler h = new TextTracerSimpleMarkupHandler(sw1);
         p.parse(dt1, h);
         assertEquals("[DT()()()(){1,1}]", sw1.toString());
 
         StringWriter sw2 = new StringWriter();
-        h = new SimplifierMarkupHandler(new TextTracerSimpleMarkupHandler(sw2));
+        h = new TextTracerSimpleMarkupHandler(sw2);
         p.parse(dt2, h);
         assertEquals("[DT(html)()()(){1,1}]", sw2.toString());
 
         StringWriter sw3 = new StringWriter();
-        h = new SimplifierMarkupHandler(new TextTracerSimpleMarkupHandler(sw3));
+        h = new TextTracerSimpleMarkupHandler(sw3);
         p.parse(dt3, h);
         assertEquals("[DT(html)(lala)()(){1,1}]", sw3.toString());
 
         StringWriter sw4 = new StringWriter();
-        h = new SimplifierMarkupHandler(new TextTracerSimpleMarkupHandler(sw4));
+        h = new TextTracerSimpleMarkupHandler(sw4);
         p.parse(dt4, h);
         assertEquals("[DT(html)(aaa)()(<!ELEMENT>){1,1}]", sw4.toString());
 
 
-
+        testDoc(
+            "Hello, World!",
+            "[T(ello, Worl){1,1}]",
+            "[T(ello, Worl){1,1}]",
+            1, 10,
+            noRestrictionsAutoClose);
+        testDoc(
+                "This is simply a text",
+                "[T(This is simply a text){1,1}]",
+                "[T(This is simply a text){1,1}]",
+                noRestrictionsAutoClose);
         testHtmlDoc(
             "<img src=\"hello\">Something",
             "[NSES(img){1,1}IWS( ){1,5}A(src){1,6}(=){1,9}(\"hello\"){1,10}NSEE(img){1,17}T(Something){1,18}]",
@@ -1546,7 +1559,7 @@ public class MarkupAttoParserTest extends TestCase {
 
             final MarkupParser parser = new MarkupParser(parseConfiguration);
 
-            // TEST WITH TRACING HANDLER
+            // TEST WITH TRACING HANDLER AND READER
             {
 
                 final ParseStatus status = new ParseStatus();
@@ -1555,9 +1568,9 @@ public class MarkupAttoParserTest extends TestCase {
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
 
                 if (offset == 0 && len == input.length) {
-                    parser.parseDocument(new CharArrayReader(input), eventProcessor, bufferSize, status);
+                    parser.parseDocument(new CharArrayReader(input), bufferSize, eventProcessor, status);
                 } else { 
-                    parser.parseDocument(new CharArrayReader(input, offset, len), eventProcessor, bufferSize, status);
+                    parser.parseDocument(new CharArrayReader(input, offset, len), bufferSize, eventProcessor, status);
                 }
 
                 final List<MarkupTraceEvent> trace = handler.getTrace();
@@ -1578,8 +1591,78 @@ public class MarkupAttoParserTest extends TestCase {
                 }
             }
 
+
+            // TEST WITH TRACING HANDLER AND NO READER
+            {
+
+                final ParseStatus status = new ParseStatus();
+                final TraceBuilderMarkupHandler handler = new TraceBuilderMarkupHandler();
+                handler.setParserStatus(status);
+                final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
+
+                parser.parseDocument(input, offset, len, eventProcessor, status);
+
+                final List<MarkupTraceEvent> trace = handler.getTrace();
+                final StringBuilder strBuilder = new StringBuilder();
+                for (final MarkupTraceEvent event : trace) {
+                    if (event.getEventType().equals(MarkupTraceEvent.EventType.DOCUMENT_START)) {
+                        strBuilder.append("[");
+                    } else if (event.getEventType().equals(MarkupTraceEvent.EventType.DOCUMENT_END)) {
+                        strBuilder.append("]");
+                    } else {
+                        strBuilder.append(event);
+                    }
+                }
+
+                final String result = strBuilder.toString();
+                if (outputBreakDown != null) {
+                    assertEquals(outputBreakDown, result);
+                }
+            }
+
+            // TEST WITH TRACING HANDLER AND NO READER WITH PADDING
+            {
+
+                final char[] newInput = new char[len + 10];
+                newInput[0] = 'X';
+                newInput[1] = 'X';
+                newInput[2] = 'X';
+                newInput[3] = 'X';
+                newInput[4] = 'X';
+                System.arraycopy(input,offset,newInput,5,len);
+                newInput[newInput.length - 1] = 'X';
+                newInput[newInput.length - 2] = 'X';
+                newInput[newInput.length - 3] = 'X';
+                newInput[newInput.length - 4] = 'X';
+                newInput[newInput.length - 5] = 'X';
+
+                final ParseStatus status = new ParseStatus();
+                final TraceBuilderMarkupHandler handler = new TraceBuilderMarkupHandler();
+                handler.setParserStatus(status);
+                final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
+
+                parser.parseDocument(newInput, 5, len, eventProcessor, status);
+
+                final List<MarkupTraceEvent> trace = handler.getTrace();
+                final StringBuilder strBuilder = new StringBuilder();
+                for (final MarkupTraceEvent event : trace) {
+                    if (event.getEventType().equals(MarkupTraceEvent.EventType.DOCUMENT_START)) {
+                        strBuilder.append("[");
+                    } else if (event.getEventType().equals(MarkupTraceEvent.EventType.DOCUMENT_END)) {
+                        strBuilder.append("]");
+                    } else {
+                        strBuilder.append(event);
+                    }
+                }
+
+                final String result = strBuilder.toString();
+                if (outputBreakDown != null) {
+                    assertEquals(outputBreakDown, result);
+                }
+            }
+
             
-            // TEST WITH DUPLICATING MARKUP HANDLER (few events)
+            // TEST WITH DUPLICATING MARKUP HANDLER AND READER
             {
                 final StringWriter sw = new StringWriter();
                 final ParseStatus status = new ParseStatus();
@@ -1587,9 +1670,9 @@ public class MarkupAttoParserTest extends TestCase {
                 handler.setParserStatus(status);
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
                 if (offset == 0 && len == input.length) {
-                    parser.parseDocument(new CharArrayReader(input), eventProcessor, bufferSize, status);
+                    parser.parseDocument(new CharArrayReader(input), bufferSize, eventProcessor, status);
                 } else { 
-                    parser.parseDocument(new CharArrayReader(input, offset, len), eventProcessor, bufferSize, status);
+                    parser.parseDocument(new CharArrayReader(input, offset, len), bufferSize, eventProcessor, status);
                 }
                 final String desired =
                         (offset == 0 && len == input.length ? new String(input) : new String(input, offset, len));
@@ -1598,18 +1681,14 @@ public class MarkupAttoParserTest extends TestCase {
             }
 
             
-            // TEST WITH DUPLICATING MARKUP BREAKDOWN HANDLER (many events)
+            // TEST WITH DUPLICATING MARKUP HANDLER AND NO READER
             {
                 final StringWriter sw = new StringWriter();
                 final ParseStatus status = new ParseStatus();
                 final IMarkupHandler handler = new DirectOutputMarkupHandler(sw);
                 handler.setParserStatus(status);
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
-                if (offset == 0 && len == input.length) {
-                    parser.parseDocument(new CharArrayReader(input), eventProcessor, bufferSize, status);
-                } else { 
-                    parser.parseDocument(new CharArrayReader(input, offset, len), eventProcessor, bufferSize, status);
-                }
+                parser.parseDocument(input, offset, len, eventProcessor, status);
                 final String desired =
                         (offset == 0 && len == input.length ? new String(input) : new String(input, offset, len));
                 final String result = sw.toString();
@@ -1627,9 +1706,9 @@ public class MarkupAttoParserTest extends TestCase {
                     handler.setParserStatus(status);
                     final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
                     if (offset == 0 && len == input.length) {
-                        parser.parseDocument(new CharArrayReader(input), eventProcessor, bufferSize, status);
+                        parser.parseDocument(new CharArrayReader(input), bufferSize, eventProcessor, status);
                     } else { 
-                        parser.parseDocument(new CharArrayReader(input, offset, len), eventProcessor, bufferSize, status);
+                        parser.parseDocument(new CharArrayReader(input, offset, len), bufferSize, eventProcessor, status);
                     }
                     final String result = sw.toString();
                     assertEquals(outputSimple, result);
@@ -1704,9 +1783,9 @@ public class MarkupAttoParserTest extends TestCase {
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
 
                 if (offset == 0 && len == input.length) {
-                    parser.parseDocument(new CharArrayReader(input), eventProcessor, bufferSize, status);
+                    parser.parseDocument(new CharArrayReader(input), bufferSize, eventProcessor, status);
                 } else {
-                    parser.parseDocument(new CharArrayReader(input, offset, len), eventProcessor, bufferSize, status);
+                    parser.parseDocument(new CharArrayReader(input, offset, len), bufferSize, eventProcessor, status);
                 }
 
                 final List<MarkupTraceEvent> trace = traceHandler.getTrace();
