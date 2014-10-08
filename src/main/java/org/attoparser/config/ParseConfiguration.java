@@ -57,11 +57,13 @@ public final class ParseConfiguration implements Serializable, Cloneable {
 
     private ParsingMode mode = ParsingMode.XML;
     private boolean caseSensitive = true;
+
+    private boolean textSplittable = false;
     
     private ElementBalancing elementBalancing = ElementBalancing.NO_BALANCING;
     
-    private boolean requireXmlWellFormedAttributeValues = false;
-    private boolean requireUniqueAttributesInElement = false;
+    private boolean xmlWellFormedAttributeValuesRequired = false;
+    private boolean uniqueAttributesInElementRequired = false;
  
     private PrologParseConfiguration prologParseConfiguration = new PrologParseConfiguration();
     private UniqueRootElementPresence uniqueRootElementPresence = UniqueRootElementPresence.DEPENDS_ON_PROLOG_DOCTYPE;
@@ -76,9 +78,10 @@ public final class ParseConfiguration implements Serializable, Cloneable {
         DEFAULT_HTML_PARSE_CONFIGURATION = new ParseConfiguration();
         DEFAULT_HTML_PARSE_CONFIGURATION.setMode(ParsingMode.HTML);
         DEFAULT_HTML_PARSE_CONFIGURATION.setCaseSensitive(false);
+        DEFAULT_HTML_PARSE_CONFIGURATION.setTextSplittable(false);
         DEFAULT_HTML_PARSE_CONFIGURATION.setElementBalancing(ElementBalancing.AUTO_CLOSE);
-        DEFAULT_HTML_PARSE_CONFIGURATION.setRequireUniqueAttributesInElement(true);
-        DEFAULT_HTML_PARSE_CONFIGURATION.setRequireXmlWellFormedAttributeValues(false);
+        DEFAULT_HTML_PARSE_CONFIGURATION.setUniqueAttributesInElementRequired(true);
+        DEFAULT_HTML_PARSE_CONFIGURATION.setXmlWellFormedAttributeValuesRequired(false);
         DEFAULT_HTML_PARSE_CONFIGURATION.setUniqueRootElementPresence(UniqueRootElementPresence.DEPENDS_ON_PROLOG_DOCTYPE);
         DEFAULT_HTML_PARSE_CONFIGURATION.getPrologParseConfiguration().setValidateProlog(true);
         DEFAULT_HTML_PARSE_CONFIGURATION.getPrologParseConfiguration().setPrologPresence(PrologPresence.ALLOWED);
@@ -90,9 +93,10 @@ public final class ParseConfiguration implements Serializable, Cloneable {
         DEFAULT_XML_PARSE_CONFIGURATION = new ParseConfiguration();
         DEFAULT_XML_PARSE_CONFIGURATION.setMode(ParsingMode.XML);
         DEFAULT_XML_PARSE_CONFIGURATION.setCaseSensitive(true);
+        DEFAULT_XML_PARSE_CONFIGURATION.setTextSplittable(false);
         DEFAULT_XML_PARSE_CONFIGURATION.setElementBalancing(ElementBalancing.REQUIRE_BALANCED);
-        DEFAULT_XML_PARSE_CONFIGURATION.setRequireUniqueAttributesInElement(true);
-        DEFAULT_XML_PARSE_CONFIGURATION.setRequireXmlWellFormedAttributeValues(true);
+        DEFAULT_XML_PARSE_CONFIGURATION.setUniqueAttributesInElementRequired(true);
+        DEFAULT_XML_PARSE_CONFIGURATION.setXmlWellFormedAttributeValuesRequired(true);
         DEFAULT_XML_PARSE_CONFIGURATION.setUniqueRootElementPresence(UniqueRootElementPresence.DEPENDS_ON_PROLOG_DOCTYPE);
         DEFAULT_XML_PARSE_CONFIGURATION.getPrologParseConfiguration().setValidateProlog(true);
         DEFAULT_XML_PARSE_CONFIGURATION.getPrologParseConfiguration().setPrologPresence(PrologPresence.ALLOWED);
@@ -138,8 +142,8 @@ public final class ParseConfiguration implements Serializable, Cloneable {
      * <ul>
      *   <li><tt>{@link #isCaseSensitive()} = true</tt></li>
      *   <li><tt>{@link #getElementBalancing()} = {@link ElementBalancing#NO_BALANCING}</tt></li>
-     *   <li><tt>{@link #getRequireXmlWellFormedAttributeValues()} = false</tt></li>
-     *   <li><tt>{@link #getRequireUniqueAttributesInElement()} = false</tt></li>
+     *   <li><tt>{@link #isXmlWellFormedAttributeValuesRequired()} = false</tt></li>
+     *   <li><tt>{@link #isUniqueAttributesInElementRequired()} = false</tt></li>
      *   <li><tt>{@link #getPrologParseConfiguration()} = new {@link org.attoparser.config.ParseConfiguration.PrologParseConfiguration}()</tt></li>
      *   <li><tt>{@link #getUniqueRootElementPresence()} = {@link UniqueRootElementPresence#DEPENDS_ON_PROLOG_DOCTYPE}</tt></li>
      * </ul>
@@ -163,8 +167,8 @@ public final class ParseConfiguration implements Serializable, Cloneable {
      * <ul>
      *   <li><tt>{@link #isCaseSensitive()} = true</tt></li>
      *   <li><tt>{@link #getElementBalancing()} = {@link ElementBalancing#NO_BALANCING}</tt></li>
-     *   <li><tt>{@link #getRequireXmlWellFormedAttributeValues()} = false</tt></li>
-     *   <li><tt>{@link #getRequireUniqueAttributesInElement()} = false</tt></li>
+     *   <li><tt>{@link #isXmlWellFormedAttributeValuesRequired()} = false</tt></li>
+     *   <li><tt>{@link #isUniqueAttributesInElementRequired()} = false</tt></li>
      *   <li><tt>{@link #getPrologParseConfiguration()} = new {@link org.attoparser.config.ParseConfiguration.PrologParseConfiguration}()</tt></li>
      *   <li><tt>{@link #getUniqueRootElementPresence()} = {@link UniqueRootElementPresence#DEPENDS_ON_PROLOG_DOCTYPE}</tt></li>
      * </ul>
@@ -207,6 +211,19 @@ public final class ParseConfiguration implements Serializable, Cloneable {
     
     public void setCaseSensitive(final boolean caseSensitive) {
         this.caseSensitive = caseSensitive;
+    }
+
+
+
+
+
+    public boolean isTextSplittable() {
+        return this.textSplittable;
+    }
+
+
+    public void setTextSplittable(final boolean textSplittable) {
+        this.textSplittable = textSplittable;
     }
 
 
@@ -277,14 +294,14 @@ public final class ParseConfiguration implements Serializable, Cloneable {
      * 
      * @return whether attributes should be XML-well-formed or not.
      */
-    public boolean getRequireXmlWellFormedAttributeValues() {
-        return this.requireXmlWellFormedAttributeValues;
+    public boolean isXmlWellFormedAttributeValuesRequired() {
+        return this.xmlWellFormedAttributeValuesRequired;
     }
 
 
-    public void setRequireXmlWellFormedAttributeValues(
-            final boolean requireXmlWellFormedAttributeValues) {
-        this.requireXmlWellFormedAttributeValues = requireXmlWellFormedAttributeValues;
+    public void setXmlWellFormedAttributeValuesRequired(
+            final boolean xmlWellFormedAttributeValuesRequired) {
+        this.xmlWellFormedAttributeValuesRequired = xmlWellFormedAttributeValuesRequired;
     }
 
 
@@ -295,13 +312,13 @@ public final class ParseConfiguration implements Serializable, Cloneable {
      * 
      * @return whether attributes should never appear duplicated in elements.
      */
-    public boolean getRequireUniqueAttributesInElement() {
-        return this.requireUniqueAttributesInElement;
+    public boolean isUniqueAttributesInElementRequired() {
+        return this.uniqueAttributesInElementRequired;
     }
 
 
-    public void setRequireUniqueAttributesInElement(final boolean requireUniqueAttributesInElement) {
-        this.requireUniqueAttributesInElement = requireUniqueAttributesInElement;
+    public void setUniqueAttributesInElementRequired(final boolean uniqueAttributesInElementRequired) {
+        this.uniqueAttributesInElementRequired = uniqueAttributesInElementRequired;
     }
 
 
@@ -363,8 +380,8 @@ public final class ParseConfiguration implements Serializable, Cloneable {
         conf.mode = this.mode;
         conf.caseSensitive = this.caseSensitive;
         conf.elementBalancing = this.elementBalancing;
-        conf.requireUniqueAttributesInElement = this.requireUniqueAttributesInElement;
-        conf.requireXmlWellFormedAttributeValues = this.requireXmlWellFormedAttributeValues;
+        conf.uniqueAttributesInElementRequired = this.uniqueAttributesInElementRequired;
+        conf.xmlWellFormedAttributeValuesRequired = this.xmlWellFormedAttributeValuesRequired;
         conf.uniqueRootElementPresence = this.uniqueRootElementPresence;
         conf.prologParseConfiguration = this.prologParseConfiguration.clone();
         return conf;

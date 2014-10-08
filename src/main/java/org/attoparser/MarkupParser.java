@@ -80,7 +80,6 @@ public final class MarkupParser implements IMarkupParser {
 
 
     private final ParseConfiguration configuration;
-    private final boolean canSplitText;
     private final BufferPool pool;
 
 
@@ -96,8 +95,6 @@ public final class MarkupParser implements IMarkupParser {
      * @since 2.0.0
      */
     public MarkupParser(final ParseConfiguration configuration) {
-        this(configuration, false);
-    }
 
 
     /**
@@ -111,8 +108,7 @@ public final class MarkupParser implements IMarkupParser {
      *
      * @since 2.0.0
      */
-    public MarkupParser(final ParseConfiguration configuration, final boolean canSplitText) {
-        this(configuration, canSplitText, DEFAULT_POOL_SIZE, DEFAULT_BUFFER_SIZE);
+        this(configuration, DEFAULT_POOL_SIZE, DEFAULT_BUFFER_SIZE);
     }
 
 
@@ -140,13 +136,10 @@ public final class MarkupParser implements IMarkupParser {
      *
      * @since 2.0.0
      */
-    public MarkupParser(
-            final ParseConfiguration configuration, final boolean canSplitText,
-            final int poolSize, final int bufferSize) {
+    public MarkupParser(final ParseConfiguration configuration, final int poolSize, final int bufferSize) {
         super();
         this.configuration = configuration;
         this.pool = new BufferPool(poolSize, bufferSize);
-        this.canSplitText = canSplitText;
     }
 
 
@@ -405,7 +398,7 @@ public final class MarkupParser implements IMarkupParser {
                 if (sequenceIndex == -1) {
 
                     // Not found, should ask for more buffer
-                    if (this.canSplitText) {
+                    if (this.configuration.isTextSplittable()) {
                         eventProcessor.processText(buffer, current, len - current, currentLine, currentCol);
                         // No need to change the disability limit, as we havent reached the sequence yet
                         current = len;
@@ -442,7 +435,7 @@ public final class MarkupParser implements IMarkupParser {
                 
                 if (tagStart == -1) {
 
-                    if (this.canSplitText) {
+                    if (this.configuration.isTextSplittable()) {
 
                         eventProcessor.processText(buffer, current, len - current, currentLine, currentCol);
                         if (status.parsingDisabledLimitSequence != null) {

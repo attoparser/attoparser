@@ -97,7 +97,7 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
         this.caseSensitive = parseConfiguration.isCaseSensitive();
 
         this.useStack = (!ParseConfiguration.ElementBalancing.NO_BALANCING.equals(parseConfiguration.getElementBalancing()) ||
-                         parseConfiguration.getRequireUniqueAttributesInElement() ||
+                         parseConfiguration.isUniqueAttributesInElementRequired() ||
                          !ParseConfiguration.UniqueRootElementPresence.NOT_VALIDATED.equals(parseConfiguration.getUniqueRootElementPresence()));
 
         this.autoClose =
@@ -115,8 +115,8 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
         this.prologParseConfiguration.validateConfiguration();
 
         this.uniqueRootElementPresence = parseConfiguration.getUniqueRootElementPresence();
-        this.requireWellFormedAttributeValues = parseConfiguration.getRequireXmlWellFormedAttributeValues();
-        this.requireUniqueAttributesInElement = parseConfiguration.getRequireUniqueAttributesInElement();
+        this.requireWellFormedAttributeValues = parseConfiguration.isXmlWellFormedAttributeValuesRequired();
+        this.requireUniqueAttributesInElement = parseConfiguration.isUniqueAttributesInElementRequired();
 
         this.validateProlog = this.prologParseConfiguration.isValidateProlog();
         this.prologPresenceForbidden = this.prologParseConfiguration.getPrologPresence().isForbidden();
