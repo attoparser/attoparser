@@ -38,20 +38,10 @@ import java.util.Map;
 public final class DOMWriter {
 
     
-    
-
-    /**
-     * <p>
-     *   Create a new instance of this DOM writer.
-     * </p>
-     */
-    public DOMWriter() {
-        super();
-    }
 
 
 
-    public void write(final INode node, final Writer writer) throws IOException {
+    public static void write(final INode node, final Writer writer) throws IOException {
 
         if (node == null) {
             return;
@@ -94,7 +84,7 @@ public final class DOMWriter {
 
     
     
-    public void writeCDATASection(final CDATASection cdataSection, final Writer writer)
+    public static void writeCDATASection(final CDATASection cdataSection, final Writer writer)
             throws IOException{
         
         writer.write("<![CDATA[");
@@ -105,7 +95,7 @@ public final class DOMWriter {
 
     
 
-    public void writeComment(final Comment comment, final Writer writer) throws IOException {
+    public static void writeComment(final Comment comment, final Writer writer) throws IOException {
         
         writer.write("<!--");
         writer.write(comment.getContent());
@@ -115,7 +105,7 @@ public final class DOMWriter {
 
     
 
-    public void writeDocType(final DocType docType, final Writer writer) throws IOException {
+    public static void writeDocType(final DocType docType, final Writer writer) throws IOException {
         
         writer.write("<!DOCTYPE ");
         writer.write(docType.getRootElementName());
@@ -160,7 +150,7 @@ public final class DOMWriter {
 
     
 
-    public void writeDocument(final Document document, final Writer writer) throws IOException {
+    public static void writeDocument(final Document document, final Writer writer) throws IOException {
 
         if (!document.hasChildren()) {
             return;
@@ -174,7 +164,7 @@ public final class DOMWriter {
 
 
     
-    public void writeElement(final Element element, final Writer writer) throws IOException {
+    public static void writeElement(final Element element, final Writer writer) throws IOException {
         
         writer.write('<');
         writer.write(element.getElementName());
@@ -212,7 +202,7 @@ public final class DOMWriter {
     }
 
 
-    public void writeProcessingInstruction(
+    public static void writeProcessingInstruction(
             final ProcessingInstruction processingInstruction, final Writer writer)
             throws IOException {
         
@@ -233,7 +223,7 @@ public final class DOMWriter {
 
     
 
-    public void writeText(final Text text, final Writer writer) throws IOException {
+    public static void writeText(final Text text, final Writer writer) throws IOException {
 
         validateNotNull(text, "Text node cannot be null");
         validateNotNull(writer, "Writer cannot be null");
@@ -244,7 +234,7 @@ public final class DOMWriter {
 
 
     
-    public void writeXmlDeclaration(final XmlDeclaration xmlDeclaration, final Writer writer) throws IOException {
+    public static void writeXmlDeclaration(final XmlDeclaration xmlDeclaration, final Writer writer) throws IOException {
 
         validateNotNull(xmlDeclaration, "XML declaration cannot be null");
         validateNotNull(writer, "Writer cannot be null");
@@ -286,5 +276,12 @@ public final class DOMWriter {
             throw new IllegalArgumentException(message);
         }
     }
-    
+
+
+
+    private DOMWriter() {
+        super();
+    }
+
+
 }

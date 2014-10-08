@@ -75,11 +75,10 @@ public class DOMBuilderTest extends TestCase {
         parser.parse(input, handler);
 
         final Document doc = handler.getDocument();
-        final DOMWriter domWriter = new DOMWriter();
 
         final StringWriter writer = new StringWriter();
 
-        domWriter.write(doc, writer);
+        DOMWriter.write(doc, writer);
 
         final String output = writer.toString();
 
