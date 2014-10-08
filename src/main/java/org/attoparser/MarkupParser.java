@@ -673,16 +673,14 @@ public final class MarkupParser implements IMarkupParser {
                 if (inOpenElement) {
                     // This is a open/standalone tag (to be determined by looking at the penultimate character)
 
-                    final boolean standalone = (buffer[tagEnd - 1] == '/');
-
-                    if (standalone) {
+                    if ((buffer[tagEnd - 1] == '/')) {
                         ParsingElementMarkupUtil.
-                                parseOpenOrStandaloneElement(
-                                        buffer, current + 1, ((tagEnd - current) + 1) - 3, current, (tagEnd - current) + 1, currentLine, currentCol, eventProcessor, true);
+                                parseStandaloneElement(
+                                        buffer, current + 1, ((tagEnd - current) + 1) - 3, current, (tagEnd - current) + 1, currentLine, currentCol, eventProcessor);
                     } else {
                         ParsingElementMarkupUtil.
-                                parseOpenOrStandaloneElement(
-                                        buffer, current + 1, ((tagEnd - current) + 1) - 2, current, (tagEnd - current) + 1, currentLine, currentCol, eventProcessor, false);
+                                parseOpenElement(
+                                        buffer, current + 1, ((tagEnd - current) + 1) - 2, current, (tagEnd - current) + 1, currentLine, currentCol, eventProcessor);
                     }
 
 

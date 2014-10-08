@@ -43,13 +43,12 @@ final class ParsingElementMarkupUtil {
 
 
 
-    static void parseOpenOrStandaloneElement(
+    static void parseStandaloneElement(
             final char[] buffer,
             final int contentOffset, final int contentLen,
             @SuppressWarnings("unused") final int outerOffset, @SuppressWarnings("unused") final int outerLen,
             final int line, final int col,
-            final MarkupEventProcessor eventProcessor,
-            final boolean isStandalone)
+            final MarkupEventProcessor eventProcessor)
             throws ParseException {
 
         final int maxi = contentOffset + contentLen;
@@ -66,44 +65,22 @@ final class ParsingElementMarkupUtil {
         if (elementNameEnd == -1) {
             // The buffer only contains the element name
             
-            if (isStandalone) {
-
-                eventProcessor.processStandaloneElementStart(
-                        buffer, contentOffset, contentLen,
-                        true, line, col);
-
-                eventProcessor.processStandaloneElementEnd(
-                        buffer, contentOffset, contentLen,
-                        true, locator[0], locator[1]);
-
-                return;
-
-            } else {
-
-                eventProcessor.processOpenElementStart(
-                        buffer, contentOffset, contentLen,
-                        line, col);
-
-                eventProcessor.processOpenElementEnd(
-                        buffer, contentOffset, contentLen,
-                        locator[0], locator[1]);
-
-                return;
-
-            }
-
-        }
-
-
-        if (isStandalone) {
             eventProcessor.processStandaloneElementStart(
-                    buffer, contentOffset, (elementNameEnd - contentOffset),
+                    buffer, contentOffset, contentLen,
                     true, line, col);
-        } else {
-            eventProcessor.processOpenElementStart(
-                    buffer, contentOffset, (elementNameEnd - contentOffset),
-                    line, col);
+
+            eventProcessor.processStandaloneElementEnd(
+                    buffer, contentOffset, contentLen,
+                    true, locator[0], locator[1]);
+
+            return;
+
         }
+
+
+        eventProcessor.processStandaloneElementStart(
+                buffer, contentOffset, (elementNameEnd - contentOffset),
+                true, line, col);
 
 
         // This parseAttributeSequence will take care of calling handleInnerWhitespace when appropriate.
@@ -111,21 +88,69 @@ final class ParsingElementMarkupUtil {
                 buffer, elementNameEnd, maxi - elementNameEnd, locator, eventProcessor);
 
 
-        if (isStandalone) {
-            eventProcessor.processStandaloneElementEnd(
-                    buffer, contentOffset, (elementNameEnd - contentOffset),
-                    true, locator[0], locator[1]);
-        } else {
-            eventProcessor.processOpenElementEnd(
-                    buffer, contentOffset, (elementNameEnd - contentOffset),
-                    locator[0], locator[1]);
-        }
+        eventProcessor.processStandaloneElementEnd(
+                buffer, contentOffset, (elementNameEnd - contentOffset),
+                true, locator[0], locator[1]);
 
     }
 
 
-    
-    
+
+
+    static void parseOpenElement(
+            final char[] buffer,
+            final int contentOffset, final int contentLen,
+            @SuppressWarnings("unused") final int outerOffset, @SuppressWarnings("unused") final int outerLen,
+            final int line, final int col,
+            final MarkupEventProcessor eventProcessor)
+            throws ParseException {
+
+        final int maxi = contentOffset + contentLen;
+
+        final int[] locator = new int[] {line, col + 1};
+
+        /*
+         * Extract the element name first
+         */
+
+        final int elementNameEnd =
+                ParsingMarkupUtil.findNextWhitespaceCharWildcard(buffer, contentOffset, maxi, true, locator);
+
+        if (elementNameEnd == -1) {
+            // The buffer only contains the element name
+
+            eventProcessor.processOpenElementStart(
+                    buffer, contentOffset, contentLen,
+                    line, col);
+
+            eventProcessor.processOpenElementEnd(
+                    buffer, contentOffset, contentLen,
+                    locator[0], locator[1]);
+
+            return;
+
+        }
+
+
+        eventProcessor.processOpenElementStart(
+                buffer, contentOffset, (elementNameEnd - contentOffset),
+                line, col);
+
+
+        // This parseAttributeSequence will take care of calling handleInnerWhitespace when appropriate.
+        ParsingAttributeSequenceUtil.parseAttributeSequence(
+                buffer, elementNameEnd, maxi - elementNameEnd, locator, eventProcessor);
+
+
+        eventProcessor.processOpenElementEnd(
+                buffer, contentOffset, (elementNameEnd - contentOffset),
+                locator[0], locator[1]);
+
+    }
+
+
+
+
     static void parseCloseElement(
             final char[] buffer,
             final int contentOffset, final int contentLen,
