@@ -169,7 +169,9 @@ final class ParsingMarkupUtil {
                 inQuotes = !inQuotes;
             } else if (avoidQuotes && !inQuotes && c == '\'') {
                 inApos = !inApos;
-            } else if (!inQuotes && !inApos && (c == ' ' || c == '\n' || Character.isWhitespace(c))) {
+            } else if (!inQuotes && !inApos && (c == ' ' || c == '\n' || c == '\t' || c == '\r' || c == '\f'
+                    || c == '\u000B' || c == '\u001C' || c == '\u001D' || c == '\u001E' || c == '\u001F'
+                    || (c > '\u007F' && Character.isWhitespace(c)))) {
                 return i;
             }
 
@@ -197,7 +199,9 @@ final class ParsingMarkupUtil {
         while (n-- != 0) {
 
             c = text[i];
-            isWhitespace = (c == ' ' || c == '\n' || Character.isWhitespace(c));
+            isWhitespace = (c == ' ' || c == '\n' || c == '\t' || c == '\r' || c == '\f' || c == '\u000B'
+                    || c == '\u001C' || c == '\u001D' || c == '\u001E' || c == '\u001F'
+                    || (c > '\u007F' && Character.isWhitespace(c)));
             
             if (!isWhitespace) {
                 return i;
@@ -227,7 +231,9 @@ final class ParsingMarkupUtil {
 
             c = text[i];
             
-            if (c == '=' || (c == ' ' || c == '\n' || Character.isWhitespace(c))) {
+            if (c == '=' || (c == ' ' || c == '\n' || c == '\t' || c == '\r' || c == '\f' || c == '\u000B'
+                    || c == '\u001C' || c == '\u001D' || c == '\u001E' || c == '\u001F'
+                    || (c > '\u007F' && Character.isWhitespace(c)))) {
                 return i;
             }
 
@@ -255,7 +261,9 @@ final class ParsingMarkupUtil {
 
             c = text[i];
             
-            if (c != '=' && !(c == ' ' || c == '\n' || Character.isWhitespace(c))) {
+            if (c != '=' && !(c == ' ' || c == '\n' || c == '\t' || c == '\r' || c == '\f' || c == '\u000B'
+                    || c == '\u001C' || c == '\u001D' || c == '\u001E' || c == '\u001F'
+                    || (c > '\u007F' && Character.isWhitespace(c)))) {
                 return i;
             }
 
