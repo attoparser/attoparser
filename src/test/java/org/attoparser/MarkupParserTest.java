@@ -29,7 +29,7 @@ import org.attoparser.config.ParseConfiguration;
 import org.attoparser.config.ParseConfiguration.ElementBalancing;
 import org.attoparser.config.ParseConfiguration.PrologPresence;
 import org.attoparser.config.ParseConfiguration.UniqueRootElementPresence;
-import org.attoparser.directoutput.DirectOutputMarkupHandler;
+import org.attoparser.output.OutputMarkupHandler;
 import org.attoparser.simple.ISimpleMarkupHandler;
 import org.attoparser.simple.ISimpleMarkupParser;
 import org.attoparser.simple.SimpleMarkupParser;
@@ -53,19 +53,25 @@ public class MarkupParserTest extends TestCase {
     public void test() throws Exception {
         
         
-        final ParseConfiguration noRestrictions = ParseConfiguration.noRestrictions();
+        final ParseConfiguration noRestrictions = ParseConfiguration.xmlConfiguration();
+        noRestrictions.setElementBalancing(ElementBalancing.NO_BALANCING);
+        noRestrictions.setUniqueAttributesInElementRequired(false);
+        noRestrictions.setXmlWellFormedAttributeValuesRequired(false);
+        noRestrictions.setUniqueRootElementPresence(UniqueRootElementPresence.NOT_VALIDATED);
+        noRestrictions.getPrologParseConfiguration().setValidateProlog(false);
+
         
         final ParseConfiguration noRestrictionsUpperCaseDocType = noRestrictions.clone();
         noRestrictionsUpperCaseDocType.getPrologParseConfiguration().setValidateProlog(true);
         noRestrictionsUpperCaseDocType.getPrologParseConfiguration().setRequireDoctypeKeywordsUpperCase(true);
         
-        final ParseConfiguration noRestrictionsAutoClose = ParseConfiguration.noRestrictions();
+        final ParseConfiguration noRestrictionsAutoClose = noRestrictions.clone();
         noRestrictionsAutoClose.setElementBalancing(ElementBalancing.AUTO_CLOSE);
         
-        final ParseConfiguration noUnbalacedClosed = ParseConfiguration.noRestrictions();
+        final ParseConfiguration noUnbalacedClosed = noRestrictions.clone();
         noUnbalacedClosed.setElementBalancing(ElementBalancing.AUTO_CLOSE_REQUIRE_NO_UNMATCHED_CLOSE);
         
-        final ParseConfiguration wellFormedXml = new ParseConfiguration();
+        final ParseConfiguration wellFormedXml = noRestrictions.clone();
         wellFormedXml.setElementBalancing(ElementBalancing.REQUIRE_BALANCED);
         wellFormedXml.setUniqueAttributesInElementRequired(true);
         wellFormedXml.setXmlWellFormedAttributeValuesRequired(true);
@@ -244,19 +250,19 @@ public class MarkupParserTest extends TestCase {
         testHtmlDoc(
                 "<script> var a = \"<div>\" if (a < 0)</script>",
                 "[OES(script){1,1}OEE(script){1,8}T( var a = \"<div>\" if (a < 0)){1,9}CES(script){1,36}CEE(script){1,44}]",
-                ParseConfiguration.defaultHtmlConfiguration());
+                ParseConfiguration.htmlConfiguration());
         testHtmlDoc(
             "<style> a = \"<div>\" if (a < 0)</style>",
             "[OES(style){1,1}OEE(style){1,7}T( a = \"<div>\" if (a < 0)){1,8}CES(style){1,31}CEE(style){1,38}]",
-            ParseConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.htmlConfiguration());
         testHtmlDoc(
             "<script> var a = \"<div>\"\n\nif (a < 0)</script>",
             "[OES(script){1,1}OEE(script){1,8}T( var a = \"<div>\"\n\nif (a < 0)){1,9}CES(script){3,11}CEE(script){3,19}]",
-            ParseConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.htmlConfiguration());
         testHtmlDoc(
             "<style> a = \"<div>\"\n\nif (a < 0)</style>",
             "[OES(style){1,1}OEE(style){1,7}T( a = \"<div>\"\n\nif (a < 0)){1,8}CES(style){3,11}CEE(style){3,18}]",
-            ParseConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.htmlConfiguration());
         testDoc(
             "<SCRIPT> var a = \"<div>\" if (a < 0)</SCRIPT>",
             "[OES(SCRIPT){1,1}OEE(SCRIPT){1,8}T( var a = \"){1,9}OES(div){1,19}OEE(div){1,23}T(\" if (a < 0)){1,24}CES(SCRIPT){1,36}CEE(SCRIPT){1,44}]",
@@ -270,19 +276,19 @@ public class MarkupParserTest extends TestCase {
         testHtmlDoc(
             "<SCRIPT> var a = \"<div>\" if (a < 0)</SCRIPT>",
             "[OES(SCRIPT){1,1}OEE(SCRIPT){1,8}T( var a = \"<div>\" if (a < 0)){1,9}CES(SCRIPT){1,36}CEE(SCRIPT){1,44}]",
-            ParseConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.htmlConfiguration());
         testHtmlDoc(
             "<STYLE> a = \"<div>\" if (a < 0)</STYLE>",
             "[OES(STYLE){1,1}OEE(STYLE){1,7}T( a = \"<div>\" if (a < 0)){1,8}CES(STYLE){1,31}CEE(STYLE){1,38}]",
-            ParseConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.htmlConfiguration());
         testHtmlDoc(
             "<SCRIPT> var a = \"<div>\"\n\nif (a < 0)</SCRIPT>",
             "[OES(SCRIPT){1,1}OEE(SCRIPT){1,8}T( var a = \"<div>\"\n\nif (a < 0)){1,9}CES(SCRIPT){3,11}CEE(SCRIPT){3,19}]",
-            ParseConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.htmlConfiguration());
         testHtmlDoc(
             "<STYLE> a = \"<div>\"\n\nif (a < 0)</STYLE>",
             "[OES(STYLE){1,1}OEE(STYLE){1,7}T( a = \"<div>\"\n\nif (a < 0)){1,8}CES(STYLE){3,11}CEE(STYLE){3,18}]",
-            ParseConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.htmlConfiguration());
         testDoc(
             "<script type=\"text/javascript\"> var a = \"<div>\" if (a < 0)</script>",
             "[OES(script){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE(script){1,31}T( var a = \"){1,32}OES(div){1,42}OEE(div){1,46}T(\" if (a < 0)){1,47}CES(script){1,59}CEE(script){1,67}]",
@@ -296,19 +302,19 @@ public class MarkupParserTest extends TestCase {
         testHtmlDoc(
             "<script type=\"text/javascript\"> var a = \"<div>\" if (a < 0)</script>",
             "[OES(script){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE(script){1,31}T( var a = \"<div>\" if (a < 0)){1,32}CES(script){1,59}CEE(script){1,67}]",
-            ParseConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.htmlConfiguration());
         testHtmlDoc(
             "<style type=\"text/css\"> a = \"<div>\" if (a < 0)</style>",
             "[OES(style){1,1}IWS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE(style){1,23}T( a = \"<div>\" if (a < 0)){1,24}CES(style){1,47}CEE(style){1,54}]",
-            ParseConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.htmlConfiguration());
         testHtmlDoc(
             "<script type=\"text/javascript\"> var a = \"<div>\"\n\nif (a < 0)</script>",
             "[OES(script){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE(script){1,31}T( var a = \"<div>\"\n\nif (a < 0)){1,32}CES(script){3,11}CEE(script){3,19}]",
-            ParseConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.htmlConfiguration());
         testHtmlDoc(
             "<style type=\"text/css\"> a = \"<div>\"\n\nif (a < 0)</style>",
             "[OES(style){1,1}IWS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE(style){1,23}T( a = \"<div>\"\n\nif (a < 0)){1,24}CES(style){3,11}CEE(style){3,18}]",
-            ParseConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.htmlConfiguration());
         testDoc(
             "<SCRIPT type=\"text/javascript\"> var a = \"<div>\" if (a < 0)</SCRIPT>",
             "[OES(SCRIPT){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE(SCRIPT){1,31}T( var a = \"){1,32}OES(div){1,42}OEE(div){1,46}T(\" if (a < 0)){1,47}CES(SCRIPT){1,59}CEE(SCRIPT){1,67}]",
@@ -322,27 +328,27 @@ public class MarkupParserTest extends TestCase {
         testHtmlDoc(
             "<SCRIPT type=\"text/javascript\"> var a = \"<div>\" if (a < 0)</SCRIPT>",
             "[OES(SCRIPT){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE(SCRIPT){1,31}T( var a = \"<div>\" if (a < 0)){1,32}CES(SCRIPT){1,59}CEE(SCRIPT){1,67}]",
-            ParseConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.htmlConfiguration());
         testHtmlDoc(
             "<STYLE type=\"text/css\"> a = \"<div>\" if (a < 0)</STYLE>",
             "[OES(STYLE){1,1}IWS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE(STYLE){1,23}T( a = \"<div>\" if (a < 0)){1,24}CES(STYLE){1,47}CEE(STYLE){1,54}]",
-            ParseConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.htmlConfiguration());
         testHtmlDoc(
             "<SCRIPT type=\"text/javascript\"> var a = \"<div>\"\n\nif (a < 0)</SCRIPT>",
             "[OES(SCRIPT){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE(SCRIPT){1,31}T( var a = \"<div>\"\n\nif (a < 0)){1,32}CES(SCRIPT){3,11}CEE(SCRIPT){3,19}]",
-            ParseConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.htmlConfiguration());
         testHtmlDoc(
             "<STYLE type=\"text/css\"> a = \"<div>\"\n\nif (a < 0)</STYLE>",
             "[OES(STYLE){1,1}IWS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE(STYLE){1,23}T( a = \"<div>\"\n\nif (a < 0)){1,24}CES(STYLE){3,11}CEE(STYLE){3,18}]",
-            ParseConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.htmlConfiguration());
         testHtmlDoc(
             "<ScripT type=\"text/javascript\"> var a = \"<div>\" if (a < 0)</ScripT>",
             "[OES(ScripT){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE(ScripT){1,31}T( var a = \"<div>\" if (a < 0)){1,32}CES(ScripT){1,59}CEE(ScripT){1,67}]",
-            ParseConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.htmlConfiguration());
         testHtmlDoc(
             "<StylE type=\"text/css\"> a = \"<div>\" if (a < 0)</StylE>",
             "[OES(StylE){1,1}IWS( ){1,7}A(type){1,8}(=){1,12}(\"text/css\"){1,13}OEE(StylE){1,23}T( a = \"<div>\" if (a < 0)){1,24}CES(StylE){1,47}CEE(StylE){1,54}]",
-            ParseConfiguration.defaultHtmlConfiguration());
+            ParseConfiguration.htmlConfiguration());
         testDoc(
             "<h1 a=\"if (a < 0)\">Hello</ h1>",
             "[OES(h1){1,1}IWS( ){1,4}A(a){1,5}(=){1,6}(\"if (a < 0)\"){1,7}OEE(h1){1,19}T(Hello</ h1>){1,20}ACES(h1){1,31}ACEE(h1){1,31}]",
@@ -1470,8 +1476,8 @@ public class MarkupParserTest extends TestCase {
                 wellFormedXml);
         testDoc(
                 "</@inject>",
-                "[UCES(@inject){1,1}UCEE(@inject){1,10}]",
-                "[UCE(@inject){1,1}]",
+                "[CES(@inject){1,1}CEE(@inject){1,10}]",
+                "[CE(@inject){1,1}]",
                 noRestrictions);
         
         System.out.println("TOTAL Test executions: " + totalTestExecutions);
@@ -1666,7 +1672,7 @@ public class MarkupParserTest extends TestCase {
             {
                 final StringWriter sw = new StringWriter();
                 final ParseStatus status = new ParseStatus();
-                final IMarkupHandler handler = new DirectOutputMarkupHandler(sw);
+                final IMarkupHandler handler = new OutputMarkupHandler(sw);
                 handler.setParserStatus(status);
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
                 if (offset == 0 && len == input.length) {
@@ -1685,7 +1691,7 @@ public class MarkupParserTest extends TestCase {
             {
                 final StringWriter sw = new StringWriter();
                 final ParseStatus status = new ParseStatus();
-                final IMarkupHandler handler = new DirectOutputMarkupHandler(sw);
+                final IMarkupHandler handler = new OutputMarkupHandler(sw);
                 handler.setParserStatus(status);
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
                 parser.parseDocument(input, offset, len, eventProcessor, status);

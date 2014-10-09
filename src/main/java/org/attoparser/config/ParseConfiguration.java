@@ -28,12 +28,31 @@ import java.io.Serializable;
 
 /**
  * <p>
- *   Models a series of markup parsing parameterizations that can be applied during document parsing
- *   by {@link org.attoparser.MarkupEventProcessor} (and its subclasses).
+ *   Models a series of parsing configurations that can be applied during document parsing
+ *   by {@link org.attoparser.MarkupParser} and its variants
+ *   {@link org.attoparser.simple.SimpleMarkupParser} and {@link org.attoparser.dom.DOMMarkupParser}.
  * </p>
  * <p>
- *   For example, a this parameterizations can be used for checking the well-formedness
- *   (from an XML/XHTML standpoint) of a document.
+ *   Among others, the parameters that can be configured are:
+ * </p>
+ * <ul>
+ *   <li>The parsing mode: <strong>XML</strong> or <strong>HTML</strong>.</li>
+ *   <li>Whether to expect XML-well-formed code or not.</li>
+ *   <li>Whether to perform automatic tag balancing or not.</li>
+ *   <li>Whether we will allow parsing of markup fragments or just entire documents.</li>
+ * </ul>
+ * <p>
+ *   The {@link #htmlConfiguration()} and {@link #xmlConfiguration()} static methods act as starting points
+ *   for configuration. Once one of these pre-initialized configurations has been created, it can be
+ *   fine-tuned for the user's needs.
+ * </p>
+ * <p>
+ *   Note these configuration objects are <strong>mutable</strong>, so they should not be modified once they
+ *   have been passed to a parser in order to initialize it.
+ * </p>
+ * <p>
+ *   Instances of this class can be <strong>cloned</strong>, so creating a variant of an already-tuned configuration
+ *   is easy.
  * </p>
  * 
  * 
@@ -43,10 +62,28 @@ import java.io.Serializable;
  *
  */
 public final class ParseConfiguration implements Serializable, Cloneable {
-    
+
+
+    /**
+     * <p>
+     *   Enumeration representing the possible actions to be taken with regard to element balancing:
+     * </p>
+     * <ul>
+     *   <li>Require that elements are already correctly balanced in markup.</li>
+     *   <li>Auto-close elements if needed, reporting (as events) unmatched close elements if they appear.</li>
+     *   <li>Auto-close elements if needed, not allowing unmatched close elements.</li>
+     *   <li>No auto-close, not allow unmatched close elements.</li>
+     *   <li>Do not perform element balancing checks at all.</li>
+     * </ul>
+     * <p>
+     *   This enumeration is used at the {@link org.attoparser.config.ParseConfiguration} class.
+     * </p>
+     */
     public static enum ElementBalancing { 
         REQUIRE_BALANCED, AUTO_CLOSE, AUTO_CLOSE_REQUIRE_NO_UNMATCHED_CLOSE, 
         REQUIRE_NO_UNMATCHED_CLOSE, NO_BALANCING } 
+
+
 
     private static final long serialVersionUID = 5191449744126332911L;
 
@@ -72,18 +109,16 @@ public final class ParseConfiguration implements Serializable, Cloneable {
 
 
 
-
     static {
 
         DEFAULT_HTML_PARSE_CONFIGURATION = new ParseConfiguration();
         DEFAULT_HTML_PARSE_CONFIGURATION.setMode(ParsingMode.HTML);
-        DEFAULT_HTML_PARSE_CONFIGURATION.setCaseSensitive(false);
         DEFAULT_HTML_PARSE_CONFIGURATION.setTextSplittable(false);
         DEFAULT_HTML_PARSE_CONFIGURATION.setElementBalancing(ElementBalancing.AUTO_CLOSE);
         DEFAULT_HTML_PARSE_CONFIGURATION.setUniqueAttributesInElementRequired(true);
         DEFAULT_HTML_PARSE_CONFIGURATION.setXmlWellFormedAttributeValuesRequired(false);
-        DEFAULT_HTML_PARSE_CONFIGURATION.setUniqueRootElementPresence(UniqueRootElementPresence.DEPENDS_ON_PROLOG_DOCTYPE);
-        DEFAULT_HTML_PARSE_CONFIGURATION.getPrologParseConfiguration().setValidateProlog(true);
+        DEFAULT_HTML_PARSE_CONFIGURATION.setUniqueRootElementPresence(UniqueRootElementPresence.NOT_VALIDATED);
+        DEFAULT_HTML_PARSE_CONFIGURATION.getPrologParseConfiguration().setValidateProlog(false);
         DEFAULT_HTML_PARSE_CONFIGURATION.getPrologParseConfiguration().setPrologPresence(PrologPresence.ALLOWED);
         DEFAULT_HTML_PARSE_CONFIGURATION.getPrologParseConfiguration().setXmlDeclarationPresence(PrologPresence.ALLOWED);
         DEFAULT_HTML_PARSE_CONFIGURATION.getPrologParseConfiguration().setDoctypePresence(PrologPresence.ALLOWED);
@@ -92,7 +127,6 @@ public final class ParseConfiguration implements Serializable, Cloneable {
 
         DEFAULT_XML_PARSE_CONFIGURATION = new ParseConfiguration();
         DEFAULT_XML_PARSE_CONFIGURATION.setMode(ParsingMode.XML);
-        DEFAULT_XML_PARSE_CONFIGURATION.setCaseSensitive(true);
         DEFAULT_XML_PARSE_CONFIGURATION.setTextSplittable(false);
         DEFAULT_XML_PARSE_CONFIGURATION.setElementBalancing(ElementBalancing.REQUIRE_BALANCED);
         DEFAULT_XML_PARSE_CONFIGURATION.setUniqueAttributesInElementRequired(true);
@@ -107,10 +141,24 @@ public final class ParseConfiguration implements Serializable, Cloneable {
     }
 
 
-
-
-
-    public static ParseConfiguration defaultHtmlConfiguration() {
+    /**
+     * <p>
+     *   Return an instance of {@link org.attoparser.config.ParseConfiguration} containing a valid configuration
+     *   set for most HTML scenarios.
+     * </p>
+     * <ul>
+     *     <li>Mode: {@link org.attoparser.config.ParseConfiguration.ParsingMode#HTML}</li>
+     *     <li>Text splittable: false</li>
+     *     <li>Element balancing: {@link org.attoparser.config.ParseConfiguration.ElementBalancing#AUTO_CLOSE}</li>
+     *     <li>Unique attributes in elements required: false</li>
+     *     <li>Xml-well-formed attribute values required: false</li>
+     *     <li>Unique root element presence: {@link org.attoparser.config.ParseConfiguration.UniqueRootElementPresence#NOT_VALIDATED}</li>
+     *     <li>Validate Prolog: false</li>
+     * </ul>
+     *
+     * @return a valid default configuration object for HTML parsing.
+     */
+    public static ParseConfiguration htmlConfiguration() {
         try {
             return DEFAULT_HTML_PARSE_CONFIGURATION.clone();
         } catch (final CloneNotSupportedException e) {
@@ -121,7 +169,28 @@ public final class ParseConfiguration implements Serializable, Cloneable {
 
 
 
-    public static ParseConfiguration defaultXmlConfiguration() {
+    /**
+     * <p>
+     *   Return an instance of {@link org.attoparser.config.ParseConfiguration} containing a valid configuration
+     *   set for most XML scenarios.
+     * </p>
+     * <ul>
+     *     <li>Mode: {@link org.attoparser.config.ParseConfiguration.ParsingMode#XML}</li>
+     *     <li>Text splittable: false</li>
+     *     <li>Element balancing: {@link org.attoparser.config.ParseConfiguration.ElementBalancing#REQUIRE_BALANCED}</li>
+     *     <li>Unique attributes in elements required: true</li>
+     *     <li>Xml-well-formed attribute values required: true</li>
+     *     <li>Unique root element presence: {@link org.attoparser.config.ParseConfiguration.UniqueRootElementPresence#DEPENDS_ON_PROLOG_DOCTYPE}</li>
+     *     <li>Validate Prolog: true</li>
+     *     <li>Prolog presence: {@link org.attoparser.config.ParseConfiguration.PrologPresence#ALLOWED}</li>
+     *     <li>XML Declaration presence: {@link org.attoparser.config.ParseConfiguration.PrologPresence#ALLOWED}</li>
+     *     <li>DOCTYPE presence: {@link org.attoparser.config.ParseConfiguration.PrologPresence#ALLOWED}</li>
+     *     <li>Require DOCTYPE keyword to be uppercase: true</li>
+     * </ul>
+     *
+     * @return a valid default configuration object for XML parsing.
+     */
+    public static ParseConfiguration xmlConfiguration() {
         try {
             return DEFAULT_XML_PARSE_CONFIGURATION.clone();
         } catch (final CloneNotSupportedException e) {
@@ -132,61 +201,54 @@ public final class ParseConfiguration implements Serializable, Cloneable {
 
 
 
-    /**
-     * <p>
-     *   Creates a {@link ParseConfiguration} instance enforcing no restrictions at all.
-     * </p>
-     * <p>
-     *   This is the setup:
-     * </p>
-     * <ul>
-     *   <li><tt>{@link #isCaseSensitive()} = true</tt></li>
-     *   <li><tt>{@link #getElementBalancing()} = {@link ElementBalancing#NO_BALANCING}</tt></li>
-     *   <li><tt>{@link #isXmlWellFormedAttributeValuesRequired()} = false</tt></li>
-     *   <li><tt>{@link #isUniqueAttributesInElementRequired()} = false</tt></li>
-     *   <li><tt>{@link #getPrologParseConfiguration()} = new {@link org.attoparser.config.ParseConfiguration.PrologParseConfiguration}()</tt></li>
-     *   <li><tt>{@link #getUniqueRootElementPresence()} = {@link UniqueRootElementPresence#DEPENDS_ON_PROLOG_DOCTYPE}</tt></li>
-     * </ul>
-     */
-    public static ParseConfiguration noRestrictions() {
-        return new ParseConfiguration();
-    }
-    
-    
 
-    
-    
-    /**
-     * <p>
-     *   Creates a {@link ParseConfiguration} instance with
-     *   a default configuration.
-     * </p>
-     * <p>
-     *   Default values are the same as created by {@link #noRestrictions()}:
-     * </p>
-     * <ul>
-     *   <li><tt>{@link #isCaseSensitive()} = true</tt></li>
-     *   <li><tt>{@link #getElementBalancing()} = {@link ElementBalancing#NO_BALANCING}</tt></li>
-     *   <li><tt>{@link #isXmlWellFormedAttributeValuesRequired()} = false</tt></li>
-     *   <li><tt>{@link #isUniqueAttributesInElementRequired()} = false</tt></li>
-     *   <li><tt>{@link #getPrologParseConfiguration()} = new {@link org.attoparser.config.ParseConfiguration.PrologParseConfiguration}()</tt></li>
-     *   <li><tt>{@link #getUniqueRootElementPresence()} = {@link UniqueRootElementPresence#DEPENDS_ON_PROLOG_DOCTYPE}</tt></li>
-     * </ul>
+
+    /*
+     * No need to make this public. Instances of ParseConfiguration should be created from the static
+     * factory methods for XML and HTML config.
      */
-    public ParseConfiguration() {
+    private ParseConfiguration() {
         super();
     }
 
 
 
 
-
+    /**
+     * <p>
+     *   Return the parsing mode to be used. Can be <strong>XML</strong> or <strong>HTML</strong>.
+     * </p>
+     * <p>
+     *   Depending on the selected mode parsers will behave differently, given HTML has some specific
+     *   rules which are not XML-compatible (like void elements which might appear <em>unclosed</em> like
+     *   <tt>&lt;meta&gt;</tt>.
+     * </p>
+     *
+     * @return the parsing mode to be used.
+     */
     public ParsingMode getMode() {
         return mode;
     }
 
+
+    /**
+     * <p>
+     *   Specify the parsing mode to be used. Can be <strong>XML</strong> or <strong>HTML</strong>.
+     * </p>
+     * <p>
+     *   Depending on the selected mode parsers will behave differently, given HTML has some specific
+     *   rules which are not XML-compatible (like void elements which might appear <em>unclosed</em> like
+     *   <tt>&lt;meta&gt;</tt>.
+     * </p>
+     *
+     * @param mode the parsing mode to be used.
+     */
     public void setMode(final ParsingMode mode) {
         this.mode = mode;
+        if (ParsingMode.HTML.equals(this.mode)) {
+            // We can never use HTML parsing in case-sensitive mode
+            this.caseSensitive = false;
+        }
     }
 
 
@@ -194,12 +256,12 @@ public final class ParseConfiguration implements Serializable, Cloneable {
 
     /**
      * <p>
-     *   Determines whether validations performed on the parsed document should be
+     *   Returns whether validations performed on the parsed document should be
      *   case sensitive or not (e.g. attribute names, document root element name, element
      *   open vs close elements, etc.)
      * </p>
      * <p>
-     *   Default is <b>true</b>.
+     *   HTML requires this parameter to be <tt>false</tt>. Default for XML is <tt>true</tt>.
      * </p>
      * 
      * @return whether validations should be case sensitive or not. 
@@ -208,20 +270,57 @@ public final class ParseConfiguration implements Serializable, Cloneable {
         return this.caseSensitive;
     }
 
-    
+
+    /**
+     * <p>
+     *   Specify whether validations performed on the parsed document should be
+     *   case sensitive or not (e.g. attribute names, document root element name, element
+     *   open vs close elements, etc.)
+     * </p>
+     * <p>
+     *   HTML requires this parameter to be <tt>false</tt>. Default for XML is <tt>true</tt>.
+     * </p>
+     *
+     * @param caseSensitive whether validations should be case sensitive or not.
+     */
     public void setCaseSensitive(final boolean caseSensitive) {
+        if (caseSensitive && ParsingMode.HTML.equals(this.mode)) {
+            throw new IllegalArgumentException(
+                    "Cannot set parser as case-sensitive for HTML mode. Use XML mode instead.");
+        }
         this.caseSensitive = caseSensitive;
     }
 
 
 
 
-
+    /**
+     * <p>
+     *   Returns whether text fragments in markup can be split in more than one text node, if it
+     *   occupies more than an entire buffer in size.
+     * </p>
+     * <p>
+     *   Default is <tt>false</tt>.
+     * </p>
+     *
+     * @return whether text fragments can be split or not.
+     */
     public boolean isTextSplittable() {
         return this.textSplittable;
     }
 
 
+    /**
+     * <p>
+     *   Specify whether text fragments in markup can be split in more than one text node, if it
+     *   occupies more than an entire buffer in size.
+     * </p>
+     * <p>
+     *   Default is <tt>false</tt>.
+     * </p>
+     *
+     * @param textSplittable whether text fragments can be split or not.
+     */
     public void setTextSplittable(final boolean textSplittable) {
         this.textSplittable = textSplittable;
     }
@@ -229,10 +328,9 @@ public final class ParseConfiguration implements Serializable, Cloneable {
 
 
 
-
     /**
      * <p>
-     *   Determines the level of element balancing required at the document being parsed,
+     *   Returns the level of element balancing required at the document being parsed,
      *   enabling auto-closing of elements if needed.
      * </p>
      * <p>
@@ -264,15 +362,46 @@ public final class ParseConfiguration implements Serializable, Cloneable {
     }
 
 
+    /**
+     * <p>
+     *   Specify the level of element balancing required at the document being parsed,
+     *   enabling auto-closing of elements if needed.
+     * </p>
+     * <p>
+     *   Possible values are:
+     * </p>
+     * <ul>
+     *   <li>{@link ElementBalancing#NO_BALANCING} (default): means no corrections and/or
+     *       validations of any kind will be performed. Artifacts will be reported by the
+     *       corresponding events without further interpretation.</li>
+     *   <li>{@link ElementBalancing#REQUIRE_BALANCED}: will require that all elements
+     *       are perfectly balanced, raising an exception if this does not happen.</li>
+     *   <li>{@link ElementBalancing#AUTO_CLOSE}: Parser will emit <i>autoclose</i> events
+     *       for those elements that are left unclosed, in order to provide a complete XML-style
+     *       tag balance.</li>
+     *   <li>{@link ElementBalancing#AUTO_CLOSE_REQUIRE_NO_UNMATCHED_CLOSE}: Same as
+     *       {@link ElementBalancing#AUTO_CLOSE} but validating that there are no unmatched
+     *       <i>close element</i> artifacts (without a corresponding <i>open element</i> artifact),
+     *       raising an exception if any are found.</li>
+     *   <li>{@link ElementBalancing#REQUIRE_NO_UNMATCHED_CLOSE}: Will not require complete
+     *       balancing nor perform <i>autoclose</i>, but will require that there are no unmatched
+     *       <i>close element</i> artifacts (without a corresponding <i>open element</i> artifact),
+     *       raising an exception if any are found.</li>
+     * </ul>
+     *
+     * @param elementBalancing the level of element balancing.
+     */
     public void setElementBalancing(final ElementBalancing elementBalancing) {
         this.elementBalancing = elementBalancing;
     }
 
 
+
+
     /**
      * <p>
-     *   A {@link org.attoparser.config.ParseConfiguration.PrologParseConfiguration} object determining the way
-     *   in which prolog (XML Declaration, DOCTYPE) will be dealt with during parsing.
+     *   Returns the {@link org.attoparser.config.ParseConfiguration.PrologParseConfiguration} object determining the
+     *   way in which prolog (XML Declaration, DOCTYPE) will be dealt with during parsing.
      * </p>
      * 
      * @return the configuration object.
@@ -282,9 +411,11 @@ public final class ParseConfiguration implements Serializable, Cloneable {
     }
 
 
+
+
     /**
      * <p>
-     *   Determine whether element attributes will be required to be well-formed from the XML
+     *   Returns whether element attributes will be required to be well-formed from the XML
      *   standpoint. This means:
      * </p>
      * <ul>
@@ -299,17 +430,31 @@ public final class ParseConfiguration implements Serializable, Cloneable {
     }
 
 
+    /**
+     * <p>
+     *   Specify whether element attributes will be required to be well-formed from the XML
+     *   standpoint. This means:
+     * </p>
+     * <ul>
+     *   <li>Attributes should always have a value.</li>
+     *   <li>Attribute values should be surrounded by double-quotes.</li>
+     * </ul>
+     *
+     * @param xmlWellFormedAttributeValuesRequired whether attributes should be XML-well-formed or not.
+     */
     public void setXmlWellFormedAttributeValuesRequired(
             final boolean xmlWellFormedAttributeValuesRequired) {
         this.xmlWellFormedAttributeValuesRequired = xmlWellFormedAttributeValuesRequired;
     }
 
 
+
+
     /**
      * <p>
-     *   Determines whether attributes should never appear duplicated in elements.
+     *   Returns whether attributes should never appear duplicated in elements.
      * </p>
-     * 
+     *
      * @return whether attributes should never appear duplicated in elements.
      */
     public boolean isUniqueAttributesInElementRequired() {
@@ -317,9 +462,18 @@ public final class ParseConfiguration implements Serializable, Cloneable {
     }
 
 
+    /**
+     * <p>
+     *   Returns whether attributes should never appear duplicated in elements.
+     * </p>
+     *
+     * @param uniqueAttributesInElementRequired whether attributes should never appear duplicated in elements.
+     */
     public void setUniqueAttributesInElementRequired(final boolean uniqueAttributesInElementRequired) {
         this.uniqueAttributesInElementRequired = uniqueAttributesInElementRequired;
     }
+
+
 
 
     /**
@@ -365,6 +519,44 @@ public final class ParseConfiguration implements Serializable, Cloneable {
     }
 
 
+    /**
+     * <p>
+     *   This value determines whether it will be required that the document has a unique
+     *   root element.
+     * </p>
+     * <p>
+     *   If set to {@link UniqueRootElementPresence#REQUIRED_ALWAYS}, then a document with
+     *   more than one elements at the root level will never be considered valid. And if
+     *   {@link org.attoparser.config.ParseConfiguration.PrologParseConfiguration#isValidateProlog()} is true and there is a DOCTYPE
+     *   clause, it will be checked that the root name established at the DOCTYPE clause
+     *   is the same as the document's element root.
+     * </p>
+     * <p>
+     *   If set to {@link UniqueRootElementPresence#DEPENDS_ON_PROLOG_DOCTYPE}, then:
+     * </p>
+     * <ul>
+     *   <li>If {@link org.attoparser.config.ParseConfiguration.PrologParseConfiguration#isValidateProlog()} is false, multiple
+     *       document root elements will be allowed.</li>
+     *   <li>If {@link org.attoparser.config.ParseConfiguration.PrologParseConfiguration#isValidateProlog()} is true:
+     *       <ul>
+     *         <li>If there is a DOCTYPE clause, a unique element root will be required,
+     *             and its name will be checked against the name specified at the DOCTYPE
+     *             clause.</li>
+     *         <li>If there is no DOCTYPE clause (even if it is forbidden), multiple
+     *             document root elements will be allowed.</li>
+     *       </ul>
+     *   </li>
+     * </ul>
+     * <p>
+     *   If set to {@link UniqueRootElementPresence#NOT_VALIDATED}, then nothing will be checked
+     *   regarding the name of the root element/s.
+     * </p>
+     * <p>
+     *   Default value is <b>{@link UniqueRootElementPresence#DEPENDS_ON_PROLOG_DOCTYPE}</b>.
+     * </p>
+     *
+     * @param uniqueRootElementPresence the configuration value for validating the presence of a unique root element.
+     */
     public void setUniqueRootElementPresence(final UniqueRootElementPresence uniqueRootElementPresence) {
         validateNotNull(uniqueRootElementPresence, "The \"unique root element presence\" configuration value cannot be null");
         this.uniqueRootElementPresence = uniqueRootElementPresence;
@@ -388,18 +580,29 @@ public final class ParseConfiguration implements Serializable, Cloneable {
     }
 
 
-
-
-
-
-
+    /**
+     * <p>
+     *   Enumeration used for determining the parsing mode, which will affect the parser's behaviour.
+     *   Values are <strong>XML</strong> and <strong>HTML</strong>.
+     * </p>
+     * <p>
+     *   This enumeration is used at the {@link org.attoparser.config.ParseConfiguration} class.
+     * </p>
+     */
     public static enum ParsingMode {
         HTML, XML
     }
 
 
-
-
+    /**
+     * <p>
+     *   Enumeration used for determining whether an element in the document prolog (DOCTYPE, XML Declaration) or
+     *   the prolog itself should be allowed, required or even forbidden.
+     * </p>
+     * <p>
+     *   This enumeration is used at the {@link org.attoparser.config.ParseConfiguration} class.
+     * </p>
+     */
     public static enum PrologPresence {
         
         REQUIRED(true, false, false), 
@@ -430,10 +633,23 @@ public final class ParseConfiguration implements Serializable, Cloneable {
         }
     
     }
-    
-    
-    
-    
+
+
+    /**
+     * <p>
+     *   Enumeration used for determining the behaviour the parser should have with respect to the presence and
+     *   number of root elements in the parsed document.
+     * </p>
+     * <p>
+     *   Root elements are the elements that appear at the root of the document (e.g. <tt>&lt;html&gt;</tt> in
+     *   complete HTML documents). This enumeration allows requiring that the root element is unique always,
+     *   requiring it only if a document prolog (XML Declaration or DOCTYPE) is present, or not validating
+     *   this at all.
+     * </p>
+     * <p>
+     *   This enumeration is used at the {@link org.attoparser.config.ParseConfiguration} class.
+     * </p>
+     */
     public static enum UniqueRootElementPresence { 
         
         REQUIRED_ALWAYS(true, false), 
@@ -480,7 +696,7 @@ public final class ParseConfiguration implements Serializable, Cloneable {
      *   will be considered.
      * </p>
      * <p>
-     *   Not all combinations of values of the tt>{@link #getPrologPresence()}</tt>, 
+     *   Not all combinations of values of the <tt>{@link #getPrologPresence()}</tt>, 
      *   <tt>{@link #getXmlDeclarationPresence()}</tt> and <tt>{@link #getDoctypePresence()}</tt> 
      *   are considered valid. See {@link #validateConfiguration()} for details.
      * </p>

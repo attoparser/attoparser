@@ -40,10 +40,10 @@ public class DOMBuilderTest extends TestCase {
 
     public void test() throws Exception {
 
-        final ParseConfiguration xmlConfig = ParseConfiguration.defaultXmlConfiguration();
-        final ParseConfiguration xmlAutoCloseConfig = ParseConfiguration.defaultXmlConfiguration();
+        final ParseConfiguration xmlConfig = ParseConfiguration.xmlConfiguration();
+        final ParseConfiguration xmlAutoCloseConfig = ParseConfiguration.xmlConfiguration();
         xmlAutoCloseConfig.setElementBalancing(ParseConfiguration.ElementBalancing.AUTO_CLOSE);
-        final ParseConfiguration htmlConfig = ParseConfiguration.defaultHtmlConfiguration();
+        final ParseConfiguration htmlConfig = ParseConfiguration.htmlConfiguration();
 
 
         check(xmlConfig, "<div>hello</div>", "<div>hello</div>");

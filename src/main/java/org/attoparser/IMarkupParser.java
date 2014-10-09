@@ -58,7 +58,7 @@ import java.io.Reader;
  *   };
  *
  *   // Create or obtain the parser instance (can be reused). Example uses the default configuration for HTML
- *   final IMarkupParser parser = new MarkupParser(ParseConfiguration.defaultHtmlConfiguration());
+ *   final IMarkupParser parser = new MarkupParser(ParseConfiguration.htmlConfiguration());
  *
  *   // Parse it!
  *   parser.parse(documentReader, handler);
