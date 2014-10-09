@@ -47,6 +47,14 @@ package org.attoparser;
  *   AttoParser provides several useful implementations of this interface out-of-the-box, like:
  * </p>
  * <ul>
+ *   <li>Markup output:
+ *     <ul>
+ *       <li>{@link org.attoparser.output.OutputMarkupHandler}: for writing the received events to a
+ *           specified {@link java.io.Writer} object, without any loss of information (case, whitespaces, etc.). This
+ *           handler is useful for performing filtering/transformation operations on the parsed markup, placing this
+ *           handler at the end of the handler chain so that it outputs the final results of such operation.</li>
+ *     </ul>
+ *   </li>
  *   <li>Conversion to other formats:
  *     <ul>
  *       <li>{@link org.attoparser.dom.DOMBuilderMarkupHandler}: for building a DOM tree as a result of parsing
@@ -60,11 +68,15 @@ package org.attoparser;
  *           applied by using the convenience ad-hob parser class {@link org.attoparser.simple.SimpleMarkupParser}.
  *     </ul>
  *   </li>
+ *   <li>Event management:
+ *     <ul>
+ *       <li>{@link org.attoparser.duplicate.DuplicateMarkupHandler}: for duplicating parsing events, sending each
+ *           of them to two different implementations if {@link org.attoparser.IMarkupHandler}.
+ *     </ul>
+ *   </li>
  *   <li>Testing and Debugging:
  *     <ul>
- *       <li>{@link org.attoparser.directoutput.DirectOutputMarkupHandler}: for writing the parsed markup to a
- *           specified {@link java.io.Writer} object, without any loss of information due to parsing.</li>
- *       <li>{@link org.attoparser.prettyhtmldisplay.PrettyHtmlDisplayMarkupHandler}: for creating an HTML
+ *       <li>{@link org.attoparser.prettyhtml.PrettyHtmlMarkupHandler}: for creating an HTML
  *           document visually explaining all the events happened during the parsing of a document:
  *           elements, attributes, auto-closing of elements, unmatched artifacts, etc.</li>
  *       <li>{@link org.attoparser.trace.TraceBuilderMarkupHandler}: for building a trace of parsing events (a

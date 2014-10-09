@@ -35,36 +35,134 @@ public interface IDOMMarkupParser {
 
 
 
+    /**
+     * <p>
+     *   Parse a document and convert it into a DOM tree, using the classes at the
+     *   <tt>org.attoparser.dom</tt> package.
+     * </p>
+     *
+     * @param document the document to be parsed, as a String.
+     * @return the {@link org.attoparser.dom.Document} object resulting from parsing.
+     * @throws ParseException if the document cannot be parsed.
+     */
     public Document parse(final String document)
             throws ParseException;
 
 
+    /**
+     * <p>
+     *   Parse a document and convert it into a DOM tree, using the classes at the
+     *   <tt>org.attoparser.dom</tt> package.
+     * </p>
+     *
+     * @param document the document to be parsed, as a char[].
+     * @return the {@link org.attoparser.dom.Document} object resulting from parsing.
+     * @throws ParseException if the document cannot be parsed.
+     */
     public Document parse(final char[] document)
             throws ParseException;
 
 
+    /**
+     * <p>
+     *   Parse a document and convert it into a DOM tree, using the classes at the
+     *   <tt>org.attoparser.dom</tt> package.
+     * </p>
+     *
+     * @param document the document to be parsed, as a char[].
+     * @param offset the offset to be applied on the char[] document to determine the
+     *        start of the document contents.
+     * @param len the length (in chars) of the document stored in the char[].
+     * @return the {@link org.attoparser.dom.Document} object resulting from parsing.
+     * @throws ParseException if the document cannot be parsed.
+     */
     public Document parse(final char[] document, final int offset, final int len)
             throws ParseException;
 
 
+    /**
+     * <p>
+     *   Parse a document and convert it into a DOM tree, using the classes at the
+     *   <tt>org.attoparser.dom</tt> package.
+     * </p>
+     * <p>
+     *   Implementations of this interface must close the provided {@link Reader}
+     *   object after parsing.
+     * </p>
+     *
+     * @param reader a Reader on the document.
+     * @return the {@link org.attoparser.dom.Document} object resulting from parsing.
+     * @throws ParseException if the document cannot be parsed.
+     */
     public Document parse(final Reader reader)
             throws ParseException;
 
 
 
 
+    /**
+     * <p>
+     *   Parse a document and convert it into a DOM tree, using the classes at the
+     *   <tt>org.attoparser.dom</tt> package.
+     * </p>
+     *
+     * @param documentName the name of the document to be parsed.
+     * @param document the document to be parsed, as a String.
+     * @return the {@link org.attoparser.dom.Document} object resulting from parsing.
+     * @throws ParseException if the document cannot be parsed.
+     */
     public Document parse(final String documentName, final String document)
             throws ParseException;
 
 
+    /**
+     * <p>
+     *   Parse a document and convert it into a DOM tree, using the classes at the
+     *   <tt>org.attoparser.dom</tt> package.
+     * </p>
+     *
+     * @param documentName the name of the document to be parsed.
+     * @param document the document to be parsed, as a char[].
+     * @return the {@link org.attoparser.dom.Document} object resulting from parsing.
+     * @throws ParseException if the document cannot be parsed.
+     */
     public Document parse(final String documentName, final char[] document)
             throws ParseException;
 
 
+    /**
+     * <p>
+     *   Parse a document and convert it into a DOM tree, using the classes at the
+     *   <tt>org.attoparser.dom</tt> package.
+     * </p>
+     *
+     * @param documentName the name of the document to be parsed.
+     * @param document the document to be parsed, as a char[].
+     * @param offset the offset to be applied on the char[] document to determine the
+     *        start of the document contents.
+     * @param len the length (in chars) of the document stored in the char[].
+     * @return the {@link org.attoparser.dom.Document} object resulting from parsing.
+     * @throws ParseException if the document cannot be parsed.
+     */
     public Document parse(final String documentName, final char[] document, final int offset, final int len)
             throws ParseException;
 
 
+    /**
+     * <p>
+     *   Parse a document and convert it into a DOM tree, using the classes at the
+     *   <tt>org.attoparser.dom</tt> package.
+     * </p>
+     * <p>
+     *   Implementations of this interface must close the provided {@link Reader}
+     *   object after parsing.
+     * </p>
+     *
+     * @param documentName the name of the document to be parsed.
+     * @param reader a Reader on the document.
+     * @return the {@link org.attoparser.dom.Document} object resulting from parsing.
+     * @throws ParseException if the document cannot be parsed.
+     */
     public Document parse(final String documentName, final Reader reader)
             throws ParseException;
 

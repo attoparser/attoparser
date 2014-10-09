@@ -17,34 +17,64 @@
  * 
  * =============================================================================
  */
-package org.attoparser.directoutput;
-
-import java.io.Writer;
+package org.attoparser.duplicate;
 
 import org.attoparser.AbstractMarkupHandler;
+import org.attoparser.IMarkupHandler;
 import org.attoparser.ParseException;
 
 
 /**
+ * <p>
+ *   Implementation of {@link org.attoparser.IMarkupHandler} used for duplicating events, sending them to two
+ *   different handlers.
+ * </p>
+ * <p>
+ *   Note that, as with most handlers, this class is <strong>not thread-safe</strong>. Also, instances of this class
+ *   should not be reused across parsing operations.
+ * </p>
+ * <p>
+ *   Sample usage:
+ * </p>
+ * <pre><code>
+ *
+ *   final Writer writer1 = new StringWriter();
+ *   final IMarkupHandler handler1 = new OutputMarkupHandler(writer1);
+ *
+ *   final Writer writer2 = new StringWriter();
+ *   final IMarkupHandler handler2 = new PrettyHtmlMarkupHandler(writer2);
+ *
+ *   final IMarkupHandler handler = new DuplicateMarkupHandler(handler1, handler2);
+ *
+ *   parser.parse(document, handler);
+ *
+ *   return writer.toString();
+ *
+ * </code></pre>
  * 
  * @author Daniel Fern&aacute;ndez
  * 
  * @since 2.0.0
  *
  */
-public final class DirectOutputMarkupHandler extends AbstractMarkupHandler {
+public final class DuplicateMarkupHandler extends AbstractMarkupHandler {
 
-    
-    private final Writer writer;
-    
 
-    
-    public DirectOutputMarkupHandler(final Writer writer) {
+    private final IMarkupHandler handler1;
+    private final IMarkupHandler handler2;
+
+
+
+    public DuplicateMarkupHandler(final IMarkupHandler handler1, final IMarkupHandler handler2) {
         super();
-        if (writer == null) {
-            throw new IllegalArgumentException("Writer cannot be null");
+        if (handler1 == null) {
+            throw new IllegalArgumentException("Handler 1 cannot be null");
         }
-        this.writer = writer;
+        if (handler2 == null) {
+            throw new IllegalArgumentException("Handler 2 cannot be null");
+        }
+        this.handler1 = handler1;
+        this.handler2 = handler2;
     }
 
     
@@ -56,11 +86,8 @@ public final class DirectOutputMarkupHandler extends AbstractMarkupHandler {
     public void handleText(final char[] buffer, final int offset, final int len, final int line, final int col)
             throws ParseException {
         
-        try {
-            this.writer.write(buffer, offset, len);
-        } catch (final Exception e) {
-            throw new ParseException(e);
-        }
+        this.handler1.handleText(buffer, offset, len, line, col);
+        this.handler2.handleText(buffer, offset, len, line, col);
 
     }
 
@@ -73,12 +100,9 @@ public final class DirectOutputMarkupHandler extends AbstractMarkupHandler {
             final int outerOffset, final int outerLen, 
             final int line, final int col)
             throws ParseException {
-        
-        try {
-            this.writer.write(buffer, outerOffset, outerLen);
-        } catch (final Exception e) {
-            throw new ParseException(e);
-        }
+
+        this.handler1.handleComment(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
+        this.handler2.handleComment(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
 
     }
 
@@ -90,12 +114,9 @@ public final class DirectOutputMarkupHandler extends AbstractMarkupHandler {
             final int outerOffset, final int outerLen,
             final int line, final int col)
             throws ParseException {
-        
-        try {
-            this.writer.write(buffer, outerOffset, outerLen);
-        } catch (final Exception e) {
-            throw new ParseException(e);
-        }
+
+        this.handler1.handleCDATASection(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
+        this.handler2.handleCDATASection(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
 
     }
 
@@ -106,13 +127,9 @@ public final class DirectOutputMarkupHandler extends AbstractMarkupHandler {
     public void handleStandaloneElementStart(
             final char[] buffer, final int offset, final int len,
             final boolean minimized, final int line, final int col) throws ParseException {
-        
-        try {
-            this.writer.write('<');
-            this.writer.write(buffer, offset, len);
-        } catch (final Exception e) {
-            throw new ParseException(e);
-        }
+
+        this.handler1.handleStandaloneElementStart(buffer, offset, len, minimized, line, col);
+        this.handler2.handleStandaloneElementStart(buffer, offset, len, minimized, line, col);
 
     }
 
@@ -123,12 +140,9 @@ public final class DirectOutputMarkupHandler extends AbstractMarkupHandler {
     public void handleStandaloneElementEnd(
             final char[] buffer, final int offset, final int len,
             final boolean minimized, final int line, final int col) throws ParseException {
-        
-        try {
-            this.writer.write("/>");
-        } catch (final Exception e) {
-            throw new ParseException(e);
-        }
+
+        this.handler1.handleStandaloneElementEnd(buffer, offset, len, minimized, line, col);
+        this.handler2.handleStandaloneElementEnd(buffer, offset, len, minimized, line, col);
 
     }
 
@@ -138,13 +152,9 @@ public final class DirectOutputMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleOpenElementStart(final char[] buffer, final int offset, final int len, final int line,
             final int col) throws ParseException {
-        
-        try {
-            this.writer.write('<');
-            this.writer.write(buffer, offset, len);
-        } catch (final Exception e) {
-            throw new ParseException(e);
-        }
+
+        this.handler1.handleOpenElementStart(buffer, offset, len, line, col);
+        this.handler2.handleOpenElementStart(buffer, offset, len, line, col);
 
     }
 
@@ -155,12 +165,9 @@ public final class DirectOutputMarkupHandler extends AbstractMarkupHandler {
     public void handleOpenElementEnd(
             final char[] buffer, final int offset, final int len,
             final int line, final int col) throws ParseException {
-        
-        try {
-            this.writer.write('>');
-        } catch (final Exception e) {
-            throw new ParseException(e);
-        }
+
+        this.handler1.handleOpenElementEnd(buffer, offset, len, line, col);
+        this.handler2.handleOpenElementEnd(buffer, offset, len, line, col);
 
     }
 
@@ -170,13 +177,9 @@ public final class DirectOutputMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleCloseElementStart(final char[] buffer, final int offset, final int len, final int line,
             final int col) throws ParseException {
-        
-        try {
-            this.writer.write("</");
-            this.writer.write(buffer, offset, len);
-        } catch (final Exception e) {
-            throw new ParseException(e);
-        }
+
+        this.handler1.handleCloseElementStart(buffer, offset, len, line, col);
+        this.handler2.handleCloseElementStart(buffer, offset, len, line, col);
 
     }
 
@@ -187,12 +190,9 @@ public final class DirectOutputMarkupHandler extends AbstractMarkupHandler {
     public void handleCloseElementEnd(
             final char[] buffer, final int offset, final int len,
             final int line, final int col) throws ParseException {
-        
-        try {
-            this.writer.write('>');
-        } catch (final Exception e) {
-            throw new ParseException(e);
-        }
+
+        this.handler1.handleCloseElementEnd(buffer, offset, len, line, col);
+        this.handler2.handleCloseElementEnd(buffer, offset, len, line, col);
 
     }
 
@@ -204,7 +204,10 @@ public final class DirectOutputMarkupHandler extends AbstractMarkupHandler {
             final char[] buffer, final int offset, final int len,
             final int line, final int col)
             throws ParseException {
-        // Nothing to be done... balanced elements were not present at the original template!
+
+        this.handler1.handleAutoCloseElementStart(buffer, offset, len, line, col);
+        this.handler2.handleAutoCloseElementStart(buffer, offset, len, line, col);
+
     }
 
 
@@ -216,7 +219,10 @@ public final class DirectOutputMarkupHandler extends AbstractMarkupHandler {
             final char[] buffer, final int offset, final int len,
             final int line, final int col)
             throws ParseException {
-        // Nothing to be done... balanced elements were not present at the original template!
+
+        this.handler1.handleAutoCloseElementEnd(buffer, offset, len, line, col);
+        this.handler2.handleAutoCloseElementEnd(buffer, offset, len, line, col);
+
     }
 
 
@@ -227,8 +233,10 @@ public final class DirectOutputMarkupHandler extends AbstractMarkupHandler {
             final char[] buffer, final int offset, final int len,
             final int line, final int col)
             throws ParseException {
-        // They were present at the original template, so simply output them.
-        handleCloseElementStart(buffer, offset, len, line, col);
+
+        this.handler1.handleUnmatchedCloseElementStart(buffer, offset, len, line, col);
+        this.handler2.handleUnmatchedCloseElementStart(buffer, offset, len, line, col);
+
     }
 
 
@@ -239,8 +247,10 @@ public final class DirectOutputMarkupHandler extends AbstractMarkupHandler {
             final char[] buffer, final int offset, final int len,
             final int line, final int col)
             throws ParseException {
-        // They were present at the original template, so simply output them.
-        handleCloseElementEnd(buffer, offset, len, line, col);
+
+        this.handler1.handleUnmatchedCloseElementEnd(buffer, offset, len, line, col);
+        this.handler2.handleUnmatchedCloseElementEnd(buffer, offset, len, line, col);
+
     }
 
 
@@ -252,14 +262,13 @@ public final class DirectOutputMarkupHandler extends AbstractMarkupHandler {
             final int operatorLine, final int operatorCol, final int valueContentOffset,
             final int valueContentLen, final int valueOuterOffset, final int valueOuterLen,
             final int valueLine, final int valueCol) throws ParseException {
-        
-        try {
-            this.writer.write(buffer, nameOffset, nameLen);
-            this.writer.write(buffer, operatorOffset, operatorLen);
-            this.writer.write(buffer, valueOuterOffset, valueOuterLen);
-        } catch (final Exception e) {
-            throw new ParseException(e);
-        }
+
+        this.handler1.handleAttribute(buffer, nameOffset, nameLen, nameLine, nameCol, operatorOffset,
+                operatorLen, operatorLine, operatorCol, valueContentOffset, valueContentLen,
+                valueOuterOffset, valueOuterLen, valueLine, valueCol);
+        this.handler2.handleAttribute(buffer, nameOffset, nameLen, nameLine, nameCol, operatorOffset,
+                operatorLen, operatorLine, operatorCol, valueContentOffset, valueContentLen,
+                valueOuterOffset, valueOuterLen, valueLine, valueCol);
 
     }
 
@@ -272,12 +281,9 @@ public final class DirectOutputMarkupHandler extends AbstractMarkupHandler {
             final int offset, final int len, 
             final int line, final int col)
             throws ParseException {
-        
-        try {
-            this.writer.write(buffer, offset, len);
-        } catch (final Exception e) {
-            throw new ParseException(e);
-        }
+
+        this.handler1.handleInnerWhiteSpace(buffer, offset, len, line, col);
+        this.handler2.handleInnerWhiteSpace(buffer, offset, len, line, col);
 
     }
 
@@ -301,12 +307,17 @@ public final class DirectOutputMarkupHandler extends AbstractMarkupHandler {
             final int internalSubsetLine, final int internalSubsetCol,
             final int outerOffset, final int outerLen,
             final int outerLine, final int outerCol) throws ParseException {
-        
-        try {
-            this.writer.write(buffer, outerOffset, outerLen);
-        } catch (final Exception e) {
-            throw new ParseException(e);
-        }
+
+        this.handler1.handleDocType(buffer, keywordOffset, keywordLen, keywordLine, keywordCol,
+                elementNameOffset, elementNameLen, elementNameLine, elementNameCol, typeOffset, typeLen,
+                typeLine, typeCol, publicIdOffset, publicIdLen, publicIdLine, publicIdCol, systemIdOffset,
+                systemIdLen, systemIdLine, systemIdCol, internalSubsetOffset, internalSubsetLen,
+                internalSubsetLine, internalSubsetCol, outerOffset, outerLen, outerLine, outerCol);
+        this.handler2.handleDocType(buffer, keywordOffset, keywordLen, keywordLine, keywordCol,
+                elementNameOffset, elementNameLen, elementNameLine, elementNameCol, typeOffset, typeLen,
+                typeLine, typeCol, publicIdOffset, publicIdLen, publicIdLine, publicIdCol, systemIdOffset,
+                systemIdLen, systemIdLine, systemIdCol, internalSubsetOffset, internalSubsetLen,
+                internalSubsetLine, internalSubsetCol, outerOffset, outerLen, outerLine, outerCol);
 
     }
 
@@ -327,65 +338,15 @@ public final class DirectOutputMarkupHandler extends AbstractMarkupHandler {
             final int outerOffset, final int outerLen,
             final int line,final int col) 
             throws ParseException {
-        
-        try {
 
-            final int outerContentEnd = (outerOffset  + outerLen) - 2;
-            
-            this.writer.write('<');
-            this.writer.write('?');
-            this.writer.write(buffer, keywordOffset, keywordLen);
-
-            /*
-             * VERSION (required) 
-             */
-            int lastStructureEnd = keywordOffset + keywordLen;
-            int thisStructureOffset = versionOffset;
-            int thisStructureLen = versionLen;
-            int thisStructureEnd = thisStructureOffset + thisStructureLen;
-            
-            this.writer.write(buffer, lastStructureEnd, thisStructureOffset - lastStructureEnd);
-            this.writer.write(buffer, thisStructureOffset, thisStructureLen);
-
-            /*
-             * ENCODING (optional)
-             */
-            if (encodingLen > 0)  {
-                
-                lastStructureEnd = thisStructureEnd;
-                thisStructureOffset = encodingOffset;
-                thisStructureLen = encodingLen;
-                thisStructureEnd = thisStructureOffset + thisStructureLen;
-            
-                this.writer.write(buffer, lastStructureEnd, thisStructureOffset - lastStructureEnd);
-                this.writer.write(buffer, thisStructureOffset, thisStructureLen);
-
-            }
-
-            /*
-             * STANDALONE (optional)
-             */
-            
-            if (standaloneLen > 0) {
-                
-                lastStructureEnd = thisStructureEnd;
-                thisStructureOffset = standaloneOffset;
-                thisStructureLen = standaloneLen;
-                thisStructureEnd = thisStructureOffset + thisStructureLen;
-            
-                this.writer.write(buffer, lastStructureEnd, thisStructureOffset - lastStructureEnd);
-                this.writer.write(buffer, thisStructureOffset, thisStructureLen);
-                
-            }
-            
-            this.writer.write(buffer, thisStructureEnd, (outerContentEnd - thisStructureEnd));
-            
-            this.writer.write('?');
-            this.writer.write('>');
-            
-        } catch (final Exception e) {
-            throw new ParseException(e);
-        }
+        this.handler1.handleXmlDeclaration(buffer, keywordOffset, keywordLen, keywordLine, keywordCol,
+                versionOffset, versionLen, versionLine, versionCol, encodingOffset, encodingLen,
+                encodingLine, encodingCol, standaloneOffset, standaloneLen, standaloneLine, standaloneCol,
+                outerOffset, outerLen, line, col);
+        this.handler2.handleXmlDeclaration(buffer, keywordOffset, keywordLen, keywordLine, keywordCol,
+                versionOffset, versionLen, versionLine, versionCol, encodingOffset, encodingLen,
+                encodingLine, encodingCol, standaloneOffset, standaloneLen, standaloneLine, standaloneCol,
+                outerOffset, outerLen, line, col);
 
     }
 
@@ -404,24 +365,11 @@ public final class DirectOutputMarkupHandler extends AbstractMarkupHandler {
             final int outerOffset, final int outerLen, 
             final int line, final int col)
             throws ParseException {
-        
-        try {
 
-            this.writer.write('<');
-            this.writer.write('?');
-            this.writer.write(buffer, targetOffset, targetLen);
-            if (contentLen > 0)  {
-                this.writer.write(buffer, (targetOffset + targetLen), contentOffset - (targetOffset + targetLen));
-                this.writer.write(buffer, contentOffset, contentLen);
-            } else {
-                this.writer.write(buffer, (targetOffset + targetLen), ((outerOffset  + outerLen) - 2) - (targetOffset + targetLen));
-            }
-            this.writer.write('?');
-            this.writer.write('>');
-            
-        } catch (final Exception e) {
-            throw new ParseException(e);
-        }
+        this.handler1.handleProcessingInstruction(buffer, targetOffset, targetLen, targetLine, targetCol,
+                contentOffset, contentLen, contentLine, contentCol, outerOffset, outerLen, line, col);
+        this.handler2.handleProcessingInstruction(buffer, targetOffset, targetLen, targetLine, targetCol,
+                contentOffset, contentLen, contentLine, contentCol, outerOffset, outerLen, line, col);
 
     }
 

@@ -27,6 +27,75 @@ import org.attoparser.config.ParseConfiguration;
 
 
 /**
+ * <p>
+ *   Default implementation of {@link org.attoparser.simple.ISimpleMarkupParser}.
+ * </p>
+ * <p>
+ *   <i>AttoParser</i> <em>simple</em> markup parsers work as SAX-style parsers that need
+ *   a <i>markup handler</i> object for handling parsing events. These handlers implement
+ *   the {@link org.attoparser.simple.ISimpleMarkupHandler} interface, and are normally developed by
+ *   users in order to perform the operations they require for their applications.
+ * </p>
+ * <p>
+ *   See the documentation of the {@link org.attoparser.simple.ISimpleMarkupHandler} interface for more
+ *   information on the event handler methods.
+ * </p>
+ * <p>
+ *   Note that this parser class and its corresponding handlers are actually a <strong>simplified
+ *   version</strong> of the full-blown {@link org.attoparser.IMarkupParser} infrastructure.
+ * </p>
+ * <p>
+ *   Sample usage:
+ * </p>
+ * <pre><code>
+ *   // Obtain a java.io.Reader on the document to be parsed
+ *   final Reader documentReader = ...;
+ *
+ *   // Create the handler instance. Extending the no-op AbstractSimpleMarkupHandler is a good start
+ *   final ISimpleMarkupHandler handler = new AbstractSimpleMarkupHandler() {
+ *       ... // some events implemented
+ *   };
+ *
+ *   // Create or obtain the parser instance (can be reused). Example uses the default configuration for HTML
+ *   final ISimpleMarkupParser parser = new SimpleMarkupParser(ParseConfiguration.htmlConfiguration());
+ *
+ *   // Parse it!
+ *   parser.parse(documentReader, handler);
+ * </code></pre>
+ * <p>
+ *   This parser class uses an instance of the {@link org.attoparser.MarkupParser} class underneath (configured
+ *   with the default values for its buffer pool), and applies to it an instance of the
+ *   {@link org.attoparser.simple.SimplifierMarkupHandler} handler class in order to make it able to report
+ *   handling events by means of an {@link org.attoparser.simple.ISimpleMarkupHandler} implementation instead of using
+ *   the default {@link org.attoparser.IMarkupHandler} interface.
+ * </p>
+ * <p>
+ *   In fact, using the {@link org.attoparser.simple.SimpleMarkupParser} class as shown above is completely
+ *   equivalent to:
+ * </p>
+ * <pre><code>
+ *   // Obtain a java.io.Reader on the document to be parsed
+ *   final Reader documentReader = ...;
+ *
+ *   // Create the handler instance. Extending the no-op AbstractSimpleMarkupHandler is a good start
+ *   final ISimpleMarkupHandler simpleHandler = new AbstractSimpleMarkupHandler() {
+ *       ... // some events implemented
+ *   };
+ *
+ *   // Create a handler chain with the 'simplifier' handler, which will convert events from 'normal' to 'simple'.
+ *   final IMarkupHandler handler = new SimplifierMarkupHandler(simpleHandler);
+ *
+ *   // Create or obtain the parser instance (note this is not the 'simple' one!)
+ *   final IMarkupParser parser = new MarkupParser(ParseConfiguration.htmlConfiguration());
+ *
+ *   // Parse it!
+ *   parser.parse(documentReader, handler);
+ * </code></pre>
+ * <p>
+ *   This parser class is <b>thread-safe</b>. However, take into account that, normally,
+ *   {@link org.attoparser.simple.ISimpleMarkupHandler} implementations are not. So, even if parsers can be reused,
+ *   handler objects usually cannot.
+ * </p>
  *
  * @author Daniel Fern&aacute;ndez
  *

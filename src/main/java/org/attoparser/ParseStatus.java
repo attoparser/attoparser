@@ -115,8 +115,8 @@ public final class ParseStatus {
      *   <tt>autoCloseLimits</tt> array.
      * </p>
      * <p>
-     *   For example, when parsing HTML an open <tt>&lt;li&gt</tt> will require closing all currently open
-     *   <tt>&lt;li&gt</tt>'s until an <tt>&lt;ul&gt</tt> or <tt>&lt;ol&gt</tt> is found.
+     *   For example, when parsing HTML an open <tt>&lt;li&gt;</tt> will require closing all currently open
+     *   <tt>&lt;li&gt;</tt>'s until an <tt>&lt;ul&gt;</tt> or <tt>&lt;ol&gt;</tt> is found.
      * </p>
      * <p>
      *   These flags will only be honored by the parser in <em>start</em> events for standalone or open elements, and

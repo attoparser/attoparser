@@ -17,7 +17,7 @@
  * 
  * =============================================================================
  */
-package org.attoparser.prettyhtmldisplay;
+package org.attoparser.prettyhtml;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -30,13 +30,39 @@ import org.attoparser.ParseException;
 
 
 /**
+ * <p>
+ *   Implementation of {@link org.attoparser.IMarkupHandler} used for pretty-printing the result of parsing
+ *   the input markup.
+ * </p>
+ * <p>
+ *   This handler will write, to the passed {@link java.io.Writer}, an HTML document which will display in a
+ *   visually-useful form the markup output corresponding with the parsing events that reach it.
+ * </p>
+ * <p>
+ *   This markup visualization will allow to easily identify elements, attributes, comments... but also those
+ *   auto* events that were required to balance the code (depending on configuration) and any unmatched
+ *   close elements that might be found in input.
+ * </p>
+ * <p>
+ *   Note that, as with most handlers, this class is <strong>not thread-safe</strong>. Also, instances of this class
+ *   should not be reused across parsing operations.
+ * </p>
+ * <p>
+ *   Sample usage:
+ * </p>
+ * <pre><code>
+ *   final Writer writer = new StringWriter();
+ *   final IMarkupHandler handler = new PrettyHtmlMarkupHandler("Some test document", writer);
+ *   parser.parse(document, handler);
+ *   return writer.toString();
+ * </code></pre>
  * 
  * @author Daniel Fern&aacute;ndez
  * 
  * @since 2.0.0
  *
  */
-public class PrettyHtmlDisplayMarkupHandler extends AbstractMarkupHandler {
+public class PrettyHtmlMarkupHandler extends AbstractMarkupHandler {
 
     private static final String OPEN_TAG_START = "&lt;";
     private static final String OPEN_TAG_END = "&gt;";
@@ -120,12 +146,16 @@ public class PrettyHtmlDisplayMarkupHandler extends AbstractMarkupHandler {
     private final String documentName;
     private final String documentId;
     private final Writer writer;
-    private final boolean createHtmlAsFragment;
-    
 
-    
-    
-    public PrettyHtmlDisplayMarkupHandler(final String documentName, final Writer writer, final boolean createHtmlAsFragment) {
+
+
+
+    public PrettyHtmlMarkupHandler(final Writer writer) {
+        this(null, writer);
+    }
+
+
+    public PrettyHtmlMarkupHandler(final String documentName, final Writer writer) {
         super();
         if (writer == null) {
             throw new IllegalArgumentException("Writer cannot be null");
@@ -135,7 +165,6 @@ public class PrettyHtmlDisplayMarkupHandler extends AbstractMarkupHandler {
                         String.valueOf(System.identityHashCode(this)) : documentName);
         this.documentId = tokenify(this.documentName);
         this.writer = writer;
-        this.createHtmlAsFragment = createHtmlAsFragment;
     }
 
     
@@ -215,16 +244,14 @@ public class PrettyHtmlDisplayMarkupHandler extends AbstractMarkupHandler {
         
         try {
             
-            if (!this.createHtmlAsFragment) {
-                this.writer.write("<!DOCTYPE html>\n");
-                this.writer.write("<html>\n");
-                this.writer.write("<head>\n");
-                this.writer.write("<title>Document output: " + this.documentName + "</title>\n");
-                this.writer.write("<style>" + DOCUMENT_STYLES + "</style>\n");
-                this.writer.write("</head>\n");
-                this.writer.write("<body>\n");
-            }
-            
+            this.writer.write("<!DOCTYPE html>\n");
+            this.writer.write("<html>\n");
+            this.writer.write("<head>\n");
+            this.writer.write("<title>Document output: " + this.documentName + "</title>\n");
+            this.writer.write("<style>" + DOCUMENT_STYLES + "</style>\n");
+            this.writer.write("</head>\n");
+            this.writer.write("<body>\n");
+
             this.writer.write("<div class=\"atto_source\" id=\"atto_source_" + this.documentId + "\">\n");
             this.writer.write("<style>\n" + FRAGMENT_STYLES.replaceAll("@@", "#atto_source_content_" + this.documentId ) + "</style>\n");
             this.writer.write("<div class=\"atto_source_content\" id=\"atto_source_content_" + this.documentId + "\">");
@@ -246,11 +273,9 @@ public class PrettyHtmlDisplayMarkupHandler extends AbstractMarkupHandler {
             
             this.writer.write("</div>");
             
-            if (!this.createHtmlAsFragment) {
-                this.writer.write("</body>\n");
-                this.writer.write("</html>\n");
-            }
-            
+            this.writer.write("</body>\n");
+            this.writer.write("</html>\n");
+
         } catch (final Exception e) {
             throw new ParseException(e);
         }

@@ -26,17 +26,22 @@ import org.attoparser.ParseException;
 
 /**
  * <p>
- *   Base abstract implementations for markup-specialized attohandlers that offer an event
- *   handling interface similar to that of the standard SAX {@link org.xml.sax.ContentHandler}.
+ *   Interface to be implemented by all <em>simple</em> Markup Handlers. The events declared in this interface
+ *   are a simplified version of the ones in {@link org.attoparser.IMarkupHandler}.
  * </p>
  * <p>
- *   Handlers extending from this class can make use of a {@link org.attoparser.config.ParseConfiguration} instance
- *   specifying a markup parsing configuration to be applied during document parsing (for example,
- *   for ensuring that a document is well-formed from an XML/XHTML standpoint).
+ *   Markup handlers are the objects that receive the events produced during parsing and perform the operations
+ *   the users need.
  * </p>
  * <p>
- *   This class provides empty implementations for all event handlers, so that
- *   subclasses can override only the methods they need.
+ *   Markup handlers can be <strong>stateful</strong>, which means that a new instance of the markup handler
+ *   class should be created for each parsing operation. In such case, it is not required that these implementations
+ *   are <em>thread-safe</em>.
+ * </p>
+ * <p>
+ *   There is an abstract, basic, no-op implementation of this interface called
+ *   {@link org.attoparser.simple.AbstractSimpleMarkupHandler} which can be used for easily creating new handlers by
+ *   overriding only the relevant event handling methods.
  * </p>
  *
  * @author Daniel Fern&aacute;ndez
@@ -54,9 +59,9 @@ public interface ISimpleMarkupHandler {
      * </p>
      *
      * @param startTimeNanos the current time (in nanoseconds) obtained when parsing starts.
-     * @param line the line of the document where parsing starts (usually number 1)
-     * @param col the column of the document where parsing starts (usually number 1)
-     * @throws org.attoparser.ParseException
+     * @param line the line of the document where parsing starts (usually number 1).
+     * @param col the column of the document where parsing starts (usually number 1).
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleDocumentStart(final long startTimeNanos, final int line, final int col)
             throws ParseException;
@@ -73,7 +78,7 @@ public interface ISimpleMarkupHandler {
      *        parsing (in nanoseconds)
      * @param line the line of the document where parsing ends (usually the last one)
      * @param col the column of the document where the parsing ends (usually the last one)
-     * @throws org.attoparser.ParseException
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleDocumentEnd(
             final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
@@ -91,8 +96,7 @@ public interface ISimpleMarkupHandler {
      * @param standalone the standalone value specified (can be null).
      * @param line the line in the document where this elements appears.
      * @param col the column in the document where this element appears.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws org.attoparser.ParseException
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleXmlDeclaration(
             final String version,
@@ -114,8 +118,7 @@ public interface ISimpleMarkupHandler {
      * @param internalSubset the internal subset specified, if present (might be null).
      * @param line the line in the document where this elements appears.
      * @param col the column in the document where this element appears.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws org.attoparser.ParseException
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleDocType(
             final String elementName, final String publicId, final String systemId,
@@ -130,8 +133,12 @@ public interface ISimpleMarkupHandler {
      * </p>
      * <p>
      *   This artifact is returned as a <tt>char[]</tt> instead of a <tt>String</tt>
-     *   because its content can be large. In order to convert it into a <tt>String</tt>,
-     *   just do <tt>new String(buffer, offset, len)</tt>.
+     *   because its contents can be large (so creating a <tt>String</tt> is avoided if it is
+     *   not considered <em>relevant</em>). In order to convert it to a
+     *   <tt>String</tt>, just do <tt>new String(buffer, offset, len)</tt>.
+     * </p>
+     * <p>
+     *   Please note <strong>the returned <tt>char[]</tt> buffer should never be modified</strong>.
      * </p>
      *
      * @param buffer the document buffer.
@@ -139,8 +146,7 @@ public interface ISimpleMarkupHandler {
      * @param len the length (in chars) of the artifact.
      * @param line the line in the document where this elements appears.
      * @param col the column in the document where this element appears.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws org.attoparser.ParseException
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleCDATASection(
             final char[] buffer, final int offset, final int len,
@@ -155,8 +161,12 @@ public interface ISimpleMarkupHandler {
      * </p>
      * <p>
      *   This artifact is returned as a <tt>char[]</tt> instead of a <tt>String</tt>
-     *   because its content can be large. In order to convert it into a <tt>String</tt>,
-     *   just do <tt>new String(buffer, offset, len)</tt>.
+     *   because its contents can be large (so creating a <tt>String</tt> is avoided if it is
+     *   not considered <em>relevant</em>). In order to convert it to a
+     *   <tt>String</tt>, just do <tt>new String(buffer, offset, len)</tt>.
+     * </p>
+     * <p>
+     *   Please note <strong>the returned <tt>char[]</tt> buffer should never be modified</strong>.
      * </p>
      *
      * @param buffer the document buffer.
@@ -164,8 +174,7 @@ public interface ISimpleMarkupHandler {
      * @param len the length (in chars) of the artifact.
      * @param line the line in the document where this elements appears.
      * @param col the column in the document where this element appears.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws org.attoparser.ParseException
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleComment(
             final char[] buffer, final int offset, final int len,
@@ -180,20 +189,20 @@ public interface ISimpleMarkupHandler {
      * </p>
      * <p>
      *   A sequence of chars is considered to be <i>text</i> when no structures of any kind are
-     *   contained inside it. In markup parsers, for example, this means no tags (a.k.a. <i>elements</i>),
+     *   contained inside it. This means no tags (a.k.a. <i>elements</i>),
      *   DOCTYPE's, processing instructions, etc. are contained in the sequence.
      * </p>
      * <p>
      *   Text sequences might include any number of new line and/or control characters.
      * </p>
      * <p>
-     *   Text artifacts are reported using the document <tt>buffer</tt> directly, and this buffer
-     *   should not be considered to be immutable, so reported texts should be copied if they need
-     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
-     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification).
+     *   This artifact is returned as a <tt>char[]</tt> instead of a <tt>String</tt>
+     *   because its contents can be large (so creating a <tt>String</tt> is avoided if it is
+     *   not considered <em>relevant</em>). In order to convert it to a
+     *   <tt>String</tt>, just do <tt>new String(buffer, offset, len)</tt>.
      * </p>
      * <p>
-     *   <b>Implementations of this handler should never modify the document buffer.</b>
+     *   Please note <strong>the returned <tt>char[]</tt> buffer should never be modified</strong>.
      * </p>
      *
      * @param buffer the document buffer (not copied)
@@ -201,8 +210,7 @@ public interface ISimpleMarkupHandler {
      * @param len the length (in chars) of the text artifact, starting in offset.
      * @param line the line in the original document where this text artifact starts.
      * @param col the column in the original document where this text artifact starts.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws org.attoparser.ParseException
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleText(
             final char[] buffer,
@@ -214,19 +222,18 @@ public interface ISimpleMarkupHandler {
 
     /**
      * <p>
-     *   Called when a standalone element (a <i>minimized tag</i>) is found.
+     *   Called when a standalone element (an element with no closing tag) is found.
      * </p>
      * <p>
      *   Note that <b>the element attributes map can be null if no attributes are present</b>.
      * </p>
      *
-     * @param elementName the element name (e.g. "&lt;img src="logo.png"&gt;" -> "img").
+     * @param elementName the element name (e.g. "&lt;img src="logo.png"&gt;" -&gt; "img").
      * @param attributes the element attributes map, or null if no attributes are present.
      * @param minimized whether the element has been found minimized (&lt;element/&gt;)in code or not.
      * @param line the line in the document where this elements appears.
      * @param col the column in the document where this element appears.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws org.attoparser.ParseException
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleStandaloneElement(
             final String elementName, final Map<String,String> attributes,
@@ -243,12 +250,11 @@ public interface ISimpleMarkupHandler {
      *   Note that <b>the element attributes map can be null if no attributes are present</b>.
      * </p>
      *
-     * @param elementName the element name (e.g. "&lt;div class="content"&gt;" -> "div").
+     * @param elementName the element name (e.g. "&lt;div class="content"&gt;" -&gt; "div").
      * @param attributes the element attributes map, or null if no attributes are present.
      * @param line the line in the document where this elements appears.
      * @param col the column in the document where this element appears.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws org.attoparser.ParseException
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleOpenElement(
             final String elementName, final Map<String,String> attributes,
@@ -261,11 +267,10 @@ public interface ISimpleMarkupHandler {
      *   Called when a close element (a <i>close tag</i>) is found.
      * </p>
      *
-     * @param elementName the element name (e.g. "&lt;/div&gt;" -> "div").
+     * @param elementName the element name (e.g. "&lt;/div&gt;" -&gt; "div").
      * @param line the line in the document where this elements appears.
      * @param col the column in the document where this element appears.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws org.attoparser.ParseException
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleCloseElement(
             final String elementName, final int line, final int col)
@@ -275,17 +280,16 @@ public interface ISimpleMarkupHandler {
     /**
      * <p>
      *   Called when a close element (a <i>close tag</i>) is needed in order
-     *   to correctly balance the markup. This is called <i>autoclosing</i>.
+     *   to correctly balance the markup. This is called <i>auto-closing</i>.
      * </p>
      * <p>
      *   Implementors might choose to ignore these autoclosing events.
      * </p>
      *
-     * @param elementName the element name (e.g. "&lt;/div&gt;" -> "div").
+     * @param elementName the element name (e.g. "&lt;/div&gt;" -&gt; "div").
      * @param line the line in the document where this elements appears.
      * @param col the column in the document where this element appears.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws org.attoparser.ParseException
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleAutoCloseElement(
             final String elementName, final int line, final int col)
@@ -301,11 +305,10 @@ public interface ISimpleMarkupHandler {
      *   Implementors might choose to ignore these events.
      * </p>
      *
-     * @param elementName the element name (e.g. "&lt;/div&gt;" -> "div").
+     * @param elementName the element name (e.g. "&lt;/div&gt;" -&gt; "div").
      * @param line the line in the document where this elements appears.
      * @param col the column in the document where this element appears.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws org.attoparser.ParseException
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleUnmatchedCloseElement(
             final String elementName, final int line, final int col)
@@ -322,8 +325,7 @@ public interface ISimpleMarkupHandler {
      * @param content the content of the processing instruction, if specified (might be null).
      * @param line the line in the document where this elements appears.
      * @param col the column in the document where this element appears.
-     * @return the result of handling the event, or null if no relevant result has to be returned.
-     * @throws org.attoparser.ParseException
+     * @throws ParseException if any exceptions occur during handling.
      */
     public void handleProcessingInstruction(
             final String target, final String content, 

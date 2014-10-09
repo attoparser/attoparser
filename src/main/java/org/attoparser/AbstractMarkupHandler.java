@@ -21,6 +21,14 @@ package org.attoparser;
 
 
 /**
+ * <p>
+ *   Base abstract implementation of {@link org.attoparser.IMarkupHandler} that implements all of its methods
+ *   as no-ops.
+ * </p>
+ * <p>
+ *   This class allows the easy creation of new handler implementations by extending it and simply overriding
+ *   the methods that are of interest for the developer.
+ * </p>
  *
  * @author Daniel Fern&aacute;ndez
  *

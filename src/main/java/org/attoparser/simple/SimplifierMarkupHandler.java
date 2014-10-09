@@ -28,19 +28,18 @@ import org.attoparser.ParseException;
 
 /**
  * <p>
- *   Base abstract implementations for markup-specialized attohandlers that offer an event
- *   handling interface similar to that of the standard SAX {@link org.xml.sax.ContentHandler}.
+ *   Implementation of the {@link org.attoparser.IMarkupHandler} interface aimed at converting the events launched
+ *   through this interface to the simpler ones at the {@link org.attoparser.simple.ISimpleMarkupHandler} interface.
  * </p>
  * <p>
- *   Handlers extending from this class can make use of a {@link org.attoparser.config.ParseConfiguration} instance
- *   specifying a markup parsing configuration to be applied during document parsing (for example, 
- *   for ensuring that a document is well-formed from an XML/XHTML standpoint).
+ *   Note that this handler, when not used as a part of a larger chain of handlers, can be more easily applied
+ *   by making use of the {@link org.attoparser.simple.SimpleMarkupParser} class.
  * </p>
  * <p>
- *   This class provides empty implementations for all event handlers, so that
- *   subclasses can override only the methods they need.
+ *   Note that, as with most handlers, this class is <strong>not thread-safe</strong>. Also, instances of this class
+ *   should not be reused across parsing operations.
  * </p>
- * 
+ *
  * @author Daniel Fern&aacute;ndez
  * 
  * @since 2.0.0

@@ -28,6 +28,23 @@ import org.attoparser.ParseException;
 
 
 /**
+ * <p>
+ *   Implementation of {@link org.attoparser.IMarkupHandler} used for building a trace of parsing events which can
+ *   be examined afterwards.
+ * </p>
+ * <p>
+ *   Main uses are testing and debugging, though it can be also useful for normalization and matching of different
+ *   markup documents or processing results (e.g. in markup testing systems).
+ * </p>
+ * <p>
+ *   The produced list of events is a list of {@link org.attoparser.trace.MarkupTraceEvent} objects. This list
+ *   can be retrieved after parsing finishes by means of the {@link #getTrace()} method.
+ * </p>
+ * <p>
+ *   Note that events in such list will be of one of the {@link org.attoparser.trace.MarkupTraceEvent} subclasses,
+ *   depending on the specific type of event, and the {@link MarkupTraceEvent#getEventType()} method will be usable
+ *   for determining this specific type.
+ * </p>
  * 
  * @author Daniel Fern&aacute;ndez
  * 
@@ -46,9 +63,13 @@ public final class TraceBuilderMarkupHandler extends AbstractMarkupHandler {
     }
 
 
-
-    
-    
+    /**
+     * <p>
+     *   Returns the list of {@link org.attoparser.trace.MarkupTraceEvent} event objects produced during parsing.
+     * </p>
+     *
+     * @return the list of events.
+     */
     public List<MarkupTraceEvent> getTrace() {
         return Collections.unmodifiableList(this.trace);
     }
