@@ -53,6 +53,9 @@ package org.attoparser;
  *           specified {@link java.io.Writer} object, without any loss of information (case, whitespaces, etc.). This
  *           handler is useful for performing filtering/transformation operations on the parsed markup, placing this
  *           handler at the end of the handler chain so that it outputs the final results of such operation.</li>
+ *       <li>{@link org.attoparser.output.TextOutputMarkupHandler}: for writing the received events to a
+ *           specified {@link java.io.Writer} object as mere text, ignoring all non-text events. This will effectively
+ *           strip all markup elements, comments, DOCTYPEs, etc. from the original markup.</li>
  *     </ul>
  *   </li>
  *   <li>Conversion to other formats:
