@@ -25,6 +25,40 @@ import org.attoparser.ParseException;
 
 
 /**
+ * <p>
+ *   Interface to be implemented by all <em>DOM</em> Markup Parsers.
+ *   Default implementation is {@link org.attoparser.dom.DOMMarkupParser}.
+ * </p>
+ * <p>
+ *   DOM trees created by this class are made with objects of the classes from the <tt>org.attoparser.dom</tt>
+ *   package.
+ * </p>
+ * <p>
+ *   Note that this parser interface and its corresponding handlers are actually a <strong>simplified
+ *   version</strong> of the full-blown {@link org.attoparser.IMarkupParser} infrastructure.
+ * </p>
+ * <p>
+ *   Sample usage:
+ * </p>
+ * <pre><code>
+ *   // Obtain a java.io.Reader on the document to be parsed
+ *   final Reader documentReader = ...;
+ *
+ *   // Create the handler instance. Extending the no-op AbstractSimpleMarkupHandler is a good start
+ *   final ISimpleMarkupHandler handler = new AbstractSimpleMarkupHandler() {
+ *       ... // some events implemented
+ *   };
+ *
+ *   // Create or obtain the parser instance (can be reused). Example uses the default configuration for HTML
+ *   final ISimpleMarkupParser parser = new SimpleMarkupParser(ParseConfiguration.htmlConfiguration());
+ *
+ *   // Parse it!
+ *   parser.parse(documentReader, handler);
+ * </code></pre>
+ * <p>
+ *   Note that implementations of this interface should be <strong>thread-safe</strong>, and therefore parsers
+ *   should be reusable through several parsing operations and any number of concurrent threads.
+ * </p>
  *
  * @author Daniel Fern&aacute;ndez
  *

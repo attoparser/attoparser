@@ -28,14 +28,37 @@ import org.attoparser.ParseException;
 
 /**
  * <p>
- *   Implementation of {@link org.attoparser.IMarkupHandler} that considers input
- *   as XML code and builds an attoDOM tree with objects from package 
- *   <tt>org.attoparser.markup.dom</tt>. 
+ *   Implementation of {@link org.attoparser.IMarkupHandler} that builds a DOM tree using objects of
+ *   classes from package <tt>org.attoparser.dom</tt>.
  * </p>
  * <p>
- *   Use of this handler requires the document to be well-formed from the XML standpoint.
+ *   Note that this handler, when not used as a part of a larger chain of handlers, can be more easily applied
+ *   by making use of the {@link org.attoparser.dom.DOMMarkupParser} class.
  * </p>
- * 
+ * <p>
+ *   Sample usage:
+ * </p>
+ * <pre><code>
+ *   // Obtain a java.io.Reader on the document to be parsed
+ *   final Reader documentReader = ...;
+ *
+ *   // Instance the DOM-builder handler
+ *   final DOMBuilderMarkupHandler handler = new DOMBuilderMarkupHandler("Some document");
+ *
+ *   // Create or obtain the parser instance
+ *   final IMarkupParser parser = new MarkupParser(ParseConfiguration.htmlConfiguration());
+ *
+ *   // Parse the document
+ *   parser.parse(documentReader, handler);
+ *
+ *   // Obtain the parsed document
+ *   final Document document = handler.getDocument();
+ * </code></pre>
+ * <p>
+ *   Note that, as with most handlers, this class is <strong>not thread-safe</strong>. Also, instances of this class
+ *   should not be reused across parsing operations.
+ * </p>
+ *
  * 
  * @author Daniel Fern&aacute;ndez
  * 

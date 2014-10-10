@@ -36,6 +36,27 @@ import org.attoparser.ParseException;
  *   by making use of the {@link org.attoparser.simple.SimpleMarkupParser} class.
  * </p>
  * <p>
+ *   Sample usage:
+ * </p>
+ * <pre><code>
+ *   // Obtain a java.io.Reader on the document to be parsed
+ *   final Reader documentReader = ...;
+ *
+ *   // Create the handler instance. Extending the no-op AbstractSimpleMarkupHandler is a good start
+ *   final ISimpleMarkupHandler handler = new AbstractSimpleMarkupHandler() {
+ *       ... // some events implemented
+ *   };
+ *
+ *   // Create a handler chain with the 'simplifier' handler, which will convert events from 'normal' to 'simple'.
+ *   final IMarkupHandler handler = new SimplifierMarkupHandler(simpleHandler);
+ *
+ *   // Create or obtain the parser instance (note this is not the 'simple' one!)
+ *   final IMarkupParser parser = new MarkupParser(ParseConfiguration.htmlConfiguration());
+ *
+ *   // Parse it!
+ *   parser.parse(documentReader, handler);
+ * </code></pre>
+ * <p>
  *   Note that, as with most handlers, this class is <strong>not thread-safe</strong>. Also, instances of this class
  *   should not be reused across parsing operations.
  * </p>
