@@ -22,6 +22,7 @@ package org.attoparser.duplicate;
 import org.attoparser.AbstractMarkupHandler;
 import org.attoparser.IMarkupHandler;
 import org.attoparser.ParseException;
+import org.attoparser.ParseStatus;
 
 
 /**
@@ -77,8 +78,41 @@ public final class DuplicateMarkupHandler extends AbstractMarkupHandler {
         this.handler2 = handler2;
     }
 
-    
-    
+
+
+    @Override
+    public void setParserStatus(final ParseStatus status) {
+        this.handler1.setParserStatus(status);
+        this.handler2.setParserStatus(status);
+    }
+
+
+
+
+    @Override
+    public void handleDocumentStart(
+            final long startTimeNanos, final int line, final int col)
+            throws ParseException {
+
+        this.handler1.handleDocumentStart(startTimeNanos, line, col);
+        this.handler2.handleDocumentStart(startTimeNanos, line, col);
+
+    }
+
+
+
+
+    @Override
+    public void handleDocumentEnd(
+            final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
+            throws ParseException {
+
+        this.handler1.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col);
+        this.handler2.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col);
+
+    }
+
+
 
 
 
@@ -90,6 +124,7 @@ public final class DuplicateMarkupHandler extends AbstractMarkupHandler {
         this.handler2.handleText(buffer, offset, len, line, col);
 
     }
+
 
 
 
@@ -105,6 +140,8 @@ public final class DuplicateMarkupHandler extends AbstractMarkupHandler {
         this.handler2.handleComment(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
 
     }
+
+
 
     
     @Override
