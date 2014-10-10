@@ -24,7 +24,7 @@ package org.attoparser.dom;
 
 /**
  * <p>
- *   Base interface for all nodes in attoDOM trees.
+ *   Base interface for all nodes in a DOM tree.
  * </p>
  * 
  * @author Daniel Fern&aacute;ndez
@@ -33,7 +33,7 @@ package org.attoparser.dom;
  *
  */
 public interface INode {
-    
+
     public boolean hasLine();
     public Integer getLine();
     public void setLine(final Integer line);

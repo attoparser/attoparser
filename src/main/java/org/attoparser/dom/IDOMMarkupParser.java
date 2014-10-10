@@ -34,8 +34,9 @@ import org.attoparser.ParseException;
  *   package.
  * </p>
  * <p>
- *   Note that this parser interface and its corresponding handlers are actually a <strong>simplified
- *   version</strong> of the full-blown {@link org.attoparser.IMarkupParser} infrastructure.
+ *   Note that this parser interface is actually a convenience artifact aimed at using
+ *   the {@link org.attoparser.dom.DOMBuilderMarkupHandler} <strong>DOM-conversion</strong> handler
+ *   more easily.
  * </p>
  * <p>
  *   Sample usage:
@@ -44,16 +45,11 @@ import org.attoparser.ParseException;
  *   // Obtain a java.io.Reader on the document to be parsed
  *   final Reader documentReader = ...;
  *
- *   // Create the handler instance. Extending the no-op AbstractSimpleMarkupHandler is a good start
- *   final ISimpleMarkupHandler handler = new AbstractSimpleMarkupHandler() {
- *       ... // some events implemented
- *   };
+ *   // Create or obtain the parser instance (note this is not the 'simple' one!)
+ *   final IDOMMarkupParser parser = new DOMMarkupParser(ParseConfiguration.htmlConfiguration());
  *
- *   // Create or obtain the parser instance (can be reused). Example uses the default configuration for HTML
- *   final ISimpleMarkupParser parser = new SimpleMarkupParser(ParseConfiguration.htmlConfiguration());
- *
- *   // Parse it!
- *   parser.parse(documentReader, handler);
+ *   // Parse it and return the Document Object Model
+ *   final Document document = parser.parse("Some document", documentReader);
  * </code></pre>
  * <p>
  *   Note that implementations of this interface should be <strong>thread-safe</strong>, and therefore parsers

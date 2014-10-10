@@ -26,7 +26,9 @@ import java.util.Map;
 
 
 /**
- *
+ * <p>
+ *   Element node in a DOM tree.
+ * </p>
  * 
  * @author Daniel Fern&aacute;ndez
  * 

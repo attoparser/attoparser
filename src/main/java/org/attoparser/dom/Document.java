@@ -23,7 +23,10 @@ import java.io.Serializable;
 
 
 /**
- *
+ * <p>
+ *   Root object for a DOM object tree produced by the {@link org.attoparser.dom.DOMBuilderMarkupHandler}
+ *   handler or the {@link org.attoparser.dom.IDOMMarkupParser} parser implementations.
+ * </p>
  * 
  * @author Daniel Fern&aacute;ndez
  * 

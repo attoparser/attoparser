@@ -51,7 +51,7 @@ import org.attoparser.ParseException;
  *   // Parse the document
  *   parser.parse(documentReader, handler);
  *
- *   // Obtain the parsed document
+ *   // Obtain the parsed Document Object Model
  *   final Document document = handler.getDocument();
  * </code></pre>
  * <p>
@@ -110,7 +110,7 @@ public final class DOMBuilderMarkupHandler extends AbstractMarkupHandler {
     
     /**
      * <p>
-     *   Returns the attoDOM {@link Document} created during parsing.
+     *   Returns the {@link Document} DOM created during parsing.
      * </p>
      * 
      * @return the built DOM document object. 

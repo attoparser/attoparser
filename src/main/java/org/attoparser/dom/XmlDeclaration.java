@@ -23,6 +23,9 @@ import java.io.Serializable;
 
 
 /**
+ * <p>
+ *   XML Declaration node in a DOM tree.
+ * </p>
  *
  * @author Daniel Fern&aacute;ndez
  * 

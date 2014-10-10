@@ -23,6 +23,9 @@ import java.io.Serializable;
 
 
 /**
+ * <p>
+ *   DOCTYPE clause node in a DOM tree.
+ * </p>
  *
  * @author Daniel Fern&aacute;ndez
  * 

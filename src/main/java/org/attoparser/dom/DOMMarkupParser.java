@@ -27,6 +27,60 @@ import org.attoparser.config.ParseConfiguration;
 
 
 /**
+ * <p>
+ *   Default implementation of the {@link org.attoparser.dom.IDOMMarkupParser} interface.
+ * </p>
+ * <p>
+ *   DOM trees created by this class are made with objects of the classes from the <tt>org.attoparser.dom</tt>
+ *   package.
+ * </p>
+ * <p>
+ *   Note that this parser interface is actually a convenience artifact aimed at using
+ *   the {@link org.attoparser.dom.DOMBuilderMarkupHandler} <strong>DOM-conversion</strong> handler
+ *   more easily.
+ * </p>
+ * <p>
+ *   Sample usage:
+ * </p>
+ * <pre><code>
+ *   // Obtain a java.io.Reader on the document to be parsed
+ *   final Reader documentReader = ...;
+ *
+ *   // Create or obtain the parser instance (note this is not the 'simple' one!)
+ *   final IDOMMarkupParser parser = new DOMMarkupParser(ParseConfiguration.htmlConfiguration());
+ *
+ *   // Parse it and return the Document Object Model
+ *   final Document document = parser.parse("Some document", documentReader);
+ * </code></pre>
+ * <p>
+ *   This parser class uses an instance of the {@link org.attoparser.MarkupParser} class underneath (configured
+ *   with the default values for its buffer pool), and applies to it an instance of the
+ *   {@link org.attoparser.dom.DOMBuilderMarkupHandler} handler class in order to make it produce a DOM
+ *   (Document Object model) tree as a result of parsing.
+ * </p>
+ * <p>
+ *   In fact, using the {@link org.attoparser.dom.DOMMarkupParser} class as shown above is completely
+ *   equivalent to:
+ * </p>
+ * <pre><code>
+ *   // Obtain a java.io.Reader on the document to be parsed
+ *   final Reader documentReader = ...;
+ *
+ *   // Instance the DOM-builder handler
+ *   final DOMBuilderMarkupHandler handler = new DOMBuilderMarkupHandler("Some document");
+ *
+ *   // Create or obtain the parser instance
+ *   final IMarkupParser parser = new MarkupParser(ParseConfiguration.htmlConfiguration());
+ *
+ *   // Parse the document
+ *   parser.parse(documentReader, handler);
+ *
+ *   // Obtain the parsed Document Object Model
+ *   final Document document = handler.getDocument();
+ * </code></pre>
+ * <p>
+ *   This parser class is <b>thread-safe</b>.
+ * </p>
  *
  * @author Daniel Fern&aacute;ndez
  *

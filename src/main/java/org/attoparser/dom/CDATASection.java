@@ -21,6 +21,9 @@ package org.attoparser.dom;
 
 
 /**
+ * <p>
+ *   CDATA Section node in a DOM tree.
+ * </p>
  *
  * @author Daniel Fern&aacute;ndez
  * 

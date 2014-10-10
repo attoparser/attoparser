@@ -23,7 +23,9 @@ import java.io.Serializable;
 
 
 /**
- *
+ * <p>
+ *   Comment node in a DOM tree.
+ * </p>
  * 
  * @author Daniel Fern&aacute;ndez
  * 

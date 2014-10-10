@@ -26,8 +26,7 @@ import java.util.Map;
 
 /**
  * <p>
- *   Specialization of {@link DOMWriter} for writing attoDOM trees
- *   as XML markup. 
+ *   Static utility class able to write a DOM tree (or a fragment of it) as markup.
  * </p>
  * 
  * @author Daniel Fern&aacute;ndez

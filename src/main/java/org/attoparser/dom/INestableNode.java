@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  * <p>
- *   Common interface for all nodes in attoDOM trees that
+ *   Common interface for all nodes in DOM trees that
  *   can have children nodes.
  * </p>
  * 
