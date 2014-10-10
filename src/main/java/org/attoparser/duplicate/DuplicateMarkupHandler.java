@@ -81,9 +81,9 @@ public final class DuplicateMarkupHandler extends AbstractMarkupHandler {
 
 
     @Override
-    public void setParserStatus(final ParseStatus status) {
-        this.handler1.setParserStatus(status);
-        this.handler2.setParserStatus(status);
+    public void setParseStatus(final ParseStatus status) {
+        this.handler1.setParseStatus(status);
+        this.handler2.setParseStatus(status);
     }
 
 

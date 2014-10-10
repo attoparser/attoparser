@@ -52,10 +52,10 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
 
 
     @Override
-    public void setParserStatus(final ParseStatus status) {
+    public void setParseStatus(final ParseStatus status) {
         // This will be ALWAYS called, so there is no need to actually check whether this property is null when using it
         this.status = status;
-        this.handler.setParserStatus(status);
+        this.handler.setParseStatus(status);
     }
 
 

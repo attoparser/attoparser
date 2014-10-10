@@ -206,7 +206,7 @@ public final class MarkupParser implements IMarkupParser {
                         new HtmlMarkupHandler(handler) : handler);
 
         final ParseStatus status = new ParseStatus();
-        markupHandler.setParserStatus(status);
+        markupHandler.setParseStatus(status);
 
         // We will not report directly to the handler, but instead to an intermediate class that will be in
         // charge of applying the required markup logic and rules, according to the specified configuration
@@ -237,7 +237,7 @@ public final class MarkupParser implements IMarkupParser {
                         new HtmlMarkupHandler(handler) : handler);
 
         final ParseStatus status = new ParseStatus();
-        markupHandler.setParserStatus(status);
+        markupHandler.setParseStatus(status);
 
         // We will not report directly to the handler, but instead to an intermediate class that will be in
         // charge of applying the required markup logic and rules, according to the specified configuration

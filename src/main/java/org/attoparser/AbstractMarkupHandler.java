@@ -46,7 +46,7 @@ public abstract class AbstractMarkupHandler implements IMarkupHandler {
 
 
 
-    public void setParserStatus(final ParseStatus status) {
+    public void setParseStatus(final ParseStatus status) {
         // Nothing to do. By default handlers will not be interested in using this object at all.
         // Implementations will have to explicitly override if they need to use it.
     }

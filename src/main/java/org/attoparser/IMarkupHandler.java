@@ -115,7 +115,7 @@ public interface IMarkupHandler {
      *
      * @param status the status object.
      */
-    public void setParserStatus(final ParseStatus status);
+    public void setParseStatus(final ParseStatus status);
 
 
     /**

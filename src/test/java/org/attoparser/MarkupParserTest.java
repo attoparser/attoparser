@@ -1570,7 +1570,7 @@ public class MarkupParserTest extends TestCase {
 
                 final ParseStatus status = new ParseStatus();
                 final TraceBuilderMarkupHandler handler = new TraceBuilderMarkupHandler();
-                handler.setParserStatus(status);
+                handler.setParseStatus(status);
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
 
                 if (offset == 0 && len == input.length) {
@@ -1603,7 +1603,7 @@ public class MarkupParserTest extends TestCase {
 
                 final ParseStatus status = new ParseStatus();
                 final TraceBuilderMarkupHandler handler = new TraceBuilderMarkupHandler();
-                handler.setParserStatus(status);
+                handler.setParseStatus(status);
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
 
                 parser.parseDocument(input, offset, len, eventProcessor, status);
@@ -1644,7 +1644,7 @@ public class MarkupParserTest extends TestCase {
 
                 final ParseStatus status = new ParseStatus();
                 final TraceBuilderMarkupHandler handler = new TraceBuilderMarkupHandler();
-                handler.setParserStatus(status);
+                handler.setParseStatus(status);
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
 
                 parser.parseDocument(newInput, 5, len, eventProcessor, status);
@@ -1673,7 +1673,7 @@ public class MarkupParserTest extends TestCase {
                 final StringWriter sw = new StringWriter();
                 final ParseStatus status = new ParseStatus();
                 final IMarkupHandler handler = new OutputMarkupHandler(sw);
-                handler.setParserStatus(status);
+                handler.setParseStatus(status);
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
                 if (offset == 0 && len == input.length) {
                     parser.parseDocument(new CharArrayReader(input), bufferSize, eventProcessor, status);
@@ -1692,7 +1692,7 @@ public class MarkupParserTest extends TestCase {
                 final StringWriter sw = new StringWriter();
                 final ParseStatus status = new ParseStatus();
                 final IMarkupHandler handler = new OutputMarkupHandler(sw);
-                handler.setParserStatus(status);
+                handler.setParseStatus(status);
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
                 parser.parseDocument(input, offset, len, eventProcessor, status);
                 final String desired =
@@ -1709,7 +1709,7 @@ public class MarkupParserTest extends TestCase {
                     final ParseStatus status = new ParseStatus();
                     final IMarkupHandler handler =
                             new SimplifierMarkupHandler(new TextTracerSimpleMarkupHandler(sw));
-                    handler.setParserStatus(status);
+                    handler.setParseStatus(status);
                     final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
                     if (offset == 0 && len == input.length) {
                         parser.parseDocument(new CharArrayReader(input), bufferSize, eventProcessor, status);
@@ -1785,7 +1785,7 @@ public class MarkupParserTest extends TestCase {
                 final ParseStatus status = new ParseStatus();
                 final TraceBuilderMarkupHandler traceHandler = new TraceBuilderMarkupHandler();
                 final IMarkupHandler handler = new HtmlMarkupHandler(traceHandler);
-                handler.setParserStatus(status);
+                handler.setParseStatus(status);
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
 
                 if (offset == 0 && len == input.length) {
