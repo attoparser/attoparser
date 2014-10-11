@@ -33,7 +33,7 @@ final class TextUtil {
 
 
 
-    public static boolean equals(final boolean caseSensitive, final String text1, final String text2) {
+    static boolean equals(final boolean caseSensitive, final String text1, final String text2) {
 
         if (text1 == null) {
             throw new IllegalArgumentException("First text being compared cannot be null");
@@ -47,17 +47,17 @@ final class TextUtil {
     }
 
 
-    public static boolean equals(final boolean caseSensitive, final String text1, final char[] text2) {
+    static boolean equals(final boolean caseSensitive, final String text1, final char[] text2) {
         return equals(caseSensitive, text1, 0, text1.length(), text2, 0, text2.length);
     }
 
-    public static boolean equals(final boolean caseSensitive, final char[] text1, final char[] text2) {
+    static boolean equals(final boolean caseSensitive, final char[] text1, final char[] text2) {
         return equals(caseSensitive, text1, 0, text1.length, text2, 0, text2.length);
     }
 
 
 
-    public static boolean equals(
+    static boolean equals(
             final boolean caseSensitive,
             final char[] text1, final int text1Offset, final int text1Len,
             final char[] text2, final int text2Offset, final int text2Len) {
@@ -118,7 +118,7 @@ final class TextUtil {
 
 
 
-    public static boolean equals(
+    static boolean equals(
             final boolean caseSensitive,
             final String text1, final int text1Offset, final int text1Len,
             final char[] text2, final int text2Offset, final int text2Len) {
@@ -175,7 +175,7 @@ final class TextUtil {
 
 
 
-    public static boolean equals(
+    static boolean equals(
             final boolean caseSensitive,
             final String text1, final int text1Offset, final int text1Len,
             final String text2, final int text2Offset, final int text2Len) {
@@ -242,7 +242,7 @@ final class TextUtil {
 
 
 
-    public static boolean startsWith(final boolean caseSensitive, final String text, final String prefix) {
+    static boolean startsWith(final boolean caseSensitive, final String text, final String prefix) {
 
         if (text == null) {
             throw new IllegalArgumentException("Text cannot be null");
@@ -256,17 +256,17 @@ final class TextUtil {
     }
 
 
-    public static boolean startsWith(final boolean caseSensitive, final String text, final char[] prefix) {
+    static boolean startsWith(final boolean caseSensitive, final String text, final char[] prefix) {
         return startsWith(caseSensitive, text, 0, text.length(), prefix, 0, prefix.length);
     }
 
-    public static boolean startsWith(final boolean caseSensitive, final char[] text, final char[] prefix) {
+    static boolean startsWith(final boolean caseSensitive, final char[] text, final char[] prefix) {
         return startsWith(caseSensitive, text, 0, text.length, prefix, 0, prefix.length);
     }
 
 
 
-    public static boolean startsWith(
+    static boolean startsWith(
             final boolean caseSensitive,
             final char[] text, final int textOffset, final int textLen,
             final char[] prefix, final int prefixOffset, final int prefixLen) {
@@ -323,7 +323,7 @@ final class TextUtil {
 
 
 
-    public static boolean startsWith(
+    static boolean startsWith(
             final boolean caseSensitive,
             final String text, final int textOffset, final int textLen,
             final char[] prefix, final int prefixOffset, final int prefixLen) {
@@ -380,7 +380,7 @@ final class TextUtil {
 
 
 
-    public static boolean startsWith(
+    static boolean startsWith(
             final boolean caseSensitive,
             final char[] text, final int textOffset, final int textLen,
             final String prefix, final int prefixOffset, final int prefixLen) {
@@ -437,7 +437,7 @@ final class TextUtil {
 
 
 
-    public static boolean startsWith(
+    static boolean startsWith(
             final boolean caseSensitive,
             final String text, final int textOffset, final int textLen,
             final String prefix, final int prefixOffset, final int prefixLen) {
@@ -500,7 +500,7 @@ final class TextUtil {
 
 
 
-    public static boolean endsWith(final boolean caseSensitive, final String text, final String suffix) {
+    static boolean endsWith(final boolean caseSensitive, final String text, final String suffix) {
 
         if (text == null) {
             throw new IllegalArgumentException("Text cannot be null");
@@ -514,17 +514,17 @@ final class TextUtil {
     }
 
 
-    public static boolean endsWith(final boolean caseSensitive, final String text, final char[] suffix) {
+    static boolean endsWith(final boolean caseSensitive, final String text, final char[] suffix) {
         return endsWith(caseSensitive, text, 0, text.length(), suffix, 0, suffix.length);
     }
 
-    public static boolean endsWith(final boolean caseSensitive, final char[] text, final char[] suffix) {
+    static boolean endsWith(final boolean caseSensitive, final char[] text, final char[] suffix) {
         return endsWith(caseSensitive, text, 0, text.length, suffix, 0, suffix.length);
     }
 
 
 
-    public static boolean endsWith(
+    static boolean endsWith(
             final boolean caseSensitive,
             final char[] text, final int textOffset, final int textLen,
             final char[] suffix, final int suffixOffset, final int suffixLen) {
@@ -584,7 +584,7 @@ final class TextUtil {
 
 
 
-    public static boolean endsWith(
+    static boolean endsWith(
             final boolean caseSensitive,
             final String text, final int textOffset, final int textLen,
             final char[] suffix, final int suffixOffset, final int suffixLen) {
@@ -644,7 +644,7 @@ final class TextUtil {
 
 
 
-    public static boolean endsWith(
+    static boolean endsWith(
             final boolean caseSensitive,
             final char[] text, final int textOffset, final int textLen,
             final String suffix, final int suffixOffset, final int suffixLen) {
@@ -704,7 +704,7 @@ final class TextUtil {
 
 
 
-    public static boolean endsWith(
+    static boolean endsWith(
             final boolean caseSensitive,
             final String text, final int textOffset, final int textLen,
             final String suffix, final int suffixOffset, final int suffixLen) {
@@ -770,7 +770,7 @@ final class TextUtil {
 
 
 
-    public static boolean contains(final boolean caseSensitive, final String text, final String fragment) {
+    static boolean contains(final boolean caseSensitive, final String text, final String fragment) {
 
         if (text == null) {
             throw new IllegalArgumentException("Text cannot be null");
@@ -784,17 +784,17 @@ final class TextUtil {
     }
 
 
-    public static boolean contains(final boolean caseSensitive, final String text, final char[] fragment) {
+    static boolean contains(final boolean caseSensitive, final String text, final char[] fragment) {
         return contains(caseSensitive, text, 0, text.length(), fragment, 0, fragment.length);
     }
 
-    public static boolean contains(final boolean caseSensitive, final char[] text, final char[] fragment) {
+    static boolean contains(final boolean caseSensitive, final char[] text, final char[] fragment) {
         return contains(caseSensitive, text, 0, text.length, fragment, 0, fragment.length);
     }
 
 
 
-    public static boolean contains(
+    static boolean contains(
             final boolean caseSensitive,
             final char[] text, final int textOffset, final int textLen,
             final char[] fragment, final int fragmentOffset, final int fragmentLen) {
@@ -859,7 +859,7 @@ final class TextUtil {
 
 
 
-    public static boolean contains(
+    static boolean contains(
             final boolean caseSensitive,
             final String text, final int textOffset, final int textLen,
             final char[] fragment, final int fragmentOffset, final int fragmentLen) {
@@ -924,7 +924,7 @@ final class TextUtil {
 
 
 
-    public static boolean contains(
+    static boolean contains(
             final boolean caseSensitive,
             final char[] text, final int textOffset, final int textLen,
             final String fragment, final int fragmentOffset, final int fragmentLen) {
@@ -989,7 +989,7 @@ final class TextUtil {
 
 
 
-    public static boolean contains(
+    static boolean contains(
             final boolean caseSensitive,
             final String text, final int textOffset, final int textLen,
             final String fragment, final int fragmentOffset, final int fragmentLen) {
@@ -1060,7 +1060,7 @@ final class TextUtil {
 
 
 
-    public static int compareTo(final boolean caseSensitive, final String text1, final String text2) {
+    static int compareTo(final boolean caseSensitive, final String text1, final String text2) {
 
         if (text1 == null) {
             throw new IllegalArgumentException("First text being compared cannot be null");
@@ -1074,17 +1074,17 @@ final class TextUtil {
     }
 
 
-    public static int compareTo(final boolean caseSensitive, final String text1, final char[] text2) {
+    static int compareTo(final boolean caseSensitive, final String text1, final char[] text2) {
         return compareTo(caseSensitive, text1, 0, text1.length(), text2, 0, text2.length);
     }
 
-    public static int compareTo(final boolean caseSensitive, final char[] text1, final char[] text2) {
+    static int compareTo(final boolean caseSensitive, final char[] text1, final char[] text2) {
         return compareTo(caseSensitive, text1, 0, text1.length, text2, 0, text2.length);
     }
 
 
 
-    public static int compareTo(
+    static int compareTo(
             final boolean caseSensitive,
             final char[] text1, final int text1Offset, final int text1Len,
             final char[] text2, final int text2Offset, final int text2Len) {
@@ -1141,7 +1141,7 @@ final class TextUtil {
 
 
 
-    public static int compareTo(
+    static int compareTo(
             final boolean caseSensitive,
             final String text1, final int text1Offset, final int text1Len,
             final char[] text2, final int text2Offset, final int text2Len) {
@@ -1195,7 +1195,7 @@ final class TextUtil {
 
 
 
-    public static int compareTo(
+    static int compareTo(
             final boolean caseSensitive,
             final String text1, final int text1Offset, final int text1Len,
             final String text2, final int text2Offset, final int text2Len) {
@@ -1258,7 +1258,7 @@ final class TextUtil {
 
 
 
-    public static int binarySearchCharArray(
+    static int binarySearchCharArray(
             final boolean caseSensitive, final List<char[]> values, final char[] text, final int offset, final int len) {
 
         int low = 0;
@@ -1292,7 +1292,7 @@ final class TextUtil {
 
 
 
-    public static int binarySearchCharArray(
+    static int binarySearchCharArray(
             final boolean caseSensitive, final List<char[]> values, final String text, final int offset, final int len) {
 
         int low = 0;
@@ -1326,7 +1326,7 @@ final class TextUtil {
 
 
 
-    public static int binarySearchString(
+    static int binarySearchString(
             final boolean caseSensitive, final List<String> values, final char[] text, final int offset, final int len) {
 
         int low = 0;
@@ -1360,7 +1360,7 @@ final class TextUtil {
 
 
 
-    public static int binarySearchString(
+    static int binarySearchString(
             final boolean caseSensitive, final List<String> values, final String text, final int offset, final int len) {
 
         int low = 0;
@@ -1394,7 +1394,7 @@ final class TextUtil {
 
 
 
-    public static int binarySearchCharArray(
+    static int binarySearchCharArray(
             final boolean caseSensitive, final char[][] values, final char[] text, final int offset, final int len) {
 
         int low = 0;
@@ -1428,7 +1428,7 @@ final class TextUtil {
 
 
 
-    public static int binarySearchCharArray(
+    static int binarySearchCharArray(
             final boolean caseSensitive, final char[][] values, final String text, final int offset, final int len) {
 
         int low = 0;
@@ -1462,7 +1462,7 @@ final class TextUtil {
 
 
 
-    public static int binarySearchString(
+    static int binarySearchString(
             final boolean caseSensitive, final String[] values, final char[] text, final int offset, final int len) {
 
         int low = 0;
@@ -1496,7 +1496,7 @@ final class TextUtil {
 
 
 
-    public static int binarySearchString(
+    static int binarySearchString(
             final boolean caseSensitive, final String[] values, final String text, final int offset, final int len) {
 
         int low = 0;
@@ -1535,7 +1535,7 @@ final class TextUtil {
 
 
 
-    public static int hashCode(final char[] text, final int offset, final int len) {
+    static int hashCode(final char[] text, final int offset, final int len) {
         // This basically mimics what the String.hashCode() method does, without the need to
         // convert the char[] into a new String object
         // If the text to compute was already a String, it would be better to directly call
