@@ -69,6 +69,7 @@ public class MinimizeHTMLMarkupHandlerTest extends TestCase {
         check(htmlConfig, ONLY_WHITE_SPACE, " <!-- something --> hey", " <!-- something --> hey");
         check(htmlConfig, ONLY_WHITE_SPACE, " <!-- something --> hey    ja", " <!-- something --> hey ja");
         check(htmlConfig, ONLY_WHITE_SPACE, "\n <!-- something --> hey  \n  ja", " <!-- something --> hey ja");
+        check(htmlConfig, ONLY_WHITE_SPACE, "<td>                 <td>OK", "<td> <td>OK");
 
         check(htmlConfig, COMPLETE, "<div >hello</div >", "<div>hello</div>");
         check(htmlConfig, COMPLETE, "<hr /><div >hello</div >", "<hr/><div>hello</div>");

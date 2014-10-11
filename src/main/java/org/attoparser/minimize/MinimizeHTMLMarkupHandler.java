@@ -19,11 +19,6 @@
  */
 package org.attoparser.minimize;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.attoparser.AbstractMarkupHandler;
 import org.attoparser.IMarkupHandler;
 import org.attoparser.ParseException;
@@ -41,14 +36,16 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
 
     public enum MinimizeMode {
 
-        ONLY_WHITE_SPACE(false, false), COMPLETE(true, true);
+        ONLY_WHITE_SPACE(false, false, false), COMPLETE(true, true, true);
 
         private boolean removeComments;
         private boolean unquoteAttributes;
+        private boolean unminimizeStandalones;
 
-        MinimizeMode(final boolean removeComments, final boolean unquoteAttributes) {
+        MinimizeMode(final boolean removeComments, final boolean unquoteAttributes, final boolean unminimizeStandalones) {
             this.removeComments = removeComments;
             this.unquoteAttributes = unquoteAttributes;
+            this.unminimizeStandalones = unminimizeStandalones;
         }
 
     }
@@ -60,61 +57,47 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
      *    - http://perfectionkills.com/experimenting-with-html-minifier/
      */
 
-    // Space will be removed from between sibling block elements, and also from between opening tags of block container and block elements
 
-    private static final String[] BLOCK_ELEMENTS_STR =
+    /*
+     * Space will be removed from between sibling block elements, and also from between opening tags of
+     * block container and block elements.
+     * This array MUST BE IN ALPHABETIC ORDER (needed for binary search).
+     */
+    private static final String[] BLOCK_ELEMENTS =
             new String[]{
-                    "address", "article", "aside", "audio", "blockquote", "canvas",
+                    "address", "article", "aside", "audio", "base", "blockquote", "body", "canvas",
                     "dd", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer",
-                    "form", "h1", "h2", "h3", "h4", "h5", "h6", "header", "hgroup", "hr",
-                    "li", "noscript", "ol", "option", "output", "p", "pre", "section", "table", "tbody",
-                    "tfoot", "tr", "td", "th", "ul", "video"
-            };
-    private static final String[] BLOCK_CONTAINER_ELEMENTS_STR =
-            new String[] {
-                    "address", "article", "aside", "div", "dl", "fieldset", "footer",
-                    "form", "header", "hgroup",  "noscript", "ol", "section", "table",
-                    "tbody", "tr", "tfoot", "ul"
+                    "form", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hgroup", "hr", "html",
+                    "li", "link", "meta", "noscript", "ol", "option", "output", "p", "pre", "script", "section",
+                    "style", "table", "tbody", "td", "tfoot", "th", "thead", "title", "tr", "ul", "video"
             };
 
-    private static final char[][] BLOCK_ELEMENTS;
-    private static final char[][] BLOCK_CONTAINER_ELEMENTS;
+    // No whitespace minimization can be done inside a preformatted element
+    private static final String[] PREFORMATTED_ELEMENTS =
+            new String[]{
+                    "pre", "script", "style", "textarea"
+            };
 
 
-    private final char[] ELEMENT_INNER_WHITE_SPACE = new char[] { ' ' };
-    private final char[] ATTRIBUTE_OPERATOR = new char[] { '=' };
+    private static final char[] SIZE_ONE_WHITE_SPACE = new char[] { ' ' };
+    private static final char[] ATTRIBUTE_OPERATOR = new char[] { '=' };
 
     private final MinimizeMode minimizeMode;
     private final IMarkupHandler handler;
 
     private char[] internalBuffer = new char[30];
-    private int pendingElementInnerWhiteSpaceLine = 1;
-    private int pendingElementInnerWhiteSpaceCol = 1;
-    private boolean lastCharWasTextWhiteSpace = false;
+    private boolean lastTextEndedInWhiteSpace = false; // last text handled ended in white space (just in case next is also text, and
+    private boolean lastOpenElementWasBlock = false; // last element that was open was a block element
+    private boolean lastClosedElementWasBlock = false; // last element that was closed was a block element
+    private boolean lastVisibleEventWasElement = false; // last event or event group was an element
+    private boolean pendingInterBlockElementWhiteSpace = false; // delayed white space between block element tags waiting to determine whether it has to be output or not
+    private boolean inPreformattedElement = false; // avoid pre and textarea to have their white space minimized
+
+    private int pendingEventLine = 1;
+    private int pendingEventCol = 1;
 
 
 
-
-
-    static {
-
-        final List<String> blockElementsStrList = new ArrayList<String>(Arrays.asList(BLOCK_ELEMENTS_STR));
-        Collections.sort(blockElementsStrList);
-
-        final List<String> blockContainerElementsStrList = new ArrayList<String>(Arrays.asList(BLOCK_ELEMENTS_STR));
-        Collections.sort(blockContainerElementsStrList);
-
-        BLOCK_ELEMENTS = new char[blockElementsStrList.size()][];
-        BLOCK_CONTAINER_ELEMENTS = new char[blockContainerElementsStrList.size()][];
-
-        for (int i = 0; i < BLOCK_ELEMENTS.length; i++) {
-            BLOCK_ELEMENTS[i] = blockElementsStrList.get(i).toCharArray();
-        }
-        for (int i = 0; i < BLOCK_CONTAINER_ELEMENTS.length; i++) {
-            BLOCK_CONTAINER_ELEMENTS[i] = blockContainerElementsStrList.get(i).toCharArray();
-        }
-
-    }
 
 
 
@@ -125,7 +108,7 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
         super();
 
         if (minimizeMode == null) {
-            throw new IllegalArgumentException("Compact mode cannot be null");
+            throw new IllegalArgumentException("Minimize mode cannot be null");
         }
         if (handler == null) {
             throw new IllegalArgumentException("Handler cannot be null");
@@ -171,39 +154,70 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
     public void handleText(final char[] buffer, final int offset, final int len, final int line, final int col)
             throws ParseException {
 
+
+        // It is a zero-len text, simply ignore the event
         if (len == 0) {
-            // It is a zero-len text, simply forward the event
+            return;
+        }
+
+
+        // If there is a delayed whitespace text event, just output it
+        flushPendingInterBlockElementWhiteSpace(false);
+
+        // If we are inside a preformatted element, there's nothing to minimize
+        if (this.inPreformattedElement) {
+            this.lastTextEndedInWhiteSpace = false;
+            this.lastVisibleEventWasElement = false;
             this.handler.handleText(buffer, offset, len, line, col);
             return;
         }
 
+
         /*
-         * First step is to check whether we will actually need to compress any whitespaces here or not.
+         * Check whether we will actually need to compress any whitespaces here or not.
          */
 
-        boolean wasWhiteSpace = this.lastCharWasTextWhiteSpace;
-        boolean shouldCompress = wasWhiteSpace;
+        boolean wasWhiteSpace = this.lastTextEndedInWhiteSpace;
+        boolean shouldCompress = false;
+        boolean isAllWhiteSpace = true;
         int i = offset;
         int n = len;
-        while (!shouldCompress && n-- != 0) {
+        while ((!shouldCompress || isAllWhiteSpace) && n-- != 0) {
             if (isWhitespace(buffer[i])) {
                 if (wasWhiteSpace) {
                     shouldCompress = true;
-                    break;
                 }
                 wasWhiteSpace = true;
             } else {
                 wasWhiteSpace = false;
+                isAllWhiteSpace = false;
             }
             i++;
         }
 
         if (!shouldCompress) {
+
             // Check whether the last char was a whitespace
-            this.lastCharWasTextWhiteSpace = (isWhitespace(buffer[offset + len - 1]));
+            this.lastTextEndedInWhiteSpace = (isWhitespace(buffer[offset + len - 1]));
+
+            // If this is all-white-space and last event was an element, better delay this event because
+            // it might be that we don't have to launch it after all...
+            if (this.lastVisibleEventWasElement && isAllWhiteSpace) {
+                this.pendingInterBlockElementWhiteSpace = true;
+                this.pendingEventLine = line;
+                this.pendingEventCol = col;
+                this.lastVisibleEventWasElement = false;
+                return;
+            }
+
+            // Modify the flag: we are outputting a non-element
+            this.lastVisibleEventWasElement = false;
+
             // Just forward the event's content without modifications
             this.handler.handleText(buffer, offset, len, line, col);
+
             return;
+
         }
 
         /*
@@ -215,7 +229,7 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
             this.internalBuffer = new char[len];
         }
 
-        wasWhiteSpace = this.lastCharWasTextWhiteSpace;
+        wasWhiteSpace = this.lastTextEndedInWhiteSpace;
         int internalBufferSize = 0;
 
         char c;
@@ -238,12 +252,40 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
             this.internalBuffer[internalBufferSize++] = c;
         }
 
-        // Check whether the last char was a whitespace
-        this.lastCharWasTextWhiteSpace = wasWhiteSpace;
+        // If as a result of compressing we don't have to output anything... don't
+        if (internalBufferSize > 0) {
 
-        // We've already constructed a text buffer with adequate white space compression, so we can forward the event
-        this.handler.handleText(this.internalBuffer, 0, internalBufferSize, line, col);
+            // Check whether the last char was a whitespace
+            this.lastTextEndedInWhiteSpace = wasWhiteSpace;
 
+            // If this is all-white-space and last event was an element, better delay this event because
+            // it might be that we don't have to launch it after all...
+            if (this.lastVisibleEventWasElement && isAllWhiteSpace) {
+                this.pendingInterBlockElementWhiteSpace = true;
+                this.pendingEventLine = line;
+                this.pendingEventCol = col;
+                this.lastVisibleEventWasElement = false;
+                return;
+            }
+
+            // Modify the flag: we are outputting a non-element
+            this.lastVisibleEventWasElement = false;
+
+            // We've already constructed a text buffer with adequate white space compression, so we can forward the event
+            this.handler.handleText(this.internalBuffer, 0, internalBufferSize, line, col);
+
+        }
+
+    }
+
+
+    private void flushPendingInterBlockElementWhiteSpace(final boolean ignore) throws ParseException {
+        if (this.pendingInterBlockElementWhiteSpace) {
+            this.pendingInterBlockElementWhiteSpace = false;
+            if (!ignore) {
+                this.handler.handleText(SIZE_ONE_WHITE_SPACE, 0, 1, this.pendingEventLine, this.pendingEventCol);
+            }
+        }
     }
 
 
@@ -257,10 +299,14 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
             final int line, final int col)
             throws ParseException {
 
-        // Not all compact modes require stripping comments
+        // Not all minimize modes require stripping comments
         if (!this.minimizeMode.removeComments) {
 
-            this.lastCharWasTextWhiteSpace = false;
+            // If there is a delayed whitespace text event, just output it
+            flushPendingInterBlockElementWhiteSpace(false);
+
+            this.lastVisibleEventWasElement = false;
+            this.lastTextEndedInWhiteSpace = false;
 
             this.handler.handleComment(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
 
@@ -279,7 +325,11 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
             final int line, final int col)
             throws ParseException {
 
-        this.lastCharWasTextWhiteSpace = false;
+        // If there is a delayed whitespace text event, just output it
+        flushPendingInterBlockElementWhiteSpace(false);
+
+        this.lastVisibleEventWasElement = false;
+        this.lastTextEndedInWhiteSpace = false;
 
         this.handler.handleCDATASection(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
 
@@ -290,12 +340,21 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
 
     @Override
     public void handleStandaloneElementStart(
-            final char[] buffer, final int offset, final int len,
+            final char[] buffer, final int nameOffset, final int nameLen,
             final boolean minimized, final int line, final int col) throws ParseException {
 
-        this.lastCharWasTextWhiteSpace = false;
+        this.lastTextEndedInWhiteSpace = false;
 
-        this.handler.handleStandaloneElementStart(buffer, offset, len, minimized, line, col);
+        // Check whether the inter-block element whitespace should be written or simply ignored
+        final boolean ignorePendingWhiteSpace =
+                ((this.lastClosedElementWasBlock || this.lastOpenElementWasBlock) && isBlockElement(buffer, nameOffset, nameLen));
+        flushPendingInterBlockElementWhiteSpace(ignorePendingWhiteSpace);
+
+        if (this.minimizeMode.unminimizeStandalones) {
+            this.handler.handleStandaloneElementStart(buffer, nameOffset, nameLen, false, line, col);
+        } else {
+            this.handler.handleStandaloneElementStart(buffer, nameOffset, nameLen, minimized, line, col);
+        }
 
     }
 
@@ -304,12 +363,19 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
 
     @Override
     public void handleStandaloneElementEnd(
-            final char[] buffer, final int offset, final int len,
+            final char[] buffer, final int nameOffset, final int nameLen,
             final boolean minimized, final int line, final int col) throws ParseException {
 
-        this.lastCharWasTextWhiteSpace = false;
+        this.lastTextEndedInWhiteSpace = false;
+        this.lastClosedElementWasBlock = isBlockElement(buffer, nameOffset, nameLen);
+        this.lastOpenElementWasBlock = false;
+        this.lastVisibleEventWasElement = true;
 
-        this.handler.handleStandaloneElementEnd(buffer, offset, len, minimized, line, col);
+        if (this.minimizeMode.unminimizeStandalones) {
+            this.handler.handleStandaloneElementEnd(buffer, nameOffset, nameLen, false, line, col);
+        } else {
+            this.handler.handleStandaloneElementEnd(buffer, nameOffset, nameLen, minimized, line, col);
+        }
 
     }
 
@@ -317,12 +383,21 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
 
 
     @Override
-    public void handleOpenElementStart(final char[] buffer, final int offset, final int len, final int line,
+    public void handleOpenElementStart(final char[] buffer, final int nameOffset, final int nameLen, final int line,
             final int col) throws ParseException {
 
-        this.lastCharWasTextWhiteSpace = false;
+        this.lastTextEndedInWhiteSpace = false;
 
-        this.handler.handleOpenElementStart(buffer, offset, len, line, col);
+        // Check whether the inter-block element whitespace should be written or simply ignored
+        final boolean ignorePendingWhiteSpace =
+                ((this.lastClosedElementWasBlock || this.lastOpenElementWasBlock) && isBlockElement(buffer, nameOffset, nameLen));
+        flushPendingInterBlockElementWhiteSpace(ignorePendingWhiteSpace);
+
+        if (isPreformattedElement(buffer, nameOffset, nameLen)) {
+            this.inPreformattedElement = true;
+        }
+
+        this.handler.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
 
     }
 
@@ -331,12 +406,15 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
 
     @Override
     public void handleOpenElementEnd(
-            final char[] buffer, final int offset, final int len,
+            final char[] buffer, final int nameOffset, final int nameLen,
             final int line, final int col) throws ParseException {
 
-        this.lastCharWasTextWhiteSpace = false;
+        this.lastTextEndedInWhiteSpace = false;
+        this.lastOpenElementWasBlock = isBlockElement(buffer, nameOffset, nameLen);
+        this.lastClosedElementWasBlock = false;
+        this.lastVisibleEventWasElement = true;
 
-        this.handler.handleOpenElementEnd(buffer, offset, len, line, col);
+        this.handler.handleOpenElementEnd(buffer, nameOffset, nameLen, line, col);
 
     }
 
@@ -344,12 +422,21 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
 
 
     @Override
-    public void handleCloseElementStart(final char[] buffer, final int offset, final int len, final int line,
+    public void handleCloseElementStart(final char[] buffer, final int nameOffset, final int nameLen, final int line,
             final int col) throws ParseException {
 
-        this.lastCharWasTextWhiteSpace = false;
+        this.lastTextEndedInWhiteSpace = false;
 
-        this.handler.handleCloseElementStart(buffer, offset, len, line, col);
+        // Check whether the inter-block element whitespace should be written or simply ignored
+        final boolean ignorePendingWhiteSpace =
+                (this.lastClosedElementWasBlock && isBlockElement(buffer, nameOffset, nameLen));
+        flushPendingInterBlockElementWhiteSpace(ignorePendingWhiteSpace);
+
+        if (isPreformattedElement(buffer, nameOffset, nameLen)) {
+            this.inPreformattedElement = false;
+        }
+
+        this.handler.handleCloseElementStart(buffer, nameOffset, nameLen, line, col);
 
     }
 
@@ -358,12 +445,15 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
 
     @Override
     public void handleCloseElementEnd(
-            final char[] buffer, final int offset, final int len,
+            final char[] buffer, final int nameOffset, final int nameLen,
             final int line, final int col) throws ParseException {
 
-        this.lastCharWasTextWhiteSpace = false;
+        this.lastTextEndedInWhiteSpace = false;
+        this.lastClosedElementWasBlock = isBlockElement(buffer, nameOffset, nameLen);
+        this.lastOpenElementWasBlock = false;
+        this.lastVisibleEventWasElement = true;
 
-        this.handler.handleCloseElementEnd(buffer, offset, len, line, col);
+        this.handler.handleCloseElementEnd(buffer, nameOffset, nameLen, line, col);
 
     }
 
@@ -372,15 +462,18 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
 
     @Override
     public void handleAutoCloseElementStart(
-            final char[] buffer, final int offset, final int len,
+            final char[] buffer, final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
 
-        // We are not sure whether auto-close events will make it to a result markup, but anyway the
-        // safest option is to set this to false to avoid event-border-compression.
-        this.lastCharWasTextWhiteSpace = false;
+        this.lastTextEndedInWhiteSpace = false;
 
-        this.handler.handleAutoCloseElementStart(buffer, offset, len, line, col);
+        // Check whether the inter-block element whitespace should be written or simply ignored
+        final boolean ignorePendingWhiteSpace =
+                (this.lastClosedElementWasBlock && isBlockElement(buffer, nameOffset, nameLen));
+        flushPendingInterBlockElementWhiteSpace(ignorePendingWhiteSpace);
+
+        this.handler.handleAutoCloseElementStart(buffer, nameOffset, nameLen, line, col);
 
     }
 
@@ -390,15 +483,16 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
 
     @Override
     public void handleAutoCloseElementEnd(
-            final char[] buffer, final int offset, final int len,
+            final char[] buffer, final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
 
-        // We are not sure whether auto-close events will make it to a result markup, but anyway the
-        // safest option is to set this to false to avoid event-border-compression.
-        this.lastCharWasTextWhiteSpace = false;
+        this.lastTextEndedInWhiteSpace = false;
+        this.lastClosedElementWasBlock = isBlockElement(buffer, nameOffset, nameLen);
+        this.lastOpenElementWasBlock = false;
+        this.lastVisibleEventWasElement = true;
 
-        this.handler.handleAutoCloseElementEnd(buffer, offset, len, line, col);
+        this.handler.handleAutoCloseElementEnd(buffer, nameOffset, nameLen, line, col);
 
     }
 
@@ -407,13 +501,18 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
 
     @Override
     public void handleUnmatchedCloseElementStart(
-            final char[] buffer, final int offset, final int len,
+            final char[] buffer, final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
 
-        this.lastCharWasTextWhiteSpace = false;
+        this.lastTextEndedInWhiteSpace = false;
 
-        this.handler.handleUnmatchedCloseElementStart(buffer, offset, len, line, col);
+        // Check whether the inter-block element whitespace should be written or simply ignored
+        final boolean ignorePendingWhiteSpace =
+                (this.lastClosedElementWasBlock && isBlockElement(buffer, nameOffset, nameLen));
+        flushPendingInterBlockElementWhiteSpace(ignorePendingWhiteSpace);
+
+        this.handler.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col);
 
     }
 
@@ -422,13 +521,16 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
 
     @Override
     public void handleUnmatchedCloseElementEnd(
-            final char[] buffer, final int offset, final int len,
+            final char[] buffer, final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
 
-        this.lastCharWasTextWhiteSpace = false;
+        this.lastTextEndedInWhiteSpace = false;
+        this.lastClosedElementWasBlock = isBlockElement(buffer, nameOffset, nameLen);
+        this.lastOpenElementWasBlock = false;
+        this.lastVisibleEventWasElement = true;
 
-        this.handler.handleUnmatchedCloseElementEnd(buffer, offset, len, line, col);
+        this.handler.handleUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col);
 
     }
 
@@ -443,8 +545,8 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
             final int valueLine, final int valueCol) throws ParseException {
 
         this.handler.handleInnerWhiteSpace(
-                ELEMENT_INNER_WHITE_SPACE, 0, ELEMENT_INNER_WHITE_SPACE.length,
-                this.pendingElementInnerWhiteSpaceLine, this.pendingElementInnerWhiteSpaceCol);
+                SIZE_ONE_WHITE_SPACE, 0, SIZE_ONE_WHITE_SPACE.length,
+                this.pendingEventLine, this.pendingEventCol);
 
 
         final boolean canRemoveAttributeQuotes =
@@ -453,7 +555,7 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
 
 
         if (operatorLen <= 1 && !canRemoveAttributeQuotes) {
-            // Operator is already compact enough, so we don't need to use our attribute-compacting buffer
+            // Operator is already minimal enough, so we don't need to use our attribute-minimizing buffer
 
             this.handler.handleAttribute(buffer, nameOffset, nameLen, nameLine, nameCol, operatorOffset,
                     operatorLen, operatorLine, operatorCol, valueContentOffset, valueContentLen,
@@ -509,8 +611,8 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
             final int line, final int col)
             throws ParseException {
 
-        this.pendingElementInnerWhiteSpaceLine = line;
-        this.pendingElementInnerWhiteSpaceCol = col;
+        this.pendingEventLine = line;
+        this.pendingEventCol = col;
 
     }
 
@@ -535,7 +637,11 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
             final int outerOffset, final int outerLen,
             final int outerLine, final int outerCol) throws ParseException {
 
-        this.lastCharWasTextWhiteSpace = false;
+        // If there is a delayed whitespace text event, just output it
+        flushPendingInterBlockElementWhiteSpace(false);
+
+        this.lastVisibleEventWasElement = false;
+        this.lastTextEndedInWhiteSpace = false;
 
         this.handler.handleDocType(buffer, keywordOffset, keywordLen, keywordLine, keywordCol,
                 elementNameOffset, elementNameLen, elementNameLine, elementNameCol, typeOffset, typeLen,
@@ -563,7 +669,11 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
             final int line,final int col) 
             throws ParseException {
 
-        this.lastCharWasTextWhiteSpace = false;
+        // If there is a delayed whitespace text event, just output it
+        flushPendingInterBlockElementWhiteSpace(false);
+
+        this.lastVisibleEventWasElement = false;
+        this.lastTextEndedInWhiteSpace = false;
 
         this.handler.handleXmlDeclaration(buffer, keywordOffset, keywordLen, keywordLine, keywordCol,
                 versionOffset, versionLen, versionLine, versionCol, encodingOffset, encodingLen,
@@ -588,7 +698,11 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
             final int line, final int col)
             throws ParseException {
 
-        this.lastCharWasTextWhiteSpace = false;
+        // If there is a delayed whitespace text event, just output it
+        flushPendingInterBlockElementWhiteSpace(false);
+
+        this.lastVisibleEventWasElement = false;
+        this.lastTextEndedInWhiteSpace = false;
 
         this.handler.handleProcessingInstruction(buffer, targetOffset, targetLen, targetLine, targetCol,
                 contentOffset, contentLen, contentLine, contentCol, outerOffset, outerLen, line, col);
@@ -639,6 +753,117 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
             || (c > '\u007F' && Character.isWhitespace(c)));
 
     }
+
+
+    private boolean isBlockElement(final char[] buffer, final int nameOffset, final int nameLen) {
+        return binarySearchString(false, BLOCK_ELEMENTS, buffer, nameOffset, nameLen) >= 0;
+    }
+
+
+    private boolean isPreformattedElement(final char[] buffer, final int nameOffset, final int nameLen) {
+        int i = 0;
+        int n = PREFORMATTED_ELEMENTS.length;
+        while (n-- != 0) {
+            if (compareTo(false, PREFORMATTED_ELEMENTS[i], 0, PREFORMATTED_ELEMENTS[i].length(), buffer, nameOffset, nameLen) == 0) {
+                return true;
+            }
+            i++;
+        }
+        return false;
+    }
+
+
+
+
+
+
+
+    // Copied here from org.attoparser.TextUtil in order to avoid the need to make that class public
+    private static int compareTo(
+            final boolean caseSensitive,
+            final String text1, final int text1Offset, final int text1Len,
+            final char[] text2, final int text2Offset, final int text2Len) {
+
+        if (text1 == null) {
+            throw new IllegalArgumentException("First text being compared cannot be null");
+        }
+        if (text2 == null) {
+            throw new IllegalArgumentException("Second text buffer being compared cannot be null");
+        }
+
+        char c1, c2;
+
+        int n = Math.min(text1Len, text2Len);
+        int i = 0;
+
+        while (n-- != 0) {
+
+            c1 = text1.charAt(text1Offset + i);
+            c2 = text2[text2Offset + i];
+
+            if (c1 != c2) {
+
+                if (caseSensitive) {
+                    return c1 - c2;
+                }
+
+                c1 = Character.toUpperCase(c1);
+                c2 = Character.toUpperCase(c2);
+
+                if (c1 != c2) {
+                    // We check both upper and lower case because that is how String#compareToIgnoreCase() is defined.
+                    c1 = Character.toLowerCase(c1);
+                    c2 = Character.toLowerCase(c2);
+                    if (c1 != c2) {
+                        return c1 - c2;
+                    }
+
+                }
+
+            }
+
+            i++;
+
+        }
+
+        return text1Len - text2Len;
+
+    }
+
+
+    // Copied here from org.attoparser.TextUtil in order to avoid the need to make that class public
+    private static int binarySearchString(
+            final boolean caseSensitive, final String[] values, final char[] text, final int offset, final int len) {
+
+        int low = 0;
+        int high = values.length - 1;
+
+        int mid, cmp;
+        String midVal;
+
+        while (low <= high) {
+
+            mid = (low + high) >>> 1;
+            midVal = values[mid];
+
+            cmp = compareTo(caseSensitive, midVal, 0, midVal.length(), text, offset, len);
+
+            if (cmp < 0) {
+                low = mid + 1;
+            } else if (cmp > 0) {
+                high = mid - 1;
+            } else {
+                // Found!!
+                return mid;
+            }
+
+        }
+
+        return -(low + 1);  // Not Found!! We return (-(insertion point) - 1), to guarantee all non-founds are < 0
+
+    }
+
+
 
 
 }
