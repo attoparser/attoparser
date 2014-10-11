@@ -150,7 +150,10 @@ public final class OutputMarkupHandler extends AbstractMarkupHandler {
             final boolean minimized, final int line, final int col) throws ParseException {
         
         try {
-            this.writer.write("/>");
+            if (minimized) {
+                this.writer.write('/');
+            }
+            this.writer.write('>');
         } catch (final Exception e) {
             throw new ParseException(e);
         }
