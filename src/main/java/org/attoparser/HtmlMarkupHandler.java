@@ -41,7 +41,7 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
 
 
 
-    public HtmlMarkupHandler(final IMarkupHandler handler) {
+    HtmlMarkupHandler(final IMarkupHandler handler) {
         super();
         if (handler == null) {
             throw new IllegalArgumentException("Delegate handler cannot be null");
@@ -179,19 +179,19 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleStandaloneElementStart(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final boolean minimized, final int line, final int col)
             throws ParseException {
         
-        this.currentElement = HtmlElements.forName(buffer, offset, len);
-        this.currentElement.handleStandaloneElementStart(buffer, offset, len, minimized, line, col, this.handler, this.status);
+        this.currentElement = HtmlElements.forName(buffer, nameOffset, nameLen);
+        this.currentElement.handleStandaloneElementStart(buffer, nameOffset, nameLen, minimized, line, col, this.handler, this.status);
 
     }
 
     @Override
     public void handleStandaloneElementEnd(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final boolean minimized, final int line, final int col)
             throws ParseException {
         
@@ -203,7 +203,7 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
         this.currentElement = null;
 
         // Hoping for better days in which tail calls might be optimized ;)
-        element.handleStandaloneElementEnd(buffer, offset, len, minimized, line, col, this.handler, this.status);
+        element.handleStandaloneElementEnd(buffer, nameOffset, nameLen, minimized, line, col, this.handler, this.status);
 
     }
 
@@ -213,19 +213,19 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleOpenElementStart(
             final char[] buffer, 
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col) 
             throws ParseException {
         
-        this.currentElement = HtmlElements.forName(buffer, offset, len);
-        this.currentElement.handleOpenElementStart(buffer, offset, len, line, col, this.handler, this.status);
+        this.currentElement = HtmlElements.forName(buffer, nameOffset, nameLen);
+        this.currentElement.handleOpenElementStart(buffer, nameOffset, nameLen, line, col, this.handler, this.status);
 
     }
 
     @Override
     public void handleOpenElementEnd(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
 
@@ -237,7 +237,7 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
         this.currentElement = null;
 
         // Hoping for better days in which tail calls might be optimized ;)
-        element.handleOpenElementEnd(buffer, offset, len, line, col, this.handler, this.status);
+        element.handleOpenElementEnd(buffer, nameOffset, nameLen, line, col, this.handler, this.status);
 
     }
 
@@ -247,19 +247,19 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleCloseElementStart(
             final char[] buffer, 
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col) 
             throws ParseException {
         
-        this.currentElement = HtmlElements.forName(buffer, offset, len);
-        this.currentElement.handleCloseElementStart(buffer, offset, len, line, col, this.handler, this.status);
+        this.currentElement = HtmlElements.forName(buffer, nameOffset, nameLen);
+        this.currentElement.handleCloseElementStart(buffer, nameOffset, nameLen, line, col, this.handler, this.status);
         
     }
 
     @Override
     public void handleCloseElementEnd(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
 
@@ -271,7 +271,7 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
         this.currentElement = null;
 
         // Hoping for better days in which tail calls might be optimized ;)
-        element.handleCloseElementEnd(buffer, offset, len, line, col, this.handler, this.status);
+        element.handleCloseElementEnd(buffer, nameOffset, nameLen, line, col, this.handler, this.status);
 
     }
 
@@ -281,19 +281,19 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleAutoCloseElementStart(
             final char[] buffer, 
-            final int offset, final int len, 
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
         
-        this.currentElement = HtmlElements.forName(buffer, offset, len);
-        this.currentElement.handleAutoCloseElementStart(buffer, offset, len, line, col, this.handler, this.status);
+        this.currentElement = HtmlElements.forName(buffer, nameOffset, nameLen);
+        this.currentElement.handleAutoCloseElementStart(buffer, nameOffset, nameLen, line, col, this.handler, this.status);
         
     }
 
     @Override
     public void handleAutoCloseElementEnd(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
 
@@ -305,7 +305,7 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
         this.currentElement = null;
 
         // Hoping for better days in which tail calls might be optimized ;)
-        element.handleAutoCloseElementEnd(buffer, offset, len, line, col, this.handler, this.status);
+        element.handleAutoCloseElementEnd(buffer, nameOffset, nameLen, line, col, this.handler, this.status);
 
     }
 
@@ -315,19 +315,19 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleUnmatchedCloseElementStart(
             final char[] buffer, 
-            final int offset, final int len, 
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
         
-        this.currentElement = HtmlElements.forName(buffer, offset, len);
-        this.currentElement.handleUnmatchedCloseElementStart(buffer, offset, len, line, col, this.handler, this.status);
+        this.currentElement = HtmlElements.forName(buffer, nameOffset, nameLen);
+        this.currentElement.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col, this.handler, this.status);
         
     }
 
     @Override
     public void handleUnmatchedCloseElementEnd(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
 
@@ -339,7 +339,7 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
         this.currentElement = null;
 
         // Hoping for better days in which tail calls might be optimized ;)
-        element.handleUnmatchedCloseElementEnd(buffer, offset, len, line, col, this.handler, this.status);
+        element.handleUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col, this.handler, this.status);
 
     }
     

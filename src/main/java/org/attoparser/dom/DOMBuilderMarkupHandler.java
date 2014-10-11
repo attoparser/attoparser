@@ -78,10 +78,10 @@ public final class DOMBuilderMarkupHandler extends AbstractMarkupHandler {
     private INestableNode currentParent = null;
 
 
-    private String currentElementName;
-    private Map<String,String> currentElementAttributes;
-    private int currentElementLine;
-    private int currentElementCol;
+    private String currentElementName = null;
+    private Map<String,String> currentElementAttributes = null;
+    private int currentElementLine = -1;
+    private int currentElementCol = -1;
 
     
 
@@ -362,7 +362,7 @@ public final class DOMBuilderMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleStandaloneElementEnd(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final boolean minimized, final int line, final int col)
             throws ParseException {
 
@@ -400,7 +400,7 @@ public final class DOMBuilderMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleOpenElementEnd(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
 
@@ -439,7 +439,7 @@ public final class DOMBuilderMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleCloseElementEnd(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
 
@@ -469,7 +469,7 @@ public final class DOMBuilderMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleAutoCloseElementEnd(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
 

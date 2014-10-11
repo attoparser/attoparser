@@ -237,7 +237,7 @@ public final class SimplifierMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleStandaloneElementEnd(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final boolean minimized, final int line, final int col)
             throws ParseException {
         
@@ -267,7 +267,7 @@ public final class SimplifierMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleOpenElementEnd(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
 
@@ -296,7 +296,7 @@ public final class SimplifierMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleCloseElementEnd(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
 
@@ -326,7 +326,7 @@ public final class SimplifierMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleAutoCloseElementEnd(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
 
@@ -356,7 +356,7 @@ public final class SimplifierMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleUnmatchedCloseElementEnd(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
 

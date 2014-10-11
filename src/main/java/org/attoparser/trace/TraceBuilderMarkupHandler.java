@@ -97,10 +97,10 @@ public final class TraceBuilderMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleStandaloneElementStart(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final boolean minimized, final int line, final int col)
             throws ParseException {
-        final String elementName = new String(buffer, offset, len);
+        final String elementName = new String(buffer, nameOffset, nameLen);
         if (minimized) {
             this.trace.add(new MarkupTraceEvent.StandaloneElementStartTraceEvent(elementName, line, col));
         } else {
@@ -113,10 +113,10 @@ public final class TraceBuilderMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleStandaloneElementEnd(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final boolean minimized, final int line, final int col)
             throws ParseException {
-        final String elementName = new String(buffer, offset, len);
+        final String elementName = new String(buffer, nameOffset, nameLen);
         if (minimized) {
             this.trace.add(new MarkupTraceEvent.StandaloneElementEndTraceEvent(elementName, line, col));
         } else {
@@ -130,10 +130,10 @@ public final class TraceBuilderMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleOpenElementStart(
             final char[] buffer, 
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
-        final String elementName = new String(buffer, offset, len);
+        final String elementName = new String(buffer, nameOffset, nameLen);
         this.trace.add(new MarkupTraceEvent.OpenElementStartTraceEvent(elementName, line, col));
     }
     
@@ -143,10 +143,10 @@ public final class TraceBuilderMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleOpenElementEnd(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
-        final String elementName = new String(buffer, offset, len);
+        final String elementName = new String(buffer, nameOffset, nameLen);
         this.trace.add(new MarkupTraceEvent.OpenElementEndTraceEvent(elementName, line, col));
     }
     
@@ -156,10 +156,10 @@ public final class TraceBuilderMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleCloseElementStart(
             final char[] buffer, 
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
-        final String elementName = new String(buffer, offset, len);
+        final String elementName = new String(buffer, nameOffset, nameLen);
         this.trace.add(new MarkupTraceEvent.CloseElementStartTraceEvent(elementName, line, col));
     }
     
@@ -169,10 +169,10 @@ public final class TraceBuilderMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleCloseElementEnd(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
-        final String elementName = new String(buffer, offset, len);
+        final String elementName = new String(buffer, nameOffset, nameLen);
         this.trace.add(new MarkupTraceEvent.CloseElementEndTraceEvent(elementName, line, col));
     }
     
@@ -182,10 +182,10 @@ public final class TraceBuilderMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleAutoCloseElementStart(
             final char[] buffer, 
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
-        final String elementName = new String(buffer, offset, len);
+        final String elementName = new String(buffer, nameOffset, nameLen);
         this.trace.add(new MarkupTraceEvent.AutoCloseElementStartTraceEvent(elementName, line, col));
     }
     
@@ -195,10 +195,10 @@ public final class TraceBuilderMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleAutoCloseElementEnd(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
-        final String elementName = new String(buffer, offset, len);
+        final String elementName = new String(buffer, nameOffset, nameLen);
         this.trace.add(new MarkupTraceEvent.AutoCloseElementEndTraceEvent(elementName, line, col));
     }
     
@@ -208,10 +208,10 @@ public final class TraceBuilderMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleUnmatchedCloseElementStart(
             final char[] buffer, 
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
-        final String elementName = new String(buffer, offset, len);
+        final String elementName = new String(buffer, nameOffset, nameLen);
         this.trace.add(new MarkupTraceEvent.UnmatchedCloseElementStartTraceEvent(elementName, line, col));
     }
     
@@ -221,10 +221,10 @@ public final class TraceBuilderMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleUnmatchedCloseElementEnd(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
-        final String elementName = new String(buffer, offset, len);
+        final String elementName = new String(buffer, nameOffset, nameLen);
         this.trace.add(new MarkupTraceEvent.UnmatchedCloseElementEndTraceEvent(elementName, line, col));
     }
 

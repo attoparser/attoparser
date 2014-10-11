@@ -288,7 +288,7 @@ public class PrettyHtmlMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleStandaloneElementStart(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final boolean minimized,
             final int line, final int col)
             throws ParseException {
@@ -297,7 +297,7 @@ public class PrettyHtmlMarkupHandler extends AbstractMarkupHandler {
             
             openStyle(STYLE_ELEMENT);
             this.writer.write(OPEN_TAG_START);
-            this.writer.write(buffer, offset, len);
+            this.writer.write(buffer, nameOffset, nameLen);
             
         } catch (final Exception e) {
             throw new ParseException(e);
@@ -309,7 +309,7 @@ public class PrettyHtmlMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleStandaloneElementEnd(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final boolean minimized,
             final int line, final int col)
             throws ParseException {
@@ -331,7 +331,7 @@ public class PrettyHtmlMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleOpenElementStart(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
         
@@ -339,7 +339,7 @@ public class PrettyHtmlMarkupHandler extends AbstractMarkupHandler {
             
             openStyle(STYLE_ELEMENT);
             this.writer.write(OPEN_TAG_START);
-            this.writer.write(buffer, offset, len);
+            this.writer.write(buffer, nameOffset, nameLen);
             
         } catch (final Exception e) {
             throw new ParseException(e);
@@ -351,7 +351,7 @@ public class PrettyHtmlMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleOpenElementEnd(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
         
@@ -372,7 +372,7 @@ public class PrettyHtmlMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleCloseElementStart(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col) 
             throws ParseException {
         
@@ -380,7 +380,7 @@ public class PrettyHtmlMarkupHandler extends AbstractMarkupHandler {
             
             openStyle(STYLE_ELEMENT);
             this.writer.write(CLOSE_TAG_START);
-            this.writer.write(buffer, offset, len);
+            this.writer.write(buffer, nameOffset, nameLen);
             
         } catch (final Exception e) {
             throw new ParseException(e);
@@ -392,7 +392,7 @@ public class PrettyHtmlMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleCloseElementEnd(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
         
@@ -413,7 +413,7 @@ public class PrettyHtmlMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleAutoCloseElementStart(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
 
@@ -421,7 +421,7 @@ public class PrettyHtmlMarkupHandler extends AbstractMarkupHandler {
 
             openStyle(STYLE_ELEMENT_AUTO);
             this.writer.write(CLOSE_TAG_START);
-            this.writer.write(buffer, offset, len);
+            this.writer.write(buffer, nameOffset, nameLen);
 
         } catch (final Exception e) {
             throw new ParseException(e);
@@ -433,7 +433,7 @@ public class PrettyHtmlMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleAutoCloseElementEnd(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
 
@@ -454,7 +454,7 @@ public class PrettyHtmlMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleUnmatchedCloseElementStart(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
 
@@ -462,7 +462,7 @@ public class PrettyHtmlMarkupHandler extends AbstractMarkupHandler {
 
             openStyle(STYLE_ELEMENT_UNMATCHED);
             this.writer.write(CLOSE_TAG_START);
-            this.writer.write(buffer, offset, len);
+            this.writer.write(buffer, nameOffset, nameLen);
 
         } catch (final Exception e) {
             throw new ParseException(e);
@@ -474,7 +474,7 @@ public class PrettyHtmlMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void handleUnmatchedCloseElementEnd(
             final char[] buffer,
-            final int offset, final int len,
+            final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
 
