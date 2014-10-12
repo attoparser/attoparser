@@ -49,8 +49,8 @@ import org.attoparser.ParseStatus;
  * </p>
  * <p>
  *   Two minimization modes are available:
- *   {@link MinimizeHtmlMarkupHandler.MinimizeMode#ONLY_WHITE_SPACE} and
- *   {@link MinimizeHtmlMarkupHandler.MinimizeMode#COMPLETE}. The former only minimizes
+ *   {@link MinimizeHtmlaMarkupHandler.MinimizeMode#ONLY_WHITE_SPACE} and
+ *   {@link MinimizeHtmlaMarkupHandler.MinimizeMode#COMPLETE}. The former only minimizes
  *   white space whereas the latter performs all the available minimizations.
  * </p>
  * <p>
@@ -81,7 +81,7 @@ import org.attoparser.ParseStatus;
  * @since 2.0.0
  *
  */
-public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
+public final class MinimizeHtmlaMarkupHandler extends AbstractMarkupHandler {
 
     public enum MinimizeMode {
 
@@ -166,7 +166,7 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
 
 
 
-    public MinimizeHtmlMarkupHandler(final MinimizeMode minimizeMode, final IMarkupHandler handler) {
+    public MinimizeHtmlaMarkupHandler(final MinimizeMode minimizeMode, final IMarkupHandler handler) {
 
         super();
 

@@ -26,11 +26,11 @@ import junit.framework.TestCase;
 import org.attoparser.IMarkupParser;
 import org.attoparser.MarkupParser;
 import org.attoparser.config.ParseConfiguration;
-import org.attoparser.minimize.MinimizeHtmlMarkupHandler.MinimizeMode;
+import org.attoparser.minimize.MinimizeHtmlaMarkupHandler.MinimizeMode;
 import org.attoparser.output.OutputMarkupHandler;
 
-import static org.attoparser.minimize.MinimizeHtmlMarkupHandler.MinimizeMode.COMPLETE;
-import static org.attoparser.minimize.MinimizeHtmlMarkupHandler.MinimizeMode.ONLY_WHITE_SPACE;
+import static org.attoparser.minimize.MinimizeHtmlaMarkupHandler.MinimizeMode.COMPLETE;
+import static org.attoparser.minimize.MinimizeHtmlaMarkupHandler.MinimizeMode.ONLY_WHITE_SPACE;
 
 /**
  * 
@@ -39,7 +39,7 @@ import static org.attoparser.minimize.MinimizeHtmlMarkupHandler.MinimizeMode.ONL
  * @since 2.0.0
  *
  */
-public class MinimizeHtmlMarkupHandlerTest extends TestCase {
+public class MinimizeHtmlaMarkupHandlerTest extends TestCase {
 
 
     public void test() throws Exception {
@@ -110,7 +110,7 @@ public class MinimizeHtmlMarkupHandlerTest extends TestCase {
         final Writer writer = new StringWriter();
 
         final IMarkupParser parser = new MarkupParser(configuration);
-        final MinimizeHtmlMarkupHandler handler = new MinimizeHtmlMarkupHandler(minimizeMode, new OutputMarkupHandler(writer));
+        final MinimizeHtmlaMarkupHandler handler = new MinimizeHtmlaMarkupHandler(minimizeMode, new OutputMarkupHandler(writer));
 
         parser.parse(input, handler);
 
