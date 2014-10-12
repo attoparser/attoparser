@@ -26,11 +26,11 @@ import junit.framework.TestCase;
 import org.attoparser.IMarkupParser;
 import org.attoparser.MarkupParser;
 import org.attoparser.config.ParseConfiguration;
-import org.attoparser.minimize.MinimizeHTMLMarkupHandler.MinimizeMode;
+import org.attoparser.minimize.MinimizeHtmlMarkupHandler.MinimizeMode;
 import org.attoparser.output.OutputMarkupHandler;
 
-import static org.attoparser.minimize.MinimizeHTMLMarkupHandler.MinimizeMode.COMPLETE;
-import static org.attoparser.minimize.MinimizeHTMLMarkupHandler.MinimizeMode.ONLY_WHITE_SPACE;
+import static org.attoparser.minimize.MinimizeHtmlMarkupHandler.MinimizeMode.COMPLETE;
+import static org.attoparser.minimize.MinimizeHtmlMarkupHandler.MinimizeMode.ONLY_WHITE_SPACE;
 
 /**
  * 
@@ -39,7 +39,7 @@ import static org.attoparser.minimize.MinimizeHTMLMarkupHandler.MinimizeMode.ONL
  * @since 2.0.0
  *
  */
-public class MinimizeHTMLMarkupHandlerTest extends TestCase {
+public class MinimizeHtmlMarkupHandlerTest extends TestCase {
 
 
     public void test() throws Exception {
@@ -72,7 +72,7 @@ public class MinimizeHTMLMarkupHandlerTest extends TestCase {
         check(htmlConfig, ONLY_WHITE_SPACE, "<td>                 <td>OK", "<td> <td>OK");
 
         check(htmlConfig, COMPLETE, "<div >hello</div >", "<div>hello</div>");
-        check(htmlConfig, COMPLETE, "<hr /><div >hello</div >", "<hr/><div>hello</div>");
+        check(htmlConfig, COMPLETE, "<hr /><div >hello</div >", "<hr><div>hello</div>");
         check(htmlConfig, COMPLETE, "<div   class=\"one\"  \n   id=\"two\">hello</div>", "<div class=one id=two>hello</div>");
         check(htmlConfig, COMPLETE, "<div   class=\"one\"  \n   id=\"two\"  >hello</div>", "<div class=one id=two>hello</div>");
         check(htmlConfig, COMPLETE, "<div   class=\"one two\"  \n   id=\"two\"  >hello</div>", "<div class=\"one two\" id=two>hello</div>");
@@ -90,6 +90,18 @@ public class MinimizeHTMLMarkupHandlerTest extends TestCase {
         check(htmlConfig, COMPLETE, " <!-- something --> hey", " hey");
         check(htmlConfig, COMPLETE, " <!-- something --> hey    ja", " hey ja");
         check(htmlConfig, COMPLETE, "\n <!-- something --> hey  \n  ja", " hey ja");
+        check(htmlConfig, COMPLETE, "<!DOCTYPE html>\n\n<html>", "<!DOCTYPE html> <html>");
+        check(htmlConfig, COMPLETE, "<head>\n  <title> TIT </title>\n    <meta ></meta>\n    <meta />\n    <link>\n  </head>", "<head><title> TIT </title><meta></meta><meta><link></head>");
+        check(htmlConfig, COMPLETE, "<p> Hello </p> \n   <p>Goodbye <p>!</p>  </p>", "<p> Hello </p><p>Goodbye <p>!</p></p>");
+        check(htmlConfig, COMPLETE, "<ul>  <li> One  <li>Two<li>Three  </ul>", "<ul><li> One <li>Two<li>Three </ul>");
+        check(htmlConfig, COMPLETE, "<table>\n<caption>A  \n<colgroup><col><col> <col>  <thead> <tr>\n<td>a<th>b    <td>c   <tr><th>a<td> <td>\n</table>", "<table><caption>A <colgroup><col><col><col><thead><tr><td>a<th>b <td>c <tr><th>a<td> <td> </table>");
+        check(htmlConfig, COMPLETE, "<html>\n<head>\n</head>\n<body>\n\n</body>\n</html>", "<html><head> </head><body> </body></html>");
+        check(htmlConfig, COMPLETE, "<html>\n<head>\n</head>\n<body>\na\n</body>\n</html>", "<html><head> </head><body> a </body></html>");
+        check(htmlConfig, COMPLETE, "<option name=\"one\" selected />", "<option name=one selected>");
+        check(htmlConfig, COMPLETE, "<option name=\"one\" selected=\"selected\" />", "<option name=one selected>");
+        check(htmlConfig, COMPLETE, "<option name=\"one\" selected=selected />", "<option name=one selected>");
+        check(htmlConfig, COMPLETE, "<option name=\"one\" ant=ant />", "<option name=one ant=ant>");
+        check(htmlConfig, COMPLETE, "<option name=\"one\" ant=ant required=required disabled=disabled/>", "<option name=one ant=ant required disabled>");
 
     }
 
@@ -99,7 +111,7 @@ public class MinimizeHTMLMarkupHandlerTest extends TestCase {
         final Writer writer = new StringWriter();
 
         final IMarkupParser parser = new MarkupParser(configuration);
-        final MinimizeHTMLMarkupHandler handler = new MinimizeHTMLMarkupHandler(minimizeMode, new OutputMarkupHandler(writer));
+        final MinimizeHtmlMarkupHandler handler = new MinimizeHtmlMarkupHandler(minimizeMode, new OutputMarkupHandler(writer));
 
         parser.parse(input, handler);
 

@@ -58,7 +58,7 @@ package org.attoparser;
  *           strip all markup elements, comments, DOCTYPEs, etc. from the original markup.</li>
  *     </ul>
  *   </li>
- *   <li>Conversion to other formats:
+ *   <li>Format conversion and transformation operations:
  *     <ul>
  *       <li>{@link org.attoparser.dom.DOMBuilderMarkupHandler}: for building a DOM tree as a result of parsing
  *           a document. This DOM tree will be created using the classes at the <tt>org.attoparser.dom</tt> package.
@@ -69,6 +69,8 @@ package org.attoparser;
  *           and allowing users to create their handlers by means of the
  *           {@link org.attoparser.simple.ISimpleMarkupHandler} interface. Note this handler can be more easily
  *           applied by using the convenience ad-hob parser class {@link org.attoparser.simple.SimpleMarkupParser}.
+ *       <li>{@link org.attoparser.minimize.MinimizeHtmlMarkupHandler}: for minimizing (compacting) HTML markup:
+ *           remove excess white space, unquote attributes, etc.
  *     </ul>
  *   </li>
  *   <li>Event management:

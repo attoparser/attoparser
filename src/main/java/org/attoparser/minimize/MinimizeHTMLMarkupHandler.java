@@ -26,26 +26,78 @@ import org.attoparser.ParseStatus;
 
 
 /**
+ * <p>
+ *   Implementation of {@link org.attoparser.IMarkupHandler} used for minimizing (compacting) HTML markup.
+ * </p>
+ * <p>
+ *   The minimization operations that can be performed are:
+ * </p>
+ * <ul>
+ *   <li>White Space minimization: excess white space is removed from texts. Also, white space is removed
+ *       from between attributes in a tag, and between block and structural tags (which would ignore it).</li>
+ *   <li>Unquoting of attributes: quotes are removed from attributes which values contain only alphanumeric
+ *       characters.</li>
+ *   <li>Collapsing of boolean attributes: boolean attributes (selected, required, disabled, etc.) are detected
+ *       and collapsed to their no-value form (e.g. <tt>selected="selected" -&gt; selected</tt>).</li>
+ *   <li>Standalone minimized elements are de-minimized to save the slash char
+ *       (e.g. <tt>&lt;meta /&gt; -&gt; &lt;meta&gt;</tt>).</li>
+ * </ul>
+ * <p>
+ *   Note that, though theoretically possible per the HTML rules, no tags are created or removed during minimization
+ *   in order to ensure the lowest impact (ideally zero, except for text white space) on the DOM of the resulting
+ *   markup.
+ * </p>
+ * <p>
+ *   Two minimization modes are available:
+ *   {@link MinimizeHtmlMarkupHandler.MinimizeMode#ONLY_WHITE_SPACE} and
+ *   {@link MinimizeHtmlMarkupHandler.MinimizeMode#COMPLETE}. The former only minimizes
+ *   white space whereas the latter performs all the available minimizations.
+ * </p>
+ * <p>
+ *   Note that, as with most handlers, this class is <strong>not thread-safe</strong>. Also, instances of this class
+ *   should not be reused across parsing operations.
+ * </p>
+ * <p>
+ *   Sample usage:
+ * </p>
+ * <pre><code>
+ *
+ *   final Writer writer = new StringWriter();
+ *
+ *   // The output handler will be the last in the handler chain
+ *   final IMarkupHandler outputHandler = new OutputMarkupHandler(writer);
+ *
+ *   // The minimizer handler will do its job before events reach output handler
+ *   final IMarkupHandler handler = new MinimizeHtmlMarkupHandler(MinimizeMode.COMPLETE, outputHandler);
+ *
+ *   parser.parse(document, handler);
+ *
+ *   return writer.toString();
+ *
+ * </code></pre>
  *
  * @author Daniel Fern&aacute;ndez
- * 
+ *
  * @since 2.0.0
  *
  */
-public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
+public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
 
     public enum MinimizeMode {
 
-        ONLY_WHITE_SPACE(false, false, false), COMPLETE(true, true, true);
+        ONLY_WHITE_SPACE(false, false, false, false), COMPLETE(true, true, true, true);
 
         private boolean removeComments;
         private boolean unquoteAttributes;
         private boolean unminimizeStandalones;
+        private boolean minimizeBooleanAttributes;
 
-        MinimizeMode(final boolean removeComments, final boolean unquoteAttributes, final boolean unminimizeStandalones) {
+        MinimizeMode(final boolean removeComments, final boolean unquoteAttributes,
+                     final boolean unminimizeStandalones, final boolean minimizeBooleanAttributes) {
             this.removeComments = removeComments;
             this.unquoteAttributes = unquoteAttributes;
             this.unminimizeStandalones = unminimizeStandalones;
+            this.minimizeBooleanAttributes = minimizeBooleanAttributes;
         }
 
     }
@@ -65,8 +117,8 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
      */
     private static final String[] BLOCK_ELEMENTS =
             new String[]{
-                    "address", "article", "aside", "audio", "base", "blockquote", "body", "canvas",
-                    "dd", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer",
+                    "address", "article", "aside", "audio", "base", "blockquote", "body", "canvas", "caption",
+                    "col", "colgroup", "dd", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer",
                     "form", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hgroup", "hr", "html",
                     "li", "link", "meta", "noscript", "ol", "option", "output", "p", "pre", "script", "section",
                     "style", "table", "tbody", "td", "tfoot", "th", "thead", "title", "tr", "ul", "video"
@@ -78,6 +130,17 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
                     "pre", "script", "style", "textarea"
             };
 
+    private static final String[] BOOLEAN_ATTRIBUTE_NAMES =
+            new String[]{
+                    "allowfullscreen", "async", "autofocus", "autoplay", "checked", "compact",
+                    "controls", "declare", "default", "defaultchecked", "defaultmuted",
+                    "defaultselected", "defer", "disabled", "draggable", "enabled",
+                    "formnovalidate", "hidden", "indeterminate", "inert", "ismap",
+                    "itemscope", "loop", "multiple", "muted", "nohref", "noresize",
+                    "noshade", "novalidate", "nowrap", "open", "pauseonexit", "readonly",
+                    "required", "reversed", "scoped", "seamless", "selected", "sortable",
+                    "spellcheck", "translate", "truespeed", "typemustmatch", "visible"
+            };
 
     private static final char[] SIZE_ONE_WHITE_SPACE = new char[] { ' ' };
     private static final char[] ATTRIBUTE_OPERATOR = new char[] { '=' };
@@ -103,7 +166,7 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
 
 
 
-    public MinimizeHTMLMarkupHandler(final MinimizeMode minimizeMode, final IMarkupHandler handler) {
+    public MinimizeHtmlMarkupHandler(final MinimizeMode minimizeMode, final IMarkupHandler handler) {
 
         super();
 
@@ -184,7 +247,7 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
         int n = len;
         while ((!shouldCompress || isAllWhiteSpace) && n-- != 0) {
             if (isWhitespace(buffer[i])) {
-                if (wasWhiteSpace) {
+                if (wasWhiteSpace || buffer[i] != ' ') { // if it's a different kind of whitespace, we'll compress anyway
                     shouldCompress = true;
                 }
                 wasWhiteSpace = true;
@@ -549,6 +612,23 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
                 this.pendingEventLine, this.pendingEventCol);
 
 
+        final boolean isMinimizableBooleanAttribute =
+                this.minimizeMode.minimizeBooleanAttributes &&
+                isBooleanAttribute(buffer, nameOffset, nameLen) &&
+                equals(false, buffer, nameOffset, nameLen, buffer, valueContentOffset, valueContentLen);
+
+        if (isMinimizableBooleanAttribute) {
+            // If it is a minimizable boolean, no need to go any further
+            this.handler.handleAttribute(
+                    buffer,
+                    nameOffset, nameLen, nameLine, nameCol,
+                    0, 0, operatorLine, operatorCol,
+                    0, 0, 0, 0, operatorLen, operatorCol
+                    );
+            return;
+        }
+
+
         final boolean canRemoveAttributeQuotes =
                 this.minimizeMode.unquoteAttributes &&
                 canAttributeValueBeUnquoted(buffer, valueContentOffset, valueContentLen, valueOuterOffset, valueOuterLen);
@@ -747,7 +827,7 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
     }
 
 
-    private boolean isWhitespace(final char c) {
+    private static boolean isWhitespace(final char c) {
         return (c == ' ' || c == '\n' || c == '\t' || c == '\r' || c == '\f'
             || c == '\u000B' || c == '\u001C' || c == '\u001D' || c == '\u001E' || c == '\u001F'
             || (c > '\u007F' && Character.isWhitespace(c)));
@@ -755,12 +835,12 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
     }
 
 
-    private boolean isBlockElement(final char[] buffer, final int nameOffset, final int nameLen) {
+    private static boolean isBlockElement(final char[] buffer, final int nameOffset, final int nameLen) {
         return binarySearchString(false, BLOCK_ELEMENTS, buffer, nameOffset, nameLen) >= 0;
     }
 
 
-    private boolean isPreformattedElement(final char[] buffer, final int nameOffset, final int nameLen) {
+    private static boolean isPreformattedElement(final char[] buffer, final int nameOffset, final int nameLen) {
         int i = 0;
         int n = PREFORMATTED_ELEMENTS.length;
         while (n-- != 0) {
@@ -773,7 +853,73 @@ public final class MinimizeHTMLMarkupHandler extends AbstractMarkupHandler {
     }
 
 
+    private static boolean isBooleanAttribute(final char[] buffer, final int nameOffset, final int nameLen) {
+        return binarySearchString(false, BOOLEAN_ATTRIBUTE_NAMES, buffer, nameOffset, nameLen) >= 0;
+    }
 
+
+
+
+
+    // Copied here from org.attoparser.TextUtil in order to avoid the need to make that class public
+    private static boolean equals(
+            final boolean caseSensitive,
+            final char[] text1, final int text1Offset, final int text1Len,
+            final char[] text2, final int text2Offset, final int text2Len) {
+
+        if (text1 == null) {
+            throw new IllegalArgumentException("First text buffer being compared cannot be null");
+        }
+        if (text2 == null) {
+            throw new IllegalArgumentException("Second text buffer being compared cannot be null");
+        }
+
+        if (text1Len != text2Len) {
+            return false;
+        }
+
+        if (text1 == text2 && text1Offset == text2Offset && text1Len == text2Len) {
+            return true;
+        }
+
+        char c1, c2;
+
+        int n = text1Len;
+        int i = 0;
+
+        while (n-- != 0) {
+
+            c1 = text1[text1Offset + i];
+            c2 = text2[text2Offset + i];
+
+            if (c1 != c2) {
+
+                if (caseSensitive) {
+                    return false;
+                }
+
+                c1 = Character.toUpperCase(c1);
+                c2 = Character.toUpperCase(c2);
+
+                if (c1 != c2) {
+
+                    // We check both upper and lower case because that is how String#equalsIgnoreCase() is defined.
+                    // See String#regionMatches(boolean,int,String,int,int)
+                    if (Character.toLowerCase(c1) != Character.toLowerCase(c2)) {
+                        return false;
+                    }
+
+                }
+
+            }
+
+            i++;
+
+        }
+
+        return true;
+
+    }
 
 
 
