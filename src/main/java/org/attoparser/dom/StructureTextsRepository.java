@@ -112,9 +112,15 @@ public final class StructureTextsRepository {
     static {
 
         // First initialize a set to make sure there are no duplicates
-        final Set<String> allStandardNamesSet = new HashSet<String>(STANDARD_ELEMENT_NAMES.length + STANDARD_ATTRIBUTE_NAMES.length + 1, 1.0f);
+        final Set<String> allStandardNamesSet = new HashSet<String>((STANDARD_ELEMENT_NAMES.length + STANDARD_ATTRIBUTE_NAMES.length + 1) * 2, 1.0f);
         allStandardNamesSet.addAll(Arrays.asList(STANDARD_ELEMENT_NAMES));
         allStandardNamesSet.addAll(Arrays.asList(STANDARD_ATTRIBUTE_NAMES));
+        for (final String str : STANDARD_ELEMENT_NAMES) {
+            allStandardNamesSet.add(str.toUpperCase());
+        }
+        for (final String str : STANDARD_ATTRIBUTE_NAMES) {
+            allStandardNamesSet.add(str.toUpperCase());
+        }
 
         // Now sort them
         final List<String> allStandardNamesList = new ArrayList<String>(allStandardNamesSet);
@@ -130,7 +136,7 @@ public final class StructureTextsRepository {
     // This method will try to avoid creating new strings for each structure name (element/attribute)
     static String getStructureName(final char[] buffer, final int offset, final int len) {
 
-        final int index = binarySearchString(false, ALL_STANDARD_NAMES, buffer, offset, len);
+        final int index = binarySearchString(true, ALL_STANDARD_NAMES, buffer, offset, len);
         if (index < 0) {
             return new String(buffer, offset, len);
         }
