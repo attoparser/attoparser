@@ -19,10 +19,11 @@
  */
 package org.attoparser;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -45,16 +46,17 @@ final class HtmlNames {
     static {
 
 
-        final Set<String> allStandardElementNamesAux = new LinkedHashSet<String>(HtmlElements.ALL_STANDARD_ELEMENTS.size() + 3);
+        final List<String> allStandardElementNamesAux = new ArrayList<String>(HtmlElements.ALL_STANDARD_ELEMENTS.size() + 3);
         for (final HtmlElement element : HtmlElements.ALL_STANDARD_ELEMENTS) {
             allStandardElementNamesAux.add(new String(element.name));
         }
-        ALL_STANDARD_ELEMENT_NAMES = Collections.unmodifiableSet(allStandardElementNamesAux);
+        Collections.sort(allStandardElementNamesAux);
+        ALL_STANDARD_ELEMENT_NAMES =
+                Collections.unmodifiableSet(new LinkedHashSet<String>(allStandardElementNamesAux));
 
 
-        ALL_STANDARD_ATTRIBUTE_NAMES =
-                Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
-                new String[] {
+        final List<String> allStandardAttributeNamesAux = new ArrayList<String>(
+                Arrays.asList(new String[]{
                         "abbr", "accept", "accept-charset", "accesskey", "action", "align", "alt", "archive",
                         "autocomplete", "autofocus", "autoplay", "axis", "border", "cellpadding", "cellspacing",
                         "challenge", "char", "charoff", "charset", "checked", "cite", "class", "classid",
@@ -83,7 +85,10 @@ final class HtmlNames {
                         "shape", "size", "span", "spellcheck", "src", "srclang", "standby", "style", "summary",
                         "tabindex", "title", "translate", "type", "usemap", "valign", "value", "valuetype",
                         "width", "xml:lang", "xml:space", "xmlns"
-                })));
+                }));
+
+        ALL_STANDARD_ATTRIBUTE_NAMES =
+                Collections.unmodifiableSet(new LinkedHashSet<String>(allStandardAttributeNamesAux));
 
     }
 

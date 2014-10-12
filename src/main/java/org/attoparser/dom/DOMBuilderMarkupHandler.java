@@ -350,7 +350,7 @@ public final class DOMBuilderMarkupHandler extends AbstractMarkupHandler {
             final boolean minimized, final int line, final int col)
             throws ParseException {
 
-        this.currentElementName = new String(buffer, nameOffset, nameLen);
+        this.currentElementName = StructureTextsRepository.getStructureName(buffer, nameOffset, nameLen);
         this.currentElementAttributes = null;
         this.currentElementLine = line;
         this.currentElementCol = col;
@@ -388,7 +388,7 @@ public final class DOMBuilderMarkupHandler extends AbstractMarkupHandler {
             final int line, final int col)
             throws ParseException {
 
-        this.currentElementName = new String(buffer, nameOffset, nameLen);
+        this.currentElementName = StructureTextsRepository.getStructureName(buffer, nameOffset, nameLen);
         this.currentElementAttributes = null;
         this.currentElementLine = line;
         this.currentElementCol = col;
@@ -427,7 +427,7 @@ public final class DOMBuilderMarkupHandler extends AbstractMarkupHandler {
             final int line, final int col)
             throws ParseException {
 
-        this.currentElementName = new String(buffer, nameOffset, nameLen);
+        this.currentElementName = StructureTextsRepository.getStructureName(buffer, nameOffset, nameLen);
         this.currentElementAttributes = null;
         this.currentElementLine = line;
         this.currentElementCol = col;
@@ -457,7 +457,7 @@ public final class DOMBuilderMarkupHandler extends AbstractMarkupHandler {
             final int line, final int col)
             throws ParseException {
 
-        this.currentElementName = new String(buffer, nameOffset, nameLen);
+        this.currentElementName = StructureTextsRepository.getStructureName(buffer, nameOffset, nameLen);
         this.currentElementAttributes = null;
         this.currentElementLine = line;
         this.currentElementCol = col;
@@ -519,7 +519,7 @@ public final class DOMBuilderMarkupHandler extends AbstractMarkupHandler {
             final int valueLine, final int valueCol)
             throws ParseException {
 
-        final String attributeName = new String(buffer, nameOffset, nameLen);
+        final String attributeName = StructureTextsRepository.getStructureName(buffer, nameOffset, nameLen);
         final String attributeValue =
                 (valueContentLen <= 0?  "" : new String(buffer, valueContentOffset, valueContentLen));
 
