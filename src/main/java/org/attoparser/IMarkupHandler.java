@@ -69,7 +69,7 @@ package org.attoparser;
  *           and allowing users to create their handlers by means of the
  *           {@link org.attoparser.simple.ISimpleMarkupHandler} interface. Note this handler can be more easily
  *           applied by using the convenience ad-hob parser class {@link org.attoparser.simple.SimpleMarkupParser}.
- *       <li>{@link org.attoparser.minimize.MinimizeHtmlaMarkupHandler}: for minimizing (compacting) HTML markup:
+ *       <li>{@link org.attoparser.minimize.MinimizeHtmlMarkupHandler}: for minimizing (compacting) HTML markup:
  *           remove excess white space, unquote attributes, etc.
  *     </ul>
  *   </li>
