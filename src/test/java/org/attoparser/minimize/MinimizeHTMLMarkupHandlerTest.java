@@ -102,6 +102,8 @@ public class MinimizeHtmlMarkupHandlerTest extends TestCase {
         check(htmlConfig, COMPLETE, "<option name=\"one\" selected=selected />", "<option name=one selected>");
         check(htmlConfig, COMPLETE, "<option name=\"one\" ant=ant />", "<option name=one ant=ant>");
         check(htmlConfig, COMPLETE, "<option name=\"one\" ant=ant required=required disabled=disabled/>", "<option name=one ant=ant required disabled>");
+        check(htmlConfig, COMPLETE, "<pre>  \n\nlala\n\n </pre>", "<pre>  \n\nlala\n\n </pre>");
+        check(htmlConfig, COMPLETE, "<textarea>  \n\nlala\n\n </textarea>", "<textarea>  \n\nlala\n\n </textarea>");
 
     }
 
