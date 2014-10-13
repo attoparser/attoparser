@@ -26,6 +26,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.attoparser.util.TextUtil;
+
 /*
  * Repository class used for allowing the reuse of String objects by the SimplifierMarkupHandler class, so
  * that turning the char[] objects for element and attribute names into Strings is more efficient.
@@ -136,7 +138,7 @@ public final class StructureTextsRepository {
     // This method will try to avoid creating new strings for each structure name (element/attribute)
     static String getStructureName(final char[] buffer, final int offset, final int len) {
 
-        final int index = binarySearchString(true, ALL_STANDARD_NAMES, buffer, offset, len);
+        final int index = TextUtil.binarySearch(true, ALL_STANDARD_NAMES, buffer, offset, len);
         if (index < 0) {
             return new String(buffer, offset, len);
         }
@@ -148,94 +150,6 @@ public final class StructureTextsRepository {
 
 
 
-
-
-
-    // This method was copied directly from the org.attoparser.TextUtil class so that we avoid making that class public
-    static int compareTo(
-            final boolean caseSensitive,
-            final String text1, final int text1Offset, final int text1Len,
-            final char[] text2, final int text2Offset, final int text2Len) {
-
-        if (text1 == null) {
-            throw new IllegalArgumentException("First text being compared cannot be null");
-        }
-        if (text2 == null) {
-            throw new IllegalArgumentException("Second text buffer being compared cannot be null");
-        }
-
-        char c1, c2;
-
-        int n = Math.min(text1Len, text2Len);
-        int i = 0;
-
-        while (n-- != 0) {
-
-            c1 = text1.charAt(text1Offset + i);
-            c2 = text2[text2Offset + i];
-
-            if (c1 != c2) {
-
-                if (caseSensitive) {
-                    return c1 - c2;
-                }
-
-                c1 = Character.toUpperCase(c1);
-                c2 = Character.toUpperCase(c2);
-
-                if (c1 != c2) {
-                    // We check both upper and lower case because that is how String#compareToIgnoreCase() is defined.
-                    c1 = Character.toLowerCase(c1);
-                    c2 = Character.toLowerCase(c2);
-                    if (c1 != c2) {
-                        return c1 - c2;
-                    }
-
-                }
-
-            }
-
-            i++;
-
-        }
-
-        return text1Len - text2Len;
-
-    }
-
-
-
-    // This method was copied directly from the org.attoparser.TextUtil class so that we avoid making that class public
-    static int binarySearchString(
-            final boolean caseSensitive, final String[] values, final char[] text, final int offset, final int len) {
-
-        int low = 0;
-        int high = values.length - 1;
-
-        int mid, cmp;
-        String midVal;
-
-        while (low <= high) {
-
-            mid = (low + high) >>> 1;
-            midVal = values[mid];
-
-            cmp = compareTo(caseSensitive, midVal, 0, midVal.length(), text, offset, len);
-
-            if (cmp < 0) {
-                low = mid + 1;
-            } else if (cmp > 0) {
-                high = mid - 1;
-            } else {
-                // Found!!
-                return mid;
-            }
-
-        }
-
-        return -(low + 1);  // Not Found!! We return (-(insertion point) - 1), to guarantee all non-founds are < 0
-
-    }
 
 
 

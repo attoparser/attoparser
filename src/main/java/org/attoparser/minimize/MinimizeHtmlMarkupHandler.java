@@ -23,6 +23,7 @@ import org.attoparser.AbstractMarkupHandler;
 import org.attoparser.IMarkupHandler;
 import org.attoparser.ParseException;
 import org.attoparser.ParseStatus;
+import org.attoparser.util.TextUtil;
 
 
 /**
@@ -615,7 +616,7 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
         final boolean isMinimizableBooleanAttribute =
                 this.minimizeMode.minimizeBooleanAttributes &&
                 isBooleanAttribute(buffer, nameOffset, nameLen) &&
-                equals(false, buffer, nameOffset, nameLen, buffer, valueContentOffset, valueContentLen);
+                TextUtil.equals(false, buffer, nameOffset, nameLen, buffer, valueContentOffset, valueContentLen);
 
         if (isMinimizableBooleanAttribute) {
             // If it is a minimizable boolean, no need to go any further
@@ -836,7 +837,7 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
 
 
     private static boolean isBlockElement(final char[] buffer, final int nameOffset, final int nameLen) {
-        return binarySearchString(false, BLOCK_ELEMENTS, buffer, nameOffset, nameLen) >= 0;
+        return TextUtil.binarySearch(false, BLOCK_ELEMENTS, buffer, nameOffset, nameLen) >= 0;
     }
 
 
@@ -844,7 +845,7 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
         int i = 0;
         int n = PREFORMATTED_ELEMENTS.length;
         while (n-- != 0) {
-            if (compareTo(false, PREFORMATTED_ELEMENTS[i], 0, PREFORMATTED_ELEMENTS[i].length(), buffer, nameOffset, nameLen) == 0) {
+            if (TextUtil.compareTo(false, PREFORMATTED_ELEMENTS[i], 0, PREFORMATTED_ELEMENTS[i].length(), buffer, nameOffset, nameLen) == 0) {
                 return true;
             }
             i++;
@@ -854,160 +855,11 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
 
 
     private static boolean isBooleanAttribute(final char[] buffer, final int nameOffset, final int nameLen) {
-        return binarySearchString(false, BOOLEAN_ATTRIBUTE_NAMES, buffer, nameOffset, nameLen) >= 0;
+        return TextUtil.binarySearch(false, BOOLEAN_ATTRIBUTE_NAMES, buffer, nameOffset, nameLen) >= 0;
     }
 
 
 
-
-
-    // Copied here from org.attoparser.TextUtil in order to avoid the need to make that class public
-    private static boolean equals(
-            final boolean caseSensitive,
-            final char[] text1, final int text1Offset, final int text1Len,
-            final char[] text2, final int text2Offset, final int text2Len) {
-
-        if (text1 == null) {
-            throw new IllegalArgumentException("First text buffer being compared cannot be null");
-        }
-        if (text2 == null) {
-            throw new IllegalArgumentException("Second text buffer being compared cannot be null");
-        }
-
-        if (text1Len != text2Len) {
-            return false;
-        }
-
-        if (text1 == text2 && text1Offset == text2Offset && text1Len == text2Len) {
-            return true;
-        }
-
-        char c1, c2;
-
-        int n = text1Len;
-        int i = 0;
-
-        while (n-- != 0) {
-
-            c1 = text1[text1Offset + i];
-            c2 = text2[text2Offset + i];
-
-            if (c1 != c2) {
-
-                if (caseSensitive) {
-                    return false;
-                }
-
-                c1 = Character.toUpperCase(c1);
-                c2 = Character.toUpperCase(c2);
-
-                if (c1 != c2) {
-
-                    // We check both upper and lower case because that is how String#equalsIgnoreCase() is defined.
-                    // See String#regionMatches(boolean,int,String,int,int)
-                    if (Character.toLowerCase(c1) != Character.toLowerCase(c2)) {
-                        return false;
-                    }
-
-                }
-
-            }
-
-            i++;
-
-        }
-
-        return true;
-
-    }
-
-
-
-
-    // Copied here from org.attoparser.TextUtil in order to avoid the need to make that class public
-    private static int compareTo(
-            final boolean caseSensitive,
-            final String text1, final int text1Offset, final int text1Len,
-            final char[] text2, final int text2Offset, final int text2Len) {
-
-        if (text1 == null) {
-            throw new IllegalArgumentException("First text being compared cannot be null");
-        }
-        if (text2 == null) {
-            throw new IllegalArgumentException("Second text buffer being compared cannot be null");
-        }
-
-        char c1, c2;
-
-        int n = Math.min(text1Len, text2Len);
-        int i = 0;
-
-        while (n-- != 0) {
-
-            c1 = text1.charAt(text1Offset + i);
-            c2 = text2[text2Offset + i];
-
-            if (c1 != c2) {
-
-                if (caseSensitive) {
-                    return c1 - c2;
-                }
-
-                c1 = Character.toUpperCase(c1);
-                c2 = Character.toUpperCase(c2);
-
-                if (c1 != c2) {
-                    // We check both upper and lower case because that is how String#compareToIgnoreCase() is defined.
-                    c1 = Character.toLowerCase(c1);
-                    c2 = Character.toLowerCase(c2);
-                    if (c1 != c2) {
-                        return c1 - c2;
-                    }
-
-                }
-
-            }
-
-            i++;
-
-        }
-
-        return text1Len - text2Len;
-
-    }
-
-
-    // Copied here from org.attoparser.TextUtil in order to avoid the need to make that class public
-    private static int binarySearchString(
-            final boolean caseSensitive, final String[] values, final char[] text, final int offset, final int len) {
-
-        int low = 0;
-        int high = values.length - 1;
-
-        int mid, cmp;
-        String midVal;
-
-        while (low <= high) {
-
-            mid = (low + high) >>> 1;
-            midVal = values[mid];
-
-            cmp = compareTo(caseSensitive, midVal, 0, midVal.length(), text, offset, len);
-
-            if (cmp < 0) {
-                low = mid + 1;
-            } else if (cmp > 0) {
-                high = mid - 1;
-            } else {
-                // Found!!
-                return mid;
-            }
-
-        }
-
-        return -(low + 1);  // Not Found!! We return (-(insertion point) - 1), to guarantee all non-founds are < 0
-
-    }
 
 
 

@@ -30,6 +30,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.attoparser.util.TextUtil;
+
 
 /*
  * Repository class for all the standard HTML elements, modeled as objects implementing

@@ -20,6 +20,8 @@
 package org.attoparser;
 
 
+import org.attoparser.util.TextUtil;
+
 /*
  * Specialization of HtmlElement for HTML elements which body should not
  * be considered 'parseable', and therefore should be treated as CDATA

@@ -20,10 +20,12 @@
 package org.attoparser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.attoparser.config.ParseConfiguration;
+import org.attoparser.util.TextUtil;
 
 
 /*
@@ -910,21 +912,25 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
      */
     static final class StructureNamesRepository {
 
-        private final List<char[]> repository;
+        private static final int REPOSITORY_INITIAL_LEN = 100;
+        private static final int REPOSITORY_INITIAL_INC = 20;
+        private char[][] repository;
+        private int repositorySize;
 
 
         StructureNamesRepository() {
             super();
-            this.repository = new ArrayList<char[]>(50);
+            this.repository = new char[REPOSITORY_INITIAL_LEN][];
         }
 
 
         char[] getStructureName(final char[] text, final int offset, final int len) {
 
-            final int index = TextUtil.binarySearchCharArray(true, this.repository, text, offset, len);
+            final int index =
+                    TextUtil.binarySearch(true, this.repository, 0, this.repositorySize, text, offset, len);
 
             if (index >= 0) {
-                return this.repository.get(index);
+                return this.repository[index];
             }
 
             /*
@@ -937,12 +943,25 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
 
         private char[] storeStructureName(final int index, final char[] text, final int offset, final int len) {
 
+            if (this.repositorySize == this.repository.length) {
+                // We must grow the repository!
+                final char[][] newRepository = new char[this.repository.length + REPOSITORY_INITIAL_INC][];
+                Arrays.fill(newRepository, null);
+                System.arraycopy(this.repository, 0, newRepository, 0, this.repositorySize);
+                this.repository = newRepository;
+            }
+
+            // binary search returned (-(insertion point) - 1)
+            final int insertionIndex = ((index + 1) * -1);
+
             // We rely on the static structure name cache, just in case it is a standard HTML structure name.
             // Note the StandardNamesRepository will create the new char[] if not found, so no need to null-check.
             final char[] structureName = StandardNamesRepository.getStructureName(text, offset, len);
 
-            // binary Search returned (-(insertion point) - 1)
-            this.repository.add(((index + 1) * -1), structureName);
+            // Make room and insert the new element
+            System.arraycopy(this.repository, insertionIndex, this.repository, insertionIndex + 1, this.repositorySize - insertionIndex);
+            this.repository[insertionIndex] = structureName;
+            this.repositorySize++;
 
             return structureName;
 
@@ -992,7 +1011,7 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
 
         static char[] getStructureName(final char[] text, final int offset, final int len) {
 
-            final int index = TextUtil.binarySearchCharArray(true, REPOSITORY, text, offset, len);
+            final int index = TextUtil.binarySearch(true, REPOSITORY, text, offset, len);
 
             if (index < 0) {
                 final char[] structureName = new char[len];

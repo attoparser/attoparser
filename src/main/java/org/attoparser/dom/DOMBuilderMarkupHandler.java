@@ -97,7 +97,9 @@ public final class DOMBuilderMarkupHandler extends AbstractMarkupHandler {
     /**
      * <p>
      *   Creates a new instance of this handler.
-     * </p> 
+     * </p>
+     *
+     * @param documentName the name of the document to be parsed.
      */
     public DOMBuilderMarkupHandler(final String documentName) {
         super();
