@@ -22,6 +22,7 @@ package org.attoparser.minimize;
 import org.attoparser.AbstractChainedMarkupHandler;
 import org.attoparser.IMarkupHandler;
 import org.attoparser.ParseException;
+import org.attoparser.config.ParseConfiguration;
 import org.attoparser.util.TextUtil;
 
 
@@ -103,12 +104,6 @@ public final class MinimizeHtmlMarkupHandler extends AbstractChainedMarkupHandle
     }
 
 
-    /*
-     * Relevant links:
-     *    - http://perfectionkills.com/optimizing-html/
-     *    - http://perfectionkills.com/experimenting-with-html-minifier/
-     */
-
 
     /*
      * Space will be removed from between sibling block elements, and also from between opening tags of
@@ -178,8 +173,20 @@ public final class MinimizeHtmlMarkupHandler extends AbstractChainedMarkupHandle
     }
 
 
+    @Override
+    public void setParseConfiguration(final ParseConfiguration parseConfiguration) {
 
-    
+        if (!ParseConfiguration.ParsingMode.HTML.equals(parseConfiguration.getMode())) {
+            throw new IllegalArgumentException(
+                    "The " + this.getClass().getName() + " handler can only be used when parsing in HTML " +
+                    "mode. Current parsing mode is " + parseConfiguration.getMode());
+        }
+
+        super.setParseConfiguration(parseConfiguration);
+
+    }
+
+
 
 
     @Override
@@ -613,7 +620,7 @@ public final class MinimizeHtmlMarkupHandler extends AbstractChainedMarkupHandle
                     nameOffset, nameLen, nameLine, nameCol,
                     0, 0, operatorLine, operatorCol,
                     0, 0, 0, 0, operatorLen, operatorCol
-                    );
+            );
             return;
         }
 
