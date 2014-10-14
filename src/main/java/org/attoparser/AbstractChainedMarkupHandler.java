@@ -23,6 +23,22 @@ package org.attoparser;
 import org.attoparser.config.ParseConfiguration;
 
 /**
+ * <p>
+ *   Base abstract implementation of {@link org.attoparser.IMarkupHandler} that implements all of its event handlers
+ *   by delegating these events to another {@link org.attoparser.IMarkupHandler} object passed during construction.
+ * </p>
+ * <p>
+ *   This class allows the easy creation of new handler implementations by extending it and simply overriding
+ *   the methods that are of interest for the developer.
+ * </p>
+ * <p>
+ *   Methods like {@link #setParseConfiguration(org.attoparser.config.ParseConfiguration)} and
+ *   {@link #setParseStatus(ParseStatus)} are also delegated to the chain.
+ * </p>
+ * <p>
+ *   The next handler in the chain can be used in classes implementing this abstract class by calling the
+ *   {@link #getNext()}.
+ * </p>
  *
  * @author Daniel Fern&aacute;ndez
  *
@@ -36,6 +52,14 @@ public abstract class AbstractChainedMarkupHandler
     private final IMarkupHandler next;
 
 
+    /**
+     * <p>
+     *   Create a new instance of this handler, specifying the handler that will be used as next step in the
+     *   chain.
+     * </p>
+     *
+     * @param next the next step in the chain.
+     */
     protected AbstractChainedMarkupHandler(final IMarkupHandler next) {
         super();
         if (next == null) {
@@ -45,6 +69,13 @@ public abstract class AbstractChainedMarkupHandler
     }
 
 
+    /**
+     * <p>
+     *   Return the next handler in the chain, so that events can be delegated to it.
+     * </p>
+     *
+     * @return the next handler in the chain.
+     */
     protected IMarkupHandler getNext() {
         return this.next;
     }

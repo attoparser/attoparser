@@ -21,6 +21,15 @@ package org.attoparser;
 
 
 /**
+ * <p>
+ *   Implementation of {@link org.attoparser.IMarkupHandler} that simply discards all events.
+ * </p>
+ * <p>
+ *   This handler is normally used in scenarios in which some events are directed to one handler and some others
+ *   to a second one, like block/node selection operations performed by means of the
+ *   {@link org.attoparser.select.BlockSelectorMarkupHandler} or
+ *   {@link org.attoparser.select.NodeSelectorMarkupHandler} handlers.
+ * </p>
  *
  * @author Daniel Fern&aacute;ndez
  *
