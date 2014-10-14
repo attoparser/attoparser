@@ -1,7 +1,7 @@
 /*
  * =============================================================================
  * 
- *   Copyright (c) 2011-2014, The THYMELEAF team (http://www.thymeleaf.org)
+ *   Copyright (c) 2012-2014, The ATTOPARSER team (http://www.attoparser.org)
  * 
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import org.attoparser.AbstractMarkupHandler;
 import org.attoparser.IMarkupHandler;
 import org.attoparser.ParseException;
 import org.attoparser.ParseStatus;
+import org.attoparser.config.ParseConfiguration;
 
 /**
  *
@@ -37,9 +38,12 @@ import org.attoparser.ParseStatus;
 public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
 
 
-    private final IMarkupHandler handler;
-    private final ISelectedSelectorEventHandler selectedHandler;
-    private final INonSelectedSelectorEventHandler nonSelectedHandler;
+    private final IMarkupHandler selectedHandler;
+    private final IMarkupHandler nonSelectedHandler;
+    private final boolean startEndEventsSelected;
+    private final ISelectionAwareMarkupHandler selectionAwareSelectedMarkupHandler; // just an (optional) cast of 'selectedHandler'
+
+    private final IMarkupSelectorReferenceResolver referenceResolver;
 
     private final SelectorElementBuffer elementBuffer;
 
@@ -63,45 +67,32 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
 
 
 
-    public BlockSelectorMarkupHandler(final IMarkupHandler handler,
-                                      final ISelectedSelectorEventHandler selectedEventHandler,
-                                      final INonSelectedSelectorEventHandler nonSelectedEventHandler,
-                                      final String selector, final MarkupSelectorMode mode) {
-        this(handler, selectedEventHandler, nonSelectedEventHandler, new String[] {selector}, mode, null);
+    public BlockSelectorMarkupHandler(final IMarkupHandler selectedHandler,
+                                      final IMarkupHandler nonSelectedHandler,
+                                      final String[] selectors) {
+        this(selectedHandler, nonSelectedHandler, selectors, true, null);
     }
 
 
 
-    public BlockSelectorMarkupHandler(final IMarkupHandler handler,
-                                      final ISelectedSelectorEventHandler selectedEventHandler,
-                                      final INonSelectedSelectorEventHandler nonSelectedEventHandler,
-                                      final String[] selectors, final MarkupSelectorMode mode) {
-        this(handler, selectedEventHandler, nonSelectedEventHandler, selectors, mode, null);
-    }
-
-
-
-    public BlockSelectorMarkupHandler(final IMarkupHandler handler,
-                                      final ISelectedSelectorEventHandler selectedEventHandler,
-                                      final INonSelectedSelectorEventHandler nonSelectedEventHandler,
-                                      final String selector, final MarkupSelectorMode mode,
+    public BlockSelectorMarkupHandler(final IMarkupHandler selectedHandler,
+                                      final IMarkupHandler nonSelectedHandler,
+                                      final String[] selectors,
                                       final IMarkupSelectorReferenceResolver referenceResolver) {
-        this(handler, selectedEventHandler, nonSelectedEventHandler, new String[] {selector}, mode, referenceResolver);
+        this(selectedHandler, nonSelectedHandler, selectors, true, referenceResolver);
     }
 
 
 
-    public BlockSelectorMarkupHandler(final IMarkupHandler handler,
-                                      final ISelectedSelectorEventHandler selectedEventHandler,
-                                      final INonSelectedSelectorEventHandler nonSelectedEventHandler,
-                                      final String[] selectors, final MarkupSelectorMode mode,
+    public BlockSelectorMarkupHandler(final IMarkupHandler selectedHandler,
+                                      final IMarkupHandler nonSelectedHandler,
+                                      final String[] selectors, final boolean startEndEventsSelected,
                                       final IMarkupSelectorReferenceResolver referenceResolver) {
 
         super();
 
-        if (handler == null) {
-            throw new IllegalArgumentException("Handler cannot be null");
-        }
+        // Both markup handlers (selected and non-selected CAN be null
+
         if (selectors == null || selectors.length == 0) {
             throw new IllegalArgumentException("Selector array cannot be null or empty");
         }
@@ -112,9 +103,16 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
             }
         }
 
-        this.handler = handler;
-        this.selectedHandler = selectedEventHandler;
-        this.nonSelectedHandler = nonSelectedEventHandler;
+        this.selectedHandler = selectedHandler;
+        this.nonSelectedHandler = nonSelectedHandler;
+        this.startEndEventsSelected = startEndEventsSelected;
+
+        this.referenceResolver = referenceResolver;
+
+        // We'll just use this to avoid a lot of casts
+        this.selectionAwareSelectedMarkupHandler =
+                (this.selectedHandler instanceof ISelectionAwareMarkupHandler ?
+                    (ISelectionAwareMarkupHandler) this.selectedHandler : null);
 
         this.selectors = selectors;
         this.selectorsLen = selectors.length;
@@ -129,18 +127,7 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
         this.insideAllSelectorMatchingBlock = false;
 
         this.selectorFilters = new MarkupSelectorFilter[this.selectorsLen];
-        for (int i = 0; i < this.selectorsLen; i++) {
-
-            final List<IMarkupSelectorItem> selectorItems =
-                    MarkupSelectorItems.forSelector(mode, selectors[i], referenceResolver);
-
-            this.selectorFilters[i] = new MarkupSelectorFilter(null, selectorItems.get(0));
-            MarkupSelectorFilter last = this.selectorFilters[i];
-            for (int j = 1; j < selectorItems.size(); j++) {
-                last = new MarkupSelectorFilter(last, selectorItems.get(j));
-            }
-
-        }
+        // We will not initialize selectorFilters here, but when we receive the configuration (setParseConfiguration)
 
         this.elementBuffer = new SelectorElementBuffer();
 
@@ -157,9 +144,47 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
 
 
 
+
+    @Override
+    public void setParseConfiguration(final ParseConfiguration parseConfiguration) {
+
+        /*
+         * We will use the parsing mode from the configuration to initialize the parsing filters
+         */
+
+        final boolean html =
+                ParseConfiguration.ParsingMode.HTML.equals(parseConfiguration.getMode());
+
+        for (int i = 0; i < this.selectorsLen; i++) {
+
+            final List<IMarkupSelectorItem> selectorItems =
+                    MarkupSelectorItems.forSelector(html, this.selectors[i], this.referenceResolver);
+
+            this.selectorFilters[i] = new MarkupSelectorFilter(null, selectorItems.get(0));
+            MarkupSelectorFilter last = this.selectorFilters[i];
+            for (int j = 1; j < selectorItems.size(); j++) {
+                last = new MarkupSelectorFilter(last, selectorItems.get(j));
+            }
+
+        }
+
+
+        /*
+         * Now delegate to the selected/non-selected handlers
+         */
+
+        this.selectedHandler.setParseConfiguration(parseConfiguration);
+        this.nonSelectedHandler.setParseConfiguration(parseConfiguration);
+
+    }
+
+
+
+
     @Override
     public void setParseStatus(final ParseStatus status) {
-        this.handler.setParseStatus(status);
+        this.selectedHandler.setParseStatus(status);
+        this.nonSelectedHandler.setParseStatus(status);
     }
 
 
@@ -175,7 +200,17 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
     public void handleDocumentStart(
             final long startTimeNanos, final int line, final int col)
             throws ParseException {
-        this.handler.handleDocumentStart(startTimeNanos, line, col);
+
+        if (this.selectionAwareSelectedMarkupHandler != null) {
+            this.selectionAwareSelectedMarkupHandler.setSelectors(this.selectors);
+        }
+
+        if (this.startEndEventsSelected) {
+            this.selectedHandler.handleDocumentStart(startTimeNanos, line, col);
+        } else {
+            this.nonSelectedHandler.handleDocumentStart(startTimeNanos, line, col);
+        }
+
     }
 
 
@@ -183,7 +218,13 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
     public void handleDocumentEnd(
             final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
             throws ParseException {
-        this.handler.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col);
+
+        if (this.startEndEventsSelected) {
+            this.selectedHandler.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col);
+        } else {
+            this.nonSelectedHandler.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col);
+        }
+
     }
 
 
@@ -225,33 +266,35 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
             }
 
             if (this.someSelectorsMatch) {
-                this.selectedHandler.handleSelectedXmlDeclaration(
-                        this.selectors, this.selectorMatches,
+                markCurrentSelection();
+                this.selectedHandler.handleXmlDeclaration(
                         buffer, keywordOffset, keywordLen, keywordLine, keywordCol,
                         versionOffset, versionLen, versionLine, versionCol,
                         encodingOffset, encodingLen, encodingLine, encodingCol,
                         standaloneOffset, standaloneLen, standaloneLine, standaloneCol,
-                        outerOffset, outerLen, line, col, this.handler);
+                        outerOffset, outerLen, line, col);
+                unmarkCurrentSelection();
                 return;
             }
 
-            this.nonSelectedHandler.handleNonSelectedXmlDeclaration(
+            this.nonSelectedHandler.handleXmlDeclaration(
                     buffer, keywordOffset, keywordLen, keywordLine, keywordCol,
                     versionOffset, versionLen, versionLine, versionCol,
                     encodingOffset, encodingLen, encodingLine, encodingCol,
                     standaloneOffset, standaloneLen, standaloneLine, standaloneCol,
-                    outerOffset, outerLen, line, col, this.handler);
+                    outerOffset, outerLen, line, col);
             return;
 
         }
 
-        this.selectedHandler.handleSelectedXmlDeclaration(
-                this.selectors, this.selectorMatches,
+        markCurrentSelection();
+        this.selectedHandler.handleXmlDeclaration(
                 buffer, keywordOffset, keywordLen, keywordLine, keywordCol,
                 versionOffset, versionLen, versionLine, versionCol,
                 encodingOffset, encodingLen, encodingLine, encodingCol,
                 standaloneOffset, standaloneLen, standaloneLine, standaloneCol,
-                outerOffset, outerLen, line, col, this.handler);
+                outerOffset, outerLen, line, col);
+        unmarkCurrentSelection();
 
     }
 
@@ -296,8 +339,8 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
             }
 
             if (this.someSelectorsMatch) {
-                this.selectedHandler.handleSelectedDocTypeClause(
-                        this.selectors, this.selectorMatches,
+                markCurrentSelection();
+                this.selectedHandler.handleDocType(
                         buffer,
                         keywordOffset, keywordLen, keywordLine, keywordCol,
                         elementNameOffset, elementNameLen, elementNameLine, elementNameCol,
@@ -305,12 +348,12 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
                         publicIdOffset, publicIdLen, publicIdLine, publicIdCol,
                         systemIdOffset, systemIdLen, systemIdLine, systemIdCol,
                         internalSubsetOffset, internalSubsetLen, internalSubsetLine, internalSubsetCol,
-                        outerOffset, outerLen, outerLine, outerCol,
-                        this.handler);
+                        outerOffset, outerLen, outerLine, outerCol);
+                unmarkCurrentSelection();
                 return;
             }
 
-            this.nonSelectedHandler.handleNonSelectedDocTypeClause(
+            this.nonSelectedHandler.handleDocType(
                     buffer,
                     keywordOffset, keywordLen, keywordLine, keywordCol,
                     elementNameOffset, elementNameLen, elementNameLine, elementNameCol,
@@ -318,14 +361,13 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
                     publicIdOffset, publicIdLen, publicIdLine, publicIdCol,
                     systemIdOffset, systemIdLen, systemIdLine, systemIdCol,
                     internalSubsetOffset, internalSubsetLen, internalSubsetLine, internalSubsetCol,
-                    outerOffset, outerLen, outerLine, outerCol,
-                    this.handler);
+                    outerOffset, outerLen, outerLine, outerCol);
             return;
 
         }
 
-        this.selectedHandler.handleSelectedDocTypeClause(
-                this.selectors, this.selectorMatches,
+        markCurrentSelection();
+        this.selectedHandler.handleDocType(
                 buffer,
                 keywordOffset, keywordLen, keywordLine, keywordCol,
                 elementNameOffset, elementNameLen, elementNameLine, elementNameCol,
@@ -333,8 +375,8 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
                 publicIdOffset, publicIdLen, publicIdLine, publicIdCol,
                 systemIdOffset, systemIdLen, systemIdLine, systemIdCol,
                 internalSubsetOffset, internalSubsetLen, internalSubsetLine, internalSubsetCol,
-                outerOffset, outerLen, outerLine, outerCol,
-                this.handler);
+                outerOffset, outerLen, outerLine, outerCol);
+        unmarkCurrentSelection();
 
     }
 
@@ -374,24 +416,24 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
             }
 
             if (this.someSelectorsMatch) {
-                this.selectedHandler.handleSelectedCDATASection(
-                        this.selectors, this.selectorMatches,
+                markCurrentSelection();
+                this.selectedHandler.handleCDATASection(
                         buffer, contentOffset, contentLen,
-                        outerOffset, outerLen, line, col, this.handler);
+                        outerOffset, outerLen, line, col);
+                unmarkCurrentSelection();
                 return;
             }
 
-            this.nonSelectedHandler.handleNonSelectedCDATASection(
+            this.nonSelectedHandler.handleCDATASection(
                     buffer, contentOffset, contentLen,
-                    outerOffset, outerLen, line, col, this.handler);
+                    outerOffset, outerLen, line, col);
             return;
 
         }
 
-        this.selectedHandler.handleSelectedCDATASection(
-                this.selectors, this.selectorMatches,
-                buffer, contentOffset, contentLen,
-                outerOffset, outerLen, line, col, this.handler);
+        markCurrentSelection();
+        this.selectedHandler.handleCDATASection(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
+        unmarkCurrentSelection();
 
     }
 
@@ -430,21 +472,20 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
             }
 
             if (this.someSelectorsMatch) {
-                this.selectedHandler.handleSelectedText(
-                        this.selectors, this.selectorMatches,
-                        buffer, offset, len, line, col, this.handler);
+                markCurrentSelection();
+                this.selectedHandler.handleText(buffer, offset, len, line, col);
+                unmarkCurrentSelection();
                 return;
             }
 
-            this.nonSelectedHandler.handleNonSelectedText(
-                    buffer, offset, len, line, col, this.handler);
+            this.nonSelectedHandler.handleText(buffer, offset, len, line, col);
             return;
 
         }
 
-        this.selectedHandler.handleSelectedText(
-                this.selectors, this.selectorMatches,
-                buffer, offset, len, line, col, this.handler);
+        markCurrentSelection();
+        this.selectedHandler.handleText(buffer, offset, len, line, col);
+        unmarkCurrentSelection();
 
     }
 
@@ -485,21 +526,23 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
             }
 
             if (this.someSelectorsMatch) {
-                this.selectedHandler.handleSelectedComment(
-                        this.selectors, this.selectorMatches,
-                        buffer, contentOffset, contentLen, outerOffset, outerLen, line, col, this.handler);
+                markCurrentSelection();
+                this.selectedHandler.handleComment(
+                        buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
+                unmarkCurrentSelection();
                 return;
             }
 
-            this.nonSelectedHandler.handleNonSelectedComment(
-                    buffer, contentOffset, contentLen, outerOffset, outerLen, line, col, this.handler);
+            this.nonSelectedHandler.handleComment(
+                    buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
             return;
 
         }
 
-        this.selectedHandler.handleSelectedComment(
-                this.selectors, this.selectorMatches,
-                buffer, contentOffset, contentLen, outerOffset, outerLen, line, col, this.handler);
+        markCurrentSelection();
+        this.selectedHandler.handleComment(
+                buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
+        unmarkCurrentSelection();
 
     }
 
@@ -532,15 +575,13 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
                     valueContentOffset, valueContentLen, valueOuterOffset, valueOuterLen, valueLine, valueCol);
             return;
         }
-        
 
-        this.selectedHandler.handleSelectedAttribute(
-                this.selectors, this.selectorMatches,
+
+        this.selectedHandler.handleAttribute(
                 buffer,
                 nameOffset, nameLen, nameLine, nameCol,
                 operatorOffset, operatorLen, operatorLine, operatorCol,
-                valueContentOffset, valueContentLen, valueOuterOffset, valueOuterLen, valueLine, valueCol,
-                this.handler);
+                valueContentOffset, valueContentLen, valueOuterOffset, valueOuterLen, valueLine, valueCol);
 
     }
 
@@ -561,9 +602,8 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
             return;
         }
 
-        this.selectedHandler.handleSelectedStandaloneElementStart(
-                this.selectors, this.selectorMatches,
-                buffer, nameOffset, nameLen, minimized, line, col, this.handler);
+        markCurrentSelection();
+        this.selectedHandler.handleStandaloneElementStart(buffer, nameOffset, nameLen, minimized, line, col);
 
     }
 
@@ -598,16 +638,19 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
             }
 
             if (this.someSelectorsMatch) {
-                this.elementBuffer.flushSelectedBuffer(this.selectedHandler, this.handler, this.selectors, this.selectorMatches);
+                markCurrentSelection();
+                this.elementBuffer.flushBuffer(this.selectedHandler);
+                unmarkCurrentSelection();
                 return;
             }
 
-            this.elementBuffer.flushNonSelectedBuffer(this.nonSelectedHandler, this.handler);
+            this.elementBuffer.flushBuffer(this.nonSelectedHandler);
             return;
 
         }
 
-        this.selectedHandler.handleSelectedStandaloneElementEnd(this.selectors, this.selectorMatches, buffer, nameOffset, nameLen, minimized, line, col, this.handler);
+        this.selectedHandler.handleStandaloneElementEnd(buffer, nameOffset, nameLen, minimized, line, col);
+        unmarkCurrentSelection();
 
     }
 
@@ -626,7 +669,8 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
             return;
         }
 
-        this.selectedHandler.handleSelectedOpenElementStart(this.selectors, this.selectorMatches, buffer, nameOffset, nameLen, line, col, this.handler);
+        markCurrentSelection();
+        this.selectedHandler.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
 
     }
 
@@ -668,7 +712,9 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
                 checkSizeOfMarkupBlocksStructure(this.markupLevel);
                 this.markupBlocks[this.markupLevel] = ++this.markupBlockIndex;
 
-                this.elementBuffer.flushSelectedBuffer(this.selectedHandler, this.handler, this.selectors, this.selectorMatches);
+                markCurrentSelection();
+                this.elementBuffer.flushBuffer(this.selectedHandler);
+                unmarkCurrentSelection();
 
                 return;
 
@@ -679,7 +725,7 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
             checkSizeOfMarkupBlocksStructure(this.markupLevel);
             this.markupBlocks[this.markupLevel] = ++this.markupBlockIndex;
 
-            this.elementBuffer.flushNonSelectedBuffer(this.nonSelectedHandler, this.handler);
+            this.elementBuffer.flushBuffer(this.nonSelectedHandler);
 
             return;
 
@@ -690,7 +736,8 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
         checkSizeOfMarkupBlocksStructure(this.markupLevel);
         this.markupBlocks[this.markupLevel] = ++this.markupBlockIndex;
 
-        this.selectedHandler.handleSelectedOpenElementEnd(this.selectors, this.selectorMatches, buffer, nameOffset, nameLen, line, col, this.handler);
+        this.selectedHandler.handleOpenElementEnd(buffer, nameOffset, nameLen, line, col);
+        unmarkCurrentSelection();
 
     }
 
@@ -720,16 +767,18 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
             }
 
             if (this.someSelectorsMatch) {
-                this.selectedHandler.handleSelectedCloseElementStart(this.selectors, this.selectorMatches, buffer, nameOffset, nameLen, line, col, this.handler);
+                markCurrentSelection();
+                this.selectedHandler.handleCloseElementStart(buffer, nameOffset, nameLen, line, col);
                 return;
             }
 
-            this.nonSelectedHandler.handleNonSelectedCloseElementStart(buffer, nameOffset, nameLen, line, col, this.handler);
+            this.nonSelectedHandler.handleCloseElementStart(buffer, nameOffset, nameLen, line, col);
             return;
 
         }
 
-        this.selectedHandler.handleSelectedCloseElementStart(this.selectors, this.selectorMatches, buffer, nameOffset, nameLen, line, col, this.handler);
+        markCurrentSelection();
+        this.selectedHandler.handleCloseElementStart(buffer, nameOffset, nameLen, line, col);
 
     }
 
@@ -761,11 +810,12 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
             }
 
             if (this.someSelectorsMatch) {
-                this.selectedHandler.handleSelectedCloseElementEnd(this.selectors, this.selectorMatches, buffer, nameOffset, nameLen, line, col, this.handler);
+                this.selectedHandler.handleCloseElementEnd(buffer, nameOffset, nameLen, line, col);
+                unmarkCurrentSelection();
                 return;
             }
 
-            this.nonSelectedHandler.handleNonSelectedCloseElementEnd(buffer, nameOffset, nameLen, line, col, this.handler);
+            this.nonSelectedHandler.handleCloseElementEnd(buffer, nameOffset, nameLen, line, col);
             return;
 
         }
@@ -778,7 +828,8 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
         }
 
 
-        this.selectedHandler.handleSelectedCloseElementEnd(this.selectors, this.selectorMatches, buffer, nameOffset, nameLen, line, col, this.handler);
+        this.selectedHandler.handleCloseElementEnd(buffer, nameOffset, nameLen, line, col);
+        unmarkCurrentSelection();
 
     }
 
@@ -808,16 +859,18 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
             }
 
             if (this.someSelectorsMatch) {
-                this.selectedHandler.handleSelectedAutoCloseElementStart(this.selectors, this.selectorMatches, buffer, nameOffset, nameLen, line, col, this.handler);
+                markCurrentSelection();
+                this.selectedHandler.handleAutoCloseElementStart(buffer, nameOffset, nameLen, line, col);
                 return;
             }
 
-            this.nonSelectedHandler.handleNonSelectedAutoCloseElementStart(buffer, nameOffset, nameLen, line, col, this.handler);
+            this.nonSelectedHandler.handleAutoCloseElementStart(buffer, nameOffset, nameLen, line, col);
             return;
 
         }
 
-        this.selectedHandler.handleSelectedAutoCloseElementStart(this.selectors, this.selectorMatches, buffer, nameOffset, nameLen, line, col, this.handler);
+        markCurrentSelection();
+        this.selectedHandler.handleAutoCloseElementStart(buffer, nameOffset, nameLen, line, col);
 
     }
 
@@ -849,11 +902,12 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
             }
 
             if (this.someSelectorsMatch) {
-                this.selectedHandler.handleSelectedAutoCloseElementEnd(this.selectors, this.selectorMatches, buffer, nameOffset, nameLen, line, col, this.handler);
+                this.selectedHandler.handleAutoCloseElementEnd(buffer, nameOffset, nameLen, line, col);
+                unmarkCurrentSelection();
                 return;
             }
 
-            this.nonSelectedHandler.handleNonSelectedAutoCloseElementEnd(buffer, nameOffset, nameLen, line, col, this.handler);
+            this.nonSelectedHandler.handleAutoCloseElementEnd(buffer, nameOffset, nameLen, line, col);
             return;
 
         }
@@ -866,7 +920,8 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
         }
 
 
-        this.selectedHandler.handleSelectedAutoCloseElementEnd(this.selectors, this.selectorMatches, buffer, nameOffset, nameLen, line, col, this.handler);
+        this.selectedHandler.handleAutoCloseElementEnd(buffer, nameOffset, nameLen, line, col);
+        unmarkCurrentSelection();
 
     }
 
@@ -891,16 +946,18 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
             }
 
             if (this.someSelectorsMatch) {
-                this.selectedHandler.handleSelectedUnmatchedCloseElementStart(this.selectors, this.selectorMatches, buffer, nameOffset, nameLen, line, col, this.handler);
+                markCurrentSelection();
+                this.selectedHandler.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col);
                 return;
             }
 
-            this.nonSelectedHandler.handleNonSelectedUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col, this.handler);
+            this.nonSelectedHandler.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col);
             return;
 
         }
 
-        this.selectedHandler.handleSelectedUnmatchedCloseElementStart(this.selectors, this.selectorMatches, buffer, nameOffset, nameLen, line, col, this.handler);
+        markCurrentSelection();
+        this.selectedHandler.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col);
 
     }
 
@@ -925,16 +982,18 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
             }
 
             if (this.someSelectorsMatch) {
-                this.selectedHandler.handleSelectedUnmatchedCloseElementEnd(this.selectors, this.selectorMatches, buffer, nameOffset, nameLen, line, col, this.handler);
+                this.selectedHandler.handleUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col);
+                unmarkCurrentSelection();
                 return;
             }
 
-            this.nonSelectedHandler.handleNonSelectedUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col, this.handler);
+            this.nonSelectedHandler.handleUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col);
             return;
 
         }
 
-        this.selectedHandler.handleSelectedUnmatchedCloseElementEnd(this.selectors, this.selectorMatches, buffer, nameOffset, nameLen, line, col, this.handler);
+        this.selectedHandler.handleUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col);
+        unmarkCurrentSelection();
 
     }
 
@@ -954,8 +1013,7 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
             return;
         }
 
-        this.selectedHandler.handleSelectedElementInnerWhiteSpace(
-                this.selectors, this.selectorMatches, buffer, offset, len, line, col, this.handler);
+        this.selectedHandler.handleInnerWhiteSpace(buffer, offset, len, line, col);
 
     }
 
@@ -996,33 +1054,54 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
             }
 
             if (this.someSelectorsMatch) {
-                this.selectedHandler.handleSelectedProcessingInstruction(
-                        this.selectors, this.selectorMatches,
+                markCurrentSelection();
+                this.selectedHandler.handleProcessingInstruction(
                         buffer,
                         targetOffset, targetLen, targetLine, targetCol,
                         contentOffset, contentLen, contentLine, contentCol,
-                        outerOffset, outerLen, line, col, this.handler);
+                        outerOffset, outerLen, line, col);
+                unmarkCurrentSelection();
                 return;
             }
 
-            this.nonSelectedHandler.handleNonSelectedProcessingInstruction(
+            this.nonSelectedHandler.handleProcessingInstruction(
                     buffer,
                     targetOffset, targetLen, targetLine, targetCol,
                     contentOffset, contentLen, contentLine, contentCol,
-                    outerOffset, outerLen, line, col, this.handler);
+                    outerOffset, outerLen, line, col);
             return;
 
         }
 
-        this.selectedHandler.handleSelectedProcessingInstruction(
-                this.selectors, this.selectorMatches,
+        markCurrentSelection();
+        this.selectedHandler.handleProcessingInstruction(
                 buffer,
                 targetOffset, targetLen, targetLine, targetCol,
                 contentOffset, contentLen, contentLine, contentCol,
-                outerOffset, outerLen, line, col, this.handler);
+                outerOffset, outerLen, line, col);
+        unmarkCurrentSelection();
 
     }
 
+
+
+    /*
+     * -------------------------------
+     * Selection handling
+     * -------------------------------
+     */
+
+    private void markCurrentSelection() {
+        if (this.selectionAwareSelectedMarkupHandler != null) {
+            this.selectionAwareSelectedMarkupHandler.setCurrentSelection(this.selectorMatches);
+        }
+    }
+
+    private void unmarkCurrentSelection() {
+        if (this.selectionAwareSelectedMarkupHandler != null) {
+            this.selectionAwareSelectedMarkupHandler.setCurrentSelection(null);
+        }
+    }
 
 
     /*

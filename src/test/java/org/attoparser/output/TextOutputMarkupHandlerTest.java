@@ -28,12 +28,10 @@ import org.attoparser.MarkupParser;
 import org.attoparser.config.ParseConfiguration;
 
 
-/**
- * 
- * @author Daniel Fern&aacute;ndez
- * 
- * @since 2.0.0
+/*
  *
+ * @author Daniel Fernandez
+ * @since 2.0.0
  */
 public class TextOutputMarkupHandlerTest extends TestCase {
 

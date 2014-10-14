@@ -1,7 +1,7 @@
 /*
  * =============================================================================
  *
- *   Copyright (c) 2011-2014, The THYMELEAF team (http://www.thymeleaf.org)
+ *   Copyright (c) 2012-2014, The ATTOPARSER team (http://www.attoparser.org)
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ final class MarkupSelectorItem implements IMarkupSelectorItem {
 
 
 
-    private final MarkupSelectorMode mode;
+    private final boolean html;
     private final boolean anyLevel;
     private final boolean textSelector;
     private final boolean commentSelector;
@@ -74,7 +74,7 @@ final class MarkupSelectorItem implements IMarkupSelectorItem {
     //                * support for matching comments, CDATA, DOCTYPE, XML Declarations and Processing Instructions
 
     MarkupSelectorItem(
-            final MarkupSelectorMode mode, final boolean anyLevel,
+            final boolean html, final boolean anyLevel,
             final boolean textSelector, final boolean commentSelector,
             final boolean cdataSectionSelector, final boolean docTypeClauseSelector,
             final boolean xmlDeclarationSelector, final boolean processingInstructionSelector,
@@ -82,7 +82,7 @@ final class MarkupSelectorItem implements IMarkupSelectorItem {
 
         super();
 
-        this.mode = mode;
+        this.html = html;
         this.anyLevel = anyLevel;
         this.textSelector = textSelector;
         this.commentSelector = commentSelector;
@@ -91,7 +91,7 @@ final class MarkupSelectorItem implements IMarkupSelectorItem {
         this.xmlDeclarationSelector = xmlDeclarationSelector;
         this.processingInstructionSelector = processingInstructionSelector;
         this.elementName = elementName;
-        this.elementNameLen = elementName.length();
+        this.elementNameLen = (elementName != null? elementName.length() : 0);
         this.index = index;
         this.attributeCondition = attributeCondition;
 
@@ -358,7 +358,8 @@ final class MarkupSelectorItem implements IMarkupSelectorItem {
         // Check the element name. We will check equality in case-sensitive or insensitive mode depending on the
         // mode being used.
         if (this.elementName != null &&
-                !TextUtil.equals(this.mode.isCaseSensitive(),
+                !TextUtil.equals(
+                        !this.html,
                         this.elementName, 0, this.elementNameLen,
                         elementBuffer.elementName, 0, elementBuffer.elementNameLen)) {
             return false;
@@ -366,7 +367,7 @@ final class MarkupSelectorItem implements IMarkupSelectorItem {
 
         // Check the attribute conditions (if any)
         if (this.attributeCondition != null &&
-                !matchesAttributeCondition(this.mode, elementBuffer, this.attributeCondition)) {
+                !matchesAttributeCondition(this.html, elementBuffer, this.attributeCondition)) {
             return false;
         }
 
@@ -387,35 +388,36 @@ final class MarkupSelectorItem implements IMarkupSelectorItem {
 
 
     private static boolean matchesAttributeCondition(
-            final MarkupSelectorMode mode, final SelectorElementBuffer elementBuffer, final IAttributeCondition attributeCondition) {
+            final boolean html, final SelectorElementBuffer elementBuffer, final IAttributeCondition attributeCondition) {
 
         if (attributeCondition instanceof AttributeConditionRelation) {
             final AttributeConditionRelation relation = (AttributeConditionRelation) attributeCondition;
             switch (relation.type) {
                 case AND:
-                    return matchesAttributeCondition(mode, elementBuffer, relation.left) &&
-                            matchesAttributeCondition(mode, elementBuffer, relation.right);
+                    return matchesAttributeCondition(html, elementBuffer, relation.left) &&
+                            matchesAttributeCondition(html, elementBuffer, relation.right);
                 case OR:
-                    return matchesAttributeCondition(mode, elementBuffer, relation.left) ||
-                            matchesAttributeCondition(mode, elementBuffer, relation.right);
+                    return matchesAttributeCondition(html, elementBuffer, relation.left) ||
+                            matchesAttributeCondition(html, elementBuffer, relation.right);
             }
         }
 
         final AttributeCondition attrCondition = (AttributeCondition) attributeCondition;
-        return matchesAttribute(mode, elementBuffer, attrCondition.name, attrCondition.operator, attrCondition.value);
+        return matchesAttribute(html, elementBuffer, attrCondition.name, attrCondition.operator, attrCondition.value);
 
     }
 
 
 
     private static boolean matchesAttribute(
-            final MarkupSelectorMode mode, final SelectorElementBuffer elementBuffer,
+            final boolean html, final SelectorElementBuffer elementBuffer,
             final String attrName, final MarkupSelectorItem.AttributeCondition.Operator attrOperator, final String attrValue) {
 
         boolean found = false;
         for (int i = 0; i < elementBuffer.attributeCount; i++) {
 
-            if (!TextUtil.equals(mode.isCaseSensitive(),
+            if (!TextUtil.equals(
+                    !html,
                     attrName, 0, attrName.length(),
                     elementBuffer.attributeBuffers[i], 0, elementBuffer.attributeNameLens[i])) {
                 continue;
@@ -426,7 +428,7 @@ final class MarkupSelectorItem implements IMarkupSelectorItem {
             // instances.
             found = true;
 
-            if (MarkupSelectorMode.HTML.equals(mode) && "class".equals(attrName)) {
+            if (html && "class".equals(attrName)) {
 
                 // The attribute we are comparing is actually the "class" attribute, which requires an special treatment
                 // if we are in HTML mode.

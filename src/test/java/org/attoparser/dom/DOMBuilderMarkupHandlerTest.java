@@ -30,12 +30,10 @@ import org.attoparser.dom.DOMWriter;
 import org.attoparser.dom.Document;
 
 
-/**
+/*
  * 
- * @author Daniel Fern&aacute;ndez
- * 
+ * @author Daniel Fernandez
  * @since 2.0.0
- *
  */
 public class DOMBuilderMarkupHandlerTest extends TestCase {
 

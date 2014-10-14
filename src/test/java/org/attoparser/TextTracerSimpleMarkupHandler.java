@@ -26,12 +26,10 @@ import java.util.Map;
 import org.attoparser.simple.AbstractSimpleMarkupHandler;
 
 
-/**
- * 
- * @author Daniel Fern&aacute;ndez
- * 
- * @since 1.0
+/*
  *
+ * @author Daniel Fernandez
+ * @since 2.0.0
  */
 public final class TextTracerSimpleMarkupHandler extends AbstractSimpleMarkupHandler {
 

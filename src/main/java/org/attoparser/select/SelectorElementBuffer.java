@@ -1,7 +1,7 @@
 /*
  * =============================================================================
  *
- *   Copyright (c) 2011-2014, The THYMELEAF team (http://www.thymeleaf.org)
+ *   Copyright (c) 2012-2014, The ATTOPARSER team (http://www.attoparser.org)
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -328,119 +328,51 @@ final class SelectorElementBuffer {
 
 
 
-    void flushSelectedBuffer(
-            final ISelectedSelectorEventHandler handler, final IMarkupHandler markupHandler,
-            final String[] selectors, final boolean[] selectorMatches) throws ParseException {
+    void flushBuffer(final IMarkupHandler handler) throws ParseException {
 
         if (this.standalone) {
-            handler.handleSelectedStandaloneElementStart(
-                    selectors, selectorMatches, this.elementName, 0, this.elementNameLen, this.minimized, this.elementNameLine, this.elementNameCol, markupHandler);
+            handler.handleStandaloneElementStart(
+                    this.elementName, 0, this.elementNameLen, this.minimized, this.elementNameLine, this.elementNameCol);
         } else {
-            handler.handleSelectedOpenElementStart(
-                    selectors, selectorMatches, this.elementName, 0, this.elementNameLen, this.elementNameLine, this.elementNameCol, markupHandler);
+            handler.handleOpenElementStart(
+                    this.elementName, 0, this.elementNameLen, this.elementNameLine, this.elementNameCol);
         }
 
         for (int i = 0; i < this.attributeCount; i++) {
 
-            handler.handleSelectedElementInnerWhiteSpace(
-                    selectors, selectorMatches,
+            handler.handleInnerWhiteSpace(
                     this.elementInnerWhiteSpaceBuffers[i],
                     0, this.elementInnerWhiteSpaceLens[i],
-                    this.elementInnerWhiteSpaceLines[i], this.elementInnerWhiteSpaceCols[i],
-                    markupHandler);
+                    this.elementInnerWhiteSpaceLines[i], this.elementInnerWhiteSpaceCols[i]);
 
-            handler.handleSelectedAttribute(
-                    selectors, selectorMatches,
+            handler.handleAttribute(
                     this.attributeBuffers[i],
                     0, this.attributeNameLens[i], this.attributeNameLines[i], this.attributeNameCols[i],
                     this.attributeNameLens[i], this.attributeOperatorLens[i], this.attributeOperatorLines[i], this.attributeOperatorCols[i],
                     this.attributeValueContentOffsets[i], this.attributeValueContentLens[i],
                     this.attributeNameLens[i] + this.attributeOperatorLens[i], this.attributeValueOuterLens[i],
-                    this.attributeValueLines[i], this.attributeValueCols[i],
-                    markupHandler);
+                    this.attributeValueLines[i], this.attributeValueCols[i]);
         }
 
         if (this.elementInnerWhiteSpaceCount - this.attributeCount > 0) {
 
             for (int i = this.attributeCount; i < this.elementInnerWhiteSpaceCount; i++) {
 
-                handler.handleSelectedElementInnerWhiteSpace(
-                        selectors, selectorMatches,
+                handler.handleInnerWhiteSpace(
                         this.elementInnerWhiteSpaceBuffers[i],
                         0, this.elementInnerWhiteSpaceLens[i],
-                        this.elementInnerWhiteSpaceLines[i], this.elementInnerWhiteSpaceCols[i],
-                        markupHandler);
+                        this.elementInnerWhiteSpaceLines[i], this.elementInnerWhiteSpaceCols[i]);
 
             }
 
         }
 
         if (this.standalone) {
-            handler.handleSelectedStandaloneElementEnd(
-                    selectors, selectorMatches,
-                    this.elementName, 0, this.elementNameLen, this.minimized, this.elementEndLine, this.elementEndCol, markupHandler);
+            handler.handleStandaloneElementEnd(
+                    this.elementName, 0, this.elementNameLen, this.minimized, this.elementEndLine, this.elementEndCol);
         } else {
-            handler.handleSelectedOpenElementEnd(
-                    selectors, selectorMatches,
-                    this.elementName, 0, this.elementNameLen, this.elementEndLine, this.elementEndCol, markupHandler);
-        }
-
-    }
-
-
-
-    void flushNonSelectedBuffer(final INonSelectedSelectorEventHandler handler, final IMarkupHandler markupHandler) throws ParseException {
-
-        if (this.standalone) {
-            handler.handleNonSelectedStandaloneElementStart(
-                    this.elementName, 0, this.elementNameLen, this.minimized, this.elementNameLine, this.elementNameCol,
-                    markupHandler);
-        } else {
-            handler.handleNonSelectedOpenElementStart(
-                    this.elementName, 0, this.elementNameLen, this.elementNameLine, this.elementNameCol,
-                    markupHandler);
-        }
-
-        for (int i = 0; i < this.attributeCount; i++) {
-
-            handler.handleNonSelectedElementInnerWhiteSpace(
-                    this.elementInnerWhiteSpaceBuffers[i],
-                    0, this.elementInnerWhiteSpaceLens[i],
-                    this.elementInnerWhiteSpaceLines[i], this.elementInnerWhiteSpaceCols[i],
-                    markupHandler);
-
-            handler.handleNonSelectedAttribute(
-                    this.attributeBuffers[i],
-                    0, this.attributeNameLens[i], this.attributeNameLines[i], this.attributeNameCols[i],
-                    this.attributeNameLens[i], this.attributeOperatorLens[i], this.attributeOperatorLines[i], this.attributeOperatorCols[i],
-                    this.attributeValueContentOffsets[i], this.attributeValueContentLens[i],
-                    this.attributeNameLens[i] + this.attributeOperatorLens[i], this.attributeValueOuterLens[i],
-                    this.attributeValueLines[i], this.attributeValueCols[i],
-                    markupHandler);
-        }
-
-        if (this.elementInnerWhiteSpaceCount - this.attributeCount > 0) {
-
-            for (int i = this.attributeCount; i < this.elementInnerWhiteSpaceCount; i++) {
-
-                handler.handleNonSelectedElementInnerWhiteSpace(
-                        this.elementInnerWhiteSpaceBuffers[i],
-                        0, this.elementInnerWhiteSpaceLens[i],
-                        this.elementInnerWhiteSpaceLines[i], this.elementInnerWhiteSpaceCols[i],
-                        markupHandler);
-
-            }
-
-        }
-
-        if (this.standalone) {
-            handler.handleNonSelectedStandaloneElementEnd(
-                    this.elementName, 0, this.elementNameLen, this.minimized, this.elementEndLine, this.elementEndCol,
-                    markupHandler);
-        } else {
-            handler.handleNonSelectedOpenElementEnd(
-                    this.elementName, 0, this.elementNameLen, this.elementEndLine, this.elementEndCol,
-                    markupHandler);
+            handler.handleOpenElementEnd(
+                    this.elementName, 0, this.elementNameLen, this.elementEndLine, this.elementEndCol);
         }
 
     }

@@ -32,12 +32,10 @@ import org.attoparser.output.OutputMarkupHandler;
 import static org.attoparser.minimize.MinimizeHtmlMarkupHandler.MinimizeMode.COMPLETE;
 import static org.attoparser.minimize.MinimizeHtmlMarkupHandler.MinimizeMode.ONLY_WHITE_SPACE;
 
-/**
- * 
- * @author Daniel Fern&aacute;ndez
- * 
- * @since 2.0.0
+/*
  *
+ * @author Daniel Fernandez
+ * @since 2.0.0
  */
 public class MinimizeHtmlMarkupHandlerTest extends TestCase {
 

@@ -19,6 +19,8 @@
  */
 package org.attoparser;
 
+import org.attoparser.config.ParseConfiguration;
+
 /**
  * <p>
  *   Interface to be implemented by all Markup Handlers.
@@ -98,6 +100,25 @@ package org.attoparser;
  *
  */
 public interface IMarkupHandler {
+
+
+    /**
+     * <p>
+     *   Sets the {@link org.attoparser.config.ParseConfiguration} object that will be used during the parsing
+     *   operation. This object will normally have been specified to the parser object during its instantiation
+     *   or initialization.
+     * </p>
+     * <p>
+     *   This method is always called by the parser <strong>before</strong> calling any other event handling method.
+     * </p>
+     * <p>
+     *   Note that this method can be <strong>safely ignored by most implementations</strong>, as there are
+     *   very few and very specific scenarios in which the handler needs to know configuration details at all.
+     * </p>
+     *
+     * @param parseConfiguration the configuration object.
+     */
+    public void setParseConfiguration(final ParseConfiguration parseConfiguration);
 
 
     /**

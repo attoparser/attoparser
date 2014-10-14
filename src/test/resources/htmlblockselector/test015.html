@@ -1,0 +1,41 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Good Thymes Virtual Grocery</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" type="text/css" media="all" href="../../css/gtvg.css" th:href="@{/css/gtvg.css}" />
+</head>
+
+<body>
+
+<div>
+    <img src="../../images/gtvglogo.png" alt="GTVG logo" title="GTVG logo"
+         th:src="@{/images/gtvglogo.png}" th:alt-title="#{logo}" />
+</div>
+
+<p th:utext="#{home.welcome('You!')}">Welcome to our grocery store, Sebastian!</p>
+
+<p>
+    <a href="something">Today</a> is: <span th:with="df=#{date.format}" th:text="${#calendars.format(today,df)}">13 February 2011</span>
+</p>
+
+<p>Please select an option</p>
+        <ol>
+            <li><a href="product/list.html" th:href="@{/product/list}">Product List
+            <li><a href="order/list.html" th:href="@{/order/list}">Order List</a>
+            <li><a href="subscribe.html" th:href="@{/subscribe}">Subscribe to our Newsletter
+            <li><a href="userprofile.html" th:href="@{/userprofile}">See User Profile</a>
+        </ol>
+
+<p id="notice">Now you are looking at a <span th:text="'working web application'">template file</span>.</p>
+
+<div th:include="footer::copy">&copy; 2011 The Static Templates</div>
+
+
+</body>
+
+</html>
+

@@ -19,10 +19,9 @@
  */
 package org.attoparser.minimize;
 
-import org.attoparser.AbstractMarkupHandler;
+import org.attoparser.AbstractChainedMarkupHandler;
 import org.attoparser.IMarkupHandler;
 import org.attoparser.ParseException;
-import org.attoparser.ParseStatus;
 import org.attoparser.util.TextUtil;
 
 
@@ -82,7 +81,7 @@ import org.attoparser.util.TextUtil;
  * @since 2.0.0
  *
  */
-public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
+public final class MinimizeHtmlMarkupHandler extends AbstractChainedMarkupHandler {
 
     public enum MinimizeMode {
 
@@ -147,7 +146,6 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
     private static final char[] ATTRIBUTE_OPERATOR = new char[] { '=' };
 
     private final MinimizeMode minimizeMode;
-    private final IMarkupHandler handler;
 
     private char[] internalBuffer = new char[30];
     private boolean lastTextEndedInWhiteSpace = false; // last text handled ended in white space (just in case next is also text, and
@@ -167,38 +165,28 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
 
 
 
-    public MinimizeHtmlMarkupHandler(final MinimizeMode minimizeMode, final IMarkupHandler handler) {
+    public MinimizeHtmlMarkupHandler(final MinimizeMode minimizeMode, final IMarkupHandler next) {
 
-        super();
+        super(next);
 
         if (minimizeMode == null) {
             throw new IllegalArgumentException("Minimize mode cannot be null");
         }
-        if (handler == null) {
-            throw new IllegalArgumentException("Handler cannot be null");
-        }
 
         this.minimizeMode = minimizeMode;
-        this.handler = handler;
 
     }
 
 
 
-
-    @Override
-    public void setParseStatus(final ParseStatus status) {
-        this.handler.setParseStatus(status);
-    }
-
-
+    
 
 
     @Override
     public void handleDocumentStart(
             final long startTimeNanos, final int line, final int col)
             throws ParseException {
-        this.handler.handleDocumentStart(startTimeNanos, line, col);
+        getNext().handleDocumentStart(startTimeNanos, line, col);
     }
 
 
@@ -208,7 +196,7 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
     public void handleDocumentEnd(
             final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
             throws ParseException {
-        this.handler.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col);
+        getNext().handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col);
     }
 
 
@@ -232,7 +220,7 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
         if (this.inPreformattedElement) {
             this.lastTextEndedInWhiteSpace = false;
             this.lastVisibleEventWasElement = false;
-            this.handler.handleText(buffer, offset, len, line, col);
+            getNext().handleText(buffer, offset, len, line, col);
             return;
         }
 
@@ -278,7 +266,7 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
             this.lastVisibleEventWasElement = false;
 
             // Just forward the event's content without modifications
-            this.handler.handleText(buffer, offset, len, line, col);
+            getNext().handleText(buffer, offset, len, line, col);
 
             return;
 
@@ -336,7 +324,7 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
             this.lastVisibleEventWasElement = false;
 
             // We've already constructed a text buffer with adequate white space compression, so we can forward the event
-            this.handler.handleText(this.internalBuffer, 0, internalBufferSize, line, col);
+            getNext().handleText(this.internalBuffer, 0, internalBufferSize, line, col);
 
         }
 
@@ -347,7 +335,7 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
         if (this.pendingInterBlockElementWhiteSpace) {
             this.pendingInterBlockElementWhiteSpace = false;
             if (!ignore) {
-                this.handler.handleText(SIZE_ONE_WHITE_SPACE, 0, 1, this.pendingEventLine, this.pendingEventCol);
+                getNext().handleText(SIZE_ONE_WHITE_SPACE, 0, 1, this.pendingEventLine, this.pendingEventCol);
             }
         }
     }
@@ -372,7 +360,7 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
             this.lastVisibleEventWasElement = false;
             this.lastTextEndedInWhiteSpace = false;
 
-            this.handler.handleComment(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
+            getNext().handleComment(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
 
         }
 
@@ -395,7 +383,7 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
         this.lastVisibleEventWasElement = false;
         this.lastTextEndedInWhiteSpace = false;
 
-        this.handler.handleCDATASection(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
+        getNext().handleCDATASection(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
 
     }
 
@@ -415,9 +403,9 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
         flushPendingInterBlockElementWhiteSpace(ignorePendingWhiteSpace);
 
         if (this.minimizeMode.unminimizeStandalones) {
-            this.handler.handleStandaloneElementStart(buffer, nameOffset, nameLen, false, line, col);
+            getNext().handleStandaloneElementStart(buffer, nameOffset, nameLen, false, line, col);
         } else {
-            this.handler.handleStandaloneElementStart(buffer, nameOffset, nameLen, minimized, line, col);
+            getNext().handleStandaloneElementStart(buffer, nameOffset, nameLen, minimized, line, col);
         }
 
     }
@@ -436,9 +424,9 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
         this.lastVisibleEventWasElement = true;
 
         if (this.minimizeMode.unminimizeStandalones) {
-            this.handler.handleStandaloneElementEnd(buffer, nameOffset, nameLen, false, line, col);
+            getNext().handleStandaloneElementEnd(buffer, nameOffset, nameLen, false, line, col);
         } else {
-            this.handler.handleStandaloneElementEnd(buffer, nameOffset, nameLen, minimized, line, col);
+            getNext().handleStandaloneElementEnd(buffer, nameOffset, nameLen, minimized, line, col);
         }
 
     }
@@ -461,7 +449,7 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
             this.inPreformattedElement = true;
         }
 
-        this.handler.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
+        getNext().handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
 
     }
 
@@ -478,7 +466,7 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
         this.lastClosedElementWasBlock = false;
         this.lastVisibleEventWasElement = true;
 
-        this.handler.handleOpenElementEnd(buffer, nameOffset, nameLen, line, col);
+        getNext().handleOpenElementEnd(buffer, nameOffset, nameLen, line, col);
 
     }
 
@@ -500,7 +488,7 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
             this.inPreformattedElement = false;
         }
 
-        this.handler.handleCloseElementStart(buffer, nameOffset, nameLen, line, col);
+        getNext().handleCloseElementStart(buffer, nameOffset, nameLen, line, col);
 
     }
 
@@ -517,7 +505,7 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
         this.lastOpenElementWasBlock = false;
         this.lastVisibleEventWasElement = true;
 
-        this.handler.handleCloseElementEnd(buffer, nameOffset, nameLen, line, col);
+        getNext().handleCloseElementEnd(buffer, nameOffset, nameLen, line, col);
 
     }
 
@@ -537,7 +525,7 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
                 (this.lastClosedElementWasBlock && isBlockElement(buffer, nameOffset, nameLen));
         flushPendingInterBlockElementWhiteSpace(ignorePendingWhiteSpace);
 
-        this.handler.handleAutoCloseElementStart(buffer, nameOffset, nameLen, line, col);
+        getNext().handleAutoCloseElementStart(buffer, nameOffset, nameLen, line, col);
 
     }
 
@@ -556,7 +544,7 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
         this.lastOpenElementWasBlock = false;
         this.lastVisibleEventWasElement = true;
 
-        this.handler.handleAutoCloseElementEnd(buffer, nameOffset, nameLen, line, col);
+        getNext().handleAutoCloseElementEnd(buffer, nameOffset, nameLen, line, col);
 
     }
 
@@ -576,7 +564,7 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
                 (this.lastClosedElementWasBlock && isBlockElement(buffer, nameOffset, nameLen));
         flushPendingInterBlockElementWhiteSpace(ignorePendingWhiteSpace);
 
-        this.handler.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col);
+        getNext().handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col);
 
     }
 
@@ -594,7 +582,7 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
         this.lastOpenElementWasBlock = false;
         this.lastVisibleEventWasElement = true;
 
-        this.handler.handleUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col);
+        getNext().handleUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col);
 
     }
 
@@ -608,7 +596,7 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
             final int valueContentLen, final int valueOuterOffset, final int valueOuterLen,
             final int valueLine, final int valueCol) throws ParseException {
 
-        this.handler.handleInnerWhiteSpace(
+        getNext().handleInnerWhiteSpace(
                 SIZE_ONE_WHITE_SPACE, 0, SIZE_ONE_WHITE_SPACE.length,
                 this.pendingEventLine, this.pendingEventCol);
 
@@ -620,7 +608,7 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
 
         if (isMinimizableBooleanAttribute) {
             // If it is a minimizable boolean, no need to go any further
-            this.handler.handleAttribute(
+            getNext().handleAttribute(
                     buffer,
                     nameOffset, nameLen, nameLine, nameCol,
                     0, 0, operatorLine, operatorCol,
@@ -638,7 +626,7 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
         if (operatorLen <= 1 && !canRemoveAttributeQuotes) {
             // Operator is already minimal enough, so we don't need to use our attribute-minimizing buffer
 
-            this.handler.handleAttribute(buffer, nameOffset, nameLen, nameLine, nameCol, operatorOffset,
+            getNext().handleAttribute(buffer, nameOffset, nameLen, nameLine, nameCol, operatorOffset,
                     operatorLen, operatorLine, operatorCol, valueContentOffset, valueContentLen,
                     valueOuterOffset, valueOuterLen, valueLine, valueCol);
 
@@ -656,7 +644,7 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
 
                 System.arraycopy(buffer, valueContentOffset, this.internalBuffer, nameLen + ATTRIBUTE_OPERATOR.length, valueContentLen);
 
-                this.handler.handleAttribute(
+                getNext().handleAttribute(
                         this.internalBuffer,
                         0, nameLen, nameLine, nameCol,
                         nameLen, ATTRIBUTE_OPERATOR.length, operatorLine, operatorCol,
@@ -668,7 +656,7 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
 
                 System.arraycopy(buffer, valueOuterOffset, this.internalBuffer, nameLen + ATTRIBUTE_OPERATOR.length, valueOuterLen);
 
-                this.handler.handleAttribute(
+                getNext().handleAttribute(
                         this.internalBuffer,
                         0, nameLen, nameLine, nameCol,
                         nameLen, ATTRIBUTE_OPERATOR.length, operatorLine, operatorCol,
@@ -724,7 +712,7 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
         this.lastVisibleEventWasElement = false;
         this.lastTextEndedInWhiteSpace = false;
 
-        this.handler.handleDocType(buffer, keywordOffset, keywordLen, keywordLine, keywordCol,
+        getNext().handleDocType(buffer, keywordOffset, keywordLen, keywordLine, keywordCol,
                 elementNameOffset, elementNameLen, elementNameLine, elementNameCol, typeOffset, typeLen,
                 typeLine, typeCol, publicIdOffset, publicIdLen, publicIdLine, publicIdCol, systemIdOffset,
                 systemIdLen, systemIdLine, systemIdCol, internalSubsetOffset, internalSubsetLen,
@@ -756,7 +744,7 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
         this.lastVisibleEventWasElement = false;
         this.lastTextEndedInWhiteSpace = false;
 
-        this.handler.handleXmlDeclaration(buffer, keywordOffset, keywordLen, keywordLine, keywordCol,
+        getNext().handleXmlDeclaration(buffer, keywordOffset, keywordLen, keywordLine, keywordCol,
                 versionOffset, versionLen, versionLine, versionCol, encodingOffset, encodingLen,
                 encodingLine, encodingCol, standaloneOffset, standaloneLen, standaloneLine, standaloneCol,
                 outerOffset, outerLen, line, col);
@@ -785,7 +773,7 @@ public final class MinimizeHtmlMarkupHandler extends AbstractMarkupHandler {
         this.lastVisibleEventWasElement = false;
         this.lastTextEndedInWhiteSpace = false;
 
-        this.handler.handleProcessingInstruction(buffer, targetOffset, targetLen, targetLine, targetCol,
+        getNext().handleProcessingInstruction(buffer, targetOffset, targetLen, targetLine, targetCol,
                 contentOffset, contentLen, contentLine, contentCol, outerOffset, outerLen, line, col);
 
     }

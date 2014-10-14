@@ -89,6 +89,8 @@ public final class SimplifierMarkupHandler extends AbstractMarkupHandler {
     }
 
 
+
+
     @Override
     public void handleDocumentStart(
             final long startTimeNanos,

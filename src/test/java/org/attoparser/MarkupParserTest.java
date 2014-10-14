@@ -38,12 +38,10 @@ import org.attoparser.trace.MarkupTraceEvent;
 import org.attoparser.trace.TraceBuilderMarkupHandler;
 
 
-/**
- * 
- * @author Daniel Fern&aacute;ndez
- * 
- * @since 1.0
+/*
  *
+ * @author Daniel Fernandez
+ * @since 2.0.0
  */
 public class MarkupParserTest extends TestCase {
 
@@ -1571,6 +1569,7 @@ public class MarkupParserTest extends TestCase {
                 final ParseStatus status = new ParseStatus();
                 final TraceBuilderMarkupHandler handler = new TraceBuilderMarkupHandler();
                 handler.setParseStatus(status);
+                handler.setParseConfiguration(parseConfiguration);
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
 
                 if (offset == 0 && len == input.length) {
@@ -1604,6 +1603,7 @@ public class MarkupParserTest extends TestCase {
                 final ParseStatus status = new ParseStatus();
                 final TraceBuilderMarkupHandler handler = new TraceBuilderMarkupHandler();
                 handler.setParseStatus(status);
+                handler.setParseConfiguration(parseConfiguration);
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
 
                 parser.parseDocument(input, offset, len, eventProcessor, status);
@@ -1645,6 +1645,7 @@ public class MarkupParserTest extends TestCase {
                 final ParseStatus status = new ParseStatus();
                 final TraceBuilderMarkupHandler handler = new TraceBuilderMarkupHandler();
                 handler.setParseStatus(status);
+                handler.setParseConfiguration(parseConfiguration);
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
 
                 parser.parseDocument(newInput, 5, len, eventProcessor, status);
@@ -1674,6 +1675,7 @@ public class MarkupParserTest extends TestCase {
                 final ParseStatus status = new ParseStatus();
                 final IMarkupHandler handler = new OutputMarkupHandler(sw);
                 handler.setParseStatus(status);
+                handler.setParseConfiguration(parseConfiguration);
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
                 if (offset == 0 && len == input.length) {
                     parser.parseDocument(new CharArrayReader(input), bufferSize, eventProcessor, status);
@@ -1693,6 +1695,7 @@ public class MarkupParserTest extends TestCase {
                 final ParseStatus status = new ParseStatus();
                 final IMarkupHandler handler = new OutputMarkupHandler(sw);
                 handler.setParseStatus(status);
+                handler.setParseConfiguration(parseConfiguration);
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
                 parser.parseDocument(input, offset, len, eventProcessor, status);
                 final String desired =
@@ -1710,6 +1713,7 @@ public class MarkupParserTest extends TestCase {
                     final IMarkupHandler handler =
                             new SimplifierMarkupHandler(new TextTracerSimpleMarkupHandler(sw));
                     handler.setParseStatus(status);
+                    handler.setParseConfiguration(parseConfiguration);
                     final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
                     if (offset == 0 && len == input.length) {
                         parser.parseDocument(new CharArrayReader(input), bufferSize, eventProcessor, status);
@@ -1786,6 +1790,7 @@ public class MarkupParserTest extends TestCase {
                 final TraceBuilderMarkupHandler traceHandler = new TraceBuilderMarkupHandler();
                 final IMarkupHandler handler = new HtmlMarkupHandler(traceHandler);
                 handler.setParseStatus(status);
+                handler.setParseConfiguration(parseConfiguration);
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
 
                 if (offset == 0 && len == input.length) {

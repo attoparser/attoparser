@@ -20,6 +20,8 @@
 package org.attoparser;
 
 
+import org.attoparser.config.ParseConfiguration;
+
 /**
  * <p>
  *   Base abstract implementation of {@link org.attoparser.IMarkupHandler} that implements all of its methods
@@ -42,6 +44,13 @@ public abstract class AbstractMarkupHandler implements IMarkupHandler {
 
     protected AbstractMarkupHandler() {
         super();
+    }
+
+
+
+    public void setParseConfiguration(final ParseConfiguration parseConfiguration) {
+        // Nothing to do. By default handlers will not be interested in using this object at all.
+        // Implementations will have to explicitly override if they need to use it.
     }
 
 

@@ -1,0 +1,4 @@
+p[!th:utext]
+<p>
+    <a href="something">Today</a> is: <span th:with="df=#{date.format}" th:text="${#calendars.format(today,df)}">13 February 2011</span>
+</p><p>Please select an option</p><p class="notice">Now you are looking at a <span th:text="'working web application'">template file</span>.</p>

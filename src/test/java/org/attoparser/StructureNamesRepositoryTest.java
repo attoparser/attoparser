@@ -22,12 +22,10 @@ package org.attoparser;
 import junit.framework.TestCase;
 
 
-/**
- * 
- * @author Daniel Fern&aacute;ndez
- * 
- * @since 2.0.0
+/*
  *
+ * @author Daniel Fernandez
+ * @since 2.0.0
  */
 public class StructureNamesRepositoryTest extends TestCase {
 

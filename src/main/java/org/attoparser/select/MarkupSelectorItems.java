@@ -1,7 +1,7 @@
 /*
  * =============================================================================
  *
- *   Copyright (c) 2011-2014, The THYMELEAF team (http://www.thymeleaf.org)
+ *   Copyright (c) 2012-2014, The ATTOPARSER team (http://www.attoparser.org)
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ final class MarkupSelectorItems {
 
 
     static List<IMarkupSelectorItem> forSelector(
-            final MarkupSelectorMode mode, final String selector, final IMarkupSelectorReferenceResolver referenceResolver) {
+            final boolean html, final String selector, final IMarkupSelectorReferenceResolver referenceResolver) {
 
         if (isEmptyOrWhitespace(selector)) {
             throw new IllegalArgumentException("Selector cannot be null");
@@ -57,7 +57,7 @@ final class MarkupSelectorItems {
 
         final ConcurrentHashMap<String,List<IMarkupSelectorItem>> map;
         if (referenceResolver == null) {
-            map = NO_REFERENCE_RESOLVER_REPOSITORY.getMap(mode);
+            map = NO_REFERENCE_RESOLVER_REPOSITORY.getMap(html);
         } else {
             if (!REPOSITORIES_BY_REFERENCE_RESOLVER.containsKey(referenceResolver)) {
                 if (REPOSITORIES_BY_REFERENCE_RESOLVER.size() < SelectorRepository.SELECTOR_ITEMS_MAX_SIZE) {
@@ -65,7 +65,7 @@ final class MarkupSelectorItems {
                     REPOSITORIES_BY_REFERENCE_RESOLVER.putIfAbsent(referenceResolver, new SelectorRepository());
                 }
             }
-            map = REPOSITORIES_BY_REFERENCE_RESOLVER.get(referenceResolver).getMap(mode);
+            map = REPOSITORIES_BY_REFERENCE_RESOLVER.get(referenceResolver).getMap(html);
         }
 
         List<IMarkupSelectorItem> items = map.get(selector);
@@ -73,7 +73,7 @@ final class MarkupSelectorItems {
             return items;
         }
 
-        items = Collections.unmodifiableList(parseSelector(mode, selector, referenceResolver));
+        items = Collections.unmodifiableList(parseSelector(html, selector, referenceResolver));
 
         if (map.size() < SelectorRepository.SELECTOR_ITEMS_MAX_SIZE) {
             map.putIfAbsent(selector, items);
@@ -94,8 +94,8 @@ final class MarkupSelectorItems {
                 new ConcurrentHashMap<String, List<IMarkupSelectorItem>>(20);
 
 
-        ConcurrentHashMap<String,List<IMarkupSelectorItem>> getMap(final MarkupSelectorMode mode) {
-            return (mode.isCaseSensitive() ? CASE_SENSITIVE_SELECTOR_ITEMS : CASE_INSENSITIVE_SELECTOR_ITEMS);
+        ConcurrentHashMap<String,List<IMarkupSelectorItem>> getMap(final boolean html) {
+            return (html ? CASE_INSENSITIVE_SELECTOR_ITEMS : CASE_SENSITIVE_SELECTOR_ITEMS);
         }
 
     }
@@ -106,14 +106,14 @@ final class MarkupSelectorItems {
 
 
     static List<IMarkupSelectorItem> parseSelector(
-            final MarkupSelectorMode mode, final String selector,
+            final boolean html, final String selector,
             final IMarkupSelectorReferenceResolver referenceResolver) {
-        return parseSelector(mode, selector, null, null, referenceResolver);
+        return parseSelector(html, selector, null, null, referenceResolver);
     }
 
 
     private static List<IMarkupSelectorItem> parseSelector(
-            final MarkupSelectorMode mode, final String selector,
+            final boolean html, final String selector,
             final MarkupSelectorItem.IAttributeCondition initialAttributeCondition,
             final MarkupSelectorItem.IndexCondition initialIndexCondition,
             final IMarkupSelectorReferenceResolver referenceResolver) {
@@ -147,7 +147,7 @@ final class MarkupSelectorItems {
         if (selEnd != -1) {
             final String tail = selectorSpecStr.substring(firstNonSlash).substring(selEnd);
             selectorSpecStr = selectorSpecStr.substring(0, firstNonSlash + selEnd);
-            result = parseSelector(mode, tail, referenceResolver);
+            result = parseSelector(html, tail, referenceResolver);
         } else {
             result = new ArrayList<IMarkupSelectorItem>(3);
         }
@@ -201,9 +201,9 @@ final class MarkupSelectorItems {
 
 
         final int idModifierPos =
-                (MarkupSelectorMode.HTML.equals(mode) ? path.indexOf(MarkupSelectorItem.ID_MODIFIER_SEPARATOR) : -1);
+                (html ? path.indexOf(MarkupSelectorItem.ID_MODIFIER_SEPARATOR) : -1);
         final int classModifierPos =
-                (MarkupSelectorMode.HTML.equals(mode) ? path.indexOf(MarkupSelectorItem.CLASS_MODIFIER_SEPARATOR) : -1);
+                (html ? path.indexOf(MarkupSelectorItem.CLASS_MODIFIER_SEPARATOR) : -1);
         final int referenceModifierPos = path.indexOf(MarkupSelectorItem.REFERENCE_MODIFIER_SEPARATOR);
 
 
@@ -311,7 +311,7 @@ final class MarkupSelectorItems {
         final String selectorPath =
                 (caseSensitiveSelectorPath == null?
                         null :
-                        (mode.isCaseSensitive() ? caseSensitiveSelectorPath : caseSensitiveSelectorPath.toLowerCase()));
+                        (html ? caseSensitiveSelectorPath.toLowerCase() : caseSensitiveSelectorPath));
 
 
         /*
@@ -366,7 +366,7 @@ final class MarkupSelectorItems {
                     // Modifier is not an index
 
                     final MarkupSelectorItem.IAttributeCondition newAttributeCondition =
-                            parseAttributeCondition(mode, selector, currentModifier);
+                            parseAttributeCondition(html, selector, currentModifier);
                     if (newAttributeCondition == null) {
                         throw new IllegalArgumentException(
                                 "Invalid syntax in selector \"" + selector + "\": selector does not match selector syntax: " +
@@ -389,7 +389,7 @@ final class MarkupSelectorItems {
 
         IMarkupSelectorItem thisItem =
                 new MarkupSelectorItem(
-                        mode, anyLevel,
+                        html, anyLevel,
                         textSelector, commentSelector, cdataSectionSelector, docTypeClauseSelector, xmlDeclarationSelector, processingInstructionSelector,
                         selectorPath, index, attributeCondition);
 
@@ -415,7 +415,7 @@ final class MarkupSelectorItems {
                     }
 
                     // We don't send the reference resolver again (null)
-                    final List<IMarkupSelectorItem> parsedReference = parseSelector(mode, resolvedSelector, null);
+                    final List<IMarkupSelectorItem> parsedReference = parseSelector(html, resolvedSelector, null);
                     if (parsedReference != null && parsedReference.size() > 1) {
                         throw new IllegalArgumentException(
                                 "Invalid selector resolved by reference resolver of class " + referenceResolver.getClass().getName() + " " +
@@ -448,7 +448,7 @@ final class MarkupSelectorItems {
                     }
 
                     // We don't send the reference resolver again (null)
-                    final List<IMarkupSelectorItem> parsedReference = parseSelector(mode, resolvedSelector, attributeCondition, index, null);
+                    final List<IMarkupSelectorItem> parsedReference = parseSelector(html, resolvedSelector, attributeCondition, index, null);
                     if (parsedReference != null && parsedReference.size() > 1) {
                         throw new IllegalArgumentException(
                                 "Invalid selector resolved by reference resolver of class " + referenceResolver.getClass().getName() + " " +
@@ -511,7 +511,7 @@ final class MarkupSelectorItems {
 
 
     private static MarkupSelectorItem.IAttributeCondition parseAttributeCondition(
-            final MarkupSelectorMode mode, final String selectorSpec, final String attrGroup) {
+            final boolean html, final String selectorSpec, final String attrGroup) {
 
         String text = attrGroup.trim();
         if (text.startsWith("(") && text.endsWith(")")) {
@@ -545,9 +545,9 @@ final class MarkupSelectorItems {
                     Character.isWhitespace(text.charAt(i + 4))) {
 
                 final MarkupSelectorItem.IAttributeCondition left =
-                        parseAttributeCondition(mode, selectorSpec, text.substring(0,i));
+                        parseAttributeCondition(html, selectorSpec, text.substring(0,i));
                 final MarkupSelectorItem.IAttributeCondition right =
-                        parseAttributeCondition(mode, selectorSpec, text.substring(i + 5,textLen));
+                        parseAttributeCondition(html, selectorSpec, text.substring(i + 5,textLen));
                 return new MarkupSelectorItem.AttributeConditionRelation(
                         MarkupSelectorItem.AttributeConditionRelation.Type.AND, left, right);
 
@@ -559,9 +559,9 @@ final class MarkupSelectorItems {
                     Character.isWhitespace(text.charAt(i + 3))) {
 
                 final MarkupSelectorItem.IAttributeCondition left =
-                        parseAttributeCondition(mode, selectorSpec, text.substring(0,i));
+                        parseAttributeCondition(html, selectorSpec, text.substring(0,i));
                 final MarkupSelectorItem.IAttributeCondition right =
-                        parseAttributeCondition(mode, selectorSpec, text.substring(i + 4,textLen));
+                        parseAttributeCondition(html, selectorSpec, text.substring(i + 4,textLen));
                 return new MarkupSelectorItem.AttributeConditionRelation(
                         MarkupSelectorItem.AttributeConditionRelation.Type.OR, left, right);
 
@@ -571,13 +571,13 @@ final class MarkupSelectorItems {
 
         }
 
-        return parseSimpleAttributeCondition(mode, selectorSpec, text);
+        return parseSimpleAttributeCondition(html, selectorSpec, text);
 
     }
 
 
     private static MarkupSelectorItem.AttributeCondition parseSimpleAttributeCondition(
-            final MarkupSelectorMode mode, final String selectorSpec, final String attributeSpec) {
+            final boolean html, final String selectorSpec, final String attributeSpec) {
 
         // 0 = attribute name, 1 = operator, 2 = value
         final String[] fragments = tokenizeAttributeSpec(attributeSpec);
@@ -586,7 +586,7 @@ final class MarkupSelectorItems {
         if (attrName.startsWith("@")) {
             attrName = attrName.substring(1);
         }
-        attrName = (mode.isCaseSensitive()? attrName : attrName.toLowerCase());
+        attrName = (html? attrName.toLowerCase() : attrName);
 
         final MarkupSelectorItem.AttributeCondition.Operator operator = parseAttributeOperator(fragments[1]);
 
