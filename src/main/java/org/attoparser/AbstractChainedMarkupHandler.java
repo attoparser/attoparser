@@ -76,7 +76,7 @@ public abstract class AbstractChainedMarkupHandler
      *
      * @return the next handler in the chain.
      */
-    protected IMarkupHandler getNext() {
+    protected final IMarkupHandler getNext() {
         return this.next;
     }
 
