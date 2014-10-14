@@ -1,0 +1,10 @@
+
+TODO
+====
+- Move block/node selection to attoparser
+- Simplify selected/non-selected interfaces --> could be an optional inteface extension of IMarkupHandler?
+- Could the optional interface thing also be used for setParseStatus?
+- Should AbstractMarkupHandler have a constructor with a delegate IMarkupHandler, getDelegateHandler() and an implementation of setParseStatus?
+- Auto-open?
+
+
