@@ -115,7 +115,7 @@ public final class ParseConfiguration implements Serializable, Cloneable {
         DEFAULT_HTML_PARSE_CONFIGURATION.setMode(ParsingMode.HTML);
         DEFAULT_HTML_PARSE_CONFIGURATION.setTextSplittable(false);
         DEFAULT_HTML_PARSE_CONFIGURATION.setElementBalancing(ElementBalancing.AUTO_CLOSE);
-        DEFAULT_HTML_PARSE_CONFIGURATION.setUniqueAttributesInElementRequired(true);
+        DEFAULT_HTML_PARSE_CONFIGURATION.setUniqueAttributesInElementRequired(false);
         DEFAULT_HTML_PARSE_CONFIGURATION.setXmlWellFormedAttributeValuesRequired(false);
         DEFAULT_HTML_PARSE_CONFIGURATION.setUniqueRootElementPresence(UniqueRootElementPresence.NOT_VALIDATED);
         DEFAULT_HTML_PARSE_CONFIGURATION.getPrologParseConfiguration().setValidateProlog(false);

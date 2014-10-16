@@ -72,44 +72,43 @@ public class PrettyHtmlMarkupHandler extends AbstractMarkupHandler {
     
     
     private static final String DOCUMENT_STYLES = "\n" +
-            "div.atto_source {\n" +
+            "body {\n" +
             "    font-family: 'Bitstream Vera Sans Mono', 'Courier New', Courier, monospace;\n" +
-            "    font-size: 12px;\n" +
+            "    font-size: 13px;\n" +
+            "    background: rgb(53, 39, 38);\n" +
             "}\n";
 
     
     private static final String FRAGMENT_STYLES = "\n" +
             "@@ .element {\n" +
-            "    font-weight: bold;\n" + 
-            "    color: black;\n" + 
+            "    color: #8bd1ff;\n" +
             "}\n" +
             "@@ .element-auto {\n" +
-            "    font-weight: bold;\n" +
-            "    color: purple;\n" +
-            "    background: #ddd;\n" +
+            "    color: yellow;\n" +
             "}\n" +
             "@@ .element-unmatched {\n" +
-            "    font-weight: bold;\n" +
-            "    color: white;\n" +
-            "    background: red;\n" +
+            "    color: red;\n" +
             "}\n" +
             "@@ .attr-name {\n" +
             "    font-weight: normal;\n" + 
-            "    color: red;\n" + 
+            "    color: white;\n" +
             "}\n" +
             "@@ .attr-value {\n" +
             "    font-weight: normal;\n" + 
-            "    color: blue;\n" + 
+            "    color: #99cc33;\n" +
             "}\n" +
             "@@ .doctype {\n" +
             "    font-weight: bold;\n" + 
             "    font-style: italics;\n" + 
-            "    color: #888;\n" + 
+            "    color: #8bd1ff;\n" +
             "}\n" +
             "@@ .comment {\n" +
-            "    font-style: italic;\n" + 
-            "    color: black;\n" + 
-            "    background: #ddd;\n" + 
+            "    font-style: italic;\n" +
+            "    color: #b58900;\n" +
+            "}\n" +
+            "@@ .cdata {\n" +
+            "    font-style: italic;\n" +
+            "    color: #b58900;\n" +
             "}\n" +
             "@@ .xml-declaration {\n" +
             "    font-weight: bold;\n" + 
@@ -120,8 +119,7 @@ public class PrettyHtmlMarkupHandler extends AbstractMarkupHandler {
             "    background: black;\n" + 
             "}\n" +
             "@@ .text {\n" +
-            "    color: #444;\n" + 
-            "    background: white;\n" + 
+            "    color: #b9bdb6;\n" +
             "}\n" +
             "\n";
     
@@ -264,7 +262,7 @@ public class PrettyHtmlMarkupHandler extends AbstractMarkupHandler {
             this.writer.write("<!DOCTYPE html>\n");
             this.writer.write("<html>\n");
             this.writer.write("<head>\n");
-            this.writer.write("<title>Document output: " + this.documentName + "</title>\n");
+            this.writer.write("<title>Parser output: " + this.documentName + "</title>\n");
             this.writer.write("<style>" + DOCUMENT_STYLES + "</style>\n");
             this.writer.write("</head>\n");
             this.writer.write("<body>\n");
