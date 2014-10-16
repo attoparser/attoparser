@@ -65,13 +65,6 @@ final class MarkupSelectorItem implements IMarkupSelectorItem {
     private final boolean requiresAttributesInElement;
 
 
-    // TODO Add to github issues a ticket explaining that the syntax is now extended to:
-    //                * support attribute "existence" and "non-existence"
-    //                * support indexes "even()" and "odd()"
-    //                * support "contains" attribute value with "*="
-    //                * support for > and < in indexed selectors
-    //                * support for both "and" and "or" in attribute conditions
-    //                * support for matching comments, CDATA, DOCTYPE, XML Declarations and Processing Instructions
 
     MarkupSelectorItem(
             final boolean html, final boolean anyLevel,

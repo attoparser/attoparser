@@ -32,6 +32,11 @@ import org.attoparser.AbstractMarkupHandler;
  *   {@link org.attoparser.select.BlockSelectorMarkupHandler} or
  *   {@link org.attoparser.select.NodeSelectorMarkupHandler} handlers.
  * </p>
+ * <p>
+ *   Note that, unlike most other implementations of {@link org.attoparser.IMarkupHandler}, this class is
+ *   completely stateless and <strong>thread-safe</strong>, and thus objects of this class can be safely reused
+ *   among several parsing operations if needed.
+ * </p>
  *
  * @author Daniel Fern&aacute;ndez
  *
@@ -41,8 +46,11 @@ import org.attoparser.AbstractMarkupHandler;
 public final class DiscardMarkupHandler extends AbstractMarkupHandler {
 
 
-
-
+    /**
+     * <p>
+     *   Create a new instance of this handler.
+     * </p>
+     */
     public DiscardMarkupHandler() {
         super();
     }

@@ -27,7 +27,7 @@ import org.attoparser.config.ParseConfiguration;
  * </p>
  * <p>
  *   Markup handlers are the objects that receive the events produced during parsing and perform the operations
- *   the users need. <strong>This interface is the basic point of extension in AttoParser</strong>.
+ *   the users need. <strong>This interface is the main entry point to use AttoParser</strong>.
  * </p>
  * <p>
  *   Markup handlers can be <strong>stateful</strong>, which means that a new instance of the markup handler
@@ -46,52 +46,95 @@ import org.attoparser.config.ParseConfiguration;
  *   {@link org.attoparser.simple.SimpleMarkupParser}.
  * </p>
  * <p>
- *   AttoParser provides several useful implementations of this interface out-of-the-box, like:
+ *   AttoParser provides several useful implementations of this interface out-of-the-box:
  * </p>
- * <ul>
- *   <li>Markup output:
- *     <ul>
- *       <li>{@link org.attoparser.output.OutputMarkupHandler}: for writing the received events to a
- *           specified {@link java.io.Writer} object, without any loss of information (case, whitespaces, etc.). This
- *           handler is useful for performing filtering/transformation operations on the parsed markup, placing this
- *           handler at the end of the handler chain so that it outputs the final results of such operation.</li>
- *       <li>{@link org.attoparser.output.TextOutputMarkupHandler}: for writing the received events to a
- *           specified {@link java.io.Writer} object as mere text, ignoring all non-text events. This will effectively
- *           strip all markup elements, comments, DOCTYPEs, etc. from the original markup.</li>
- *     </ul>
- *   </li>
- *   <li>Format conversion and transformation operations:
- *     <ul>
- *       <li>{@link org.attoparser.dom.DOMBuilderMarkupHandler}: for building a DOM tree as a result of parsing
- *           a document. This DOM tree will be created using the classes at the <tt>org.attoparser.dom</tt> package.
- *           This handler can be more easily applied by using the convenience ad-hoc parser
- *           class {@link org.attoparser.dom.DOMMarkupParser}.
- *       <li>{@link org.attoparser.simple.SimplifierMarkupHandler}: for transforming the produced markup
- *           parsing events into a much simpler format, removing much of the complexity of these parsing events
- *           and allowing users to create their handlers by means of the
- *           {@link org.attoparser.simple.ISimpleMarkupHandler} interface. Note this handler can be more easily
- *           applied by using the convenience ad-hob parser class {@link org.attoparser.simple.SimpleMarkupParser}.
- *       <li>{@link org.attoparser.minimize.MinimizeHtmlMarkupHandler}: for minimizing (compacting) HTML markup:
- *           remove excess white space, unquote attributes, etc.
- *     </ul>
- *   </li>
- *   <li>Event management:
- *     <ul>
- *       <li>{@link org.attoparser.duplicate.DuplicateMarkupHandler}: for duplicating parsing events, sending each
- *           of them to two different implementations if {@link org.attoparser.IMarkupHandler}.
- *     </ul>
- *   </li>
- *   <li>Testing and Debugging:
- *     <ul>
- *       <li>{@link org.attoparser.prettyhtml.PrettyHtmlMarkupHandler}: for creating an HTML
- *           document visually explaining all the events happened during the parsing of a document:
- *           elements, attributes, auto-closing of elements, unmatched artifacts, etc.</li>
- *       <li>{@link org.attoparser.trace.TraceBuilderMarkupHandler}: for building a trace of parsing events (a
- *           list of {@link org.attoparser.trace.MarkupTraceEvent} objects) detailing all the events launched
- *           during the parsing of a document.</li>
- *     </ul>
- *   </li>
- * </ul>
+ *
+ * <h3>Markup output</h3>
+ * <dl>
+ *
+ *   <dt>{@link org.attoparser.output.OutputMarkupHandler}</dt><dd>
+ *     For writing the received events to a
+ *     specified {@link java.io.Writer} object, without any loss of information (case, whitespaces, etc.). This
+ *     handler is useful for performing filtering/transformation operations on the parsed markup, placing this
+ *     handler at the end of the handler chain so that it outputs the final results of such operation.
+ *   </dd>
+ *
+ *   <dt>{@link org.attoparser.output.TextOutputMarkupHandler}</dt>
+ *   <dd>
+ *     For writing the received events to a
+ *     specified {@link java.io.Writer} object as mere text, ignoring all non-text events. This will effectively
+ *     strip all markup elements, comments, DOCTYPEs, etc. from the original markup.
+ *   </dd>
+ * </dl>
+ *
+ * <h3>Format conversion and transformation operations</h3>
+ * <dl>
+ *
+ *   <dt>{@link org.attoparser.dom.DOMBuilderMarkupHandler}</dt>
+ *   <dd>
+ *     For building a DOM tree as a result of parsing
+ *     a document. This DOM tree will be created using the classes at the <tt>org.attoparser.dom</tt> package.
+ *     This handler can be more easily applied by using the convenience ad-hoc parser
+ *     class {@link org.attoparser.dom.DOMMarkupParser}.
+ *   </dd>
+ *
+ *   <dt>{@link org.attoparser.simple.SimplifierMarkupHandler}</dt>
+ *   <dd>
+ *     For transforming the produced markup
+ *     parsing events into a much simpler format, removing much of the complexity of these parsing events
+ *     and allowing users to create their handlers by means of the
+ *     {@link org.attoparser.simple.ISimpleMarkupHandler} interface. Note this handler can be more easily
+ *     applied by using the convenience ad-hob parser class {@link org.attoparser.simple.SimpleMarkupParser}.
+ *   </dd>
+ *
+ *   <dt>{@link org.attoparser.minimize.MinimizeHtmlMarkupHandler}</dt>
+ *   <dd>
+ *       For minimizing (compacting) HTML markup: remove excess white space, unquote attributes, etc.
+ *   </dd>
+ *
+ * </dl>
+ *
+ * <h3>Fragment selection and event management</h3>
+ * <dl>
+ *
+ *   <dt>{@link org.attoparser.select.BlockSelectorMarkupHandler}</dt>
+ *   <dd>
+ *     For applying <em>block selection</em> (element + subtree) on the parsed markup, based on a set
+ *     of specified <em>markup selectors</em> (see {@link org.attoparser.select}).
+ *   </dd>
+ *
+ *   <dt>{@link org.attoparser.select.NodeSelectorMarkupHandler}</dt>
+ *   <dd>
+ *     For applying <em>node selection</em> (element, no subtree) on the parsed markup, based on a set
+ *     of specified <em>markup selectors</em> (see {@link org.attoparser.select}).
+ *   </dd>
+ *
+ *   <dt>{@link org.attoparser.duplicate.DuplicateMarkupHandler}</dt>
+ *   <dd>
+ *     For duplicating parsing events, sending each
+ *     of them to two different implementations if {@link org.attoparser.IMarkupHandler}.
+ *   </dd>
+ *
+ * </dl>
+ *
+ * <h3>Testing and Debugging</h3>
+ * <dl>
+ *
+ *   <dt>{@link org.attoparser.prettyhtml.PrettyHtmlMarkupHandler}</dt>
+ *   <dd>
+ *     For creating an HTML
+ *     document visually explaining all the events happened during the parsing of a document:
+ *     elements, attributes, auto-closing of elements, unmatched artifacts, etc.
+ *   </dd>
+ *
+ *   <dt>{@link org.attoparser.trace.TraceBuilderMarkupHandler}</dt>
+ *   <dd>
+ *     For building a trace of parsing events (a
+ *     list of {@link org.attoparser.trace.MarkupTraceEvent} objects) detailing all the events launched
+ *     during the parsing of a document.
+ *   </dd>
+ *
+ * </dl>
  *
  *
  * @author Daniel Fern&aacute;ndez

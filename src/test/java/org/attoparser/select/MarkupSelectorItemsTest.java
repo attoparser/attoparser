@@ -123,6 +123,8 @@ public class MarkupSelectorItemsTest extends TestCase {
         check(true, "p//procinstr()","(//p || //*[th:fragment='p' OR data-th-fragment='p'])//procinstr()");
         checkNoRef(true, "p//procinstr()[2]","//p//procinstr()[2]");
         checkNoRef(true, "p//procinstr()[even()]","//p//procinstr()[even()]");
+        checkNoRef(true, "/p[a OR !b]", "/p[a* OR b!]");
+        checkNoRef(true, "/p[a OR b!]", "/p[a* OR b!*]");
     }
     
 

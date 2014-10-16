@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>API Overview</title>
+  </head>
+  <body>
+
+    <p>
+        <strong>attoparser</strong> is a Java parser for XML and HTML markup.
+    </p>
+
+    <h2>Main features</h2>
+    <p>
+        The main features of attoparser are:
+    </p>
+    <ul>
+        <li>Fast, lightweight and <strong>easy to use</strong>.</li>
+        <li>Supports <em>and understands</em> both <strong>XML</strong> and <strong>HTML</strong>
+            (including <strong>HTML5</strong>).</li>
+        <li><strong>Powerful API</strong>. Does not implement the official SAX or DOM standard XML APIs.
+            On purpose.</li>
+        <li><strong>Event-based</strong> (SAX-style), uses <em>markup handler</em> objects for processing parsing
+            events, which can be (and many times are) chained to achieve the desired final results.</li>
+        <li>Though it is event-based, it offers out-of-the-box a handler that can turn events into a DOM-style
+            object tree.</li>
+        <li>Does not perform any <em>DTD / XSD validation</em>, <em>namespace processing</em>,
+            <em>entity resolution</em> or <em>escaping / unescaping</em> operations. All of this on purpose, too.</li>
+        <li>Allows <strong>ill-formed markup</strong> (XML or HTML) if configured to do so.</li>
+        <li>Performs <strong>auto-balancing</strong> of tags if configured to do so. Both in XML and in HTML
+            parsing modes.</li>
+        <li><strong>Zero loss</strong> parsing. Does not lose any information during parsing (keyword case,
+            attribute quoting...), so that the exact original markup can be reconstructed at the handler layer.</li>
+        <li>Can perform fast <strong>fragment selection</strong> operations during parsing, based on powerful
+            <em>markup selection expressions</em> like <kbd>//div/p#content</kbd>.</li>
+        <li>Loaded with other useful goodies like <em>HTML minimization</em>, <em>event trace building</em> or
+            <em>pretty-HTML reporting</em>.</li>
+    </ul>
+
+    <h2>How to use it</h2>
+
+    <p>
+        Using attoparser can be as simple as:
+    </p>
+<pre><code>
+  // Obtain a java.io.Reader on the document to be parsed
+  final Reader documentReader = ...;
+
+  // Create the handler instance. Extending the no-op AbstractMarkupHandler is a good start
+  final IMarkupHandler handler = new AbstractMarkupHandler() {
+      ... // some events implemented
+  };
+
+  // Create or obtain the parser instance (can be reused). Example uses the default configuration for HTML
+  final IMarkupParser parser = new MarkupParser(ParseConfiguration.htmlConfiguration());
+
+  // Parse it!
+  parser.parse(documentReader, handler);
+</code></pre>
+<br>
+
+    <h2>Where to start</h2>
+
+    <p>
+        The best place to start learning about attoparser by reading this docs is having a look at the
+        <a href="org/attoparser/IMarkupParser.html"><kbd>IMarkupParser</kbd></a> and especially the
+        <a href="org/attoparser/IMarkupHandler.html"><kbd>IMarkupHandler</kbd></a> interfaces.
+    </p>
+
+  </body>
+</html>

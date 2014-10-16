@@ -39,13 +39,25 @@ import org.attoparser.config.ParseConfiguration;
  * </p>
  * <p>
  *   This markup handler will apply the specified <strong>markup selectors</strong> and divide parsing events
- *   between two (possibly different) chained markup handlers implementing {@link org.attoparser.IMarkupHandler},
+ *   between two (possibly different) chained markup handlers implementing {@link org.attoparser.IMarkupHandler}:
  *   the <tt>selectedHandler</tt> and the <tt>nonSelectedHandler</tt>. Also, document start/end events will be
  *   sent to the <tt>selectedHandler</tt> unless specified otherwise by means of the
  *   {@link #setDocumentStartEndHandler(org.attoparser.IMarkupHandler)} method.
  * </p>
  * <p>
- *   For example, given the following markup:
+ *   Additionally, if the specified <tt>selectedHandler</tt> implements the
+ *   {@link org.attoparser.select.ISelectionAwareMarkupHandler} interface, this handler will provide it with
+ *   information about what markup selectors are being used and which of those selectors specifically match the
+ *   delegated events.
+ * </p>
+ * <p>
+ *   Also note that this filtering will be done in the most memory-efficient way, without the need to create any
+ *   large extra <tt>String</tt> or <tt>char[]</tt> objects apart from a minimal <em>element buffer</em> object which
+ *   will be reused throughout all the parsing process. This makes the execution of this handler extremely fast
+ *   and integrated with the parsing process itself.
+ * </p>
+ * <p>
+ *   In order to see how this handler works we can see some examples. For instance, given the following markup:
  * </p>
  * <pre><code>
  * &lt;!DOCTYPE html&gt;
@@ -108,6 +120,7 @@ import org.attoparser.config.ParseConfiguration;
  */
 public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
 
+
     private final IMarkupHandler selectedHandler;
     private final IMarkupHandler nonSelectedHandler;
     private final ISelectionAwareMarkupHandler selectionAwareSelectedMarkupHandler; // just an (optional) cast of 'selectedHandler'
@@ -139,7 +152,16 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
 
 
 
-
+    /**
+     * <p>
+     *   Create a new instance of this handler, specifying both the <em>selected</em> and <em>non-selected</em>
+     *   handlers, and the selectors to be used.
+     * </p>
+     *
+     * @param selectedHandler the handler to which <em>selected</em> events will be delegated.
+     * @param nonSelectedHandler the handler to which <em>non-selected</em> events will be delegated.
+     * @param selectors the selectors to be used. Cannot be neither null nor empty.
+     */
     public NodeSelectorMarkupHandler(final IMarkupHandler selectedHandler,
                                       final IMarkupHandler nonSelectedHandler,
                                       final String[] selectors) {
@@ -148,6 +170,17 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
 
 
 
+    /**
+     * <p>
+     *   Create a new instance of this handler, specifying both the <em>selected</em> and <em>non-selected</em>
+     *   handlers, as well as a <em>markup selector reference resolver</em> and the selectors to be used.
+     * </p>
+     *
+     * @param selectedHandler the handler to which <em>selected</em> events will be delegated.
+     * @param nonSelectedHandler the handler to which <em>non-selected</em> events will be delegated.
+     * @param selectors the selectors to be used. Cannot be neither null nor empty.
+     * @param referenceResolver the reference resolver to be used. Can be null if none is required.
+     */
     public NodeSelectorMarkupHandler(final IMarkupHandler selectedHandler,
                                       final IMarkupHandler nonSelectedHandler,
                                       final String[] selectors,

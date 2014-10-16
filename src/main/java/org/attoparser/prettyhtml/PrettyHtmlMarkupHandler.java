@@ -150,11 +150,28 @@ public class PrettyHtmlMarkupHandler extends AbstractMarkupHandler {
 
 
 
+
+    /**
+     * <p>
+     *   Creates a new instance of this handler.
+     * </p>
+     *
+     * @param writer the writer to which output will be written.
+     */
     public PrettyHtmlMarkupHandler(final Writer writer) {
         this(null, writer);
     }
 
 
+
+    /**
+     * <p>
+     *   Creates a new instance of this handler.
+     * </p>
+     *
+     * @param documentName the name of the parsed document (will appear in the title).
+     * @param writer the writer to which output will be written.
+     */
     public PrettyHtmlMarkupHandler(final String documentName, final Writer writer) {
         super();
         if (writer == null) {

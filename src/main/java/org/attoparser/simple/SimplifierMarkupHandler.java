@@ -75,11 +75,18 @@ public final class SimplifierMarkupHandler extends AbstractMarkupHandler {
     private Map<String,String> currentElementAttributes;
     private int currentElementLine;
     private int currentElementCol;
-    
-    
-    
-    
-    
+
+
+
+
+
+    /**
+     * <p>
+     *   Creates a new instance of this parser.
+     * </p>
+     *
+     * @param handler the <strong>simple</strong> handler to which events will be delegated.
+     */
     public SimplifierMarkupHandler(final ISimpleMarkupHandler handler) {
         super();
         if (handler == null) {

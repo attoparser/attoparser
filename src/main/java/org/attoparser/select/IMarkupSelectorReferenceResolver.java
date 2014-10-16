@@ -35,7 +35,8 @@ package org.attoparser.select;
  *   called 'data-additional' with value '<tt>someref</tt>'".</em>
  * </p>
  * <p>
- *   As another example, this <tt>%fragment</tt> (or simply <tt>fragment</tt>) syntax is heavily used by Thymeleaf
+ *   As another example, this <tt>%fragment</tt> (or simply <tt>fragment</tt>) syntax is heavily used by
+ *   <a href="http://www.thymeleaf.org">Thymeleaf</a>
  *   in order to search for elements with a <tt>th:fragment</tt> or <tt>data-th-fragment</tt> attribute with a
  *   specific <tt>"fragment"</tt> value.
  * </p>

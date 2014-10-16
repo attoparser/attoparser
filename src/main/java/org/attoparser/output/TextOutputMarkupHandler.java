@@ -57,6 +57,14 @@ public final class TextOutputMarkupHandler extends AbstractMarkupHandler {
 
 
 
+
+    /**
+     * <p>
+     *   Creates a new instance of this handler.
+     * </p>
+     *
+     * @param writer the writer to which output will be written.
+     */
     public TextOutputMarkupHandler(final Writer writer) {
         super();
         if (writer == null) {

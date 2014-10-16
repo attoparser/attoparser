@@ -55,12 +55,20 @@ public final class TraceBuilderMarkupHandler extends AbstractMarkupHandler {
 
     
     private final List<MarkupTraceEvent> trace = new ArrayList<MarkupTraceEvent>(20);
-    
 
 
+
+
+    /**
+     * <p>
+     *   Creates a new instance of this handler.
+     * </p>
+     */
     public TraceBuilderMarkupHandler() {
         super();
     }
+
+
 
 
     /**

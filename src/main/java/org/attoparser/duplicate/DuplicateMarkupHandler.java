@@ -66,7 +66,14 @@ public final class DuplicateMarkupHandler extends AbstractMarkupHandler {
     private final IMarkupHandler handler2;
 
 
-
+    /**
+     * <p>
+     *   Creates a new instance of this handler, specifying the two delegate handlers to which events
+     *   will be redirected.
+     * </p>
+     * @param handler1 the first delegate handler.
+     * @param handler2 the second delegate handler.
+     */
     public DuplicateMarkupHandler(final IMarkupHandler handler1, final IMarkupHandler handler2) {
         super();
         if (handler1 == null) {

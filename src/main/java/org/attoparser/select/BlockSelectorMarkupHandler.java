@@ -27,6 +27,7 @@ import org.attoparser.IMarkupHandler;
 import org.attoparser.ParseException;
 import org.attoparser.ParseStatus;
 import org.attoparser.config.ParseConfiguration;
+import org.attoparser.discard.DiscardMarkupHandler;
 
 /**
  * <p>
@@ -39,13 +40,25 @@ import org.attoparser.config.ParseConfiguration;
  * </p>
  * <p>
  *   This markup handler will apply the specified <strong>markup selectors</strong> and divide parsing events
- *   between two (possibly different) chained markup handlers implementing {@link org.attoparser.IMarkupHandler},
+ *   between two (possibly different) chained markup handlers implementing {@link org.attoparser.IMarkupHandler}:
  *   the <tt>selectedHandler</tt> and the <tt>nonSelectedHandler</tt>. Also, document start/end events will be
  *   sent to the <tt>selectedHandler</tt> unless specified otherwise by means of the
  *   {@link #setDocumentStartEndHandler(org.attoparser.IMarkupHandler)} method.
  * </p>
  * <p>
- *   For example, given the following markup:
+ *   Additionally, if the specified <tt>selectedHandler</tt> implements the
+ *   {@link org.attoparser.select.ISelectionAwareMarkupHandler} interface, this handler will provide it with
+ *   information about what markup selectors are being used and which of those selectors specifically match the
+ *   delegated events.
+ * </p>
+ * <p>
+ *   Also note that this filtering will be done in the most memory-efficient way, without the need to create any
+ *   large extra <tt>String</tt> or <tt>char[]</tt> objects apart from a minimal <em>element buffer</em> object which
+ *   will be reused throughout all the parsing process. This makes the execution of this handler extremely fast
+ *   and integrated with the parsing process itself.
+ * </p>
+ * <p>
+ *   In order to see how this handler works we can see some examples. For instance, given the following markup:
  * </p>
  * <pre><code>
  * &lt;!DOCTYPE html&gt;
@@ -63,7 +76,8 @@ import org.attoparser.config.ParseConfiguration;
  * </p>
  * <ul>
  *   <li>An {@link org.attoparser.output.OutputMarkupHandler} object as <tt>selectedHandler</tt>.</li>
- *   <li>A {@link org.attoparser.discard.DiscardMarkupHandler} object as <tt>nonSelectedHandler</tt>.</li>
+ *   <li>A {@link org.attoparser.discard.DiscardMarkupHandler} object as <tt>nonSelectedHandler</tt>. This
+ *       is the default <em>non-selected</em> handler used when none is specified.</li>
  * </ul>
  * <p>
  *   Using selector <tt>"div.content"</tt>, we would get:
@@ -98,6 +112,10 @@ import org.attoparser.config.ParseConfiguration;
 public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
 
 
+    // This implementation is completely stateless, so we can safely reuse it.
+    private final static DiscardMarkupHandler DISCARD_MARKUP_HANDLER = new DiscardMarkupHandler();
+
+
     private final IMarkupHandler selectedHandler;
     private final IMarkupHandler nonSelectedHandler;
     private final ISelectionAwareMarkupHandler selectionAwareSelectedMarkupHandler; // just an (optional) cast of 'selectedHandler'
@@ -129,6 +147,58 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
 
 
 
+    /**
+     * <p>
+     *   Create a new instance of this handler, specifying the <em>selected</em>
+     *   handler and the selectors to be used.
+     * </p>
+     * <p>
+     *   Given no <em>non-selected</em> handler is specified, an instance of
+     *   {@link org.attoparser.discard.DiscardMarkupHandler} is used. So all non-selected events will be just
+     *   discarded.
+     * </p>
+     *
+     * @param selectedHandler the handler to which <em>selected</em> events will be delegated.
+     * @param selectors the selectors to be used. Cannot be neither null nor empty.
+     */
+    public BlockSelectorMarkupHandler(final IMarkupHandler selectedHandler,
+                                      final String[] selectors) {
+        this(selectedHandler, DISCARD_MARKUP_HANDLER, selectors, null);
+    }
+
+
+    /**
+     * <p>
+     *   Create a new instance of this handler, specifying the <em>selected</em>
+     *   handler, as well as a <em>markup selector reference resolver</em> and the selectors to be used.
+     * </p>
+     * <p>
+     *   Given no <em>non-selected</em> handler is specified, an instance of
+     *   {@link org.attoparser.discard.DiscardMarkupHandler} is used. So all non-selected events will be just
+     *   discarded.
+     * </p>
+     *
+     * @param selectedHandler the handler to which <em>selected</em> events will be delegated.
+     * @param selectors the selectors to be used. Cannot be neither null nor empty.
+     * @param referenceResolver the reference resolver to be used. Can be null if none is required.
+     */
+    public BlockSelectorMarkupHandler(final IMarkupHandler selectedHandler,
+                                      final String[] selectors,
+                                      final IMarkupSelectorReferenceResolver referenceResolver) {
+        this(selectedHandler, DISCARD_MARKUP_HANDLER, selectors, referenceResolver);
+    }
+
+
+    /**
+     * <p>
+     *   Create a new instance of this handler, specifying both the <em>selected</em> and <em>non-selected</em>
+     *   handlers, and the selectors to be used.
+     * </p>
+     *
+     * @param selectedHandler the handler to which <em>selected</em> events will be delegated.
+     * @param nonSelectedHandler the handler to which <em>non-selected</em> events will be delegated.
+     * @param selectors the selectors to be used. Cannot be neither null nor empty.
+     */
     public BlockSelectorMarkupHandler(final IMarkupHandler selectedHandler,
                                       final IMarkupHandler nonSelectedHandler,
                                       final String[] selectors) {
@@ -136,7 +206,17 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
     }
 
 
-
+    /**
+     * <p>
+     *   Create a new instance of this handler, specifying both the <em>selected</em> and <em>non-selected</em>
+     *   handlers, as well as a <em>markup selector reference resolver</em> and the selectors to be used.
+     * </p>
+     *
+     * @param selectedHandler the handler to which <em>selected</em> events will be delegated.
+     * @param nonSelectedHandler the handler to which <em>non-selected</em> events will be delegated.
+     * @param selectors the selectors to be used. Cannot be neither null nor empty.
+     * @param referenceResolver the reference resolver to be used. Can be null if none is required.
+     */
     public BlockSelectorMarkupHandler(final IMarkupHandler selectedHandler,
                                       final IMarkupHandler nonSelectedHandler,
                                       final String[] selectors,

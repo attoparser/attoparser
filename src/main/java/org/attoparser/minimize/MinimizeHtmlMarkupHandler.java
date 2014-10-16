@@ -84,6 +84,15 @@ import org.attoparser.util.TextUtil;
  */
 public final class MinimizeHtmlMarkupHandler extends AbstractChainedMarkupHandler {
 
+    /**
+     * <p>
+     *   Enumeration for the type of minimization to be performed.
+     * </p>
+     * <ul>
+     *     <li>{@link #ONLY_WHITE_SPACE} for compacting only <em>excess</em> white space.</li>
+     *     <li>{@link #COMPLETE} for performing all available compacting operations.</li>
+     * </ul>
+     */
     public enum MinimizeMode {
 
         ONLY_WHITE_SPACE(false, false, false, false), COMPLETE(true, true, true, true);
@@ -157,9 +166,15 @@ public final class MinimizeHtmlMarkupHandler extends AbstractChainedMarkupHandle
 
 
 
-
-
-
+    /**
+     * <p>
+     *   Creates a new instance of this handler, specifying the <em>minimization mode</em> and the handler to which
+     *   minimized events will be delegated.
+     * </p>
+     *
+     * @param minimizeMode the minimization mode to be used.
+     * @param next the handler to which events will be delegated after minimization.
+     */
     public MinimizeHtmlMarkupHandler(final MinimizeMode minimizeMode, final IMarkupHandler next) {
 
         super(next);

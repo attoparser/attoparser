@@ -20,6 +20,8 @@
 package org.attoparser;
 
 
+import org.attoparser.config.ParseConfiguration;
+
 /*
  * Special implementation of the IMarkupHandler interface which implements the logic required to parse HTML
  * markup. It acts as a bridge and ends up delegating most of its events to another IMarkupHandler instance,
@@ -30,18 +32,22 @@ package org.attoparser;
  * @author Daniel Fernandez
  * @since 2.0.0
  */
-final class HtmlMarkupHandler extends AbstractChainedMarkupHandler {
+final class HtmlMarkupHandler extends AbstractMarkupHandler {
 
+    private IMarkupHandler next;
 
     private ParseStatus status = null; // Will be always set, but anyway we should initialize.
-
     private HtmlElement currentElement = null;
 
 
 
 
     HtmlMarkupHandler(final IMarkupHandler next) {
-        super(next);
+        super();
+        if (next == null) {
+            throw new IllegalArgumentException("Chained handler cannot be null");
+        }
+        this.next = next;
     }
 
 
@@ -50,7 +56,14 @@ final class HtmlMarkupHandler extends AbstractChainedMarkupHandler {
     public void setParseStatus(final ParseStatus status) {
         // This will be ALWAYS called, so there is no need to actually check whether this property is null when using it
         this.status = status;
-        super.setParseStatus(status);
+        this.next.setParseStatus(status);
+    }
+
+
+
+    @Override
+    public void setParseConfiguration(final ParseConfiguration parseConfiguration) {
+        this.next.setParseConfiguration(parseConfiguration);
     }
 
 
@@ -61,7 +74,7 @@ final class HtmlMarkupHandler extends AbstractChainedMarkupHandler {
             final long startTimeNanos, final int line, final int col)
             throws ParseException {
 
-        getNext().handleDocumentStart(startTimeNanos, line, col);
+        this.next.handleDocumentStart(startTimeNanos, line, col);
 
     }
 
@@ -72,7 +85,7 @@ final class HtmlMarkupHandler extends AbstractChainedMarkupHandler {
             final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
             throws ParseException {
 
-        getNext().handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col);
+        this.next.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col);
 
     }
 
@@ -89,7 +102,7 @@ final class HtmlMarkupHandler extends AbstractChainedMarkupHandler {
             final int line, final int col)
             throws ParseException {
 
-        getNext().handleXmlDeclaration(
+        this.next.handleXmlDeclaration(
                 buffer,
                 keywordOffset, keywordLen, keywordLine, keywordCol,
                 versionOffset, versionLen, versionLine, versionCol,
@@ -115,7 +128,7 @@ final class HtmlMarkupHandler extends AbstractChainedMarkupHandler {
             final int outerLine, final int outerCol)
             throws ParseException {
 
-        getNext().handleDocType(
+        this.next.handleDocType(
                 buffer,
                 keywordOffset, keywordLen, keywordLine, keywordCol,
                 elementNameOffset, elementNameLen, elementNameLine, elementNameCol,
@@ -138,7 +151,7 @@ final class HtmlMarkupHandler extends AbstractChainedMarkupHandler {
             final int line, final int col)
             throws ParseException {
 
-        getNext().handleCDATASection(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
+        this.next.handleCDATASection(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
 
     }
 
@@ -152,7 +165,7 @@ final class HtmlMarkupHandler extends AbstractChainedMarkupHandler {
             final int line, final int col)
             throws ParseException {
 
-        getNext().handleComment(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
+        this.next.handleComment(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
 
     }
 
@@ -165,7 +178,7 @@ final class HtmlMarkupHandler extends AbstractChainedMarkupHandler {
             final int line, final int col)
             throws ParseException {
 
-        getNext().handleText(buffer, offset, len, line, col);
+        this.next.handleText(buffer, offset, len, line, col);
 
     }
 
@@ -179,7 +192,7 @@ final class HtmlMarkupHandler extends AbstractChainedMarkupHandler {
             throws ParseException {
         
         this.currentElement = HtmlElements.forName(buffer, nameOffset, nameLen);
-        this.currentElement.handleStandaloneElementStart(buffer, nameOffset, nameLen, minimized, line, col, getNext(), this.status);
+        this.currentElement.handleStandaloneElementStart(buffer, nameOffset, nameLen, minimized, line, col, this.next, this.status);
 
     }
 
@@ -198,7 +211,7 @@ final class HtmlMarkupHandler extends AbstractChainedMarkupHandler {
         this.currentElement = null;
 
         // Hoping for better days in which tail calls might be optimized ;)
-        element.handleStandaloneElementEnd(buffer, nameOffset, nameLen, minimized, line, col, getNext(), this.status);
+        element.handleStandaloneElementEnd(buffer, nameOffset, nameLen, minimized, line, col, this.next, this.status);
 
     }
 
@@ -213,7 +226,7 @@ final class HtmlMarkupHandler extends AbstractChainedMarkupHandler {
             throws ParseException {
         
         this.currentElement = HtmlElements.forName(buffer, nameOffset, nameLen);
-        this.currentElement.handleOpenElementStart(buffer, nameOffset, nameLen, line, col, getNext(), this.status);
+        this.currentElement.handleOpenElementStart(buffer, nameOffset, nameLen, line, col, this.next, this.status);
 
     }
 
@@ -232,7 +245,7 @@ final class HtmlMarkupHandler extends AbstractChainedMarkupHandler {
         this.currentElement = null;
 
         // Hoping for better days in which tail calls might be optimized ;)
-        element.handleOpenElementEnd(buffer, nameOffset, nameLen, line, col, getNext(), this.status);
+        element.handleOpenElementEnd(buffer, nameOffset, nameLen, line, col, this.next, this.status);
 
     }
 
@@ -247,7 +260,7 @@ final class HtmlMarkupHandler extends AbstractChainedMarkupHandler {
             throws ParseException {
         
         this.currentElement = HtmlElements.forName(buffer, nameOffset, nameLen);
-        this.currentElement.handleCloseElementStart(buffer, nameOffset, nameLen, line, col, getNext(), this.status);
+        this.currentElement.handleCloseElementStart(buffer, nameOffset, nameLen, line, col, this.next, this.status);
         
     }
 
@@ -266,7 +279,7 @@ final class HtmlMarkupHandler extends AbstractChainedMarkupHandler {
         this.currentElement = null;
 
         // Hoping for better days in which tail calls might be optimized ;)
-        element.handleCloseElementEnd(buffer, nameOffset, nameLen, line, col, getNext(), this.status);
+        element.handleCloseElementEnd(buffer, nameOffset, nameLen, line, col, this.next, this.status);
 
     }
 
@@ -281,7 +294,7 @@ final class HtmlMarkupHandler extends AbstractChainedMarkupHandler {
             throws ParseException {
         
         this.currentElement = HtmlElements.forName(buffer, nameOffset, nameLen);
-        this.currentElement.handleAutoCloseElementStart(buffer, nameOffset, nameLen, line, col, getNext(), this.status);
+        this.currentElement.handleAutoCloseElementStart(buffer, nameOffset, nameLen, line, col, this.next, this.status);
         
     }
 
@@ -300,7 +313,7 @@ final class HtmlMarkupHandler extends AbstractChainedMarkupHandler {
         this.currentElement = null;
 
         // Hoping for better days in which tail calls might be optimized ;)
-        element.handleAutoCloseElementEnd(buffer, nameOffset, nameLen, line, col, getNext(), this.status);
+        element.handleAutoCloseElementEnd(buffer, nameOffset, nameLen, line, col, this.next, this.status);
 
     }
 
@@ -315,7 +328,7 @@ final class HtmlMarkupHandler extends AbstractChainedMarkupHandler {
             throws ParseException {
         
         this.currentElement = HtmlElements.forName(buffer, nameOffset, nameLen);
-        this.currentElement.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col, getNext(), this.status);
+        this.currentElement.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col, this.next, this.status);
         
     }
 
@@ -334,7 +347,7 @@ final class HtmlMarkupHandler extends AbstractChainedMarkupHandler {
         this.currentElement = null;
 
         // Hoping for better days in which tail calls might be optimized ;)
-        element.handleUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col, getNext(), this.status);
+        element.handleUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col, this.next, this.status);
 
     }
     
@@ -360,7 +373,7 @@ final class HtmlMarkupHandler extends AbstractChainedMarkupHandler {
         this.currentElement.handleAttribute(buffer, nameOffset, nameLen, nameLine, nameCol,
                 operatorOffset, operatorLen, operatorLine, operatorCol,
                 valueContentOffset, valueContentLen, valueOuterOffset, valueOuterLen,
-                valueLine, valueCol, getNext(), this.status);
+                valueLine, valueCol, this.next, this.status);
         
     }
 
@@ -378,7 +391,7 @@ final class HtmlMarkupHandler extends AbstractChainedMarkupHandler {
             throw new IllegalStateException("Cannot handle attribute: no current element");
         }
         
-        this.currentElement.handleInnerWhiteSpace(buffer, offset, len, line, col, getNext(), this.status);
+        this.currentElement.handleInnerWhiteSpace(buffer, offset, len, line, col, this.next, this.status);
         
     }
 
@@ -394,7 +407,7 @@ final class HtmlMarkupHandler extends AbstractChainedMarkupHandler {
             final int line, final int col)
             throws ParseException {
 
-        getNext().handleProcessingInstruction(
+        this.next.handleProcessingInstruction(
                 buffer,
                 targetOffset, targetLen, targetLine, targetCol,
                 contentOffset, contentLen, contentLine, contentCol,
