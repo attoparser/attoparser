@@ -17,8 +17,10 @@
  * 
  * =============================================================================
  */
-package org.attoparser;
+package org.attoparser.discard;
 
+
+import org.attoparser.AbstractMarkupHandler;
 
 /**
  * <p>
