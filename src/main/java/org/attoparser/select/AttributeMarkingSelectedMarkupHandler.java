@@ -24,6 +24,18 @@ import org.attoparser.IMarkupHandler;
 import org.attoparser.ParseException;
 
 /**
+ * <p>
+ *   Implementation of the {@link org.attoparser.select.ISelectionAwareMarkupHandler} that
+ *   adds an attribute (with a user-specified name) to all elements that match one or more selectors,
+ *   as determined by a {@link org.attoparser.select.BlockSelectorMarkupHandler} or
+ *   {@link org.attoparser.select.NodeSelectorMarkupHandler} handler.
+ * </p>
+ * <p>
+ *   So for example, given an instance of this handler configured to use <tt>"selectors"</tt> as its attribute name
+ *   and an <tt>&lt;img href="logo.png"&gt;</tt> tag that matches both selectors <tt>"//img"</tt> and
+ *   <tt>"div/img"</tt>, this handler would transform such tag in:
+ *   <tt>&lt;img href="logo.png" selectors="//img div/img"&gt;</tt>
+ * </p>
  *
  * @author Daniel Fern&aacute;ndez
  *
@@ -37,6 +49,8 @@ public final class AttributeMarkingSelectedMarkupHandler
 
     private static final char[] INNER_WHITESPACE_BUFFER = " ".toCharArray();
 
+    private final ISelectionAwareMarkupHandler selectionAwareMarkupHandler;
+
     private String[] selectors = null;
     private boolean[] currentSelection = null;
 
@@ -47,7 +61,15 @@ public final class AttributeMarkingSelectedMarkupHandler
     private char[] selectorAttributeBuffer;
 
 
-
+    /**
+     * <p>
+     *   Build a new instance of this class, specifying the name of the attribute to be added to the matching elements
+     *   and also the handler all events should be delegated to.
+     * </p>
+     *
+     * @param selectorAttributeName the name of the marking attribute.
+     * @param handler the handler to delegate events to.
+     */
     public AttributeMarkingSelectedMarkupHandler(final String selectorAttributeName, final IMarkupHandler handler) {
 
         super(handler);
@@ -55,6 +77,11 @@ public final class AttributeMarkingSelectedMarkupHandler
         if (selectorAttributeName == null || selectorAttributeName.trim().length() == 0) {
             throw new IllegalArgumentException("Selector attribute name cannot be null or empty");
         }
+
+        // We capture the handler as selection-aware just in case it is, in order to also forward
+        // calls to setSelectors and setCurrentSelection to it.
+        this.selectionAwareMarkupHandler =
+            (handler instanceof ISelectionAwareMarkupHandler ? (ISelectionAwareMarkupHandler) handler : null);
 
         this.selectorAttributeName = selectorAttributeName.toCharArray();
         this.selectorAttributeNameLen = this.selectorAttributeName.length;
@@ -70,11 +97,17 @@ public final class AttributeMarkingSelectedMarkupHandler
 
     public void setSelectors(final String[] selectors) {
         this.selectors = selectors;
+        if (this.selectionAwareMarkupHandler != null) {
+            this.selectionAwareMarkupHandler.setSelectors(selectors);
+        }
     }
 
 
     public void setCurrentSelection(final boolean[] currentSelection) {
         this.currentSelection = currentSelection;
+        if (this.selectionAwareMarkupHandler != null) {
+            this.selectionAwareMarkupHandler.setCurrentSelection(currentSelection);
+        }
     }
 
 

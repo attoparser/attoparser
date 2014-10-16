@@ -61,6 +61,41 @@ public final class ParseStatus {
 
     /**
      * <p>
+     *   Returns the line in the document the parser is currently located at.
+     * </p>
+     * <p>
+     *   Note this should not be used for event reference, because the parser cursor might be ahead of the events
+     *   it is reporting. In order to know the lines and cols an event was found at, use the <tt>(line,col)</tt>
+     *   pairs reported with every event handler.
+     * </p>
+     *
+     * @return the line number.
+     */
+    public int getLine() {
+        return this.line;
+    }
+
+
+    /**
+     * <p>
+     *   Returns the column in the current line in the document the parser is currently located at.
+     * </p>
+     * <p>
+     *   Note this should not be used for event reference, because the parser cursor might be ahead of the events
+     *   it is reporting. In order to know the lines and cols an event was found at, use the <tt>(line,col)</tt>
+     *   pairs reported with every event handler.
+     * </p>
+     *
+     * @return the column number.
+     */
+    public int getCol() {
+        return this.col;
+    }
+
+
+
+    /**
+     * <p>
      *   Determines whether parsing is currently disabled or not. This only happens if an event handler calls the
      *   {@link #setParsingDisabled(char[])} method. In such case, every Text event that will be reported until
      *   the specified limit sequence is found will return <tt>false</tt> for this method.

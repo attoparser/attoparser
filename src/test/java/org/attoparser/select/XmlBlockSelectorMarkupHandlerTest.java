@@ -34,7 +34,7 @@ import java.util.List;
 import junit.framework.TestCase;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.attoparser.DiscardMarkupHandler;
+import org.attoparser.discard.DiscardMarkupHandler;
 import org.attoparser.IMarkupHandler;
 import org.attoparser.IMarkupParser;
 import org.attoparser.MarkupParser;
@@ -126,8 +126,7 @@ public class XmlBlockSelectorMarkupHandlerTest extends TestCase {
         final IMarkupHandler directOutputHandler = new OutputMarkupHandler(writer);
 
         final BlockSelectorMarkupHandler handler =
-                new BlockSelectorMarkupHandler(directOutputHandler, new DiscardMarkupHandler(),
-                        blockSelectors, true, referenceResolver);
+                new BlockSelectorMarkupHandler(directOutputHandler, new DiscardMarkupHandler(), blockSelectors, referenceResolver);
 
         parser.parse(reader, handler);
 

@@ -25,9 +25,6 @@ import junit.framework.TestCase;
 import org.attoparser.IMarkupParser;
 import org.attoparser.MarkupParser;
 import org.attoparser.config.ParseConfiguration;
-import org.attoparser.dom.DOMBuilderMarkupHandler;
-import org.attoparser.dom.DOMWriter;
-import org.attoparser.dom.Document;
 
 
 /*

@@ -29,6 +29,77 @@ import org.attoparser.ParseStatus;
 import org.attoparser.config.ParseConfiguration;
 
 /**
+ * <p>
+ *   Implementation of {@link org.attoparser.IMarkupHandler} able to apply <em>node-selection</em> based on a set
+ *   of specified <em>markup selectors</em> (see {@link org.attoparser.select}).
+ * </p>
+ * <p>
+ *   <em>Node selection</em> means that nodes (elements, texts, CDATA sections, etc.) are selected individually, so
+ *   the fact that an element is <em>selected</em> does not mean that its subtree will be selected too.
+ * </p>
+ * <p>
+ *   This markup handler will apply the specified <strong>markup selectors</strong> and divide parsing events
+ *   between two (possibly different) chained markup handlers implementing {@link org.attoparser.IMarkupHandler},
+ *   the <tt>selectedHandler</tt> and the <tt>nonSelectedHandler</tt>. Also, document start/end events will be
+ *   sent to the <tt>selectedHandler</tt> unless specified otherwise by means of the
+ *   {@link #setDocumentStartEndHandler(org.attoparser.IMarkupHandler)} method.
+ * </p>
+ * <p>
+ *   For example, given the following markup:
+ * </p>
+ * <pre><code>
+ * &lt;!DOCTYPE html&gt;
+ * &lt;html&gt;
+ *   &lt;body&gt;
+ *     &lt;h1&gt;AttoParser&lt;/h1&gt;
+ *     &lt;div class="content"&gt;
+ *       AttoParser is able to select &lt;strong&gt;just a fragment of markup&lt;/strong&gt;.
+ *     &lt;/div&gt;
+ *   &lt;/body&gt;
+ * &lt;/html&gt;
+ * </code></pre>
+ * <p>
+ *   ...and a {@link org.attoparser.select.NodeSelectorMarkupHandler} initialized with:
+ * </p>
+ * <ul>
+ *   <li>An {@link org.attoparser.output.OutputMarkupHandler} object as <tt>selectedHandler</tt>.</li>
+ *   <li>A {@link org.attoparser.discard.DiscardMarkupHandler} object as <tt>nonSelectedHandler</tt>.</li>
+ * </ul>
+ * <p>
+ *   Using selector <tt>"div.content"</tt>, we would get:
+ * </p>
+ * <pre><code>
+ * &lt;div class="content"&gt;&lt;/div&gt;
+ * </code></pre>
+ * <p>
+ *   Note how selecting that <tt>div</tt> element does not mean selecting its entire subtree.
+ * </p>
+ * <p>
+ *   If we had two selectors, <tt>"div.content"</tt> and <tt>"div.content//text()"</tt>, we would get:
+ * </p>
+ * <pre><code>
+ *     &lt;div class="content"&gt;
+ *       AttoParser is able to select just a fragment of markup.
+ *     &lt;/div&gt;
+ * </code></pre>
+ * <p>
+ *   Which, given we are not selecting the <tt>&lt;strong&gt;</tt> element at all, would effectively strip its open and
+ *   close tags. Note however how the result would change if we used single-level nesting for the <tt>text()</tt> part,
+ *   i.e. if we used selectors <tt>"div.content"</tt> and <tt>"div.content/text()"</tt>:
+ * </p>
+ * <pre><code>
+ *     &lt;div class="content"&gt;
+ *       AttoParser is able to select .
+ *     &lt;/div&gt;
+ * </code></pre>
+ * <p>
+ *   Have a look at the package info for {@link org.attoparser.select} for a complete explanation on
+ *   <em>markup selector</em> syntax.
+ * </p>
+ * <p>
+ *   Note that, as with most handlers, this class is <strong>not thread-safe</strong>. Also, instances of this class
+ *   should not be reused across parsing operations.
+ * </p>
  *
  * @author Daniel Fern&aacute;ndez
  *
@@ -39,12 +110,14 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
 
     private final IMarkupHandler selectedHandler;
     private final IMarkupHandler nonSelectedHandler;
-    private final boolean startEndEventsSelected;
     private final ISelectionAwareMarkupHandler selectionAwareSelectedMarkupHandler; // just an (optional) cast of 'selectedHandler'
 
     private final IMarkupSelectorReferenceResolver referenceResolver;
 
     private final SelectorElementBuffer elementBuffer;
+
+    // By default, "documentStart" and "documentEnd" events will be sent to selectedHandler.
+    private IMarkupHandler documentStartEndHandler;
 
     private final int selectorsLen;
     private final String[] selectors;
@@ -70,7 +143,7 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
     public NodeSelectorMarkupHandler(final IMarkupHandler selectedHandler,
                                       final IMarkupHandler nonSelectedHandler,
                                       final String[] selectors) {
-        this(selectedHandler, nonSelectedHandler, selectors, true, null);
+        this(selectedHandler, nonSelectedHandler, selectors, null);
     }
 
 
@@ -78,15 +151,6 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
     public NodeSelectorMarkupHandler(final IMarkupHandler selectedHandler,
                                       final IMarkupHandler nonSelectedHandler,
                                       final String[] selectors,
-                                      final IMarkupSelectorReferenceResolver referenceResolver) {
-        this(selectedHandler, nonSelectedHandler, selectors, true, referenceResolver);
-    }
-
-
-
-    public NodeSelectorMarkupHandler(final IMarkupHandler selectedHandler,
-                                      final IMarkupHandler nonSelectedHandler,
-                                      final String[] selectors, final boolean startEndEventsSelected,
                                       final IMarkupSelectorReferenceResolver referenceResolver) {
 
         super();
@@ -105,7 +169,9 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
 
         this.selectedHandler = selectedHandler;
         this.nonSelectedHandler = nonSelectedHandler;
-        this.startEndEventsSelected = startEndEventsSelected;
+
+        // By default, send the "document start" and "document end" events to the selected handler
+        this.documentStartEndHandler = this.selectedHandler;
 
         this.referenceResolver = referenceResolver;
 
@@ -139,6 +205,35 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
         this.markupBlocks[this.markupLevel] = this.markupBlockIndex;
 
     }
+
+
+
+
+    /**
+     * <p>
+     *   Sets the {@link org.attoparser.IMarkupHandler} instance to which the <em>document start</em> and
+     *   <em>document end</em> events should be delegated.
+     * </p>
+     * <p>
+     *   This is specified separately in order to avoid undesired event duplicities. By default, the
+     *   <em>selected handler</em> specified during construction will be the one receiving these events.
+     * </p>
+     * <p>
+     *   If sending these events to both selected and non-selected handlers is required, developers can make use of
+     *   {@link org.attoparser.duplicate.DuplicateMarkupHandler}.
+     * </p>
+     *
+     * @param documentStartEndHandler the handler these events will be delegated to.
+     */
+    public void setDocumentStartEndHandler(final IMarkupHandler documentStartEndHandler) {
+        if (documentStartEndHandler == null) {
+            throw new IllegalArgumentException("Handler cannot be null");
+        }
+        this.documentStartEndHandler = documentStartEndHandler;
+    }
+
+
+
 
 
 
@@ -203,11 +298,7 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
             this.selectionAwareSelectedMarkupHandler.setSelectors(this.selectors);
         }
 
-        if (this.startEndEventsSelected) {
-            this.selectedHandler.handleDocumentStart(startTimeNanos, line, col);
-        } else {
-            this.nonSelectedHandler.handleDocumentStart(startTimeNanos, line, col);
-        }
+        this.documentStartEndHandler.handleDocumentStart(startTimeNanos, line, col);
 
     }
 
@@ -217,11 +308,7 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
             final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
             throws ParseException {
 
-        if (this.startEndEventsSelected) {
-            this.selectedHandler.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col);
-        } else {
-            this.nonSelectedHandler.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col);
-        }
+        this.documentStartEndHandler.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col);
 
     }
 
