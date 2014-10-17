@@ -57,6 +57,31 @@
   parser.parse(documentReader, handler);
 </code></pre>
 <br>
+    <p>
+        A more complex example, say you want to extract to another file only the <kbd>&lt;div&gt;</kbd> elements
+        with class <kbd>"content"</kbd> from an HTML file. You will need a <kbd>BlockSelectorMarkupHandler</kbd>
+        instance to do the selection, and then an <kbd>OutputMarkupHandler</kbd> chained to the former in order
+        to write the output markup somewhere:
+    </p>
+<pre><code>
+    // Obtain a java.io.Reader on the document to be parsed
+    final Reader documentReader = ...;
+
+    // Obtain a java.io.Writer on the resource you want the results to be written to
+    final Writer documentWriter = ...;
+
+    // Last step of the chain will be the OutputMarkupHandler, who will write events as markup to the writer
+    final OutputMarkupHandler outputHandler = new OutputMarkupHandler(documentWriter);
+
+    // Before outputting, we will need to select those div's by means of a "markup selector expression", so we chain it
+    final BlockSelectorMarkupHandler selectorHandler = new BlockSelectorMarkupHandler(outputHandler, "div.content");
+
+    // Create or obtain the parser instance (can be reused). We will use the default configuration for HTML
+    final IMarkupParser parser = new MarkupParser(ParseConfiguration.htmlConfiguration());
+
+    // Parse it!
+    parser.parse(documentReader, selectorHandler);
+</code></pre>
 
     <h2>Where to start</h2>
 

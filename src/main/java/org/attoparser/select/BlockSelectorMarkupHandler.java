@@ -146,6 +146,84 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
 
 
 
+    /**
+     * <p>
+     *   Create a new instance of this handler, specifying the <em>selected</em>
+     *   handler and the selector to be used.
+     * </p>
+     * <p>
+     *   Given no <em>non-selected</em> handler is specified, an instance of
+     *   {@link org.attoparser.discard.DiscardMarkupHandler} is used. So all non-selected events will be just
+     *   discarded.
+     * </p>
+     *
+     * @param selectedHandler the handler to which <em>selected</em> events will be delegated.
+     * @param selector the selector to be used. Cannot be null.
+     */
+    public BlockSelectorMarkupHandler(final IMarkupHandler selectedHandler,
+                                      final String selector) {
+        this(selectedHandler, DISCARD_MARKUP_HANDLER, new String[] { selector }, null);
+    }
+
+
+    /**
+     * <p>
+     *   Create a new instance of this handler, specifying the <em>selected</em>
+     *   handler, as well as a <em>markup selector reference resolver</em> and the selector to be used.
+     * </p>
+     * <p>
+     *   Given no <em>non-selected</em> handler is specified, an instance of
+     *   {@link org.attoparser.discard.DiscardMarkupHandler} is used. So all non-selected events will be just
+     *   discarded.
+     * </p>
+     *
+     * @param selectedHandler the handler to which <em>selected</em> events will be delegated.
+     * @param selector the selector to be used. Cannot be null.
+     * @param referenceResolver the reference resolver to be used. Can be null if none is required.
+     */
+    public BlockSelectorMarkupHandler(final IMarkupHandler selectedHandler,
+                                      final String selector,
+                                      final IMarkupSelectorReferenceResolver referenceResolver) {
+        this(selectedHandler, DISCARD_MARKUP_HANDLER, new String[] { selector }, referenceResolver);
+    }
+
+
+    /**
+     * <p>
+     *   Create a new instance of this handler, specifying both the <em>selected</em> and <em>non-selected</em>
+     *   handlers, and the selector to be used.
+     * </p>
+     *
+     * @param selectedHandler the handler to which <em>selected</em> events will be delegated.
+     * @param nonSelectedHandler the handler to which <em>non-selected</em> events will be delegated.
+     * @param selector the selector to be used. Cannot be null.
+     */
+    public BlockSelectorMarkupHandler(final IMarkupHandler selectedHandler,
+                                      final IMarkupHandler nonSelectedHandler,
+                                      final String selector) {
+        this(selectedHandler, nonSelectedHandler, new String[] { selector }, null);
+    }
+
+
+    /**
+     * <p>
+     *   Create a new instance of this handler, specifying both the <em>selected</em> and <em>non-selected</em>
+     *   handlers, as well as a <em>markup selector reference resolver</em> and the selector to be used.
+     * </p>
+     *
+     * @param selectedHandler the handler to which <em>selected</em> events will be delegated.
+     * @param nonSelectedHandler the handler to which <em>non-selected</em> events will be delegated.
+     * @param selector the selector to be used. Cannot be null.
+     * @param referenceResolver the reference resolver to be used. Can be null if none is required.
+     */
+    public BlockSelectorMarkupHandler(final IMarkupHandler selectedHandler,
+                                      final IMarkupHandler nonSelectedHandler,
+                                      final String selector,
+                                      final IMarkupSelectorReferenceResolver referenceResolver) {
+        this(selectedHandler, nonSelectedHandler, new String[] { selector }, referenceResolver);
+    }
+
+
 
     /**
      * <p>

@@ -155,6 +155,44 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
     /**
      * <p>
      *   Create a new instance of this handler, specifying both the <em>selected</em> and <em>non-selected</em>
+     *   handlers, and the selector to be used.
+     * </p>
+     *
+     * @param selectedHandler the handler to which <em>selected</em> events will be delegated.
+     * @param nonSelectedHandler the handler to which <em>non-selected</em> events will be delegated.
+     * @param selector the selector to be used. Cannot be null.
+     */
+    public NodeSelectorMarkupHandler(final IMarkupHandler selectedHandler,
+                                     final IMarkupHandler nonSelectedHandler,
+                                     final String selector) {
+        this(selectedHandler, nonSelectedHandler, new String[] { selector }, null);
+    }
+
+
+
+    /**
+     * <p>
+     *   Create a new instance of this handler, specifying both the <em>selected</em> and <em>non-selected</em>
+     *   handlers, as well as a <em>markup selector reference resolver</em> and the selector to be used.
+     * </p>
+     *
+     * @param selectedHandler the handler to which <em>selected</em> events will be delegated.
+     * @param nonSelectedHandler the handler to which <em>non-selected</em> events will be delegated.
+     * @param selector the selector to be used. Cannot be null.
+     * @param referenceResolver the reference resolver to be used. Can be null if none is required.
+     */
+    public NodeSelectorMarkupHandler(final IMarkupHandler selectedHandler,
+                                     final IMarkupHandler nonSelectedHandler,
+                                     final String selector,
+                                     final IMarkupSelectorReferenceResolver referenceResolver) {
+        this(selectedHandler, nonSelectedHandler, new String[] { selector }, referenceResolver);
+    }
+
+
+
+    /**
+     * <p>
+     *   Create a new instance of this handler, specifying both the <em>selected</em> and <em>non-selected</em>
      *   handlers, and the selectors to be used.
      * </p>
      *
