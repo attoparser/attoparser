@@ -111,6 +111,22 @@ public class MarkupParserTest extends TestCase {
         assertEquals("[DT(html)(aaa)()(<!ELEMENT>){1,1}]", sw4.toString());
 
 
+        testHtmlDoc(
+            "<table><tr><td><tr>",
+            "[OES(table){1,1}OEE(table){1,7}OES(tr){1,8}OEE(tr){1,11}OES(td){1,12}OEE(td){1,15}ACES(td){1,16}ACEE(td){1,16}ACES(tr){1,16}ACEE(tr){1,16}OES(tr){1,16}OEE(tr){1,19}ACES(tr){1,20}ACEE(tr){1,20}ACES(table){1,20}ACEE(table){1,20}]",
+            noRestrictionsAutoClose);
+        testHtmlDoc(
+            "<table><tr><th><tr>",
+            "[OES(table){1,1}OEE(table){1,7}OES(tr){1,8}OEE(tr){1,11}OES(th){1,12}OEE(th){1,15}ACES(th){1,16}ACEE(th){1,16}ACES(tr){1,16}ACEE(tr){1,16}OES(tr){1,16}OEE(tr){1,19}ACES(tr){1,20}ACEE(tr){1,20}ACES(table){1,20}ACEE(table){1,20}]",
+            noRestrictionsAutoClose);
+        testHtmlDoc(
+            "<td><tr>",
+            "[OES(td){1,1}OEE(td){1,4}ACES(td){1,5}ACEE(td){1,5}OES(tr){1,5}OEE(tr){1,8}ACES(tr){1,9}ACEE(tr){1,9}]",
+            noRestrictionsAutoClose);
+        testHtmlDoc(
+            "<th><tr>",
+            "[OES(th){1,1}OEE(th){1,4}ACES(th){1,5}ACEE(th){1,5}OES(tr){1,5}OEE(tr){1,8}ACES(tr){1,9}ACEE(tr){1,9}]",
+            noRestrictionsAutoClose);
         testDoc(
             "Hello, World!",
             "[T(ello, Worl){1,1}]",
@@ -118,10 +134,10 @@ public class MarkupParserTest extends TestCase {
             1, 10,
             noRestrictionsAutoClose);
         testDoc(
-                "This is simply a text",
-                "[T(This is simply a text){1,1}]",
-                "[T(This is simply a text){1,1}]",
-                noRestrictionsAutoClose);
+            "This is simply a text",
+            "[T(This is simply a text){1,1}]",
+            "[T(This is simply a text){1,1}]",
+            noRestrictionsAutoClose);
         testHtmlDoc(
             "<img src=\"hello\">Something",
             "[NSES(img){1,1}IWS( ){1,5}A(src){1,6}(=){1,9}(\"hello\"){1,10}NSEE(img){1,17}T(Something){1,18}]",
