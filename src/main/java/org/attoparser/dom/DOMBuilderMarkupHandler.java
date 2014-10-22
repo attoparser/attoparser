@@ -423,6 +423,45 @@ public final class DOMBuilderMarkupHandler extends AbstractMarkupHandler {
 
 
     @Override
+    public void handleAutoOpenElementStart(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
+            throws ParseException {
+
+        this.currentElementName = StructureTextsRepository.getStructureName(buffer, nameOffset, nameLen);
+        this.currentElementAttributes = null;
+        this.currentElementLine = line;
+        this.currentElementCol = col;
+
+    }
+
+
+
+    @Override
+    public void handleAutoOpenElementEnd(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
+            throws ParseException {
+
+        final Element element = new Element(this.currentElementName);
+        element.addAttributes(this.currentElementAttributes);
+        element.setLine(Integer.valueOf(this.currentElementLine));
+        element.setLine(Integer.valueOf(this.currentElementCol));
+
+        if (this.currentParent == null) {
+            this.document.addChild(element);
+        } else {
+            this.currentParent.addChild(element);
+        }
+        this.currentParent = element;
+
+    }
+
+
+
+    @Override
     public void handleCloseElementStart(
             final char[] buffer,
             final int nameOffset, final int nameLen,

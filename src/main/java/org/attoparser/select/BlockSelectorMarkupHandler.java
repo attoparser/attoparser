@@ -872,12 +872,12 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
 
             if (this.someSelectorsMatch) {
                 markCurrentSelection();
-                this.elementBuffer.flushBuffer(this.selectedHandler);
+                this.elementBuffer.flushBuffer(this.selectedHandler, false);
                 unmarkCurrentSelection();
                 return;
             }
 
-            this.elementBuffer.flushBuffer(this.nonSelectedHandler);
+            this.elementBuffer.flushBuffer(this.nonSelectedHandler, false);
             return;
 
         }
@@ -946,7 +946,7 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
                 this.markupBlocks[this.markupLevel] = ++this.markupBlockIndex;
 
                 markCurrentSelection();
-                this.elementBuffer.flushBuffer(this.selectedHandler);
+                this.elementBuffer.flushBuffer(this.selectedHandler, false);
                 unmarkCurrentSelection();
 
                 return;
@@ -958,7 +958,7 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
             checkSizeOfMarkupBlocksStructure(this.markupLevel);
             this.markupBlocks[this.markupLevel] = ++this.markupBlockIndex;
 
-            this.elementBuffer.flushBuffer(this.nonSelectedHandler);
+            this.elementBuffer.flushBuffer(this.nonSelectedHandler, false);
 
             return;
 
@@ -970,6 +970,93 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
         this.markupBlocks[this.markupLevel] = ++this.markupBlockIndex;
 
         this.selectedHandler.handleOpenElementEnd(buffer, nameOffset, nameLen, line, col);
+        unmarkCurrentSelection();
+
+    }
+
+
+
+    @Override
+    public void handleAutoOpenElementStart(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
+            throws ParseException {
+
+        if (!this.insideAllSelectorMatchingBlock) {
+            // We are not in a matching block, so let's put this element into the buffer just in case it matches
+            this.elementBuffer.bufferElementStart(buffer, nameOffset, nameLen, line, col, false, false);
+            return;
+        }
+
+        markCurrentSelection();
+        this.selectedHandler.handleAutoOpenElementStart(buffer, nameOffset, nameLen, line, col);
+
+    }
+
+
+
+    @Override
+    public void handleAutoOpenElementEnd(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
+            throws ParseException {
+
+        if (!this.insideAllSelectorMatchingBlock) {
+
+            this.elementBuffer.bufferElementEnd(buffer, nameOffset, nameLen, line, col);
+
+            this.someSelectorsMatch = false;
+            for (int i = 0; i < this.selectorsLen; i++) {
+                if (this.matchingMarkupLevelsPerSelector[i] > this.markupLevel) {
+                    this.selectorMatches[i] =
+                            this.selectorFilters[i].matchOpenElement(true, this.markupLevel, this.markupBlocks[this.markupLevel], this.elementBuffer);
+                    if (this.selectorMatches[i]) {
+                        this.someSelectorsMatch = true;
+                        this.matchingMarkupLevelsPerSelector[i] = this.markupLevel;
+                    }
+                } else {
+                    this.selectorMatches[i] = true;
+                    this.someSelectorsMatch = true;
+                }
+            }
+
+            if (this.someSelectorsMatch) {
+
+                // Given we are opening a new markup level, we must update this flag (if required)
+                updateInsideAllSelectorMatchingBlockFlag();
+
+                this.markupLevel++;
+
+                checkSizeOfMarkupBlocksStructure(this.markupLevel);
+                this.markupBlocks[this.markupLevel] = ++this.markupBlockIndex;
+
+                markCurrentSelection();
+                this.elementBuffer.flushBuffer(this.selectedHandler, true);
+                unmarkCurrentSelection();
+
+                return;
+
+            }
+
+            this.markupLevel++;
+
+            checkSizeOfMarkupBlocksStructure(this.markupLevel);
+            this.markupBlocks[this.markupLevel] = ++this.markupBlockIndex;
+
+            this.elementBuffer.flushBuffer(this.nonSelectedHandler, true);
+
+            return;
+
+        }
+
+        this.markupLevel++;
+
+        checkSizeOfMarkupBlocksStructure(this.markupLevel);
+        this.markupBlocks[this.markupLevel] = ++this.markupBlockIndex;
+
+        this.selectedHandler.handleAutoOpenElementEnd(buffer, nameOffset, nameLen, line, col);
         unmarkCurrentSelection();
 
     }

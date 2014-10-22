@@ -685,12 +685,12 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
 
         if (this.someSelectorsMatch) {
             markCurrentSelection();
-            this.elementBuffer.flushBuffer(this.selectedHandler);
+            this.elementBuffer.flushBuffer(this.selectedHandler, false);
             unmarkCurrentSelection();
             return;
         }
 
-        this.elementBuffer.flushBuffer(this.nonSelectedHandler);
+        this.elementBuffer.flushBuffer(this.nonSelectedHandler, false);
 
     }
 
@@ -735,12 +735,62 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
 
         if (this.someSelectorsMatch) {
             markCurrentSelection();
-            this.elementBuffer.flushBuffer(this.selectedHandler);
+            this.elementBuffer.flushBuffer(this.selectedHandler, false);
             unmarkCurrentSelection();
             return;
         }
 
-        this.elementBuffer.flushBuffer(this.nonSelectedHandler);
+        this.elementBuffer.flushBuffer(this.nonSelectedHandler, false);
+
+    }
+
+
+
+    @Override
+    public void handleAutoOpenElementStart(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
+            throws ParseException {
+
+        this.elementBuffer.bufferElementStart(buffer, nameOffset, nameLen, line, col, false, false);
+
+    }
+
+
+
+    @Override
+    public void handleAutoOpenElementEnd(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
+            throws ParseException {
+
+        this.elementBuffer.bufferElementEnd(buffer, nameOffset, nameLen, line, col);
+
+        this.someSelectorsMatch = false;
+        for (int i = 0; i < this.selectorsLen; i++) {
+            this.selectorMatches[i] =
+                    this.selectorFilters[i].matchOpenElement(false, this.markupLevel, this.markupBlocks[this.markupLevel], this.elementBuffer);
+            if (this.selectorMatches[i]) {
+                this.someSelectorsMatch = true;
+                addMatchingMarkupLevel(i, this.markupLevel);
+            }
+        }
+
+        this.markupLevel++;
+
+        checkSizeOfMarkupBlocksStructure(this.markupLevel);
+        this.markupBlocks[this.markupLevel] = ++this.markupBlockIndex;
+
+        if (this.someSelectorsMatch) {
+            markCurrentSelection();
+            this.elementBuffer.flushBuffer(this.selectedHandler, true);
+            unmarkCurrentSelection();
+            return;
+        }
+
+        this.elementBuffer.flushBuffer(this.nonSelectedHandler, true);
 
     }
 

@@ -381,6 +381,47 @@ public class PrettyHtmlMarkupHandler extends AbstractMarkupHandler {
 
     }
 
+
+
+
+    @Override
+    public void handleAutoOpenElementStart(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
+            throws ParseException {
+
+        try {
+
+            openStyle(STYLE_ELEMENT_AUTO);
+            this.writer.write(OPEN_TAG_START);
+            this.writer.write(buffer, nameOffset, nameLen);
+
+        } catch (final Exception e) {
+            throw new ParseException(e);
+        }
+
+    }
+
+
+    @Override
+    public void handleAutoOpenElementEnd(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
+            throws ParseException {
+
+        try {
+
+            this.writer.write(OPEN_TAG_END);
+            closeStyle();
+
+        } catch (final Exception e) {
+            throw new ParseException(e);
+        }
+
+    }
+
     
     
     

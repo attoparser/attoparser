@@ -328,11 +328,14 @@ final class SelectorElementBuffer {
 
 
 
-    void flushBuffer(final IMarkupHandler handler) throws ParseException {
+    void flushBuffer(final IMarkupHandler handler, final boolean autoOpen) throws ParseException {
 
         if (this.standalone) {
             handler.handleStandaloneElementStart(
                     this.elementName, 0, this.elementNameLen, this.minimized, this.elementNameLine, this.elementNameCol);
+        } else if (autoOpen) {
+            handler.handleAutoOpenElementStart(
+                    this.elementName, 0, this.elementNameLen, this.elementNameLine, this.elementNameCol);
         } else {
             handler.handleOpenElementStart(
                     this.elementName, 0, this.elementNameLen, this.elementNameLine, this.elementNameCol);
@@ -370,6 +373,9 @@ final class SelectorElementBuffer {
         if (this.standalone) {
             handler.handleStandaloneElementEnd(
                     this.elementName, 0, this.elementNameLen, this.minimized, this.elementEndLine, this.elementEndCol);
+        } else if (autoOpen) {
+            handler.handleAutoOpenElementEnd(
+                    this.elementName, 0, this.elementNameLen, this.elementEndLine, this.elementEndCol);
         } else {
             handler.handleOpenElementEnd(
                     this.elementName, 0, this.elementNameLen, this.elementEndLine, this.elementEndCol);

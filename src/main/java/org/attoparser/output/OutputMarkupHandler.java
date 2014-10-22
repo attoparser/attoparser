@@ -171,9 +171,10 @@ public final class OutputMarkupHandler extends AbstractMarkupHandler {
 
 
     @Override
-    public void handleOpenElementStart(final char[] buffer, final int offset, final int len, final int line,
-            final int col) throws ParseException {
-        
+    public void handleOpenElementStart(
+            final char[] buffer, final int offset, final int len,
+            final int line, final int col) throws ParseException {
+
         try {
             this.writer.write('<');
             this.writer.write(buffer, offset, len);
@@ -190,13 +191,33 @@ public final class OutputMarkupHandler extends AbstractMarkupHandler {
     public void handleOpenElementEnd(
             final char[] buffer, final int offset, final int len,
             final int line, final int col) throws ParseException {
-        
+
         try {
             this.writer.write('>');
         } catch (final Exception e) {
             throw new ParseException(e);
         }
 
+    }
+
+
+
+
+    @Override
+    public void handleAutoOpenElementStart(
+            final char[] buffer, final int offset, final int len,
+            final int line, final int col) throws ParseException {
+        // Nothing to be done... balanced elements were not present at the original template!
+    }
+
+
+
+
+    @Override
+    public void handleAutoOpenElementEnd(
+            final char[] buffer, final int offset, final int len,
+            final int line, final int col) throws ParseException {
+        // Nothing to be done... balanced elements were not present at the original template!
     }
 
 

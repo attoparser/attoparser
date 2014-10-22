@@ -53,6 +53,7 @@ public class MarkupParserTest extends TestCase {
         
         final ParseConfiguration noRestrictions = ParseConfiguration.xmlConfiguration();
         noRestrictions.setElementBalancing(ElementBalancing.NO_BALANCING);
+        noRestrictions.setNoUnmatchedCloseElementsRequired(false);
         noRestrictions.setUniqueAttributesInElementRequired(false);
         noRestrictions.setXmlWellFormedAttributeValuesRequired(false);
         noRestrictions.setUniqueRootElementPresence(UniqueRootElementPresence.NOT_VALIDATED);
@@ -65,9 +66,13 @@ public class MarkupParserTest extends TestCase {
         
         final ParseConfiguration noRestrictionsAutoClose = noRestrictions.clone();
         noRestrictionsAutoClose.setElementBalancing(ElementBalancing.AUTO_CLOSE);
-        
+
+        final ParseConfiguration noRestrictionsAutoOpenClose = noRestrictions.clone();
+        noRestrictionsAutoOpenClose.setElementBalancing(ElementBalancing.AUTO_OPEN_CLOSE);
+
         final ParseConfiguration noUnbalacedClosed = noRestrictions.clone();
-        noUnbalacedClosed.setElementBalancing(ElementBalancing.AUTO_CLOSE_REQUIRE_NO_UNMATCHED_CLOSE);
+        noUnbalacedClosed.setElementBalancing(ElementBalancing.AUTO_CLOSE);
+        noUnbalacedClosed.setNoUnmatchedCloseElementsRequired(true);
         
         final ParseConfiguration wellFormedXml = noRestrictions.clone();
         wellFormedXml.setElementBalancing(ElementBalancing.REQUIRE_BALANCED);
@@ -112,9 +117,85 @@ public class MarkupParserTest extends TestCase {
 
 
         testHtmlDoc(
+            "<table><tr>",
+            "[OES(table){1,1}OEE(table){1,7}AOES(tbody){1,8}AOEE(tbody){1,8}OES(tr){1,8}OEE(tr){1,11}ACES(tr){1,12}ACEE(tr){1,12}ACES(tbody){1,12}ACEE(tbody){1,12}ACES(table){1,12}ACEE(table){1,12}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<tr>",
+            "[AOES(tbody){1,1}AOEE(tbody){1,1}OES(tr){1,1}OEE(tr){1,4}ACES(tr){1,5}ACEE(tr){1,5}ACES(tbody){1,5}ACEE(tbody){1,5}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<table><tfoot><tr>",
+            "[OES(table){1,1}OEE(table){1,7}OES(tfoot){1,8}OEE(tfoot){1,14}OES(tr){1,15}OEE(tr){1,18}ACES(tr){1,19}ACEE(tr){1,19}ACES(tfoot){1,19}ACEE(tfoot){1,19}ACES(table){1,19}ACEE(table){1,19}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<table><thead><tr>",
+            "[OES(table){1,1}OEE(table){1,7}OES(thead){1,8}OEE(thead){1,14}OES(tr){1,15}OEE(tr){1,18}ACES(tr){1,19}ACEE(tr){1,19}ACES(thead){1,19}ACEE(thead){1,19}ACES(table){1,19}ACEE(table){1,19}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
             "<table><tr><td><tr>",
             "[OES(table){1,1}OEE(table){1,7}OES(tr){1,8}OEE(tr){1,11}OES(td){1,12}OEE(td){1,15}ACES(td){1,16}ACEE(td){1,16}ACES(tr){1,16}ACEE(tr){1,16}OES(tr){1,16}OEE(tr){1,19}ACES(tr){1,20}ACEE(tr){1,20}ACES(table){1,20}ACEE(table){1,20}]",
             noRestrictionsAutoClose);
+        testHtmlDoc(
+            "<table><col>",
+            "[OES(table){1,1}OEE(table){1,7}AOES(colgroup){1,8}AOEE(colgroup){1,8}NSES(col){1,8}NSEE(col){1,12}ACES(colgroup){1,13}ACEE(colgroup){1,13}ACES(table){1,13}ACEE(table){1,13}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<table><thead><td><col>",
+            "[OES(table){1,1}OEE(table){1,7}OES(thead){1,8}OEE(thead){1,14}OES(td){1,15}OEE(td){1,18}ACES(td){1,19}ACEE(td){1,19}ACES(thead){1,19}ACEE(thead){1,19}AOES(colgroup){1,19}AOEE(colgroup){1,19}NSES(col){1,19}NSEE(col){1,23}ACES(colgroup){1,24}ACEE(colgroup){1,24}ACES(table){1,24}ACEE(table){1,24}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<meta>",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}NSES(meta){1,1}NSEE(meta){1,6}ACES(head){1,7}ACEE(head){1,7}ACES(html){1,7}ACEE(html){1,7}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<html><meta>",
+            "[OES(html){1,1}OEE(html){1,6}AOES(head){1,7}AOEE(head){1,7}NSES(meta){1,7}NSEE(meta){1,12}ACES(head){1,13}ACEE(head){1,13}ACES(html){1,13}ACEE(html){1,13}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<head><meta>",
+            "[OES(head){1,1}OEE(head){1,6}NSES(meta){1,7}NSEE(meta){1,12}ACES(head){1,13}ACEE(head){1,13}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<body><meta>",
+            "[OES(body){1,1}OEE(body){1,6}NSES(meta){1,7}NSEE(meta){1,12}ACES(body){1,13}ACEE(body){1,13}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<title>",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}OES(title){1,1}OEE(title){1,7}ACES(title){1,8}ACEE(title){1,8}ACES(head){1,8}ACEE(head){1,8}ACES(html){1,8}ACEE(html){1,8}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<head><title>",
+            "[OES(head){1,1}OEE(head){1,6}OES(title){1,7}OEE(title){1,13}ACES(title){1,14}ACEE(title){1,14}ACES(head){1,14}ACEE(head){1,14}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<html><title>",
+            "[OES(html){1,1}OEE(html){1,6}AOES(head){1,7}AOEE(head){1,7}OES(title){1,7}OEE(title){1,13}ACES(title){1,14}ACEE(title){1,14}ACES(head){1,14}ACEE(head){1,14}ACES(html){1,14}ACEE(html){1,14}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<body><title>",
+            "[OES(body){1,1}OEE(body){1,6}OES(title){1,7}OEE(title){1,13}ACES(title){1,14}ACEE(title){1,14}ACES(body){1,14}ACEE(body){1,14}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<div><div><title>",
+            "[OES(div){1,1}OEE(div){1,5}OES(div){1,6}OEE(div){1,10}OES(title){1,11}OEE(title){1,17}ACES(title){1,18}ACEE(title){1,18}ACES(div){1,18}ACEE(div){1,18}ACES(div){1,18}ACEE(div){1,18}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<html><object>",
+            "[OES(html){1,1}OEE(html){1,6}AOES(head){1,7}AOEE(head){1,7}OES(object){1,7}OEE(object){1,14}ACES(object){1,15}ACEE(object){1,15}ACES(head){1,15}ACEE(head){1,15}ACES(html){1,15}ACEE(html){1,15}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<body><object>",
+            "[OES(body){1,1}OEE(body){1,6}OES(object){1,7}OEE(object){1,14}ACES(object){1,15}ACEE(object){1,15}ACES(body){1,15}ACEE(body){1,15}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<template> if (a < 0) { do this} </template>",
+            "[OES(template){1,1}OEE(template){1,10}T( if (a < 0) { do this} ){1,11}CES(template){1,34}CEE(template){1,44}]",
+            noRestrictionsAutoClose);
+        testHtmlDoc(
+            "<template> if (a < 0) { do this} </template>",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}OES(template){1,1}OEE(template){1,10}T( if (a < 0) { do this} ){1,11}CES(template){1,34}CEE(template){1,44}ACES(head){1,45}ACEE(head){1,45}ACES(html){1,45}ACEE(html){1,45}]",
+            noRestrictionsAutoOpenClose);
         testHtmlDoc(
             "<table><tr><th><tr>",
             "[OES(table){1,1}OEE(table){1,7}OES(tr){1,8}OEE(tr){1,11}OES(th){1,12}OEE(th){1,15}ACES(th){1,16}ACEE(th){1,16}ACES(tr){1,16}ACEE(tr){1,16}OES(tr){1,16}OEE(tr){1,19}ACES(tr){1,20}ACEE(tr){1,20}ACES(table){1,20}ACEE(table){1,20}]",

@@ -59,48 +59,51 @@ final class HtmlElements {
     
     // Document metadata
     static final HtmlElement HEAD = new HtmlElement("head");
-    static final HtmlElement TITLE = new HtmlElement("title");
-    static final HtmlElement BASE = new HtmlVoidElement("base");
-    static final HtmlElement LINK = new HtmlVoidElement("link");
-    static final HtmlElement META = new HtmlVoidElement("meta");
-    static final HtmlElement STYLE = new HtmlCDATAContentElement("style");
+    static final HtmlElement TITLE = new HtmlAutoOpenElement("title", new String[] { "html", "head" }, null);
+    static final HtmlElement BASE = new HtmlVoidAutoOpenElement("base", new String[] { "html", "head" }, null);
+    static final HtmlElement LINK = new HtmlVoidAutoOpenElement("link", new String[] { "html", "head" }, null);
+    static final HtmlElement META = new HtmlVoidAutoOpenElement("meta", new String[] { "html", "head" }, null);
+    static final HtmlElement STYLE = new HtmlAutoOpenCDATAContentElement("style", new String[] { "html", "head" }, null);
     
     // Scripting
-    static final HtmlElement SCRIPT = new HtmlCDATAContentElement("script");
+    static final HtmlElement SCRIPT = new HtmlAutoOpenCDATAContentElement("script", new String[] { "html", "head" }, null);
     static final HtmlElement NOSCRIPT = new HtmlElement("noscript");
-    
+
+    // Templating
+    static final HtmlElement TEMPLATE = new HtmlAutoOpenCDATAContentElement("template", new String[] { "html", "head" }, null);
+
     // Sections
     static final HtmlElement BODY = new HtmlElement("body");
-    static final HtmlElement ARTICLE = new HtmlAutoCloserElement("article", new String[] { "p" }, null);
-    static final HtmlElement SECTION = new HtmlAutoCloserElement("section", new String[] { "p" }, null);
-    static final HtmlElement NAV = new HtmlAutoCloserElement("nav", new String[] { "p" }, null);
-    static final HtmlElement ASIDE = new HtmlAutoCloserElement("aside", new String[] { "p" }, null);
-    static final HtmlElement H1 = new HtmlAutoCloserElement("h1", new String[] { "p" }, null);
-    static final HtmlElement H2 = new HtmlAutoCloserElement("h2", new String[] { "p" }, null);
-    static final HtmlElement H3 = new HtmlAutoCloserElement("h3", new String[] { "p" }, null);
-    static final HtmlElement H4 = new HtmlAutoCloserElement("h4", new String[] { "p" }, null);
-    static final HtmlElement H5 = new HtmlAutoCloserElement("h5", new String[] { "p" }, null);
-    static final HtmlElement H6 = new HtmlAutoCloserElement("h6", new String[] { "p" }, null);
-    static final HtmlElement HGROUP = new HtmlAutoCloserElement("hgroup", new String[] { "p" }, null);
-    static final HtmlElement HEADER = new HtmlAutoCloserElement("header", new String[] { "p" }, null);
-    static final HtmlElement FOOTER = new HtmlAutoCloserElement("footer", new String[] { "p" }, null);
-    static final HtmlElement ADDRESS = new HtmlAutoCloserElement("address", new String[] { "p" }, null);
-    static final HtmlElement MAIN = new HtmlAutoCloserElement("main", new String[] { "p" }, null);
+    static final HtmlElement ARTICLE = new HtmlAutoCloseElement("article", new String[] { "p" }, null);
+    static final HtmlElement SECTION = new HtmlAutoCloseElement("section", new String[] { "p" }, null);
+    static final HtmlElement NAV = new HtmlAutoCloseElement("nav", new String[] { "p" }, null);
+    static final HtmlElement ASIDE = new HtmlAutoCloseElement("aside", new String[] { "p" }, null);
+    static final HtmlElement H1 = new HtmlAutoCloseElement("h1", new String[] { "p" }, null);
+    static final HtmlElement H2 = new HtmlAutoCloseElement("h2", new String[] { "p" }, null);
+    static final HtmlElement H3 = new HtmlAutoCloseElement("h3", new String[] { "p" }, null);
+    static final HtmlElement H4 = new HtmlAutoCloseElement("h4", new String[] { "p" }, null);
+    static final HtmlElement H5 = new HtmlAutoCloseElement("h5", new String[] { "p" }, null);
+    static final HtmlElement H6 = new HtmlAutoCloseElement("h6", new String[] { "p" }, null);
+    static final HtmlElement HGROUP = new HtmlAutoCloseElement("hgroup", new String[] { "p" }, null);
+    static final HtmlElement HEADER = new HtmlAutoCloseElement("header", new String[] { "p" }, null);
+    static final HtmlElement FOOTER = new HtmlAutoCloseElement("footer", new String[] { "p" }, null);
+    static final HtmlElement ADDRESS = new HtmlAutoCloseElement("address", new String[] { "p" }, null);
+    static final HtmlElement MAIN = new HtmlAutoCloseElement("main", new String[] { "p" }, null);
 
     // Grouping content
-    static final HtmlElement P = new HtmlAutoCloserElement("p", new String[] { "p" }, null);
-    static final HtmlElement HR = new HtmlVoidAutoCloserElement("hr", new String[] { "p" }, null);
-    static final HtmlElement PRE = new HtmlAutoCloserElement("pre", new String[] { "p" }, null);
-    static final HtmlElement BLOCKQUOTE = new HtmlAutoCloserElement("blockquote", new String[] { "p" }, null);
-    static final HtmlElement OL = new HtmlAutoCloserElement("ol", new String[] { "p" }, null);
-    static final HtmlElement UL = new HtmlAutoCloserElement("ul", new String[] { "p" }, null);
-    static final HtmlElement LI = new HtmlAutoCloserElement("li", new String[] { "li" }, new String[] { "ul", "ol" });
-    static final HtmlElement DL = new HtmlAutoCloserElement("dl", new String[] { "p" }, null);
-    static final HtmlElement DT = new HtmlAutoCloserElement("dt", new String[] { "dt", "dd" }, new String[] { "dl" });
-    static final HtmlElement DD = new HtmlAutoCloserElement("dd", new String[] { "dt", "dd" }, new String[] { "dl" });
+    static final HtmlElement P = new HtmlAutoCloseElement("p", new String[] { "p" }, null);
+    static final HtmlElement HR = new HtmlVoidAutoCloseElement("hr", new String[] { "p" }, null);
+    static final HtmlElement PRE = new HtmlAutoCloseElement("pre", new String[] { "p" }, null);
+    static final HtmlElement BLOCKQUOTE = new HtmlAutoCloseElement("blockquote", new String[] { "p" }, null);
+    static final HtmlElement OL = new HtmlAutoCloseElement("ol", new String[] { "p" }, null);
+    static final HtmlElement UL = new HtmlAutoCloseElement("ul", new String[] { "p" }, null);
+    static final HtmlElement LI = new HtmlAutoCloseElement("li", new String[] { "li" }, new String[] { "ul", "ol" });
+    static final HtmlElement DL = new HtmlAutoCloseElement("dl", new String[] { "p" }, null);
+    static final HtmlElement DT = new HtmlAutoCloseElement("dt", new String[] { "dt", "dd" }, new String[] { "dl" });
+    static final HtmlElement DD = new HtmlAutoCloseElement("dd", new String[] { "dt", "dd" }, new String[] { "dl" });
     static final HtmlElement FIGURE = new HtmlElement("figure");
     static final HtmlElement FIGCAPTION = new HtmlElement("figcaption");
-    static final HtmlElement DIV = new HtmlAutoCloserElement("div", new String[] { "p" }, null);
+    static final HtmlElement DIV = new HtmlAutoCloseElement("div", new String[] { "p" }, null);
     
     // Text-level semantics
     static final HtmlElement A = new HtmlElement("a");
@@ -124,10 +127,10 @@ final class HtmlElements {
     static final HtmlElement U = new HtmlElement("u");
     static final HtmlElement MARK = new HtmlElement("mark");
     static final HtmlElement RUBY = new HtmlElement("ruby");
-    static final HtmlElement RB = new HtmlAutoCloserElement("rb", new String[] { "rb", "rt", "rtc", "rp" }, new String[] { "ruby" });
-    static final HtmlElement RT = new HtmlAutoCloserElement("rt", new String[] { "rb", "rt", "rp" }, new String[] { "ruby", "rtc" });
-    static final HtmlElement RTC = new HtmlAutoCloserElement("rtc", new String[] { "rb", "rt", "rtc", "rp" }, new String[] { "ruby" });
-    static final HtmlElement RP = new HtmlAutoCloserElement("rp", new String[] { "rb", "rt", "rp" }, new String[] { "ruby", "rtc" });
+    static final HtmlElement RB = new HtmlAutoCloseElement("rb", new String[] { "rb", "rt", "rtc", "rp" }, new String[] { "ruby" });
+    static final HtmlElement RT = new HtmlAutoCloseElement("rt", new String[] { "rb", "rt", "rp" }, new String[] { "ruby", "rtc" });
+    static final HtmlElement RTC = new HtmlAutoCloseElement("rtc", new String[] { "rb", "rt", "rtc", "rp" }, new String[] { "ruby" });
+    static final HtmlElement RP = new HtmlAutoCloseElement("rp", new String[] { "rb", "rt", "rp" }, new String[] { "ruby", "rtc" });
     static final HtmlElement BDI = new HtmlElement("bdi");
     static final HtmlElement BDO = new HtmlElement("bdo");
     static final HtmlElement SPAN = new HtmlElement("span");
@@ -142,7 +145,7 @@ final class HtmlElements {
     static final HtmlElement IMG = new HtmlVoidElement("img");
     static final HtmlElement IFRAME = new HtmlElement("iframe");
     static final HtmlElement EMBED = new HtmlVoidElement("embed");
-    static final HtmlElement OBJECT = new HtmlElement("object");
+    static final HtmlElement OBJECT = new HtmlAutoOpenElement("object", new String[] { "html", "head" }, null);
     static final HtmlElement PARAM = new HtmlVoidElement("param");
     static final HtmlElement VIDEO = new HtmlElement("video");
     static final HtmlElement AUDIO = new HtmlElement("audio");
@@ -153,28 +156,28 @@ final class HtmlElements {
     static final HtmlElement AREA = new HtmlVoidElement("area");
     
     // Tabular data
-    static final HtmlElement TABLE = new HtmlAutoCloserElement("table", new String[] { "p" }, null);
-    static final HtmlElement CAPTION = new HtmlAutoCloserElement("caption", new String[] { "tr", "td", "th", "thead", "tfoot", "tbody", "caption", "colgroup" }, new String[] { "table" });
-    static final HtmlElement COLGROUP = new HtmlAutoCloserElement("colgroup", new String[] { "tr", "td", "th", "thead", "tfoot", "tbody", "caption", "colgroup" }, new String[] { "table" });
-    static final HtmlElement COL = new HtmlVoidElement("col");
-    static final HtmlElement TBODY = new HtmlAutoCloserElement("tbody", new String[] { "tr", "td", "th", "thead", "tfoot", "tbody", "caption", "colgroup" }, new String[] { "table" });
-    static final HtmlElement THEAD = new HtmlAutoCloserElement("thead", new String[] { "tr", "td", "th", "thead", "tfoot", "tbody", "caption", "colgroup" }, new String[] { "table" });
-    static final HtmlElement TFOOT = new HtmlAutoCloserElement("tfoot", new String[] { "tr", "td", "th", "thead", "tfoot", "tbody", "caption", "colgroup" }, new String[] { "table" });
-    static final HtmlElement TR = new HtmlAutoCloserElement("tr", new String[] { "tr", "td", "th", "caption", "colgroup" }, new String[] { "table", "thead", "tbody", "tfoot" });
-    static final HtmlElement TD = new HtmlAutoCloserElement("td", new String[] { "td", "th" }, new String[] { "tr" });
-    static final HtmlElement TH = new HtmlAutoCloserElement("th", new String[] { "td", "th" }, new String[] { "tr" });
+    static final HtmlElement TABLE = new HtmlAutoCloseElement("table", new String[] { "p" }, null);
+    static final HtmlElement CAPTION = new HtmlAutoCloseElement("caption", new String[] { "tr", "td", "th", "thead", "tfoot", "tbody", "caption", "colgroup" }, new String[] { "table" });
+    static final HtmlElement COLGROUP = new HtmlAutoCloseElement("colgroup", new String[] { "tr", "td", "th", "thead", "tfoot", "tbody", "caption", "colgroup" }, new String[] { "table" });
+    static final HtmlElement COL = new HtmlVoidAutoOpenCloseElement("col", new String[] { "colgroup" }, new String[] { "colgroup" }, new String[] { "tr", "td", "th", "thead", "tfoot", "tbody", "caption", "colgroup" }, new String[] { "table" });
+    static final HtmlElement TBODY = new HtmlAutoCloseElement("tbody", new String[] { "tr", "td", "th", "thead", "tfoot", "tbody", "caption", "colgroup" }, new String[] { "table" });
+    static final HtmlElement THEAD = new HtmlAutoCloseElement("thead", new String[] { "tr", "td", "th", "thead", "tfoot", "tbody", "caption", "colgroup" }, new String[] { "table" });
+    static final HtmlElement TFOOT = new HtmlAutoCloseElement("tfoot", new String[] { "tr", "td", "th", "thead", "tfoot", "tbody", "caption", "colgroup" }, new String[] { "table" });
+    static final HtmlElement TR = new HtmlAutoOpenCloseElement("tr", new String[] { "tbody" }, new String[] { "thead", "tfoot", "tbody" }, new String[] { "tr", "td", "th", "caption", "colgroup" }, new String[] { "table", "thead", "tbody", "tfoot" });
+    static final HtmlElement TD = new HtmlAutoCloseElement("td", new String[] { "td", "th" }, new String[] { "tr" });
+    static final HtmlElement TH = new HtmlAutoCloseElement("th", new String[] { "td", "th" }, new String[] { "tr" });
     
     // Forms
-    static final HtmlElement FORM = new HtmlAutoCloserElement("form", new String[] { "p" }, null);
-    static final HtmlElement FIELDSET = new HtmlAutoCloserElement("fieldset", new String[] { "p" }, null);
+    static final HtmlElement FORM = new HtmlAutoCloseElement("form", new String[] { "p" }, null);
+    static final HtmlElement FIELDSET = new HtmlAutoCloseElement("fieldset", new String[] { "p" }, null);
     static final HtmlElement LEGEND = new HtmlElement("legend");
     static final HtmlElement LABEL = new HtmlElement("label");
     static final HtmlElement INPUT = new HtmlVoidElement("input");
     static final HtmlElement BUTTON = new HtmlElement("button");
     static final HtmlElement SELECT = new HtmlElement("select");
     static final HtmlElement DATALIST = new HtmlElement("datalist");
-    static final HtmlElement OPTGROUP = new HtmlAutoCloserElement("optgroup", new String[] { "optgroup", "option" }, new String[] { "select" });
-    static final HtmlElement OPTION = new HtmlAutoCloserElement("option", new String[] { "option" }, new String[] { "select", "optgroup", "datalist" });
+    static final HtmlElement OPTGROUP = new HtmlAutoCloseElement("optgroup", new String[] { "optgroup", "option" }, new String[] { "select" });
+    static final HtmlElement OPTION = new HtmlAutoCloseElement("option", new String[] { "option" }, new String[] { "select", "optgroup", "datalist" });
     static final HtmlElement TEXTAREA = new HtmlElement("textarea");
     static final HtmlElement KEYGEN = new HtmlVoidElement("keygen");
     static final HtmlElement OUTPUT = new HtmlElement("output");
@@ -185,7 +188,7 @@ final class HtmlElements {
     static final HtmlElement DETAILS = new HtmlElement("details");
     static final HtmlElement SUMMARY = new HtmlElement("summary");
     static final HtmlElement COMMAND = new HtmlElement("command");
-    static final HtmlElement MENU = new HtmlAutoCloserElement("menu", new String[] { "p" }, null);
+    static final HtmlElement MENU = new HtmlAutoCloseElement("menu", new String[] { "p" }, null);
     static final HtmlElement MENUITEM = new HtmlVoidElement("menuitem");
     static final HtmlElement DIALOG = new HtmlElement("dialog");
     
@@ -196,7 +199,7 @@ final class HtmlElements {
         ALL_STANDARD_ELEMENTS =
                 Collections.unmodifiableSet(new LinkedHashSet<HtmlElement>(Arrays.asList(
                         new HtmlElement[] {
-                                HTML, HEAD, TITLE, BASE, LINK, META, STYLE, SCRIPT, NOSCRIPT, BODY, ARTICLE,
+                                HTML, HEAD, TITLE, BASE, LINK, META, STYLE, SCRIPT, NOSCRIPT, TEMPLATE, BODY, ARTICLE,
                                 SECTION, NAV, ASIDE, H1, H2, H3, H4, H5, H6, HGROUP, HEADER, FOOTER,
                                 ADDRESS, P, HR, PRE, BLOCKQUOTE, OL, UL, LI, DL, DT, DD, FIGURE,
                                 FIGCAPTION, DIV, A, EM, STRONG, SMALL, S, CITE, G, DFN, ABBR, TIME,

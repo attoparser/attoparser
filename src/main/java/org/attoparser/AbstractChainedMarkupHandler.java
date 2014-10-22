@@ -230,6 +230,24 @@ public abstract class AbstractChainedMarkupHandler
     }
 
 
+
+    public void handleAutoOpenElementStart(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
+            throws ParseException {
+        this.next.handleAutoOpenElementStart(buffer, nameOffset, nameLen, line, col);
+    }
+
+    public void handleAutoOpenElementEnd(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
+            throws ParseException {
+        this.next.handleAutoOpenElementEnd(buffer, nameOffset, nameLen, line, col);
+    }
+
+
     
     public void handleCloseElementStart(
             final char[] buffer,

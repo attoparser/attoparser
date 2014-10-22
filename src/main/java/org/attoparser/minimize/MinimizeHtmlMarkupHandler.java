@@ -457,8 +457,9 @@ public final class MinimizeHtmlMarkupHandler extends AbstractChainedMarkupHandle
 
 
     @Override
-    public void handleOpenElementStart(final char[] buffer, final int nameOffset, final int nameLen, final int line,
-            final int col) throws ParseException {
+    public void handleOpenElementStart(
+            final char[] buffer, final int nameOffset, final int nameLen,
+            final int line, final int col) throws ParseException {
 
         this.lastTextEndedInWhiteSpace = false;
 
@@ -489,6 +490,46 @@ public final class MinimizeHtmlMarkupHandler extends AbstractChainedMarkupHandle
         this.lastVisibleEventWasElement = true;
 
         getNext().handleOpenElementEnd(buffer, nameOffset, nameLen, line, col);
+
+    }
+
+
+
+
+    @Override
+    public void handleAutoOpenElementStart(
+            final char[] buffer, final int nameOffset, final int nameLen,
+            final int line, final int col) throws ParseException {
+
+        this.lastTextEndedInWhiteSpace = false;
+
+        // Check whether the inter-block element whitespace should be written or simply ignored
+        final boolean ignorePendingWhiteSpace =
+                ((this.lastClosedElementWasBlock || this.lastOpenElementWasBlock) && isBlockElement(buffer, nameOffset, nameLen));
+        flushPendingInterBlockElementWhiteSpace(ignorePendingWhiteSpace);
+
+        if (isPreformattedElement(buffer, nameOffset, nameLen)) {
+            this.inPreformattedElement = true;
+        }
+
+        getNext().handleAutoOpenElementStart(buffer, nameOffset, nameLen, line, col);
+
+    }
+
+
+
+
+    @Override
+    public void handleAutoOpenElementEnd(
+            final char[] buffer, final int nameOffset, final int nameLen,
+            final int line, final int col) throws ParseException {
+
+        this.lastTextEndedInWhiteSpace = false;
+        this.lastOpenElementWasBlock = isBlockElement(buffer, nameOffset, nameLen);
+        this.lastClosedElementWasBlock = false;
+        this.lastVisibleEventWasElement = true;
+
+        getNext().handleAutoOpenElementEnd(buffer, nameOffset, nameLen, line, col);
 
     }
 

@@ -131,6 +131,15 @@ public abstract class AbstractSimpleMarkupHandler implements ISimpleMarkupHandle
 
 
 
+    public void handleAutoOpenElement(
+            final String elementName, final Map<String, String> attributes,
+            final int line, final int col)
+            throws ParseException {
+        // Nothing to be done here, meant to be overridden if required
+    }
+
+
+
     public void handleCloseElement(
             final String elementName,
             final int line, final int col)

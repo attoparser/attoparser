@@ -107,6 +107,34 @@ class HtmlElement {
     }
 
 
+
+
+    public void handleAutoOpenElementStart(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col,
+            final IMarkupHandler handler,
+            final ParseStatus status)
+            throws ParseException {
+
+        handler.handleAutoOpenElementStart(buffer, nameOffset, nameLen, line, col);
+
+    }
+
+
+    public void handleAutoOpenElementEnd(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col,
+            final IMarkupHandler handler,
+            final ParseStatus status)
+            throws ParseException {
+
+        handler.handleAutoOpenElementEnd(buffer, nameOffset, nameLen, line, col);
+
+    }
+
+
     
     
     public void handleCloseElementStart(

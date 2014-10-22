@@ -249,6 +249,39 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
 
     }
 
+
+
+    @Override
+    public void handleAutoOpenElementStart(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
+            throws ParseException {
+
+        this.currentElement = HtmlElements.forName(buffer, nameOffset, nameLen);
+        this.currentElement.handleAutoOpenElementStart(buffer, nameOffset, nameLen, line, col, this.next, this.status);
+
+    }
+
+    @Override
+    public void handleAutoOpenElementEnd(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
+            throws ParseException {
+
+        if (this.currentElement == null) {
+            throw new IllegalStateException("Cannot end element: no current element");
+        }
+
+        final HtmlElement element = this.currentElement;
+        this.currentElement = null;
+
+        // Hoping for better days in which tail calls might be optimized ;)
+        element.handleAutoOpenElementEnd(buffer, nameOffset, nameLen, line, col, this.next, this.status);
+
+    }
+
     
     
     

@@ -21,49 +21,52 @@ package org.attoparser;
 
 
 /*
- * Specialization of HtmlElement for void HTML elements which also require some open
- * elements to be closed before they appear, as per the HTML specification.
- * For example, an <hr> element will force the auto-close of a previous <p> if
- * they are siblings.
+ * Specialization of HtmlElement for VOID HTML elements that might require some parent elements
+ * to be opened as their own parents, as per the HTML specification.
+ * For example, a <meta> element will force the auto-open of a <head> if not inside one (or
+ * inside any other element).
  * 
  * @author Daniel Fernandez
  * @since 2.0.0
- *
  */
-final class HtmlVoidAutoCloserElement extends HtmlVoidElement {
+class HtmlVoidAutoOpenElement extends HtmlVoidElement {
 
 
-    private final char[][] autoCloseRequired;
-    private final char[][] autoCloseLimits;
+    private final char[][] autoOpenParents;
+    private final char[][] autoOpenLimits;
 
 
-    HtmlVoidAutoCloserElement(final String name, final String[] autoCloseElements, final String[] autoCloseLimits) {
+    HtmlVoidAutoOpenElement(final String name,
+                            final String[] autoOpenParents, final String[] autoOpenLimits) {
 
         super(name);
 
-        if (autoCloseElements == null) {
-            throw new IllegalArgumentException("The array of auto-close elements cannot be null");
+        if (autoOpenParents == null) {
+            throw new IllegalArgumentException("The array of auto-open parents cannot be null");
         }
 
-        final char[][] autoCloseElementsCharArray = new char[autoCloseElements.length][];
-        for (int i = 0; i < autoCloseElementsCharArray.length; i++) {
-            autoCloseElementsCharArray[i] = autoCloseElements[i].toCharArray();
+        final char[][] autoOpenParentsCharArray = new char[autoOpenParents.length][];
+        for (int i = 0; i < autoOpenParentsCharArray.length; i++) {
+            autoOpenParentsCharArray[i] = autoOpenParents[i].toCharArray();
         }
 
-        final char[][] autoCloseLimitsCharArray;
-        if (autoCloseLimits != null) {
-            autoCloseLimitsCharArray = new char[autoCloseLimits.length][];
-            for (int i = 0; i < autoCloseLimitsCharArray.length; i++) {
-                autoCloseLimitsCharArray[i] = autoCloseLimits[i].toCharArray();
+        final char[][] autoOpenLimitsCharArray;
+        if (autoOpenLimits != null) {
+            autoOpenLimitsCharArray = new char[autoOpenLimits.length][];
+            for (int i = 0; i < autoOpenLimitsCharArray.length; i++) {
+                autoOpenLimitsCharArray[i] = autoOpenLimits[i].toCharArray();
             }
         } else {
-            autoCloseLimitsCharArray = null;
+            autoOpenLimitsCharArray = null;
         }
 
-        this.autoCloseRequired = autoCloseElementsCharArray;
-        this.autoCloseLimits = autoCloseLimitsCharArray;
+        this.autoOpenParents = autoOpenParentsCharArray;
+        this.autoOpenLimits = autoOpenLimitsCharArray;
 
     }
+
+
+
 
 
 
@@ -80,7 +83,7 @@ final class HtmlVoidAutoCloserElement extends HtmlVoidElement {
         status.setAvoidStacking(true);
 
         if (!status.isAutoOpenCloseDone()) {
-            status.setAutoCloseRequired(this.autoCloseRequired, this.autoCloseLimits);
+            status.setAutoOpenRequired(this.autoOpenParents, this.autoOpenLimits);
             return;
         }
 
@@ -103,7 +106,7 @@ final class HtmlVoidAutoCloserElement extends HtmlVoidElement {
         status.setAvoidStacking(true);
 
         if (!status.isAutoOpenCloseDone()) {
-            status.setAutoCloseRequired(this.autoCloseRequired, this.autoCloseLimits);
+            status.setAutoOpenRequired(this.autoOpenParents, this.autoOpenLimits);
             return;
         }
 
@@ -111,6 +114,5 @@ final class HtmlVoidAutoCloserElement extends HtmlVoidElement {
 
     }
 
-    
-    
+
 }

@@ -69,19 +69,37 @@ public final class ParseConfiguration implements Serializable, Cloneable {
      *   Enumeration representing the possible actions to be taken with regard to element balancing:
      * </p>
      * <ul>
-     *   <li>Require that elements are already correctly balanced in markup.</li>
-     *   <li>Auto-close elements if needed, reporting (as events) unmatched close elements if they appear.</li>
-     *   <li>Auto-close elements if needed, not allowing unmatched close elements.</li>
-     *   <li>No auto-close, not allow unmatched close elements.</li>
-     *   <li>Do not perform element balancing checks at all.</li>
+     *   <li>{@link #NO_BALANCING}: Do not perform element balancing checks at all. Events will be
+     *       reported as they appear. There is no guarantee that a DOM tree can be built from the
+     *       fired events though.</li>
+     *   <li>{@link #REQUIRE_BALANCED}: Require that elements are already correctly balanced in markup,
+     *       throwing an exception if not. Note that when in HTML mode, this does not require the
+     *       specification of optional tags such as <tt>&lt;tbody&gt;</tt>. Also note that this
+     *       will automatically consider the
+     *       {@link #setNoUnmatchedCloseElementsRequired(boolean)} flag to be set to <tt>true</tt>.</li>
+     *   <li>{@link #AUTO_OPEN_CLOSE}: Auto open and close elements, which includes both those elements that,
+     *       according to the HTML spec (when in HTML mode) have optional start or end tags (see
+     *       <a href="http://www.w3.org/html/wg/drafts/html/master/syntax.html#optional-tags">http://www.w3.org/html/wg/drafts/html/master/syntax.html#optional-tags</a>)
+     *       and those that simply are unclosed at the moment a parent element needs to be closed (so their closing
+     *       is forced). As an example of optional tags, the HTML5 spec
+     *       establishes that &lt;html&gt;, &lt;body&gt; and &lt;tbody&gt; are optional, and
+     *       that an <tt>&lt;li&gt;</tt> will close any currently
+     *       open <tt>&lt;li&gt;</tt> elements. This is not really
+     *       <em>ill-formed code</em>, but something allowed by the spec. All of these will be
+     *       reported as auto-* events by the parser.</li>
+     *   <li>{@link #AUTO_CLOSE}: Equivalent to {@link #AUTO_OPEN_CLOSE} but not performing any auto-open
+     *       operations, so that processing of HTML fragments is possible (no <tt>&lt;html&gt;</tt> or
+     *       <tt>&lt;body&gt;</tt> elements are automatically added).</li>
      * </ul>
      * <p>
      *   This enumeration is used at the {@link org.attoparser.config.ParseConfiguration} class.
      * </p>
      */
-    public static enum ElementBalancing { 
-        REQUIRE_BALANCED, AUTO_CLOSE, AUTO_CLOSE_REQUIRE_NO_UNMATCHED_CLOSE, 
-        REQUIRE_NO_UNMATCHED_CLOSE, NO_BALANCING } 
+    public static enum ElementBalancing {
+        NO_BALANCING,
+        REQUIRE_BALANCED,
+        AUTO_OPEN_CLOSE,
+        AUTO_CLOSE }
 
 
 
@@ -98,7 +116,8 @@ public final class ParseConfiguration implements Serializable, Cloneable {
     private boolean textSplittable = false;
     
     private ElementBalancing elementBalancing = ElementBalancing.NO_BALANCING;
-    
+
+    private boolean noUnmatchedCloseElementsRequired = false;
     private boolean xmlWellFormedAttributeValuesRequired = false;
     private boolean uniqueAttributesInElementRequired = false;
  
@@ -115,6 +134,7 @@ public final class ParseConfiguration implements Serializable, Cloneable {
         DEFAULT_HTML_PARSE_CONFIGURATION.setMode(ParsingMode.HTML);
         DEFAULT_HTML_PARSE_CONFIGURATION.setTextSplittable(false);
         DEFAULT_HTML_PARSE_CONFIGURATION.setElementBalancing(ElementBalancing.AUTO_CLOSE);
+        DEFAULT_HTML_PARSE_CONFIGURATION.setNoUnmatchedCloseElementsRequired(false);
         DEFAULT_HTML_PARSE_CONFIGURATION.setUniqueAttributesInElementRequired(false);
         DEFAULT_HTML_PARSE_CONFIGURATION.setXmlWellFormedAttributeValuesRequired(false);
         DEFAULT_HTML_PARSE_CONFIGURATION.setUniqueRootElementPresence(UniqueRootElementPresence.NOT_VALIDATED);
@@ -129,6 +149,7 @@ public final class ParseConfiguration implements Serializable, Cloneable {
         DEFAULT_XML_PARSE_CONFIGURATION.setMode(ParsingMode.XML);
         DEFAULT_XML_PARSE_CONFIGURATION.setTextSplittable(false);
         DEFAULT_XML_PARSE_CONFIGURATION.setElementBalancing(ElementBalancing.REQUIRE_BALANCED);
+        DEFAULT_XML_PARSE_CONFIGURATION.setNoUnmatchedCloseElementsRequired(true);
         DEFAULT_XML_PARSE_CONFIGURATION.setUniqueAttributesInElementRequired(true);
         DEFAULT_XML_PARSE_CONFIGURATION.setXmlWellFormedAttributeValuesRequired(true);
         DEFAULT_XML_PARSE_CONFIGURATION.setUniqueRootElementPresence(UniqueRootElementPresence.DEPENDS_ON_PROLOG_DOCTYPE);
@@ -150,6 +171,7 @@ public final class ParseConfiguration implements Serializable, Cloneable {
      *     <li>Mode: {@link org.attoparser.config.ParseConfiguration.ParsingMode#HTML}</li>
      *     <li>Text splittable: false</li>
      *     <li>Element balancing: {@link org.attoparser.config.ParseConfiguration.ElementBalancing#AUTO_CLOSE}</li>
+     *     <li>No unmatched close elements required: false</li>
      *     <li>Unique attributes in elements required: false</li>
      *     <li>Xml-well-formed attribute values required: false</li>
      *     <li>Unique root element presence: {@link org.attoparser.config.ParseConfiguration.UniqueRootElementPresence#NOT_VALIDATED}</li>
@@ -178,6 +200,7 @@ public final class ParseConfiguration implements Serializable, Cloneable {
      *     <li>Mode: {@link org.attoparser.config.ParseConfiguration.ParsingMode#XML}</li>
      *     <li>Text splittable: false</li>
      *     <li>Element balancing: {@link org.attoparser.config.ParseConfiguration.ElementBalancing#REQUIRE_BALANCED}</li>
+     *     <li>No unmatched close elements required: true</li>
      *     <li>Unique attributes in elements required: true</li>
      *     <li>Xml-well-formed attribute values required: true</li>
      *     <li>Unique root element presence: {@link org.attoparser.config.ParseConfiguration.UniqueRootElementPresence#DEPENDS_ON_PROLOG_DOCTYPE}</li>
@@ -337,22 +360,27 @@ public final class ParseConfiguration implements Serializable, Cloneable {
      *   Possible values are:
      * </p>
      * <ul>
-     *   <li>{@link ElementBalancing#NO_BALANCING} (default): means no corrections and/or
-     *       validations of any kind will be performed. Artifacts will be reported by the
-     *       corresponding events without further interpretation.</li>
-     *   <li>{@link ElementBalancing#REQUIRE_BALANCED}: will require that all elements
-     *       are perfectly balanced, raising an exception if this does not happen.</li>
-     *   <li>{@link ElementBalancing#AUTO_CLOSE}: Parser will emit <i>autoclose</i> events
-     *       for those elements that are left unclosed, in order to provide a complete XML-style
-     *       tag balance.</li>
-     *   <li>{@link ElementBalancing#AUTO_CLOSE_REQUIRE_NO_UNMATCHED_CLOSE}: Same as 
-     *       {@link ElementBalancing#AUTO_CLOSE} but validating that there are no unmatched
-     *       <i>close element</i> artifacts (without a corresponding <i>open element</i> artifact),
-     *       raising an exception if any are found.</li>
-     *   <li>{@link ElementBalancing#REQUIRE_NO_UNMATCHED_CLOSE}: Will not require complete
-     *       balancing nor perform <i>autoclose</i>, but will require that there are no unmatched
-     *       <i>close element</i> artifacts (without a corresponding <i>open element</i> artifact),
-     *       raising an exception if any are found.</li>
+     *   <li>{@link ElementBalancing#NO_BALANCING}: Do not perform element balancing checks at all. Events will be
+     *       reported as they appear. There is no guarantee that a DOM tree can be built from the
+     *       fired events though.</li>
+     *   <li>{@link ElementBalancing#REQUIRE_BALANCED}: Require that elements are already correctly balanced in markup,
+     *       throwing an exception if not. Note that when in HTML mode, this does not require the
+     *       specification of optional tags such as <tt>&lt;tbody&gt;</tt>. Also note that this
+     *       will automatically consider the
+     *       {@link #setNoUnmatchedCloseElementsRequired(boolean)} flag to be set to <tt>true</tt>.</li>
+     *   <li>{@link ElementBalancing#AUTO_OPEN_CLOSE}: Auto open and close elements, which includes both those elements that,
+     *       according to the HTML spec (when in HTML mode) have optional start or end tags (see
+     *       <a href="http://www.w3.org/html/wg/drafts/html/master/syntax.html#optional-tags">http://www.w3.org/html/wg/drafts/html/master/syntax.html#optional-tags</a>)
+     *       and those that simply are unclosed at the moment a parent element needs to be closed (so their closing
+     *       is forced). As an example of optional tags, the HTML5 spec
+     *       establishes that <tt>&lt;html&gt;</tt>, <tt>&lt;body&gt;</tt> and <tt>&lt;tbody&gt;</tt> are optional, and
+     *       that an <tt>&lt;li&gt;</tt> will close any currently
+     *       open <tt>&lt;li&gt;</tt> elements. This is not really
+     *       <em>ill-formed code</em>, but something allowed by the spec. All of these will be
+     *       reported as auto-* events by the parser.</li>
+     *   <li>{@link ElementBalancing#AUTO_CLOSE}: Equivalent to {@link ElementBalancing#AUTO_OPEN_CLOSE} but not performing any auto-open
+     *       operations, so that processing of HTML fragments is possible (no <tt>&lt;html&gt;</tt> or
+     *       <tt>&lt;body&gt;</tt> elements are automatically added).</li>
      * </ul>
      * 
      * @return the level of element balancing.
@@ -371,22 +399,27 @@ public final class ParseConfiguration implements Serializable, Cloneable {
      *   Possible values are:
      * </p>
      * <ul>
-     *   <li>{@link ElementBalancing#NO_BALANCING} (default): means no corrections and/or
-     *       validations of any kind will be performed. Artifacts will be reported by the
-     *       corresponding events without further interpretation.</li>
-     *   <li>{@link ElementBalancing#REQUIRE_BALANCED}: will require that all elements
-     *       are perfectly balanced, raising an exception if this does not happen.</li>
-     *   <li>{@link ElementBalancing#AUTO_CLOSE}: Parser will emit <i>autoclose</i> events
-     *       for those elements that are left unclosed, in order to provide a complete XML-style
-     *       tag balance.</li>
-     *   <li>{@link ElementBalancing#AUTO_CLOSE_REQUIRE_NO_UNMATCHED_CLOSE}: Same as
-     *       {@link ElementBalancing#AUTO_CLOSE} but validating that there are no unmatched
-     *       <i>close element</i> artifacts (without a corresponding <i>open element</i> artifact),
-     *       raising an exception if any are found.</li>
-     *   <li>{@link ElementBalancing#REQUIRE_NO_UNMATCHED_CLOSE}: Will not require complete
-     *       balancing nor perform <i>autoclose</i>, but will require that there are no unmatched
-     *       <i>close element</i> artifacts (without a corresponding <i>open element</i> artifact),
-     *       raising an exception if any are found.</li>
+     *   <li>{@link ElementBalancing#NO_BALANCING}: Do not perform element balancing checks at all. Events will be
+     *       reported as they appear. There is no guarantee that a DOM tree can be built from the
+     *       fired events though.</li>
+     *   <li>{@link ElementBalancing#REQUIRE_BALANCED}: Require that elements are already correctly balanced in markup,
+     *       throwing an exception if not. Note that when in HTML mode, this does not require the
+     *       specification of optional tags such as <tt>&lt;tbody&gt;</tt>. Also note that this
+     *       will automatically consider the
+     *       {@link #setNoUnmatchedCloseElementsRequired(boolean)} flag to be set to <tt>true</tt>.</li>
+     *   <li>{@link ElementBalancing#AUTO_OPEN_CLOSE}: Auto open and close elements, which includes both those elements that,
+     *       according to the HTML spec (when in HTML mode) have optional start or end tags (see
+     *       <a href="http://www.w3.org/html/wg/drafts/html/master/syntax.html#optional-tags">http://www.w3.org/html/wg/drafts/html/master/syntax.html#optional-tags</a>)
+     *       and those that simply are unclosed at the moment a parent element needs to be closed (so their closing
+     *       is forced). As an example of optional tags, the HTML5 spec
+     *       establishes that &lt;html&gt;, &lt;body&gt; and &lt;tbody&gt; are optional, and
+     *       that an <tt>&lt;li&gt;</tt> will close any currently
+     *       open <tt>&lt;li&gt;</tt> elements. This is not really
+     *       <em>ill-formed code</em>, but something allowed by the spec. All of these will be
+     *       reported as auto-* events by the parser.</li>
+     *   <li>{@link ElementBalancing#AUTO_CLOSE}: Equivalent to {@link ElementBalancing#AUTO_OPEN_CLOSE} but not performing any auto-open
+     *       operations, so that processing of HTML fragments is possible (no <tt>&lt;html&gt;</tt> or
+     *       <tt>&lt;body&gt;</tt> elements are automatically added).</li>
      * </ul>
      *
      * @param elementBalancing the level of element balancing.
@@ -415,6 +448,36 @@ public final class ParseConfiguration implements Serializable, Cloneable {
 
     /**
      * <p>
+     *   Returns whether unmatched close elements (those not matching any equivalent open elements) are
+     *   allowed or not.
+     * </p>
+     *
+     * @return whether unmatched close elements will be allowed (<tt>false</tt>) or not (<tt>true</tt>).
+     */
+    public boolean isNoUnmatchedCloseElementsRequired() {
+        return this.noUnmatchedCloseElementsRequired;
+    }
+
+
+    /**
+     * <p>
+     *   Specify whether unmatched close elements (those not matching any equivalent open elements) are
+     *   allowed or not.
+     * </p>
+     *
+     * @param noUnmatchedCloseElementsRequired whether unmatched close elements will be allowed
+     *                                         (<tt>false</tt>) or not (<tt>true</tt>).
+     */
+    public void setNoUnmatchedCloseElementsRequired(
+            final boolean noUnmatchedCloseElementsRequired) {
+        this.noUnmatchedCloseElementsRequired = noUnmatchedCloseElementsRequired;
+    }
+
+
+
+
+    /**
+     * <p>
      *   Returns whether element attributes will be required to be well-formed from the XML
      *   standpoint. This means:
      * </p>
@@ -422,7 +485,7 @@ public final class ParseConfiguration implements Serializable, Cloneable {
      *   <li>Attributes should always have a value.</li>
      *   <li>Attribute values should be surrounded by double-quotes.</li>
      * </ul>
-     * 
+     *
      * @return whether attributes should be XML-well-formed or not.
      */
     public boolean isXmlWellFormedAttributeValuesRequired() {

@@ -255,13 +255,13 @@ public final class SimplifierMarkupHandler extends AbstractMarkupHandler {
 
     }
 
-    
-    
+
+
     @Override
     public void handleOpenElementStart(
-            final char[] buffer, 
-            final int nameOffset, final int nameLen, 
-            final int line, final int col) 
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
             throws ParseException {
 
         this.currentElementName = StructureTextsRepository.getStructureName(buffer, nameOffset, nameLen);
@@ -271,8 +271,8 @@ public final class SimplifierMarkupHandler extends AbstractMarkupHandler {
 
     }
 
-    
-    
+
+
     @Override
     public void handleOpenElementEnd(
             final char[] buffer,
@@ -281,6 +281,35 @@ public final class SimplifierMarkupHandler extends AbstractMarkupHandler {
             throws ParseException {
 
         this.handler.handleOpenElement(this.currentElementName, this.currentElementAttributes, this.currentElementLine, this.currentElementCol);
+
+    }
+
+
+
+    @Override
+    public void handleAutoOpenElementStart(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
+            throws ParseException {
+
+        this.currentElementName = StructureTextsRepository.getStructureName(buffer, nameOffset, nameLen);
+        this.currentElementAttributes = null;
+        this.currentElementLine = line;
+        this.currentElementCol = col;
+
+    }
+
+
+
+    @Override
+    public void handleAutoOpenElementEnd(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
+            throws ParseException {
+
+        this.handler.handleAutoOpenElement(this.currentElementName, this.currentElementAttributes, this.currentElementLine, this.currentElementCol);
 
     }
 

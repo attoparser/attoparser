@@ -48,6 +48,7 @@ public abstract class MarkupTraceEvent {
         NON_MINIMIZED_STANDALONE_ELEMENT_START("NSES"), NON_MINIMIZED_STANDALONE_ELEMENT_END("NSEE"),
 
         OPEN_ELEMENT_START("OES"), OPEN_ELEMENT_END("OEE"),
+        AUTO_OPEN_ELEMENT_START("AOES"), AUTO_OPEN_ELEMENT_END("AOEE"),
 
         CLOSE_ELEMENT_START("CES"), CLOSE_ELEMENT_END("CEE"),
         AUTO_CLOSE_ELEMENT_START("ACES"), AUTO_CLOSE_ELEMENT_END("ACEE"),
@@ -383,6 +384,18 @@ public abstract class MarkupTraceEvent {
     public static final class OpenElementEndTraceEvent extends AbstractElementTraceEvent {
         public OpenElementEndTraceEvent(final String elementName, final int line, final int col) {
             super(EventType.OPEN_ELEMENT_END, elementName, line, col);
+        }
+    }
+
+    public static final class AutoOpenElementStartTraceEvent extends AbstractElementTraceEvent {
+        public AutoOpenElementStartTraceEvent(final String elementName, final int line, final int col) {
+            super(EventType.AUTO_OPEN_ELEMENT_START, elementName, line, col);
+        }
+    }
+
+    public static final class AutoOpenElementEndTraceEvent extends AbstractElementTraceEvent {
+        public AutoOpenElementEndTraceEvent(final String elementName, final int line, final int col) {
+            super(EventType.AUTO_OPEN_ELEMENT_END, elementName, line, col);
         }
     }
 

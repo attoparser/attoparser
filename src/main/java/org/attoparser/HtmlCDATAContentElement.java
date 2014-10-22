@@ -33,7 +33,7 @@ import org.attoparser.util.TextUtil;
  * @author Daniel Fernandez
  * @since 2.0.0
  */
-final class HtmlCDATAContentElement extends HtmlElement {
+class HtmlCDATAContentElement extends HtmlElement {
 
 
     private final char[] nameLower;

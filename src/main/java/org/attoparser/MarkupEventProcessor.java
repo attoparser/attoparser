@@ -53,7 +53,9 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
 
     private final boolean useStack;
 
+    private final boolean autoOpen;
     private final boolean autoClose;
+
     private final boolean requireBalancedElements;
     private final boolean requireNoUnmatchedCloseElements;
 
@@ -99,18 +101,19 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
         this.caseSensitive = parseConfiguration.isCaseSensitive();
 
         this.useStack = (!ParseConfiguration.ElementBalancing.NO_BALANCING.equals(parseConfiguration.getElementBalancing()) ||
-                         parseConfiguration.isUniqueAttributesInElementRequired() ||
+                         parseConfiguration.isUniqueAttributesInElementRequired() || parseConfiguration.isNoUnmatchedCloseElementsRequired() ||
                          !ParseConfiguration.UniqueRootElementPresence.NOT_VALIDATED.equals(parseConfiguration.getUniqueRootElementPresence()));
 
+
+        this.autoOpen =
+                ParseConfiguration.ElementBalancing.AUTO_OPEN_CLOSE.equals(parseConfiguration.getElementBalancing());
         this.autoClose =
-                (ParseConfiguration.ElementBalancing.AUTO_CLOSE.equals(parseConfiguration.getElementBalancing()) ||
-                        ParseConfiguration.ElementBalancing.AUTO_CLOSE_REQUIRE_NO_UNMATCHED_CLOSE.equals(parseConfiguration.getElementBalancing()));
-        this.requireBalancedElements =
-                ParseConfiguration.ElementBalancing.REQUIRE_BALANCED.equals(parseConfiguration.getElementBalancing());
-        this.requireNoUnmatchedCloseElements =
-                (this.requireBalancedElements ||
-                        ParseConfiguration.ElementBalancing.AUTO_CLOSE_REQUIRE_NO_UNMATCHED_CLOSE.equals(parseConfiguration.getElementBalancing()) ||
-                        ParseConfiguration.ElementBalancing.REQUIRE_NO_UNMATCHED_CLOSE.equals(parseConfiguration.getElementBalancing()));
+                (ParseConfiguration.ElementBalancing.AUTO_OPEN_CLOSE.equals(parseConfiguration.getElementBalancing()) ||
+                 ParseConfiguration.ElementBalancing.AUTO_CLOSE.equals(parseConfiguration.getElementBalancing()));
+
+
+        this.requireBalancedElements = ParseConfiguration.ElementBalancing.REQUIRE_BALANCED.equals(parseConfiguration.getElementBalancing());
+        this.requireNoUnmatchedCloseElements = (this.requireBalancedElements || parseConfiguration.isNoUnmatchedCloseElementsRequired());
 
         this.prologParseConfiguration = parseConfiguration.getPrologParseConfiguration();
 
@@ -324,9 +327,15 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
         this.handler.handleStandaloneElementStart(buffer, nameOffset, nameLen, minimized, line, col);
 
         if (this.useStack) {
-            if (this.status.autoCloseRequired != null) {
-                // Auto-* operations
-                unstack(this.status.autoCloseRequired, this.status.autoCloseLimits, line, col);
+            if (this.status.autoOpenParents != null || this.status.autoCloseRequired != null) {
+                if (this.status.autoCloseRequired != null) {
+                    // Auto-close operations
+                    autoClose(this.status.autoCloseRequired, this.status.autoCloseLimits, line, col);
+                }
+                if (this.status.autoOpenParents != null) {
+                    // Auto-open operations
+                    autoOpen(this.status.autoOpenParents, this.status.autoOpenLimits, line, col);
+                }
                 // Re-launching of the event
                 this.status.autoOpenCloseDone = true;
                 this.handler.handleStandaloneElementStart(buffer, nameOffset, nameLen, minimized, line, col);
@@ -335,7 +344,7 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
                 pushToStack(buffer, nameOffset, nameLen);
             }
         } else {
-            if (this.status.autoCloseRequired != null) {
+            if (this.status.autoOpenParents != null || this.status.autoCloseRequired != null) {
                 // We were required to perform auto* operations, but we have no stack, so we will
                 // just launch the event again
                 this.status.autoOpenCloseDone = true;
@@ -394,9 +403,15 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
         this.handler.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
 
         if (this.useStack) {
-            if (this.status.autoCloseRequired != null) {
-                // Auto-* operations
-                unstack(this.status.autoCloseRequired, this.status.autoCloseLimits, line, col);
+            if (this.status.autoOpenParents != null || this.status.autoCloseRequired != null) {
+                if (this.status.autoCloseRequired != null) {
+                    // Auto-close operations
+                    autoClose(this.status.autoCloseRequired, this.status.autoCloseLimits, line, col);
+                }
+                if (this.status.autoOpenParents != null) {
+                    // Auto-open operations
+                    autoOpen(this.status.autoOpenParents, this.status.autoOpenLimits, line, col);
+                }
                 // Re-launching of the event
                 this.status.autoOpenCloseDone = true;
                 this.handler.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
@@ -406,7 +421,7 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
                 pushToStack(buffer, nameOffset, nameLen);
             }
         } else {
-            if (this.status.autoCloseRequired != null) {
+            if (this.status.autoOpenParents != null || this.status.autoCloseRequired != null) {
                 // We were required to perform auto* operations, but we have no stack, so we will
                 // just launch the event again
                 this.status.autoOpenCloseDone = true;
@@ -727,6 +742,12 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
                     if (this.autoClose) {
                         this.handler.handleAutoCloseElementStart(peek, 0, peek.length, line, col);
                         this.handler.handleAutoCloseElementEnd(peek, 0, peek.length, line, col);
+                    } else {
+                        // fixing unclosed non-optional tags by auto closing is forbidden!
+                        throw new ParseException(
+                                "Malformed markup: element " +
+                                "\"" + new String(peek, 0, peek.length) + "\"" +
+                                " is never closed", line, col);
                     }
                 }
                 popFromStack();
@@ -779,6 +800,12 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
                 if (this.autoClose) {
                     this.handler.handleAutoCloseElementStart(popped, 0, popped.length, line, col);
                     this.handler.handleAutoCloseElementEnd(popped, 0, popped.length, line, col);
+                } else {
+                    // fixing unclosed non-optional tags by auto closing is forbidden!
+                    throw new ParseException(
+                            "Malformed markup: element " +
+                            "\"" + new String(popped, 0, popped.length) + "\"" +
+                            " is never closed", line, col);
                 }
 
                 popped = popFromStack();
@@ -791,38 +818,44 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
 
 
 
-    private void unstack(
-            final char[][] unstackElements, final char[][] unstackLimits, final int line, final int col)
+    private void autoClose(
+            final char[][] autoCloseElements, final char[][] autoCloseLimits, final int line, final int col)
             throws ParseException {
 
         int peekDelta = 0;
         int unstackCount = 0;
         char[] peek = peekFromStack(peekDelta);
 
-        int i;
+        int i,n;
 
         while (peek != null) {
 
-            if (unstackLimits != null) {
+            if (autoCloseLimits != null) {
                 // First check whether we found a limit
-                for (i = 0; i < unstackLimits.length; i++) {
-                    if (TextUtil.equals(this.caseSensitive, unstackLimits[i], peek)) {
+                i = 0;
+                n = autoCloseLimits.length;
+                while (n-- != 0) {
+                    if (TextUtil.equals(this.caseSensitive, autoCloseLimits[i], peek)) {
                         // Just found a limit, we should stop computing unstacking here
                         peek = null; // This will make us exit the loop
                         break;
                     }
+                    i++;
                 }
             }
 
             if (peek != null) {
 
                 // Check whether this is an element we must close
-                for (i = 0; i < unstackElements.length; i++) {
-                    if (TextUtil.equals(this.caseSensitive, unstackElements[i], peek)) {
+                i = 0;
+                n = autoCloseElements.length;
+                while (n-- != 0) {
+                    if (TextUtil.equals(this.caseSensitive, autoCloseElements[i], peek)) {
                         // This is an element we must unstack, so we should mark unstackCount
                         unstackCount = peekDelta + 1;
                         break;
                     }
+                    i++;
                 }
 
                 // Feed the loop
@@ -833,7 +866,8 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
         }
 
 
-        for (i = 0; i < unstackCount; i++) {
+        n = unstackCount;
+        while (n-- != 0) {
 
             peek = popFromStack();
 
@@ -848,6 +882,101 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
                 this.handler.handleAutoCloseElementStart(peek, 0, peek.length, line, col);
                 this.handler.handleAutoCloseElementEnd(peek, 0, peek.length, line, col);
             }
+
+        }
+
+    }
+
+
+
+    private void autoOpen(
+            final char[][] autoOpenParents, final char[][] autoOpenLimits, final int line, final int col)
+            throws ParseException {
+
+        if (!this.autoOpen) {
+            // Nothing to do here!
+            return;
+        }
+
+        int parentInsertCount = 0;
+        int i,n;
+
+        if (autoOpenLimits == null) {
+            // There are no limits, so all we have to check is whether we need to complete the parent sequence.
+
+            if (this.elementStackSize >= autoOpenParents.length) {
+                // If the stack is already larger or equal in size to the parent sequence, we are sure that nothing is
+                // required to be inserted as a parent.
+                return;
+            }
+
+            char[] peek = peekFromStack(0);
+
+            if (peek == null) {
+                // We are at root level - we need to insert the whole parent sequence
+
+                parentInsertCount = autoOpenParents.length;
+
+            } else {
+
+                n = autoOpenParents.length;
+                while (peek != null && n-- != 0) {
+                    if (TextUtil.equals(this.caseSensitive, autoOpenParents[n], peek)) {
+                        // We compute the amount of parent elements we need to insert
+                        parentInsertCount = (autoOpenParents.length - n) - 1;
+                        break;
+                    }
+                }
+
+            }
+
+            if (parentInsertCount == 0) {
+                // Nothing to be inserted here!
+                return;
+            }
+
+
+        } else {
+            // There are limits, so we will first check them against the immediate parent and if it doesn't match,
+            // simply add the entire parent sequence.
+
+            char[] peek = peekFromStack(0);
+
+            if (peek != null) {
+                // Let's check the immediate parent and see if it is in the list of limits
+
+                i = 0;
+                n = autoOpenLimits.length;
+                while (n-- != 0) {
+                    if (TextUtil.equals(this.caseSensitive, autoOpenLimits[i], peek)) {
+                        // Just found a limit, so there's nothing to insert here
+                        return;
+                    }
+                    i++;
+                }
+
+            }
+
+            // We've checked the limits, and they don't match, so we need to insert the parents.
+            parentInsertCount = autoOpenParents.length;
+
+        }
+
+
+        // Parent insertion count already computed. We will insert as many parents as needed (counted from the
+        // end of the array).
+
+        n = parentInsertCount;
+        i = autoOpenParents.length - parentInsertCount;
+
+        while (n-- != 0) {
+
+            this.handler.handleAutoOpenElementStart(autoOpenParents[i], 0, autoOpenParents[i].length, line, col);
+            this.handler.handleAutoOpenElementEnd(autoOpenParents[i], 0, autoOpenParents[i].length, line, col);
+
+            pushToStack(autoOpenParents[i], 0, autoOpenParents[i].length);
+
+            i++;
 
         }
 

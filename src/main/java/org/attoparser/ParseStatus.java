@@ -48,8 +48,51 @@ public final class ParseStatus {
 
     boolean avoidStacking;
 
+
+    // These attributes instruct the event processor to make sure an element is correctly stacked inside the elements
+    // it needs to. For example, a <tr> element will ask for the auto-opening of a <tbody> element as its
+    // parent, but it will specify as limits also <thead> and <tfoot> because these two elements are also valid
+    // parents for it (just not default).
+    // The limits array will be used for specifying: if not null, the IMMEDIATE parents that will be considered
+    // valid. If not null, that the parent element sequence should only be considered from the document root, and
+    // that it should be completed if something is missing (e.g. there is <html> but no <body>).
+    // When in HTML, the auto-open elements will be:
+    //
+    //   * <tr>
+    //     RULE: if (parent != <tbody> &amp;&amp; parent != <tfoot> &amp;&amp; parent != <thead>) -> AUTO-OPEN <tbody>
+    //     PARENTS: (tbody) LIMITS: (tbody,tfoot,thead)
+    //
+    //   * <col>
+    //     RULE: if (parent != <colgroup>) -> AUTO-OPEN <colgroup>
+    //     PARENTS: (colgroup) LIMITS: (colgroup)
+    //
+    //   * <meta>, <link>, <script>, <style>, <template>, <base>, <object>
+    //     RULE: if (parent == null) -> AUTO-OPEN <html>, <head>
+    //           if (parent == html &amp;&amp; html.parent == null) -> AUTO-OPEN <head>
+    //     PARENTS: (html,head) LIMITS: (null)
+    //
+    //   * All other standard HTML tags
+    //     RULE: if (parent == null) -> AUTO-OPEN <html>, <body>
+    //           if (parent == html &amp;&amp; html.parent == null) -> AUTO-OPEN <body>
+    //     PARENTS: (html,body) LIMITS: (null)
+    //
+    char[][] autoOpenParents;
+    char[][] autoOpenLimits;
+
+    // These two attributes instruct the event processor to make sure certain elements are closed before an
+    // open/standalone start event is actually fired. This avoids incorrect stacking of elements that cannot appear
+    // inside the currently open ones. For example, an <li> element will ask for the auto-closing of every currently
+    // open <li> element. This possible parent <li> element will be searched in the stack from the currently open
+    // element (because the last open element could be a <b>, an <a>, etc.) and it will be closed (along with any
+    // other open elements that have been open after it (i.e. those <b>, <a>, etc.). Note also that some "limits"
+    // are established so that, in this same example, we stop searching the stack for that open <li> as soon as we
+    // find an <ul> or <ol> in the stack. This allows correctly stacking of <ul> or <ol> inside an <li> of a
+    // higher-level <ul> or <ol>.
     char[][] autoCloseRequired;
     char[][] autoCloseLimits;
+
+    // This flag indicates whether the auto-open and auto-close operations have already been done, so that the
+    // firing events know that they don't need to stop the execution chain again.
     boolean autoOpenCloseDone;
 
 
@@ -136,6 +179,63 @@ public final class ParseStatus {
      */
     public boolean isAutoOpenCloseDone() {
         return this.autoOpenCloseDone;
+    }
+
+
+    /**
+     * <p>
+     *   Force the parser to (possibly) perform a series of auto-open operations for elements that should be
+     *   considered parents of the one being open at a specific moment per the markup spec (made for HTML).
+     * </p>
+     * <p>
+     *   These attributes instruct the event processor to make sure an element is correctly stacked inside the elements
+     *   it needs to. For example, a <tt>&lt;tr&gt;</tt> element will ask for the auto-opening of a <tt>&lt;tbody&gt;</tt> element as its
+     *   parent, but it will specify as limits also <tt>&lt;thead&gt;</tt> and <tt>&lt;tfoot&gt;</tt> because these two elements are also valid
+     *   parents for it (just not default).
+     * </p>
+     * <p>
+     *   The limits array will be used for specifying: if not null, the IMMEDIATE parents that will be considered
+     *   valid. If not null, that the parent element sequence should only be considered from the document root, and
+     *   that it should be completed if something is missing (e.g. there is <tt>&lt;html&gt;</tt> but no <tt>&lt;body&gt;</tt>).
+     * </p>
+     * <p>
+     *   When in HTML, the auto-open elements will be:
+     * </p>
+     * <ul>
+     *   <li>
+     *      <tt>&lt;tr&gt;</tt><br>
+     *      RULE: if (parent != <tt>&lt;tbody&gt;</tt> &amp;&amp; parent != <tt>&lt;tfoot&gt;</tt> &amp;&amp; parent != <tt>&lt;thead&gt;</tt>) : AUTO-OPEN <tt>&lt;tbody&gt;</tt><br>
+     *      PARENTS: (tbody) LIMITS: (tbody,tfoot,thead)
+     *   </li>
+     *
+     *   <li>
+     *      <tt>&lt;col&gt;</tt><br>
+     *      RULE: if (parent != <tt>&lt;colgroup&gt;</tt>) : AUTO-OPEN <tt>&lt;colgroup&gt;</tt><br>
+     *      PARENTS: (colgroup) LIMITS: (colgroup)
+     *   </li>
+     *
+     *   <li>
+     *      <tt>&lt;meta&gt;</tt>, <tt>&lt;link&gt;</tt>, <tt>&lt;script&gt;</tt>, <tt>&lt;style&gt;</tt>, <tt>&lt;template&gt;</tt>, <tt>&lt;base&gt;</tt>, <tt>&lt;object&gt;</tt><br>
+     *      RULE: if (parent == null) : AUTO-OPEN <tt>&lt;html&gt;</tt>, <tt>&lt;head&gt;</tt><br>
+     *            if (parent == <tt>&lt;html&gt;</tt> &amp;&amp; <tt>&lt;html&gt;</tt>.parent == null) : AUTO-OPEN <tt>&lt;head&gt;</tt><br>
+     *      PARENTS: (html,head) LIMITS: (null)
+     *   </li>
+     *
+     *   <li>
+     *      All other standard HTML tags<br>
+     *      RULE: if (parent == null) : AUTO-OPEN <tt>&lt;html&gt;</tt>, <tt>&lt;body&gt;</tt><br>
+     *            if (parent == <tt>&lt;html&gt;</tt> &amp;&amp; <tt>&lt;html&gt;</tt>.parent == null) : AUTO-OPEN <tt>&lt;body&gt;</tt><br>
+     *      PARENTS: (html,body) LIMITS: (null)
+     *   </li>
+     * </ul>
+     *
+     * @param autoOpenParents the parent sequence to be (potentially) auto-open.
+     * @param autoOpenLimits the names of the elements that will serve as limits for the auto-open operation. If null,
+     *                       the parent sequence will only be applied if at root level, or of the sequence is incomplete.
+     */
+    public void setAutoOpenRequired(final char[][] autoOpenParents, final char[][] autoOpenLimits) {
+        this.autoOpenParents = autoOpenParents;
+        this.autoOpenLimits = autoOpenLimits;
     }
 
 

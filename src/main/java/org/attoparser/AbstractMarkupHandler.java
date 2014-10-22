@@ -183,7 +183,25 @@ public abstract class AbstractMarkupHandler implements IMarkupHandler {
     }
 
 
-    
+
+    public void handleAutoOpenElementStart(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
+            throws ParseException {
+        // Nothing to be done here, meant to be overridden if required
+    }
+
+    public void handleAutoOpenElementEnd(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
+            throws ParseException {
+        // Nothing to be done here, meant to be overridden if required
+    }
+
+
+
     public void handleCloseElementStart(
             final char[] buffer,
             final int nameOffset, final int nameLen, 

@@ -264,6 +264,29 @@ public interface ISimpleMarkupHandler {
 
     /**
      * <p>
+     *   Called when an element (an <i>open tag</i>) is automatically added in order to
+     *   shape markup according to the spec (made for HTML parsing). See
+     *   {@link org.attoparser.config.ParseConfiguration.ElementBalancing#AUTO_OPEN_CLOSE} for
+     *   more info.
+     * </p>
+     * <p>
+     *   Note that <b>the element attributes map can be null if no attributes are present</b>.
+     * </p>
+     *
+     * @param elementName the element name (e.g. "&lt;div class="content"&gt;" -&gt; "div").
+     * @param attributes the element attributes map, or null if no attributes are present.
+     * @param line the line in the document where this elements appears.
+     * @param col the column in the document where this element appears.
+     * @throws ParseException if any exceptions occur during handling.
+     */
+    public void handleAutoOpenElement(
+            final String elementName, final Map<String,String> attributes,
+            final int line, final int col)
+            throws ParseException;
+
+
+    /**
+     * <p>
      *   Called when a close element (a <i>close tag</i>) is found.
      * </p>
      *

@@ -204,8 +204,9 @@ public final class DuplicateMarkupHandler extends AbstractMarkupHandler {
 
 
     @Override
-    public void handleOpenElementStart(final char[] buffer, final int nameOffset, final int nameLen, final int line,
-            final int col) throws ParseException {
+    public void handleOpenElementStart(
+            final char[] buffer, final int nameOffset, final int nameLen,
+            final int line, final int col) throws ParseException {
 
         this.handler1.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
         this.handler2.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
@@ -222,6 +223,32 @@ public final class DuplicateMarkupHandler extends AbstractMarkupHandler {
 
         this.handler1.handleOpenElementEnd(buffer, nameOffset, nameLen, line, col);
         this.handler2.handleOpenElementEnd(buffer, nameOffset, nameLen, line, col);
+
+    }
+
+
+
+
+    @Override
+    public void handleAutoOpenElementStart(
+            final char[] buffer, final int nameOffset, final int nameLen,
+            final int line, final int col) throws ParseException {
+
+        this.handler1.handleAutoOpenElementStart(buffer, nameOffset, nameLen, line, col);
+        this.handler2.handleAutoOpenElementStart(buffer, nameOffset, nameLen, line, col);
+
+    }
+
+
+
+
+    @Override
+    public void handleAutoOpenElementEnd(
+            final char[] buffer, final int nameOffset, final int nameLen,
+            final int line, final int col) throws ParseException {
+
+        this.handler1.handleAutoOpenElementEnd(buffer, nameOffset, nameLen, line, col);
+        this.handler2.handleAutoOpenElementEnd(buffer, nameOffset, nameLen, line, col);
 
     }
 
