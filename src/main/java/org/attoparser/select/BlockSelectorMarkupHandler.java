@@ -114,7 +114,7 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
 
 
     // This implementation is completely stateless, so we can safely reuse it.
-    private final static DiscardMarkupHandler DISCARD_MARKUP_HANDLER = new DiscardMarkupHandler();
+    private static final DiscardMarkupHandler DISCARD_MARKUP_HANDLER = new DiscardMarkupHandler();
 
 
     private final IMarkupHandler selectedHandler;
@@ -395,7 +395,7 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
          */
 
         final boolean html =
-                ParseConfiguration.ParsingMode.HTML.equals(parseConfiguration.getMode());
+                ParseConfiguration.ParsingMode.HTML == parseConfiguration.getMode();
 
         for (int i = 0; i < this.selectorsLen; i++) {
 

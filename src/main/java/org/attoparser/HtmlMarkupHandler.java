@@ -37,7 +37,7 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
     private static final char[] HEAD_BUFFER = "head".toCharArray();
     private static final char[] BODY_BUFFER = "body".toCharArray();
 
-    private IMarkupHandler next;
+    private final IMarkupHandler next;
 
     private ParseStatus status = null; // Will be always set, but anyway we should initialize.
     private boolean autoOpenEnabled = false;
@@ -75,10 +75,10 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
     public void setParseConfiguration(final ParseConfiguration parseConfiguration) {
 
         this.autoOpenEnabled =
-                ParseConfiguration.ElementBalancing.AUTO_OPEN_CLOSE.equals(parseConfiguration.getElementBalancing());
+                ParseConfiguration.ElementBalancing.AUTO_OPEN_CLOSE == parseConfiguration.getElementBalancing();
         this.autoCloseEnabled =
-                (ParseConfiguration.ElementBalancing.AUTO_OPEN_CLOSE.equals(parseConfiguration.getElementBalancing()) ||
-                 ParseConfiguration.ElementBalancing.AUTO_CLOSE.equals(parseConfiguration.getElementBalancing()));
+                (ParseConfiguration.ElementBalancing.AUTO_OPEN_CLOSE == parseConfiguration.getElementBalancing() ||
+                 ParseConfiguration.ElementBalancing.AUTO_CLOSE == parseConfiguration.getElementBalancing());
 
         this.next.setParseConfiguration(parseConfiguration);
 

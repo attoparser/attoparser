@@ -100,19 +100,19 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
 
         this.caseSensitive = parseConfiguration.isCaseSensitive();
 
-        this.useStack = (!ParseConfiguration.ElementBalancing.NO_BALANCING.equals(parseConfiguration.getElementBalancing()) ||
+        this.useStack = (ParseConfiguration.ElementBalancing.NO_BALANCING != parseConfiguration.getElementBalancing() ||
                          parseConfiguration.isUniqueAttributesInElementRequired() || parseConfiguration.isNoUnmatchedCloseElementsRequired() ||
-                         !ParseConfiguration.UniqueRootElementPresence.NOT_VALIDATED.equals(parseConfiguration.getUniqueRootElementPresence()));
+                ParseConfiguration.UniqueRootElementPresence.NOT_VALIDATED != parseConfiguration.getUniqueRootElementPresence());
 
 
         this.autoOpen =
-                ParseConfiguration.ElementBalancing.AUTO_OPEN_CLOSE.equals(parseConfiguration.getElementBalancing());
+                ParseConfiguration.ElementBalancing.AUTO_OPEN_CLOSE == parseConfiguration.getElementBalancing();
         this.autoClose =
-                (ParseConfiguration.ElementBalancing.AUTO_OPEN_CLOSE.equals(parseConfiguration.getElementBalancing()) ||
-                 ParseConfiguration.ElementBalancing.AUTO_CLOSE.equals(parseConfiguration.getElementBalancing()));
+                (ParseConfiguration.ElementBalancing.AUTO_OPEN_CLOSE == parseConfiguration.getElementBalancing() ||
+                        ParseConfiguration.ElementBalancing.AUTO_CLOSE == parseConfiguration.getElementBalancing());
 
 
-        this.requireBalancedElements = ParseConfiguration.ElementBalancing.REQUIRE_BALANCED.equals(parseConfiguration.getElementBalancing());
+        this.requireBalancedElements = ParseConfiguration.ElementBalancing.REQUIRE_BALANCED == parseConfiguration.getElementBalancing();
         this.requireNoUnmatchedCloseElements = (this.requireBalancedElements || parseConfiguration.isNoUnmatchedCloseElementsRequired());
 
         this.prologParseConfiguration = parseConfiguration.getPrologParseConfiguration();
@@ -914,7 +914,7 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
                 return;
             }
 
-            char[] peek = peekFromStack(0);
+            final char[] peek = peekFromStack(0);
 
             if (peek == null) {
                 // We are at root level - we need to insert the whole parent sequence
@@ -944,7 +944,7 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
             // There are limits, so we will first check them against the immediate parent and if it doesn't match,
             // simply add the entire parent sequence.
 
-            char[] peek = peekFromStack(0);
+            final char[] peek = peekFromStack(0);
 
             if (peek != null) {
                 // Let's check the immediate parent and see if it is in the list of limits
@@ -1054,6 +1054,7 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
         StructureNamesRepository() {
             super();
             this.repository = new char[REPOSITORY_INITIAL_LEN][];
+            this.repositorySize = 0;
         }
 
 
