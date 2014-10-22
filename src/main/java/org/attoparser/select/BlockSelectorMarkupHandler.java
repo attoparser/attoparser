@@ -528,6 +528,7 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
                 return;
             }
 
+            unmarkCurrentSelection();
             this.nonSelectedHandler.handleXmlDeclaration(
                     buffer, keywordOffset, keywordLen, keywordLine, keywordCol,
                     versionOffset, versionLen, versionLine, versionCol,
@@ -604,6 +605,7 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
                 return;
             }
 
+            unmarkCurrentSelection();
             this.nonSelectedHandler.handleDocType(
                     buffer,
                     keywordOffset, keywordLen, keywordLine, keywordCol,
@@ -675,6 +677,7 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
                 return;
             }
 
+            unmarkCurrentSelection();
             this.nonSelectedHandler.handleCDATASection(
                     buffer, contentOffset, contentLen,
                     outerOffset, outerLen, line, col);
@@ -729,6 +732,7 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
                 return;
             }
 
+            unmarkCurrentSelection();
             this.nonSelectedHandler.handleText(buffer, offset, len, line, col);
             return;
 
@@ -784,6 +788,7 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
                 return;
             }
 
+            unmarkCurrentSelection();
             this.nonSelectedHandler.handleComment(
                     buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
             return;
@@ -895,6 +900,7 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
                 return;
             }
 
+            unmarkCurrentSelection();
             this.elementBuffer.flushBuffer(this.nonSelectedHandler, false);
             return;
 
@@ -976,6 +982,7 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
             checkSizeOfMarkupBlocksStructure(this.markupLevel);
             this.markupBlocks[this.markupLevel] = ++this.markupBlockIndex;
 
+            unmarkCurrentSelection();
             this.elementBuffer.flushBuffer(this.nonSelectedHandler, false);
 
             return;
@@ -1063,6 +1070,7 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
             checkSizeOfMarkupBlocksStructure(this.markupLevel);
             this.markupBlocks[this.markupLevel] = ++this.markupBlockIndex;
 
+            unmarkCurrentSelection();
             this.elementBuffer.flushBuffer(this.nonSelectedHandler, true);
 
             return;
@@ -1110,6 +1118,7 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
                 return;
             }
 
+            unmarkCurrentSelection();
             this.nonSelectedHandler.handleCloseElementStart(buffer, nameOffset, nameLen, line, col);
             return;
 
@@ -1153,6 +1162,7 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
                 return;
             }
 
+            unmarkCurrentSelection();
             this.nonSelectedHandler.handleCloseElementEnd(buffer, nameOffset, nameLen, line, col);
             return;
 
@@ -1202,6 +1212,7 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
                 return;
             }
 
+            unmarkCurrentSelection();
             this.nonSelectedHandler.handleAutoCloseElementStart(buffer, nameOffset, nameLen, line, col);
             return;
 
@@ -1245,6 +1256,7 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
                 return;
             }
 
+            unmarkCurrentSelection();
             this.nonSelectedHandler.handleAutoCloseElementEnd(buffer, nameOffset, nameLen, line, col);
             return;
 
@@ -1289,6 +1301,7 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
                 return;
             }
 
+            unmarkCurrentSelection();
             this.nonSelectedHandler.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col);
             return;
 
@@ -1325,6 +1338,7 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
                 return;
             }
 
+            unmarkCurrentSelection();
             this.nonSelectedHandler.handleUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col);
             return;
 
@@ -1402,6 +1416,7 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
                 return;
             }
 
+            unmarkCurrentSelection();
             this.nonSelectedHandler.handleProcessingInstruction(
                     buffer,
                     targetOffset, targetLen, targetLine, targetCol,

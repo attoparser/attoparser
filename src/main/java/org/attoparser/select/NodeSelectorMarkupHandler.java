@@ -444,6 +444,7 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
             return;
         }
 
+        unmarkCurrentSelection();
         this.nonSelectedHandler.handleXmlDeclaration(
                 buffer,
                 keywordOffset, keywordLen, keywordLine, keywordCol,
@@ -502,6 +503,7 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
             return;
         }
 
+        unmarkCurrentSelection();
         this.nonSelectedHandler.handleDocType(
                 buffer,
                 keywordOffset, keywordLen, keywordLine, keywordCol,
@@ -550,6 +552,7 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
             return;
         }
 
+        unmarkCurrentSelection();
         this.nonSelectedHandler.handleCDATASection(
                 buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
 
@@ -589,6 +592,7 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
             return;
         }
 
+        unmarkCurrentSelection();
         this.nonSelectedHandler.handleText(buffer, offset, len, line, col);
 
     }
@@ -630,6 +634,7 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
             return;
         }
 
+        unmarkCurrentSelection();
         this.nonSelectedHandler.handleComment(
                 buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
 
@@ -708,6 +713,7 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
             return;
         }
 
+        unmarkCurrentSelection();
         this.elementBuffer.flushBuffer(this.nonSelectedHandler, false);
 
     }
@@ -758,6 +764,7 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
             return;
         }
 
+        unmarkCurrentSelection();
         this.elementBuffer.flushBuffer(this.nonSelectedHandler, false);
 
     }
@@ -808,6 +815,7 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
             return;
         }
 
+        unmarkCurrentSelection();
         this.elementBuffer.flushBuffer(this.nonSelectedHandler, true);
 
     }
@@ -841,6 +849,7 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
             return;
         }
 
+        unmarkCurrentSelection();
         this.nonSelectedHandler.handleCloseElementStart(buffer, nameOffset, nameLen, line, col);
 
     }
@@ -870,6 +879,7 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
             return;
         }
 
+        unmarkCurrentSelection();
         this.nonSelectedHandler.handleCloseElementEnd(buffer, nameOffset, nameLen, line, col);
 
     }
@@ -903,6 +913,7 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
             return;
         }
 
+        unmarkCurrentSelection();
         this.nonSelectedHandler.handleAutoCloseElementStart(buffer, nameOffset, nameLen, line, col);
 
     }
@@ -932,6 +943,7 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
             return;
         }
 
+        unmarkCurrentSelection();
         this.nonSelectedHandler.handleAutoCloseElementEnd(buffer, nameOffset, nameLen, line, col);
 
     }
@@ -960,6 +972,7 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
             return;
         }
 
+        unmarkCurrentSelection();
         this.nonSelectedHandler.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col);
 
     }
@@ -988,6 +1001,7 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
             return;
         }
 
+        unmarkCurrentSelection();
         this.nonSelectedHandler.handleUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col);
 
     }
@@ -1045,6 +1059,7 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
             return;
         }
 
+        unmarkCurrentSelection();
         this.nonSelectedHandler.handleProcessingInstruction(
                 buffer,
                 targetOffset, targetLen, targetLine, targetCol,
