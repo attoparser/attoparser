@@ -75,12 +75,17 @@ class HtmlAutoOpenCloseElement extends HtmlAutoCloseElement {
             final int nameOffset, final int nameLen,
             final int line, final int col,
             final IMarkupHandler handler,
-            final ParseStatus status)
+            final ParseStatus status,
+            final boolean autoOpenEnabled, final boolean autoCloseEnabled)
             throws ParseException {
 
-        if (!status.isAutoOpenCloseDone()) {
-            status.setAutoCloseRequired(this.autoCloseRequired, this.autoCloseLimits);
-            status.setAutoOpenRequired(this.autoOpenParents, this.autoOpenLimits);
+        if ((autoOpenEnabled || autoCloseEnabled) && !status.isAutoOpenCloseDone()) {
+            if (autoCloseEnabled) {
+                status.setAutoCloseRequired(this.autoCloseRequired, this.autoCloseLimits);
+            }
+            if (autoOpenEnabled) {
+                status.setAutoOpenRequired(this.autoOpenParents, this.autoOpenLimits);
+            }
             return;
         }
 
@@ -97,12 +102,17 @@ class HtmlAutoOpenCloseElement extends HtmlAutoCloseElement {
             final boolean minimized,
             final int line, final int col,
             final IMarkupHandler handler,
-            final ParseStatus status)
+            final ParseStatus status,
+            final boolean autoOpenEnabled, final boolean autoCloseEnabled)
             throws ParseException {
 
-        if (!status.isAutoOpenCloseDone()) {
-            status.setAutoCloseRequired(this.autoCloseRequired, this.autoCloseLimits);
-            status.setAutoOpenRequired(this.autoOpenParents, this.autoOpenLimits);
+        if ((autoOpenEnabled || autoCloseEnabled) && !status.isAutoOpenCloseDone()) {
+            if (autoCloseEnabled) {
+                status.setAutoCloseRequired(this.autoCloseRequired, this.autoCloseLimits);
+            }
+            if (autoOpenEnabled) {
+                status.setAutoOpenRequired(this.autoOpenParents, this.autoOpenLimits);
+            }
             return;
         }
 

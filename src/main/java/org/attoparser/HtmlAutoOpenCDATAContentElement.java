@@ -73,10 +73,11 @@ class HtmlAutoOpenCDATAContentElement extends HtmlCDATAContentElement {
             final int nameOffset, final int nameLen,
             final int line, final int col,
             final IMarkupHandler handler,
-            final ParseStatus status)
+            final ParseStatus status,
+            final boolean autoOpenEnabled, final boolean autoCloseEnabled)
             throws ParseException {
 
-        if (!status.isAutoOpenCloseDone()) {
+        if (autoOpenEnabled && !status.isAutoOpenCloseDone()) {
             status.setAutoOpenRequired(this.autoOpenParents, this.autoOpenLimits);
             return;
         }
@@ -94,10 +95,11 @@ class HtmlAutoOpenCDATAContentElement extends HtmlCDATAContentElement {
             final boolean minimized,
             final int line, final int col,
             final IMarkupHandler handler,
-            final ParseStatus status)
+            final ParseStatus status,
+            final boolean autoOpenEnabled, final boolean autoCloseEnabled)
             throws ParseException {
 
-        if (!status.isAutoOpenCloseDone()) {
+        if (autoOpenEnabled && !status.isAutoOpenCloseDone()) {
             status.setAutoOpenRequired(this.autoOpenParents, this.autoOpenLimits);
             return;
         }

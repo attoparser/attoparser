@@ -27,7 +27,7 @@
             <em>entity resolution</em> or <em>escaping / unescaping</em> operations. All of this on purpose, too.</li>
         <li>Allows <strong>ill-formed markup</strong> (XML or HTML) if configured to do so.</li>
         <li>Performs <strong>auto-balancing</strong> of tags if configured to do so. Both in XML and in HTML
-            parsing modes.</li>
+            parsing modes (will do it according to the HTML5 specification if in HTML mode).</li>
         <li><strong>Zero loss</strong> parsing. Does not lose any information during parsing (keyword case,
             attribute quoting...), so that the exact original markup can be reconstructed at the handler layer.</li>
         <li>Can perform fast <strong>fragment selection</strong> operations during parsing, based on powerful

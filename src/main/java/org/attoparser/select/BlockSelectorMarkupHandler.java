@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.attoparser.AbstractMarkupHandler;
 import org.attoparser.IMarkupHandler;
+import org.attoparser.IMarkupParser;
 import org.attoparser.ParseException;
 import org.attoparser.ParseStatus;
 import org.attoparser.config.ParseConfiguration;
@@ -426,6 +427,23 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
     public void setParseStatus(final ParseStatus status) {
         this.selectedHandler.setParseStatus(status);
         this.nonSelectedHandler.setParseStatus(status);
+    }
+
+
+
+
+    @Override
+    public void setParser(final IMarkupParser parser) {
+        this.selectedHandler.setParser(parser);
+        this.nonSelectedHandler.setParser(parser);
+    }
+
+
+
+    @Override
+    public void setHandlerChain(final IMarkupHandler handlerChain) {
+        this.selectedHandler.setHandlerChain(handlerChain);
+        this.nonSelectedHandler.setHandlerChain(handlerChain);
     }
 
 

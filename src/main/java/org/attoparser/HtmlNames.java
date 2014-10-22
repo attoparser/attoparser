@@ -86,7 +86,7 @@ final class HtmlNames {
                         "tabindex", "title", "translate", "type", "usemap", "valign", "value", "valuetype",
                         "width", "xml:lang", "xml:space", "xmlns"
                 }));
-
+        Collections.sort(allStandardAttributeNamesAux);
         ALL_STANDARD_ATTRIBUTE_NAMES =
                 Collections.unmodifiableSet(new LinkedHashSet<String>(allStandardAttributeNamesAux));
 

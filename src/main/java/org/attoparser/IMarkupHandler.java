@@ -186,6 +186,48 @@ public interface IMarkupHandler {
 
     /**
      * <p>
+     *   Sets the {@link org.attoparser.IMarkupParser} object that will be actually parsing the document and calling
+     *   this handler's methods.
+     * </p>
+     * <p>
+     *   This method is always called by the parser <strong>before</strong> calling any other event handling method.
+     * </p>
+     * <p>
+     *   Note that this method can be <strong>safely ignored by most implementations</strong>, as there are
+     *   very few and very specific scenarios in which this kind of interaction with the parser would be needed.
+     *   It is therefore mainly for internal use.
+     * </p>
+     *
+     * @param parser the parser object.
+     */
+    public void setParser(final IMarkupParser parser);
+
+
+    /**
+     * <p>
+     *   Sets the {@link org.attoparser.IMarkupHandler} object that represents the first element of the handler
+     *   chain, i.e. the original handler that is passed to the parser's <tt>parse*</tt> methods. This
+     *   object can be used for calling the parser again (obtained with {@link #setParser(IMarkupParser)}) from one
+     *   of its handlers in order to perform nested parsing operations.
+     * </p>
+     * <p>
+     *   This method is always called by the parser <strong>before</strong> calling any other event handling method.
+     * </p>
+     * <p>
+     *   Note that this method can be <strong>safely ignored by most implementations</strong>, as there are
+     *   very few and very specific scenarios in which this kind of interaction with the parser would be needed.
+     *   It is therefore mainly for internal use.
+     * </p>
+     *
+     * @param handlerChain the status object.
+     */
+    public void setHandlerChain(final IMarkupHandler handlerChain);
+
+
+
+
+    /**
+     * <p>
      *   Called at the beginning of document parsing.
      * </p>
      *

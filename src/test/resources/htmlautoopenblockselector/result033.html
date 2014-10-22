@@ -1,0 +1,4 @@
+p[!@class]
+<p th:utext="#{home.welcome('You!')}">Welcome to our grocery store, Sebastian!</p><p>
+    <a href="something">Today</a> is: <span th:with="df=#{date.format}" th:text="${#calendars.format(today,df)}">13 February 2011</span>
+</p><p>Please select an option</p>

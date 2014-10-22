@@ -34,11 +34,21 @@ import org.attoparser.config.ParseConfiguration;
  */
 final class HtmlMarkupHandler extends AbstractMarkupHandler {
 
+    private static final char[] HEAD_BUFFER = "head".toCharArray();
+    private static final char[] BODY_BUFFER = "body".toCharArray();
+
     private IMarkupHandler next;
 
     private ParseStatus status = null; // Will be always set, but anyway we should initialize.
+    private boolean autoOpenEnabled = false;
+    private boolean autoCloseEnabled = false;
     private HtmlElement currentElement = null;
 
+    private int markupLevel = 0;
+
+    private boolean htmlElementHandled = false;
+    private boolean headElementHandled = false;
+    private boolean bodyElementHandled = false;
 
 
 
@@ -63,7 +73,29 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
 
     @Override
     public void setParseConfiguration(final ParseConfiguration parseConfiguration) {
+
+        this.autoOpenEnabled =
+                ParseConfiguration.ElementBalancing.AUTO_OPEN_CLOSE.equals(parseConfiguration.getElementBalancing());
+        this.autoCloseEnabled =
+                (ParseConfiguration.ElementBalancing.AUTO_OPEN_CLOSE.equals(parseConfiguration.getElementBalancing()) ||
+                 ParseConfiguration.ElementBalancing.AUTO_CLOSE.equals(parseConfiguration.getElementBalancing()));
+
         this.next.setParseConfiguration(parseConfiguration);
+
+    }
+
+
+
+    @Override
+    public void setParser(final IMarkupParser parser) {
+        this.next.setParser(parser);
+    }
+
+
+
+    @Override
+    public void setHandlerChain(final IMarkupHandler handlerChain) {
+        this.next.setHandlerChain(handlerChain);
     }
 
 
@@ -192,7 +224,7 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
             throws ParseException {
         
         this.currentElement = HtmlElements.forName(buffer, nameOffset, nameLen);
-        this.currentElement.handleStandaloneElementStart(buffer, nameOffset, nameLen, minimized, line, col, this.next, this.status);
+        this.currentElement.handleStandaloneElementStart(buffer, nameOffset, nameLen, minimized, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
 
     }
 
@@ -211,7 +243,7 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
         this.currentElement = null;
 
         // Hoping for better days in which tail calls might be optimized ;)
-        element.handleStandaloneElementEnd(buffer, nameOffset, nameLen, minimized, line, col, this.next, this.status);
+        element.handleStandaloneElementEnd(buffer, nameOffset, nameLen, minimized, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
 
     }
 
@@ -226,7 +258,27 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
             throws ParseException {
         
         this.currentElement = HtmlElements.forName(buffer, nameOffset, nameLen);
-        this.currentElement.handleOpenElementStart(buffer, nameOffset, nameLen, line, col, this.next, this.status);
+
+        if (this.autoOpenEnabled) {
+            if (this.markupLevel == 0 && this.currentElement == HtmlElements.HTML) {
+                this.htmlElementHandled = true;
+            } else if (this.markupLevel == 1 && this.htmlElementHandled && this.currentElement == HtmlElements.HEAD) {
+                this.headElementHandled = true;
+            } else if (this.markupLevel == 1 && this.htmlElementHandled && this.currentElement == HtmlElements.BODY) {
+                if (!this.headElementHandled) {
+                    // No <head> element has been handled, we should add it automatically
+                    final HtmlElement headElement = HtmlElements.forName(HEAD_BUFFER, 0, HEAD_BUFFER.length);
+                    headElement.handleAutoOpenElementStart(HEAD_BUFFER, 0, HEAD_BUFFER.length, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
+                    headElement.handleAutoOpenElementEnd(HEAD_BUFFER, 0, HEAD_BUFFER.length, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
+                    headElement.handleAutoCloseElementStart(HEAD_BUFFER, 0, HEAD_BUFFER.length, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
+                    headElement.handleAutoCloseElementEnd(HEAD_BUFFER, 0, HEAD_BUFFER.length, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
+                    this.headElementHandled = true;
+                }
+                this.bodyElementHandled = true;
+            }
+        }
+
+        this.currentElement.handleOpenElementStart(buffer, nameOffset, nameLen, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
 
     }
 
@@ -241,11 +293,13 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
             throw new IllegalStateException("Cannot end element: no current element");
         }
 
+        this.markupLevel++;
+
         final HtmlElement element = this.currentElement;
         this.currentElement = null;
 
         // Hoping for better days in which tail calls might be optimized ;)
-        element.handleOpenElementEnd(buffer, nameOffset, nameLen, line, col, this.next, this.status);
+        element.handleOpenElementEnd(buffer, nameOffset, nameLen, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
 
     }
 
@@ -259,7 +313,27 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
             throws ParseException {
 
         this.currentElement = HtmlElements.forName(buffer, nameOffset, nameLen);
-        this.currentElement.handleAutoOpenElementStart(buffer, nameOffset, nameLen, line, col, this.next, this.status);
+
+        if (this.autoOpenEnabled) {
+            if (this.markupLevel == 0 && this.currentElement == HtmlElements.HTML) {
+                this.htmlElementHandled = true;
+            } else if (this.markupLevel == 1 && this.htmlElementHandled && this.currentElement == HtmlElements.HEAD) {
+                this.headElementHandled = true;
+            } else if (this.markupLevel == 1 && this.htmlElementHandled && this.currentElement == HtmlElements.BODY) {
+                if (!this.headElementHandled) {
+                    // No <head> element has been handled, we should add it automatically
+                    final HtmlElement headElement = HtmlElements.forName(HEAD_BUFFER, 0, HEAD_BUFFER.length);
+                    headElement.handleAutoOpenElementStart(HEAD_BUFFER, 0, HEAD_BUFFER.length, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
+                    headElement.handleAutoOpenElementEnd(HEAD_BUFFER, 0, HEAD_BUFFER.length, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
+                    headElement.handleAutoCloseElementStart(HEAD_BUFFER, 0, HEAD_BUFFER.length, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
+                    headElement.handleAutoCloseElementEnd(HEAD_BUFFER, 0, HEAD_BUFFER.length, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
+                    this.headElementHandled = true;
+                }
+                this.bodyElementHandled = true;
+            }
+        }
+
+        this.currentElement.handleAutoOpenElementStart(buffer, nameOffset, nameLen, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
 
     }
 
@@ -274,11 +348,13 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
             throw new IllegalStateException("Cannot end element: no current element");
         }
 
+        this.markupLevel++;
+
         final HtmlElement element = this.currentElement;
         this.currentElement = null;
 
         // Hoping for better days in which tail calls might be optimized ;)
-        element.handleAutoOpenElementEnd(buffer, nameOffset, nameLen, line, col, this.next, this.status);
+        element.handleAutoOpenElementEnd(buffer, nameOffset, nameLen, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
 
     }
 
@@ -291,9 +367,35 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
             final int nameOffset, final int nameLen,
             final int line, final int col) 
             throws ParseException {
-        
+
+        this.markupLevel--;
+
         this.currentElement = HtmlElements.forName(buffer, nameOffset, nameLen);
-        this.currentElement.handleCloseElementStart(buffer, nameOffset, nameLen, line, col, this.next, this.status);
+
+        if (this.autoOpenEnabled) {
+            if (this.markupLevel == 0 && this.htmlElementHandled && this.currentElement == HtmlElements.HTML) {
+                if (!this.headElementHandled) {
+                    // No <head> element has been handled, we should add it automatically
+                    final HtmlElement headElement = HtmlElements.forName(HEAD_BUFFER, 0, HEAD_BUFFER.length);
+                    headElement.handleAutoOpenElementStart(HEAD_BUFFER, 0, HEAD_BUFFER.length, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
+                    headElement.handleAutoOpenElementEnd(HEAD_BUFFER, 0, HEAD_BUFFER.length, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
+                    headElement.handleAutoCloseElementStart(HEAD_BUFFER, 0, HEAD_BUFFER.length, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
+                    headElement.handleAutoCloseElementEnd(HEAD_BUFFER, 0, HEAD_BUFFER.length, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
+                    this.headElementHandled = true;
+                }
+                if (!this.bodyElementHandled) {
+                    // No <body> element has been handled, we should add it automatically
+                    final HtmlElement headElement = HtmlElements.forName(BODY_BUFFER, 0, BODY_BUFFER.length);
+                    headElement.handleAutoOpenElementStart(BODY_BUFFER, 0, BODY_BUFFER.length, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
+                    headElement.handleAutoOpenElementEnd(BODY_BUFFER, 0, BODY_BUFFER.length, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
+                    headElement.handleAutoCloseElementStart(BODY_BUFFER, 0, BODY_BUFFER.length, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
+                    headElement.handleAutoCloseElementEnd(BODY_BUFFER, 0, BODY_BUFFER.length, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
+                    this.bodyElementHandled = true;
+                }
+            }
+        }
+
+        this.currentElement.handleCloseElementStart(buffer, nameOffset, nameLen, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
         
     }
 
@@ -312,7 +414,7 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
         this.currentElement = null;
 
         // Hoping for better days in which tail calls might be optimized ;)
-        element.handleCloseElementEnd(buffer, nameOffset, nameLen, line, col, this.next, this.status);
+        element.handleCloseElementEnd(buffer, nameOffset, nameLen, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
 
     }
 
@@ -325,9 +427,35 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
             final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
-        
+
+        this.markupLevel--;
+
         this.currentElement = HtmlElements.forName(buffer, nameOffset, nameLen);
-        this.currentElement.handleAutoCloseElementStart(buffer, nameOffset, nameLen, line, col, this.next, this.status);
+
+        if (this.autoOpenEnabled) {
+            if (this.markupLevel == 0 && this.htmlElementHandled && this.currentElement == HtmlElements.HTML) {
+                if (!this.headElementHandled) {
+                    // No <head> element has been handled, we should add it automatically
+                    final HtmlElement headElement = HtmlElements.forName(HEAD_BUFFER, 0, HEAD_BUFFER.length);
+                    headElement.handleAutoOpenElementStart(HEAD_BUFFER, 0, HEAD_BUFFER.length, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
+                    headElement.handleAutoOpenElementEnd(HEAD_BUFFER, 0, HEAD_BUFFER.length, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
+                    headElement.handleAutoCloseElementStart(HEAD_BUFFER, 0, HEAD_BUFFER.length, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
+                    headElement.handleAutoCloseElementEnd(HEAD_BUFFER, 0, HEAD_BUFFER.length, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
+                    this.headElementHandled = true;
+                }
+                if (!this.bodyElementHandled) {
+                    // No <body> element has been handled, we should add it automatically
+                    final HtmlElement headElement = HtmlElements.forName(BODY_BUFFER, 0, BODY_BUFFER.length);
+                    headElement.handleAutoOpenElementStart(BODY_BUFFER, 0, BODY_BUFFER.length, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
+                    headElement.handleAutoOpenElementEnd(BODY_BUFFER, 0, BODY_BUFFER.length, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
+                    headElement.handleAutoCloseElementStart(BODY_BUFFER, 0, BODY_BUFFER.length, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
+                    headElement.handleAutoCloseElementEnd(BODY_BUFFER, 0, BODY_BUFFER.length, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
+                    this.bodyElementHandled = true;
+                }
+            }
+        }
+
+        this.currentElement.handleAutoCloseElementStart(buffer, nameOffset, nameLen, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
         
     }
 
@@ -346,7 +474,7 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
         this.currentElement = null;
 
         // Hoping for better days in which tail calls might be optimized ;)
-        element.handleAutoCloseElementEnd(buffer, nameOffset, nameLen, line, col, this.next, this.status);
+        element.handleAutoCloseElementEnd(buffer, nameOffset, nameLen, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
 
     }
 
@@ -361,7 +489,7 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
             throws ParseException {
         
         this.currentElement = HtmlElements.forName(buffer, nameOffset, nameLen);
-        this.currentElement.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col, this.next, this.status);
+        this.currentElement.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
         
     }
 
@@ -380,7 +508,7 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
         this.currentElement = null;
 
         // Hoping for better days in which tail calls might be optimized ;)
-        element.handleUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col, this.next, this.status);
+        element.handleUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
 
     }
     
@@ -406,7 +534,7 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
         this.currentElement.handleAttribute(buffer, nameOffset, nameLen, nameLine, nameCol,
                 operatorOffset, operatorLen, operatorLine, operatorCol,
                 valueContentOffset, valueContentLen, valueOuterOffset, valueOuterLen,
-                valueLine, valueCol, this.next, this.status);
+                valueLine, valueCol, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
         
     }
 
@@ -424,7 +552,7 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
             throw new IllegalStateException("Cannot handle attribute: no current element");
         }
         
-        this.currentElement.handleInnerWhiteSpace(buffer, offset, len, line, col, this.next, this.status);
+        this.currentElement.handleInnerWhiteSpace(buffer, offset, len, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
         
     }
 

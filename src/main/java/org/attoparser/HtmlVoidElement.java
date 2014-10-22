@@ -53,7 +53,8 @@ class HtmlVoidElement extends HtmlElement {
             final boolean minimized,
             final int line, final int col,
             final IMarkupHandler handler,
-            final ParseStatus status)
+            final ParseStatus status,
+            final boolean autoOpenEnabled, final boolean autoCloseEnabled)
             throws ParseException {
 
         status.setAvoidStacking(true);
@@ -68,7 +69,8 @@ class HtmlVoidElement extends HtmlElement {
             final int nameOffset, final int nameLen, 
             final int line, final int col, 
             final IMarkupHandler handler,
-            final ParseStatus status)
+            final ParseStatus status,
+            final boolean autoOpenEnabled, final boolean autoCloseEnabled)
             throws ParseException {
 
         status.setAvoidStacking(true);
@@ -83,7 +85,8 @@ class HtmlVoidElement extends HtmlElement {
             final int nameOffset, final int nameLen,
             final int line, final int col,
             final IMarkupHandler handler,
-            final ParseStatus status)
+            final ParseStatus status,
+            final boolean autoOpenEnabled, final boolean autoCloseEnabled)
             throws ParseException {
 
         handler.handleStandaloneElementEnd(buffer, nameOffset, nameLen, false, line, col);
@@ -99,7 +102,8 @@ class HtmlVoidElement extends HtmlElement {
             final int nameOffset, final int nameLen, 
             final int line, final int col, 
             final IMarkupHandler handler,
-            final ParseStatus status)
+            final ParseStatus status,
+            final boolean autoOpenEnabled, final boolean autoCloseEnabled)
             throws ParseException {
 
         // Void elements have no closing tag, so these are always unmatched
@@ -114,7 +118,8 @@ class HtmlVoidElement extends HtmlElement {
             final int nameOffset, final int nameLen,
             final int line, final int col,
             final IMarkupHandler handler,
-            final ParseStatus status)
+            final ParseStatus status,
+            final boolean autoOpenEnabled, final boolean autoCloseEnabled)
             throws ParseException {
 
         // Void elements have no closing tag, so these are always unmatched

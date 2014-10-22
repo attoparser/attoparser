@@ -205,6 +205,9 @@ public final class MarkupParser implements IMarkupParser {
                 (ParseConfiguration.ParsingMode.HTML.equals(this.configuration.getMode()) ?
                         new HtmlMarkupHandler(handler) : handler);
 
+        markupHandler.setParser(this);
+        markupHandler.setHandlerChain(markupHandler);
+
         markupHandler.setParseConfiguration(this.configuration);
 
         final ParseStatus status = new ParseStatus();
@@ -237,6 +240,9 @@ public final class MarkupParser implements IMarkupParser {
         final IMarkupHandler markupHandler =
                 (ParseConfiguration.ParsingMode.HTML.equals(this.configuration.getMode()) ?
                         new HtmlMarkupHandler(handler) : handler);
+
+        markupHandler.setParser(this);
+        markupHandler.setHandlerChain(markupHandler);
 
         markupHandler.setParseConfiguration(this.configuration);
 

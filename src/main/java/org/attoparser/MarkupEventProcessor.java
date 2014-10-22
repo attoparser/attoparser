@@ -320,6 +320,8 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
          */
 
         this.status.autoOpenCloseDone = false;
+        this.status.autoOpenParents = null;
+        this.status.autoOpenLimits = null;
         this.status.autoCloseRequired = null;
         this.status.autoCloseLimits = null;
         this.status.avoidStacking = true; // Default for standalone elements is avoid stacking
@@ -396,6 +398,8 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
          */
 
         this.status.autoOpenCloseDone = false;
+        this.status.autoOpenParents = null;
+        this.status.autoOpenLimits = null;
         this.status.autoCloseRequired = null;
         this.status.autoCloseLimits = null;
         this.status.avoidStacking = false; // Default for open elements is not to avoid stacking

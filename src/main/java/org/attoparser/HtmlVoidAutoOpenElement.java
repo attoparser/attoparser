@@ -77,12 +77,13 @@ class HtmlVoidAutoOpenElement extends HtmlVoidElement {
             final int nameOffset, final int nameLen,
             final int line, final int col,
             final IMarkupHandler handler,
-            final ParseStatus status)
+            final ParseStatus status,
+            final boolean autoOpenEnabled, final boolean autoCloseEnabled)
             throws ParseException {
 
         status.setAvoidStacking(true);
 
-        if (!status.isAutoOpenCloseDone()) {
+        if (autoOpenEnabled && !status.isAutoOpenCloseDone()) {
             status.setAutoOpenRequired(this.autoOpenParents, this.autoOpenLimits);
             return;
         }
@@ -100,12 +101,13 @@ class HtmlVoidAutoOpenElement extends HtmlVoidElement {
             final boolean minimized,
             final int line, final int col,
             final IMarkupHandler handler,
-            final ParseStatus status)
+            final ParseStatus status,
+            final boolean autoOpenEnabled, final boolean autoCloseEnabled)
             throws ParseException {
 
         status.setAvoidStacking(true);
 
-        if (!status.isAutoOpenCloseDone()) {
+        if (autoOpenEnabled && status.isAutoOpenCloseDone()) {
             status.setAutoOpenRequired(this.autoOpenParents, this.autoOpenLimits);
             return;
         }

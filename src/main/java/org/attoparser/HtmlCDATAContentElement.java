@@ -66,7 +66,8 @@ class HtmlCDATAContentElement extends HtmlElement {
             final int nameOffset, final int nameLen,
             final int line, final int col,
             final IMarkupHandler handler,
-            final ParseStatus status)
+            final ParseStatus status,
+            final boolean autoOpenEnabled, final boolean autoCloseEnabled)
             throws ParseException {
 
 

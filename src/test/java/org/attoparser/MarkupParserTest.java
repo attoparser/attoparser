@@ -117,8 +117,48 @@ public class MarkupParserTest extends TestCase {
 
 
         testHtmlDoc(
+            "<html>",
+            "[OES(html){1,1}OEE(html){1,6}AOES(head){1,7}AOEE(head){1,7}ACES(head){1,7}ACEE(head){1,7}AOES(body){1,7}AOEE(body){1,7}ACES(body){1,7}ACEE(body){1,7}ACES(html){1,7}ACEE(html){1,7}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<html></html>",
+            "[OES(html){1,1}OEE(html){1,6}AOES(head){1,7}AOEE(head){1,7}ACES(head){1,7}ACEE(head){1,7}AOES(body){1,7}AOEE(body){1,7}ACES(body){1,7}ACEE(body){1,7}CES(html){1,7}CEE(html){1,13}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<html><body></html>",
+            "[OES(html){1,1}OEE(html){1,6}AOES(head){1,7}AOEE(head){1,7}ACES(head){1,7}ACEE(head){1,7}OES(body){1,7}OEE(body){1,12}ACES(body){1,13}ACEE(body){1,13}CES(html){1,13}CEE(html){1,19}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<html>",
+            "[OES(html){1,1}OEE(html){1,6}ACES(html){1,7}ACEE(html){1,7}]",
+            noRestrictionsAutoClose);
+        testHtmlDoc(
+            "<html></html>",
+            "[OES(html){1,1}OEE(html){1,6}CES(html){1,7}CEE(html){1,13}]",
+            noRestrictionsAutoClose);
+        testHtmlDoc(
+            "<html><body></html>",
+            "[OES(html){1,1}OEE(html){1,6}OES(body){1,7}OEE(body){1,12}ACES(body){1,13}ACEE(body){1,13}CES(html){1,13}CEE(html){1,19}]",
+            noRestrictionsAutoClose);
+        testHtmlDoc(
+            "<html><title><body><p>",
+            "[OES(html){1,1}OEE(html){1,6}AOES(head){1,7}AOEE(head){1,7}OES(title){1,7}OEE(title){1,13}ACES(title){1,14}ACEE(title){1,14}ACES(head){1,14}ACEE(head){1,14}OES(body){1,14}OEE(body){1,19}OES(p){1,20}OEE(p){1,22}ACES(p){1,23}ACEE(p){1,23}ACES(body){1,23}ACEE(body){1,23}ACES(html){1,23}ACEE(html){1,23}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<title><body><p>",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}OES(title){1,1}OEE(title){1,7}ACES(title){1,8}ACEE(title){1,8}ACES(head){1,8}ACEE(head){1,8}OES(body){1,8}OEE(body){1,13}OES(p){1,14}OEE(p){1,16}ACES(p){1,17}ACEE(p){1,17}ACES(body){1,17}ACEE(body){1,17}ACES(html){1,17}ACEE(html){1,17}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<html><body>",
+            "[OES(html){1,1}OEE(html){1,6}AOES(head){1,7}AOEE(head){1,7}ACES(head){1,7}ACEE(head){1,7}OES(body){1,7}OEE(body){1,12}ACES(body){1,13}ACEE(body){1,13}ACES(html){1,13}ACEE(html){1,13}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<p><img src=\"hello\">Something</p>",
+            "[OES(p){1,1}OEE(p){1,3}NSES(img){1,4}IWS( ){1,8}A(src){1,9}(=){1,12}(\"hello\"){1,13}NSEE(img){1,20}T(Something){1,21}CES(p){1,30}CEE(p){1,33}]",
+            noRestrictionsAutoClose);
+        testHtmlDoc(
             "<table><tr>",
-            "[OES(table){1,1}OEE(table){1,7}AOES(tbody){1,8}AOEE(tbody){1,8}OES(tr){1,8}OEE(tr){1,11}ACES(tr){1,12}ACEE(tr){1,12}ACES(tbody){1,12}ACEE(tbody){1,12}ACES(table){1,12}ACEE(table){1,12}]",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}ACES(head){1,1}ACEE(head){1,1}AOES(body){1,1}AOEE(body){1,1}OES(table){1,1}OEE(table){1,7}AOES(tbody){1,8}AOEE(tbody){1,8}OES(tr){1,8}OEE(tr){1,11}ACES(tr){1,12}ACEE(tr){1,12}ACES(tbody){1,12}ACEE(tbody){1,12}ACES(table){1,12}ACEE(table){1,12}ACES(body){1,12}ACEE(body){1,12}ACES(html){1,12}ACEE(html){1,12}]",
             noRestrictionsAutoOpenClose);
         testHtmlDoc(
             "<tr>",
@@ -126,11 +166,11 @@ public class MarkupParserTest extends TestCase {
             noRestrictionsAutoOpenClose);
         testHtmlDoc(
             "<table><tfoot><tr>",
-            "[OES(table){1,1}OEE(table){1,7}OES(tfoot){1,8}OEE(tfoot){1,14}OES(tr){1,15}OEE(tr){1,18}ACES(tr){1,19}ACEE(tr){1,19}ACES(tfoot){1,19}ACEE(tfoot){1,19}ACES(table){1,19}ACEE(table){1,19}]",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}ACES(head){1,1}ACEE(head){1,1}AOES(body){1,1}AOEE(body){1,1}OES(table){1,1}OEE(table){1,7}OES(tfoot){1,8}OEE(tfoot){1,14}OES(tr){1,15}OEE(tr){1,18}ACES(tr){1,19}ACEE(tr){1,19}ACES(tfoot){1,19}ACEE(tfoot){1,19}ACES(table){1,19}ACEE(table){1,19}ACES(body){1,19}ACEE(body){1,19}ACES(html){1,19}ACEE(html){1,19}]",
             noRestrictionsAutoOpenClose);
         testHtmlDoc(
             "<table><thead><tr>",
-            "[OES(table){1,1}OEE(table){1,7}OES(thead){1,8}OEE(thead){1,14}OES(tr){1,15}OEE(tr){1,18}ACES(tr){1,19}ACEE(tr){1,19}ACES(thead){1,19}ACEE(thead){1,19}ACES(table){1,19}ACEE(table){1,19}]",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}ACES(head){1,1}ACEE(head){1,1}AOES(body){1,1}AOEE(body){1,1}OES(table){1,1}OEE(table){1,7}OES(thead){1,8}OEE(thead){1,14}OES(tr){1,15}OEE(tr){1,18}ACES(tr){1,19}ACEE(tr){1,19}ACES(thead){1,19}ACEE(thead){1,19}ACES(table){1,19}ACEE(table){1,19}ACES(body){1,19}ACEE(body){1,19}ACES(html){1,19}ACEE(html){1,19}]",
             noRestrictionsAutoOpenClose);
         testHtmlDoc(
             "<table><tr><td><tr>",
@@ -138,11 +178,11 @@ public class MarkupParserTest extends TestCase {
             noRestrictionsAutoClose);
         testHtmlDoc(
             "<table><col>",
-            "[OES(table){1,1}OEE(table){1,7}AOES(colgroup){1,8}AOEE(colgroup){1,8}NSES(col){1,8}NSEE(col){1,12}ACES(colgroup){1,13}ACEE(colgroup){1,13}ACES(table){1,13}ACEE(table){1,13}]",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}ACES(head){1,1}ACEE(head){1,1}AOES(body){1,1}AOEE(body){1,1}OES(table){1,1}OEE(table){1,7}AOES(colgroup){1,8}AOEE(colgroup){1,8}NSES(col){1,8}NSEE(col){1,12}ACES(colgroup){1,13}ACEE(colgroup){1,13}ACES(table){1,13}ACEE(table){1,13}ACES(body){1,13}ACEE(body){1,13}ACES(html){1,13}ACEE(html){1,13}]",
             noRestrictionsAutoOpenClose);
         testHtmlDoc(
             "<table><thead><td><col>",
-            "[OES(table){1,1}OEE(table){1,7}OES(thead){1,8}OEE(thead){1,14}OES(td){1,15}OEE(td){1,18}ACES(td){1,19}ACEE(td){1,19}ACES(thead){1,19}ACEE(thead){1,19}AOES(colgroup){1,19}AOEE(colgroup){1,19}NSES(col){1,19}NSEE(col){1,23}ACES(colgroup){1,24}ACEE(colgroup){1,24}ACES(table){1,24}ACEE(table){1,24}]",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}ACES(head){1,1}ACEE(head){1,1}AOES(body){1,1}AOEE(body){1,1}OES(table){1,1}OEE(table){1,7}OES(thead){1,8}OEE(thead){1,14}OES(td){1,15}OEE(td){1,18}ACES(td){1,19}ACEE(td){1,19}ACES(thead){1,19}ACEE(thead){1,19}AOES(colgroup){1,19}AOEE(colgroup){1,19}NSES(col){1,19}NSEE(col){1,23}ACES(colgroup){1,24}ACEE(colgroup){1,24}ACES(table){1,24}ACEE(table){1,24}ACES(body){1,24}ACEE(body){1,24}ACES(html){1,24}ACEE(html){1,24}]",
             noRestrictionsAutoOpenClose);
         testHtmlDoc(
             "<meta>",
@@ -154,39 +194,39 @@ public class MarkupParserTest extends TestCase {
             noRestrictionsAutoOpenClose);
         testHtmlDoc(
             "<head><meta>",
-            "[OES(head){1,1}OEE(head){1,6}NSES(meta){1,7}NSEE(meta){1,12}ACES(head){1,13}ACEE(head){1,13}]",
+            "[AOES(html){1,1}AOEE(html){1,1}OES(head){1,1}OEE(head){1,6}NSES(meta){1,7}NSEE(meta){1,12}ACES(head){1,13}ACEE(head){1,13}ACES(html){1,13}ACEE(html){1,13}]",
             noRestrictionsAutoOpenClose);
         testHtmlDoc(
             "<body><meta>",
-            "[OES(body){1,1}OEE(body){1,6}NSES(meta){1,7}NSEE(meta){1,12}ACES(body){1,13}ACEE(body){1,13}]",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}ACES(head){1,1}ACEE(head){1,1}OES(body){1,1}OEE(body){1,6}NSES(meta){1,7}NSEE(meta){1,12}ACES(body){1,13}ACEE(body){1,13}ACES(html){1,13}ACEE(html){1,13}]",
             noRestrictionsAutoOpenClose);
         testHtmlDoc(
             "<title>",
-            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}OES(title){1,1}OEE(title){1,7}ACES(title){1,8}ACEE(title){1,8}ACES(head){1,8}ACEE(head){1,8}ACES(html){1,8}ACEE(html){1,8}]",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}OES(title){1,1}OEE(title){1,7}ACES(title){1,8}ACEE(title){1,8}ACES(head){1,8}ACEE(head){1,8}AOES(body){1,8}AOEE(body){1,8}ACES(body){1,8}ACEE(body){1,8}ACES(html){1,8}ACEE(html){1,8}]",
             noRestrictionsAutoOpenClose);
         testHtmlDoc(
             "<head><title>",
-            "[OES(head){1,1}OEE(head){1,6}OES(title){1,7}OEE(title){1,13}ACES(title){1,14}ACEE(title){1,14}ACES(head){1,14}ACEE(head){1,14}]",
+            "[AOES(html){1,1}AOEE(html){1,1}OES(head){1,1}OEE(head){1,6}OES(title){1,7}OEE(title){1,13}ACES(title){1,14}ACEE(title){1,14}ACES(head){1,14}ACEE(head){1,14}AOES(body){1,14}AOEE(body){1,14}ACES(body){1,14}ACEE(body){1,14}ACES(html){1,14}ACEE(html){1,14}]",
             noRestrictionsAutoOpenClose);
         testHtmlDoc(
             "<html><title>",
-            "[OES(html){1,1}OEE(html){1,6}AOES(head){1,7}AOEE(head){1,7}OES(title){1,7}OEE(title){1,13}ACES(title){1,14}ACEE(title){1,14}ACES(head){1,14}ACEE(head){1,14}ACES(html){1,14}ACEE(html){1,14}]",
+            "[OES(html){1,1}OEE(html){1,6}AOES(head){1,7}AOEE(head){1,7}OES(title){1,7}OEE(title){1,13}ACES(title){1,14}ACEE(title){1,14}ACES(head){1,14}ACEE(head){1,14}AOES(body){1,14}AOEE(body){1,14}ACES(body){1,14}ACEE(body){1,14}ACES(html){1,14}ACEE(html){1,14}]",
             noRestrictionsAutoOpenClose);
         testHtmlDoc(
             "<body><title>",
-            "[OES(body){1,1}OEE(body){1,6}OES(title){1,7}OEE(title){1,13}ACES(title){1,14}ACEE(title){1,14}ACES(body){1,14}ACEE(body){1,14}]",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}ACES(head){1,1}ACEE(head){1,1}OES(body){1,1}OEE(body){1,6}OES(title){1,7}OEE(title){1,13}ACES(title){1,14}ACEE(title){1,14}ACES(body){1,14}ACEE(body){1,14}ACES(html){1,14}ACEE(html){1,14}]",
             noRestrictionsAutoOpenClose);
         testHtmlDoc(
             "<div><div><title>",
-            "[OES(div){1,1}OEE(div){1,5}OES(div){1,6}OEE(div){1,10}OES(title){1,11}OEE(title){1,17}ACES(title){1,18}ACEE(title){1,18}ACES(div){1,18}ACEE(div){1,18}ACES(div){1,18}ACEE(div){1,18}]",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}ACES(head){1,1}ACEE(head){1,1}AOES(body){1,1}AOEE(body){1,1}OES(div){1,1}OEE(div){1,5}OES(div){1,6}OEE(div){1,10}OES(title){1,11}OEE(title){1,17}ACES(title){1,18}ACEE(title){1,18}ACES(div){1,18}ACEE(div){1,18}ACES(div){1,18}ACEE(div){1,18}ACES(body){1,18}ACEE(body){1,18}ACES(html){1,18}ACEE(html){1,18}]",
             noRestrictionsAutoOpenClose);
         testHtmlDoc(
             "<html><object>",
-            "[OES(html){1,1}OEE(html){1,6}AOES(head){1,7}AOEE(head){1,7}OES(object){1,7}OEE(object){1,14}ACES(object){1,15}ACEE(object){1,15}ACES(head){1,15}ACEE(head){1,15}ACES(html){1,15}ACEE(html){1,15}]",
+            "[OES(html){1,1}OEE(html){1,6}AOES(head){1,7}AOEE(head){1,7}OES(object){1,7}OEE(object){1,14}ACES(object){1,15}ACEE(object){1,15}ACES(head){1,15}ACEE(head){1,15}AOES(body){1,15}AOEE(body){1,15}ACES(body){1,15}ACEE(body){1,15}ACES(html){1,15}ACEE(html){1,15}]",
             noRestrictionsAutoOpenClose);
         testHtmlDoc(
             "<body><object>",
-            "[OES(body){1,1}OEE(body){1,6}OES(object){1,7}OEE(object){1,14}ACES(object){1,15}ACEE(object){1,15}ACES(body){1,15}ACEE(body){1,15}]",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}ACES(head){1,1}ACEE(head){1,1}OES(body){1,1}OEE(body){1,6}OES(object){1,7}OEE(object){1,14}ACES(object){1,15}ACEE(object){1,15}ACES(body){1,15}ACEE(body){1,15}ACES(html){1,15}ACEE(html){1,15}]",
             noRestrictionsAutoOpenClose);
         testHtmlDoc(
             "<template> if (a < 0) { do this} </template>",
@@ -194,12 +234,112 @@ public class MarkupParserTest extends TestCase {
             noRestrictionsAutoClose);
         testHtmlDoc(
             "<template> if (a < 0) { do this} </template>",
-            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}OES(template){1,1}OEE(template){1,10}T( if (a < 0) { do this} ){1,11}CES(template){1,34}CEE(template){1,44}ACES(head){1,45}ACEE(head){1,45}ACES(html){1,45}ACEE(html){1,45}]",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}OES(template){1,1}OEE(template){1,10}T( if (a < 0) { do this} ){1,11}CES(template){1,34}CEE(template){1,44}ACES(head){1,45}ACEE(head){1,45}AOES(body){1,45}AOEE(body){1,45}ACES(body){1,45}ACEE(body){1,45}ACES(html){1,45}ACEE(html){1,45}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<head>",
+            "[AOES(html){1,1}AOEE(html){1,1}OES(head){1,1}OEE(head){1,6}ACES(head){1,7}ACEE(head){1,7}AOES(body){1,7}AOEE(body){1,7}ACES(body){1,7}ACEE(body){1,7}ACES(html){1,7}ACEE(html){1,7}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<div><head>",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}ACES(head){1,1}ACEE(head){1,1}AOES(body){1,1}AOEE(body){1,1}OES(div){1,1}OEE(div){1,5}OES(head){1,6}OEE(head){1,11}ACES(head){1,12}ACEE(head){1,12}ACES(div){1,12}ACEE(div){1,12}ACES(body){1,12}ACEE(body){1,12}ACES(html){1,12}ACEE(html){1,12}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<body>",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}ACES(head){1,1}ACEE(head){1,1}OES(body){1,1}OEE(body){1,6}ACES(body){1,7}ACEE(body){1,7}ACES(html){1,7}ACEE(html){1,7}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<div><body>",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}ACES(head){1,1}ACEE(head){1,1}AOES(body){1,1}AOEE(body){1,1}OES(div){1,1}OEE(div){1,5}OES(body){1,6}OEE(body){1,11}ACES(body){1,12}ACEE(body){1,12}ACES(div){1,12}ACEE(div){1,12}ACES(body){1,12}ACEE(body){1,12}ACES(html){1,12}ACEE(html){1,12}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<h1>",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}ACES(head){1,1}ACEE(head){1,1}AOES(body){1,1}AOEE(body){1,1}OES(h1){1,1}OEE(h1){1,4}ACES(h1){1,5}ACEE(h1){1,5}ACES(body){1,5}ACEE(body){1,5}ACES(html){1,5}ACEE(html){1,5}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<html><h1>",
+            "[OES(html){1,1}OEE(html){1,6}AOES(head){1,7}AOEE(head){1,7}ACES(head){1,7}ACEE(head){1,7}AOES(body){1,7}AOEE(body){1,7}OES(h1){1,7}OEE(h1){1,10}ACES(h1){1,11}ACEE(h1){1,11}ACES(body){1,11}ACEE(body){1,11}ACES(html){1,11}ACEE(html){1,11}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<footer>",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}ACES(head){1,1}ACEE(head){1,1}AOES(body){1,1}AOEE(body){1,1}OES(footer){1,1}OEE(footer){1,8}ACES(footer){1,9}ACEE(footer){1,9}ACES(body){1,9}ACEE(body){1,9}ACES(html){1,9}ACEE(html){1,9}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<html><footer>",
+            "[OES(html){1,1}OEE(html){1,6}AOES(head){1,7}AOEE(head){1,7}ACES(head){1,7}ACEE(head){1,7}AOES(body){1,7}AOEE(body){1,7}OES(footer){1,7}OEE(footer){1,14}ACES(footer){1,15}ACEE(footer){1,15}ACES(body){1,15}ACEE(body){1,15}ACES(html){1,15}ACEE(html){1,15}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<p>",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}ACES(head){1,1}ACEE(head){1,1}AOES(body){1,1}AOEE(body){1,1}OES(p){1,1}OEE(p){1,3}ACES(p){1,4}ACEE(p){1,4}ACES(body){1,4}ACEE(body){1,4}ACES(html){1,4}ACEE(html){1,4}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<html><p>",
+            "[OES(html){1,1}OEE(html){1,6}AOES(head){1,7}AOEE(head){1,7}ACES(head){1,7}ACEE(head){1,7}AOES(body){1,7}AOEE(body){1,7}OES(p){1,7}OEE(p){1,9}ACES(p){1,10}ACEE(p){1,10}ACES(body){1,10}ACEE(body){1,10}ACES(html){1,10}ACEE(html){1,10}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<div><p>",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}ACES(head){1,1}ACEE(head){1,1}AOES(body){1,1}AOEE(body){1,1}OES(div){1,1}OEE(div){1,5}OES(p){1,6}OEE(p){1,8}ACES(p){1,9}ACEE(p){1,9}ACES(div){1,9}ACEE(div){1,9}ACES(body){1,9}ACEE(body){1,9}ACES(html){1,9}ACEE(html){1,9}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<html><p>",
+            "[OES(html){1,1}OEE(html){1,6}AOES(head){1,7}AOEE(head){1,7}ACES(head){1,7}ACEE(head){1,7}AOES(body){1,7}AOEE(body){1,7}OES(p){1,7}OEE(p){1,9}ACES(p){1,10}ACEE(p){1,10}ACES(body){1,10}ACEE(body){1,10}ACES(html){1,10}ACEE(html){1,10}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<head><p>",
+            "[AOES(html){1,1}AOEE(html){1,1}OES(head){1,1}OEE(head){1,6}ACES(head){1,7}ACEE(head){1,7}AOES(body){1,7}AOEE(body){1,7}OES(p){1,7}OEE(p){1,9}ACES(p){1,10}ACEE(p){1,10}ACES(body){1,10}ACEE(body){1,10}ACES(html){1,10}ACEE(html){1,10}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<ul>",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}ACES(head){1,1}ACEE(head){1,1}AOES(body){1,1}AOEE(body){1,1}OES(ul){1,1}OEE(ul){1,4}ACES(ul){1,5}ACEE(ul){1,5}ACES(body){1,5}ACEE(body){1,5}ACES(html){1,5}ACEE(html){1,5}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<html><ul>",
+            "[OES(html){1,1}OEE(html){1,6}AOES(head){1,7}AOEE(head){1,7}ACES(head){1,7}ACEE(head){1,7}AOES(body){1,7}AOEE(body){1,7}OES(ul){1,7}OEE(ul){1,10}ACES(ul){1,11}ACEE(ul){1,11}ACES(body){1,11}ACEE(body){1,11}ACES(html){1,11}ACEE(html){1,11}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<li>",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}ACES(head){1,1}ACEE(head){1,1}AOES(body){1,1}AOEE(body){1,1}OES(li){1,1}OEE(li){1,4}ACES(li){1,5}ACEE(li){1,5}ACES(body){1,5}ACEE(body){1,5}ACES(html){1,5}ACEE(html){1,5}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<html><li>",
+            "[OES(html){1,1}OEE(html){1,6}AOES(head){1,7}AOEE(head){1,7}ACES(head){1,7}ACEE(head){1,7}AOES(body){1,7}AOEE(body){1,7}OES(li){1,7}OEE(li){1,10}ACES(li){1,11}ACEE(li){1,11}ACES(body){1,11}ACEE(body){1,11}ACES(html){1,11}ACEE(html){1,11}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<figure>",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}ACES(head){1,1}ACEE(head){1,1}AOES(body){1,1}AOEE(body){1,1}OES(figure){1,1}OEE(figure){1,8}ACES(figure){1,9}ACEE(figure){1,9}ACES(body){1,9}ACEE(body){1,9}ACES(html){1,9}ACEE(html){1,9}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<html><figure>",
+            "[OES(html){1,1}OEE(html){1,6}AOES(head){1,7}AOEE(head){1,7}ACES(head){1,7}ACEE(head){1,7}AOES(body){1,7}AOEE(body){1,7}OES(figure){1,7}OEE(figure){1,14}ACES(figure){1,15}ACEE(figure){1,15}ACES(body){1,15}ACEE(body){1,15}ACES(html){1,15}ACEE(html){1,15}]",
             noRestrictionsAutoOpenClose);
         testHtmlDoc(
             "<table><tr><th><tr>",
             "[OES(table){1,1}OEE(table){1,7}OES(tr){1,8}OEE(tr){1,11}OES(th){1,12}OEE(th){1,15}ACES(th){1,16}ACEE(th){1,16}ACES(tr){1,16}ACEE(tr){1,16}OES(tr){1,16}OEE(tr){1,19}ACES(tr){1,20}ACEE(tr){1,20}ACES(table){1,20}ACEE(table){1,20}]",
             noRestrictionsAutoClose);
+        testHtmlDoc(
+            "<code>",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}ACES(head){1,1}ACEE(head){1,1}AOES(body){1,1}AOEE(body){1,1}OES(code){1,1}OEE(code){1,6}ACES(code){1,7}ACEE(code){1,7}ACES(body){1,7}ACEE(body){1,7}ACES(html){1,7}ACEE(html){1,7}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<html><code>",
+            "[OES(html){1,1}OEE(html){1,6}AOES(head){1,7}AOEE(head){1,7}ACES(head){1,7}ACEE(head){1,7}AOES(body){1,7}AOEE(body){1,7}OES(code){1,7}OEE(code){1,12}ACES(code){1,13}ACEE(code){1,13}ACES(body){1,13}ACEE(body){1,13}ACES(html){1,13}ACEE(html){1,13}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<html><body><code>",
+            "[OES(html){1,1}OEE(html){1,6}AOES(head){1,7}AOEE(head){1,7}ACES(head){1,7}ACEE(head){1,7}OES(body){1,7}OEE(body){1,12}OES(code){1,13}OEE(code){1,18}ACES(code){1,19}ACEE(code){1,19}ACES(body){1,19}ACEE(body){1,19}ACES(html){1,19}ACEE(html){1,19}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<br>",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}ACES(head){1,1}ACEE(head){1,1}AOES(body){1,1}AOEE(body){1,1}NSES(br){1,1}NSEE(br){1,4}ACES(body){1,5}ACEE(body){1,5}ACES(html){1,5}ACEE(html){1,5}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<html><br>",
+            "[OES(html){1,1}OEE(html){1,6}AOES(head){1,7}AOEE(head){1,7}ACES(head){1,7}ACEE(head){1,7}AOES(body){1,7}AOEE(body){1,7}NSES(br){1,7}NSEE(br){1,10}ACES(body){1,11}ACEE(body){1,11}ACES(html){1,11}ACEE(html){1,11}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<html><body><br>",
+            "[OES(html){1,1}OEE(html){1,6}AOES(head){1,7}AOEE(head){1,7}ACES(head){1,7}ACEE(head){1,7}OES(body){1,7}OEE(body){1,12}NSES(br){1,13}NSEE(br){1,16}ACES(body){1,17}ACEE(body){1,17}ACES(html){1,17}ACEE(html){1,17}]",
+            noRestrictionsAutoOpenClose);
         testHtmlDoc(
             "<td><tr>",
             "[OES(td){1,1}OEE(td){1,4}ACES(td){1,5}ACEE(td){1,5}OES(tr){1,5}OEE(tr){1,8}ACES(tr){1,9}ACEE(tr){1,9}]",
@@ -1665,6 +1805,8 @@ public class MarkupParserTest extends TestCase {
 
                 final ParseStatus status = new ParseStatus();
                 final TraceBuilderMarkupHandler handler = new TraceBuilderMarkupHandler();
+                handler.setParser(parser);
+                handler.setHandlerChain(handler);
                 handler.setParseStatus(status);
                 handler.setParseConfiguration(parseConfiguration);
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
@@ -1699,6 +1841,8 @@ public class MarkupParserTest extends TestCase {
 
                 final ParseStatus status = new ParseStatus();
                 final TraceBuilderMarkupHandler handler = new TraceBuilderMarkupHandler();
+                handler.setParser(parser);
+                handler.setHandlerChain(handler);
                 handler.setParseStatus(status);
                 handler.setParseConfiguration(parseConfiguration);
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
@@ -1741,6 +1885,8 @@ public class MarkupParserTest extends TestCase {
 
                 final ParseStatus status = new ParseStatus();
                 final TraceBuilderMarkupHandler handler = new TraceBuilderMarkupHandler();
+                handler.setParser(parser);
+                handler.setHandlerChain(handler);
                 handler.setParseStatus(status);
                 handler.setParseConfiguration(parseConfiguration);
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
@@ -1771,6 +1917,8 @@ public class MarkupParserTest extends TestCase {
                 final StringWriter sw = new StringWriter();
                 final ParseStatus status = new ParseStatus();
                 final IMarkupHandler handler = new OutputMarkupHandler(sw);
+                handler.setParser(parser);
+                handler.setHandlerChain(handler);
                 handler.setParseStatus(status);
                 handler.setParseConfiguration(parseConfiguration);
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
@@ -1791,6 +1939,8 @@ public class MarkupParserTest extends TestCase {
                 final StringWriter sw = new StringWriter();
                 final ParseStatus status = new ParseStatus();
                 final IMarkupHandler handler = new OutputMarkupHandler(sw);
+                handler.setParser(parser);
+                handler.setHandlerChain(handler);
                 handler.setParseStatus(status);
                 handler.setParseConfiguration(parseConfiguration);
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
@@ -1809,6 +1959,8 @@ public class MarkupParserTest extends TestCase {
                     final ParseStatus status = new ParseStatus();
                     final IMarkupHandler handler =
                             new SimplifierMarkupHandler(new TextTracerSimpleMarkupHandler(sw));
+                    handler.setParser(parser);
+                    handler.setHandlerChain(handler);
                     handler.setParseStatus(status);
                     handler.setParseConfiguration(parseConfiguration);
                     final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
@@ -1886,6 +2038,8 @@ public class MarkupParserTest extends TestCase {
                 final ParseStatus status = new ParseStatus();
                 final TraceBuilderMarkupHandler traceHandler = new TraceBuilderMarkupHandler();
                 final IMarkupHandler handler = new HtmlMarkupHandler(traceHandler);
+                handler.setParser(parser);
+                handler.setHandlerChain(handler);
                 handler.setParseStatus(status);
                 handler.setParseConfiguration(parseConfiguration);
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);

@@ -32,8 +32,10 @@ import org.attoparser.config.ParseConfiguration;
  *   the methods that are of interest for the developer.
  * </p>
  * <p>
- *   Methods like {@link #setParseConfiguration(org.attoparser.config.ParseConfiguration)} and
- *   {@link #setParseStatus(ParseStatus)} are also delegated to the chain.
+ *   Methods like {@link #setParseConfiguration(org.attoparser.config.ParseConfiguration)},
+ *   {@link #setParseStatus(ParseStatus)}, {@link #setParser(IMarkupParser)} and
+ *   {@link #setHandlerChain(IMarkupHandler)} are also delegated to
+ *   the chain.
  * </p>
  * <p>
  *   The next handler in the chain can be used in classes implementing this abstract class by calling the
@@ -92,6 +94,19 @@ public abstract class AbstractChainedMarkupHandler
     public void setParseStatus(final ParseStatus status) {
         this.next.setParseStatus(status);
     }
+
+
+
+    public void setParser(final IMarkupParser parser) {
+        this.next.setParser(parser);
+    }
+
+
+
+    public void setHandlerChain(final IMarkupHandler handlerChain) {
+        this.next.setHandlerChain(handlerChain);
+    }
+
 
 
 

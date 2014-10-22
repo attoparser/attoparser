@@ -52,12 +52,13 @@ class HtmlElement {
 
 
     public void handleStandaloneElementStart(
-            final char[] buffer, 
+            final char[] buffer,
             final int nameOffset, final int nameLen,
             final boolean minimized,
-            final int line, final int col, 
+            final int line, final int col,
             final IMarkupHandler handler,
-            final ParseStatus status)
+            final ParseStatus status,
+            final boolean autoOpenEnabled, final boolean autoCloseEnabled)
             throws ParseException {
 
         handler.handleStandaloneElementStart(buffer, nameOffset, nameLen, minimized, line, col);
@@ -71,7 +72,8 @@ class HtmlElement {
             final boolean minimized,
             final int line, final int col,
             final IMarkupHandler handler,
-            final ParseStatus status)
+            final ParseStatus status,
+            final boolean autoOpenEnabled, final boolean autoCloseEnabled)
             throws ParseException {
 
         handler.handleStandaloneElementEnd(buffer, nameOffset, nameLen, minimized, line, col);
@@ -86,7 +88,8 @@ class HtmlElement {
             final int nameOffset, final int nameLen, 
             final int line, final int col, 
             final IMarkupHandler handler,
-            final ParseStatus status)
+            final ParseStatus status,
+            final boolean autoOpenEnabled, final boolean autoCloseEnabled)
             throws ParseException {
         
         handler.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
@@ -99,7 +102,8 @@ class HtmlElement {
             final int nameOffset, final int nameLen,
             final int line, final int col,
             final IMarkupHandler handler,
-            final ParseStatus status)
+            final ParseStatus status,
+            final boolean autoOpenEnabled, final boolean autoCloseEnabled)
             throws ParseException {
         
         handler.handleOpenElementEnd(buffer, nameOffset, nameLen, line, col);
@@ -114,7 +118,8 @@ class HtmlElement {
             final int nameOffset, final int nameLen,
             final int line, final int col,
             final IMarkupHandler handler,
-            final ParseStatus status)
+            final ParseStatus status,
+            final boolean autoOpenEnabled, final boolean autoCloseEnabled)
             throws ParseException {
 
         handler.handleAutoOpenElementStart(buffer, nameOffset, nameLen, line, col);
@@ -127,7 +132,8 @@ class HtmlElement {
             final int nameOffset, final int nameLen,
             final int line, final int col,
             final IMarkupHandler handler,
-            final ParseStatus status)
+            final ParseStatus status,
+            final boolean autoOpenEnabled, final boolean autoCloseEnabled)
             throws ParseException {
 
         handler.handleAutoOpenElementEnd(buffer, nameOffset, nameLen, line, col);
@@ -142,7 +148,8 @@ class HtmlElement {
             final int nameOffset, final int nameLen, 
             final int line, final int col, 
             final IMarkupHandler handler,
-            final ParseStatus status)
+            final ParseStatus status,
+            final boolean autoOpenEnabled, final boolean autoCloseEnabled)
             throws ParseException {
         
         handler.handleCloseElementStart(buffer, nameOffset, nameLen, line, col);
@@ -155,7 +162,8 @@ class HtmlElement {
             final int nameOffset, final int nameLen,
             final int line, final int col,
             final IMarkupHandler handler,
-            final ParseStatus status)
+            final ParseStatus status,
+            final boolean autoOpenEnabled, final boolean autoCloseEnabled)
             throws ParseException {
 
         handler.handleCloseElementEnd(buffer, nameOffset, nameLen, line, col);
@@ -170,7 +178,8 @@ class HtmlElement {
             final int nameOffset, final int nameLen, 
             final int line, final int col, 
             final IMarkupHandler handler,
-            final ParseStatus status)
+            final ParseStatus status,
+            final boolean autoOpenEnabled, final boolean autoCloseEnabled)
             throws ParseException {
 
         handler.handleAutoCloseElementStart(buffer, nameOffset, nameLen, line, col);
@@ -183,7 +192,8 @@ class HtmlElement {
             final int nameOffset, final int nameLen,
             final int line, final int col,
             final IMarkupHandler handler,
-            final ParseStatus status)
+            final ParseStatus status,
+            final boolean autoOpenEnabled, final boolean autoCloseEnabled)
             throws ParseException {
 
         handler.handleAutoCloseElementEnd(buffer, nameOffset, nameLen, line, col);
@@ -198,7 +208,8 @@ class HtmlElement {
             final int nameOffset, final int nameLen, 
             final int line, final int col, 
             final IMarkupHandler handler,
-            final ParseStatus status)
+            final ParseStatus status,
+            final boolean autoOpenEnabled, final boolean autoCloseEnabled)
             throws ParseException {
         
         handler.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col);
@@ -211,7 +222,8 @@ class HtmlElement {
             final int nameOffset, final int nameLen,
             final int line, final int col,
             final IMarkupHandler handler,
-            final ParseStatus status)
+            final ParseStatus status,
+            final boolean autoOpenEnabled, final boolean autoCloseEnabled)
             throws ParseException {
         
         handler.handleUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col);
@@ -231,7 +243,8 @@ class HtmlElement {
             final int valueOuterOffset, final int valueOuterLen,
             final int valueLine, final int valueCol, 
             final IMarkupHandler handler,
-            final ParseStatus status)
+            final ParseStatus status,
+            final boolean autoOpenEnabled, final boolean autoCloseEnabled)
             throws ParseException {
         
         handler.handleAttribute(
@@ -248,7 +261,8 @@ class HtmlElement {
             final int offset, final int len,
             final int line, final int col, 
             final IMarkupHandler handler,
-            final ParseStatus status)
+            final ParseStatus status,
+            final boolean autoOpenEnabled, final boolean autoCloseEnabled)
             throws ParseException {
         
         handler.handleInnerWhiteSpace(buffer, offset, len, line, col);
