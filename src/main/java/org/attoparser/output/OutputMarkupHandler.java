@@ -383,62 +383,9 @@ public final class OutputMarkupHandler extends AbstractMarkupHandler {
             final int outerOffset, final int outerLen,
             final int line,final int col) 
             throws ParseException {
-        
+
         try {
-
-            final int outerContentEnd = (outerOffset  + outerLen) - 2;
-            
-            this.writer.write('<');
-            this.writer.write('?');
-            this.writer.write(buffer, keywordOffset, keywordLen);
-
-            /*
-             * VERSION (required) 
-             */
-            int lastStructureEnd = keywordOffset + keywordLen;
-            int thisStructureOffset = versionOffset;
-            int thisStructureLen = versionLen;
-            int thisStructureEnd = thisStructureOffset + thisStructureLen;
-            
-            this.writer.write(buffer, lastStructureEnd, thisStructureOffset - lastStructureEnd);
-            this.writer.write(buffer, thisStructureOffset, thisStructureLen);
-
-            /*
-             * ENCODING (optional)
-             */
-            if (encodingLen > 0)  {
-                
-                lastStructureEnd = thisStructureEnd;
-                thisStructureOffset = encodingOffset;
-                thisStructureLen = encodingLen;
-                thisStructureEnd = thisStructureOffset + thisStructureLen;
-            
-                this.writer.write(buffer, lastStructureEnd, thisStructureOffset - lastStructureEnd);
-                this.writer.write(buffer, thisStructureOffset, thisStructureLen);
-
-            }
-
-            /*
-             * STANDALONE (optional)
-             */
-            
-            if (standaloneLen > 0) {
-                
-                lastStructureEnd = thisStructureEnd;
-                thisStructureOffset = standaloneOffset;
-                thisStructureLen = standaloneLen;
-                thisStructureEnd = thisStructureOffset + thisStructureLen;
-            
-                this.writer.write(buffer, lastStructureEnd, thisStructureOffset - lastStructureEnd);
-                this.writer.write(buffer, thisStructureOffset, thisStructureLen);
-                
-            }
-            
-            this.writer.write(buffer, thisStructureEnd, (outerContentEnd - thisStructureEnd));
-            
-            this.writer.write('?');
-            this.writer.write('>');
-            
+            this.writer.write(buffer, outerOffset, outerLen);
         } catch (final Exception e) {
             throw new ParseException(e);
         }
@@ -462,19 +409,7 @@ public final class OutputMarkupHandler extends AbstractMarkupHandler {
             throws ParseException {
         
         try {
-
-            this.writer.write('<');
-            this.writer.write('?');
-            this.writer.write(buffer, targetOffset, targetLen);
-            if (contentLen > 0)  {
-                this.writer.write(buffer, (targetOffset + targetLen), contentOffset - (targetOffset + targetLen));
-                this.writer.write(buffer, contentOffset, contentLen);
-            } else {
-                this.writer.write(buffer, (targetOffset + targetLen), ((outerOffset  + outerLen) - 2) - (targetOffset + targetLen));
-            }
-            this.writer.write('?');
-            this.writer.write('>');
-            
+            this.writer.write(buffer, outerOffset, outerLen);
         } catch (final Exception e) {
             throw new ParseException(e);
         }
