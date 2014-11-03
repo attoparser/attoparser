@@ -25,7 +25,7 @@ import org.attoparser.ParseException;
 
 /**
  * <p>
- *   Implementation of the {@link org.attoparser.select.ISelectionAwareMarkupHandler} that
+ *   Implementation of the {@link org.attoparser.IMarkupHandler} that
  *   adds an attribute (with a user-specified name) to all elements that match one or more selectors,
  *   as determined by a {@link org.attoparser.select.BlockSelectorMarkupHandler} or
  *   {@link org.attoparser.select.NodeSelectorMarkupHandler} handler.
@@ -34,7 +34,7 @@ import org.attoparser.ParseException;
  *   So for example, given an instance of this handler configured to use <tt>"selectors"</tt> as its attribute name
  *   and an <tt>&lt;img href="logo.png"&gt;</tt> tag that matches both selectors <tt>"//img"</tt> and
  *   <tt>"div/img"</tt>, this handler would transform such tag in:
- *   <tt>&lt;img href="logo.png" selectors="//img div/img"&gt;</tt>
+ *   <tt>&lt;img href="logo.png" selectors="[//img,div/img]"&gt;</tt>
  * </p>
  *
  * @author Daniel Fern&aacute;ndez
@@ -42,20 +42,16 @@ import org.attoparser.ParseException;
  * @since 2.0.0
  *
  */
-public final class AttributeMarkingSelectedMarkupHandler
-            extends AbstractChainedMarkupHandler
-            implements ISelectionAwareMarkupHandler {
+public final class AttributeSelectionMarkingMarkupHandler
+            extends AbstractChainedMarkupHandler {
     
 
     private static final char[] INNER_WHITESPACE_BUFFER = " ".toCharArray();
 
-    private final ISelectionAwareMarkupHandler selectionAwareMarkupHandler;
-
-    private String[] selectors = null;
-    private boolean[] currentSelection = null;
-
     private final char[] selectorAttributeName;
     private final int selectorAttributeNameLen;
+
+    private ParseSelection selection;
 
     private boolean lastWasInnerWhiteSpace = false;
     private char[] selectorAttributeBuffer;
@@ -70,18 +66,13 @@ public final class AttributeMarkingSelectedMarkupHandler
      * @param selectorAttributeName the name of the marking attribute.
      * @param handler the handler to delegate events to.
      */
-    public AttributeMarkingSelectedMarkupHandler(final String selectorAttributeName, final IMarkupHandler handler) {
+    public AttributeSelectionMarkingMarkupHandler(final String selectorAttributeName, final IMarkupHandler handler) {
 
         super(handler);
 
         if (selectorAttributeName == null || selectorAttributeName.trim().length() == 0) {
             throw new IllegalArgumentException("Selector attribute name cannot be null or empty");
         }
-
-        // We capture the handler as selection-aware just in case it is, in order to also forward
-        // calls to setSelectors and setCurrentSelection to it.
-        this.selectionAwareMarkupHandler =
-            (handler instanceof ISelectionAwareMarkupHandler ? (ISelectionAwareMarkupHandler) handler : null);
 
         this.selectorAttributeName = selectorAttributeName.toCharArray();
         this.selectorAttributeNameLen = this.selectorAttributeName.length;
@@ -93,23 +84,11 @@ public final class AttributeMarkingSelectedMarkupHandler
     }
 
 
-
-
-    public void setSelectors(final String[] selectors) {
-        this.selectors = selectors;
-        if (this.selectionAwareMarkupHandler != null) {
-            this.selectionAwareMarkupHandler.setSelectors(selectors);
-        }
+    @Override
+    public void setParseSelection(final ParseSelection selection) {
+        this.selection = selection;
+        super.setParseSelection(selection);
     }
-
-
-    public void setCurrentSelection(final boolean[] currentSelection) {
-        this.currentSelection = currentSelection;
-        if (this.selectionAwareMarkupHandler != null) {
-            this.selectionAwareMarkupHandler.setCurrentSelection(currentSelection);
-        }
-    }
-
 
 
 
@@ -141,29 +120,14 @@ public final class AttributeMarkingSelectedMarkupHandler
             final int line, final int col)
             throws ParseException {
 
-        if (!this.lastWasInnerWhiteSpace) {
-            getNext().handleInnerWhiteSpace(INNER_WHITESPACE_BUFFER, 0, INNER_WHITESPACE_BUFFER.length, line, col);
-            this.lastWasInnerWhiteSpace = true;
-        }
+        if (this.selection.isMatchingAny()) {
 
-        StringBuilder selectorValues = null;
-
-        if (this.selectors != null && this.currentSelection != null) {
-
-            for (int i = 0; i < selectors.length; i++) {
-                if (this.currentSelection[i]) {
-                    if (selectorValues != null) {
-                        selectorValues.append(' ');
-                    } else {
-                        selectorValues = new StringBuilder(30);
-                    }
-                    selectorValues.append(selectors[i]);
-                }
+            if (!this.lastWasInnerWhiteSpace) {
+                getNext().handleInnerWhiteSpace(INNER_WHITESPACE_BUFFER, 0, INNER_WHITESPACE_BUFFER.length, line, col);
+                this.lastWasInnerWhiteSpace = true;
             }
 
-        }
-
-        if (selectorValues != null) {
+            final String selectorValues = this.selection.toString();
 
             final int selectorValuesLen = selectorValues.length();
             checkSelectorAttributeLen(selectorValuesLen);
@@ -192,29 +156,14 @@ public final class AttributeMarkingSelectedMarkupHandler
             final int line, final int col)
             throws ParseException {
 
-        if (!this.lastWasInnerWhiteSpace) {
-            getNext().handleInnerWhiteSpace(INNER_WHITESPACE_BUFFER, 0, INNER_WHITESPACE_BUFFER.length, line, col);
-            this.lastWasInnerWhiteSpace = true;
-        }
+        if (this.selection.isMatchingAny()) {
 
-        StringBuilder selectorValues = null;
-
-        if (this.selectors != null && this.currentSelection != null) {
-
-            for (int i = 0; i < selectors.length; i++) {
-                if (this.currentSelection[i]) {
-                    if (selectorValues != null) {
-                        selectorValues.append(' ');
-                    } else {
-                        selectorValues = new StringBuilder(30);
-                    }
-                    selectorValues.append(selectors[i]);
-                }
+            if (!this.lastWasInnerWhiteSpace) {
+                getNext().handleInnerWhiteSpace(INNER_WHITESPACE_BUFFER, 0, INNER_WHITESPACE_BUFFER.length, line, col);
+                this.lastWasInnerWhiteSpace = true;
             }
 
-        }
-
-        if (selectorValues != null) {
+            final String selectorValues = this.selection.toString();
 
             final int selectorValuesLen = selectorValues.length();
             checkSelectorAttributeLen(selectorValuesLen);

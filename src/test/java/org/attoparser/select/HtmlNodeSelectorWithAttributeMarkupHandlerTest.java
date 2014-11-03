@@ -123,7 +123,7 @@ public class HtmlNodeSelectorWithAttributeMarkupHandlerTest extends TestCase {
         final StringWriter writer = new StringWriter();
 
         final IMarkupHandler directOutputHandler = new OutputMarkupHandler(writer);
-        final IMarkupHandler attributeMarkingHandler = new OpenCloseAttributeMarkingSelectedSelectorEventHandler(directOutputHandler);
+        final IMarkupHandler attributeMarkingHandler = new OpenCloseAttributeSelectionMarkingMarkupHandler(directOutputHandler);
 
         final NodeSelectorMarkupHandler handler =
                 new NodeSelectorMarkupHandler(attributeMarkingHandler, new DiscardMarkupHandler(), blockSelectors, referenceResolver);

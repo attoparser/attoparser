@@ -123,7 +123,7 @@ public class HtmlBlockSelectorWithAttributeMarkupHandlerTest extends TestCase {
         final StringWriter writer = new StringWriter();
 
         final IMarkupHandler directOutputHandler = new OutputMarkupHandler(writer);
-        final IMarkupHandler attributeMarkingHandler = new OpenCloseAttributeMarkingSelectedSelectorEventHandler(directOutputHandler);
+        final IMarkupHandler attributeMarkingHandler = new OpenCloseAttributeSelectionMarkingMarkupHandler(directOutputHandler);
 
         final BlockSelectorMarkupHandler handler =
                 new BlockSelectorMarkupHandler(attributeMarkingHandler, new DiscardMarkupHandler(), blockSelectors, referenceResolver);

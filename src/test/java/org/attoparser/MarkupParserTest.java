@@ -30,6 +30,7 @@ import org.attoparser.config.ParseConfiguration.ElementBalancing;
 import org.attoparser.config.ParseConfiguration.PrologPresence;
 import org.attoparser.config.ParseConfiguration.UniqueRootElementPresence;
 import org.attoparser.output.OutputMarkupHandler;
+import org.attoparser.select.ParseSelection;
 import org.attoparser.simple.ISimpleMarkupHandler;
 import org.attoparser.simple.ISimpleMarkupParser;
 import org.attoparser.simple.SimpleMarkupParser;
@@ -1809,6 +1810,8 @@ public class MarkupParserTest extends TestCase {
                 handler.setHandlerChain(handler);
                 handler.setParseStatus(status);
                 handler.setParseConfiguration(parseConfiguration);
+                final ParseSelection selection = new ParseSelection();
+                handler.setParseSelection(selection);
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
 
                 if (offset == 0 && len == input.length) {
@@ -1845,6 +1848,8 @@ public class MarkupParserTest extends TestCase {
                 handler.setHandlerChain(handler);
                 handler.setParseStatus(status);
                 handler.setParseConfiguration(parseConfiguration);
+                final ParseSelection selection = new ParseSelection();
+                handler.setParseSelection(selection);
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
 
                 parser.parseDocument(input, offset, len, eventProcessor, status);
@@ -1889,6 +1894,8 @@ public class MarkupParserTest extends TestCase {
                 handler.setHandlerChain(handler);
                 handler.setParseStatus(status);
                 handler.setParseConfiguration(parseConfiguration);
+                final ParseSelection selection = new ParseSelection();
+                handler.setParseSelection(selection);
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
 
                 parser.parseDocument(newInput, 5, len, eventProcessor, status);
@@ -1921,6 +1928,8 @@ public class MarkupParserTest extends TestCase {
                 handler.setHandlerChain(handler);
                 handler.setParseStatus(status);
                 handler.setParseConfiguration(parseConfiguration);
+                final ParseSelection selection = new ParseSelection();
+                handler.setParseSelection(selection);
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
                 if (offset == 0 && len == input.length) {
                     parser.parseDocument(new CharArrayReader(input), bufferSize, eventProcessor, status);
@@ -1943,6 +1952,8 @@ public class MarkupParserTest extends TestCase {
                 handler.setHandlerChain(handler);
                 handler.setParseStatus(status);
                 handler.setParseConfiguration(parseConfiguration);
+                final ParseSelection selection = new ParseSelection();
+                handler.setParseSelection(selection);
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
                 parser.parseDocument(input, offset, len, eventProcessor, status);
                 final String desired =
@@ -1963,6 +1974,8 @@ public class MarkupParserTest extends TestCase {
                     handler.setHandlerChain(handler);
                     handler.setParseStatus(status);
                     handler.setParseConfiguration(parseConfiguration);
+                    final ParseSelection selection = new ParseSelection();
+                    handler.setParseSelection(selection);
                     final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
                     if (offset == 0 && len == input.length) {
                         parser.parseDocument(new CharArrayReader(input), bufferSize, eventProcessor, status);
@@ -2042,6 +2055,8 @@ public class MarkupParserTest extends TestCase {
                 handler.setHandlerChain(handler);
                 handler.setParseStatus(status);
                 handler.setParseConfiguration(parseConfiguration);
+                final ParseSelection selection = new ParseSelection();
+                handler.setParseSelection(selection);
                 final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
 
                 if (offset == 0 && len == input.length) {

@@ -24,6 +24,7 @@ import java.io.StringReader;
 import java.util.Arrays;
 
 import org.attoparser.config.ParseConfiguration;
+import org.attoparser.select.ParseSelection;
 
 
 /**
@@ -213,6 +214,9 @@ public final class MarkupParser implements IMarkupParser {
         final ParseStatus status = new ParseStatus();
         markupHandler.setParseStatus(status);
 
+        final ParseSelection selection = new ParseSelection();
+        markupHandler.setParseSelection(selection);
+
         // We will not report directly to the handler, but instead to an intermediate class that will be in
         // charge of applying the required markup logic and rules, according to the specified configuration
         final MarkupEventProcessor eventProcessor =
@@ -248,6 +252,9 @@ public final class MarkupParser implements IMarkupParser {
 
         final ParseStatus status = new ParseStatus();
         markupHandler.setParseStatus(status);
+
+        final ParseSelection selection = new ParseSelection();
+        markupHandler.setParseSelection(selection);
 
         // We will not report directly to the handler, but instead to an intermediate class that will be in
         // charge of applying the required markup logic and rules, according to the specified configuration

@@ -46,10 +46,11 @@ import org.attoparser.config.ParseConfiguration;
  *   {@link #setDocumentStartEndHandler(org.attoparser.IMarkupHandler)} method.
  * </p>
  * <p>
- *   Additionally, if the specified <tt>selectedHandler</tt> implements the
- *   {@link org.attoparser.select.ISelectionAwareMarkupHandler} interface, this handler will provide it with
- *   information about what markup selectors are being used and which of those selectors specifically match the
- *   delegated events.
+ *   Additionally, this handler will update the {@link org.attoparser.select.ParseSelection} object currently in use
+ *   by the handler chain (which has been set to handlers by means of the
+ *   {@link org.attoparser.IMarkupHandler#setParseSelection(ParseSelection)} method). For every event fired
+ *   on the delegated handlers, the parse selection object will contain up-to-date information about the selectors
+ *   (at every active selection level) that are currently matching the delegated events.
  * </p>
  * <p>
  *   Also note that this filtering will be done in the most memory-efficient way, without the need to create any
@@ -124,7 +125,9 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
 
     private final IMarkupHandler selectedHandler;
     private final IMarkupHandler nonSelectedHandler;
-    private final ISelectionAwareMarkupHandler selectionAwareSelectedMarkupHandler; // just an (optional) cast of 'selectedHandler'
+
+    private ParseSelection selection;
+    private int selectionIndex = -1;
 
     private final IMarkupSelectorReferenceResolver referenceResolver;
 
@@ -247,11 +250,6 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
 
         this.referenceResolver = referenceResolver;
 
-        // We'll just use this to avoid a lot of casts
-        this.selectionAwareSelectedMarkupHandler =
-                (this.selectedHandler instanceof ISelectionAwareMarkupHandler ?
-                        (ISelectionAwareMarkupHandler) this.selectedHandler : null);
-
         this.selectors = selectors;
         this.selectorsLen = selectors.length;
 
@@ -339,7 +337,9 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
          */
 
         this.selectedHandler.setParseConfiguration(parseConfiguration);
-        this.nonSelectedHandler.setParseConfiguration(parseConfiguration);
+        if (this.nonSelectedHandler != this.selectedHandler) {
+            this.nonSelectedHandler.setParseConfiguration(parseConfiguration);
+        }
 
     }
 
@@ -349,7 +349,26 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void setParseStatus(final ParseStatus status) {
         this.selectedHandler.setParseStatus(status);
-        this.nonSelectedHandler.setParseStatus(status);
+        if (this.nonSelectedHandler != this.selectedHandler) {
+            this.nonSelectedHandler.setParseStatus(status);
+        }
+    }
+
+
+
+
+    @Override
+    public void setParseSelection(final ParseSelection selection) {
+        if (this.selection == null) {
+            this.selection = selection;
+        }
+        if (this.selectionIndex == -1) {
+            this.selectionIndex = this.selection.subscribeLevel();
+        }
+        this.selectedHandler.setParseSelection(selection);
+        if (this.nonSelectedHandler != this.selectedHandler) {
+            this.nonSelectedHandler.setParseSelection(selection);
+        }
     }
 
 
@@ -358,7 +377,9 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void setParser(final IMarkupParser parser) {
         this.selectedHandler.setParser(parser);
-        this.nonSelectedHandler.setParser(parser);
+        if (this.nonSelectedHandler != this.selectedHandler) {
+            this.nonSelectedHandler.setParser(parser);
+        }
     }
 
 
@@ -366,7 +387,9 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
     @Override
     public void setHandlerChain(final IMarkupHandler handlerChain) {
         this.selectedHandler.setHandlerChain(handlerChain);
-        this.nonSelectedHandler.setHandlerChain(handlerChain);
+        if (this.nonSelectedHandler != this.selectedHandler) {
+            this.nonSelectedHandler.setHandlerChain(handlerChain);
+        }
     }
 
 
@@ -383,9 +406,7 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
             final long startTimeNanos, final int line, final int col)
             throws ParseException {
 
-        if (this.selectionAwareSelectedMarkupHandler != null) {
-            this.selectionAwareSelectedMarkupHandler.setSelectors(this.selectors);
-        }
+        this.selection.levels[this.selectionIndex].selectors = this.selectors;
 
         this.documentStartEndHandler.handleDocumentStart(startTimeNanos, line, col);
 
@@ -1077,15 +1098,11 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
      */
 
     private void markCurrentSelection() {
-        if (this.selectionAwareSelectedMarkupHandler != null) {
-            this.selectionAwareSelectedMarkupHandler.setCurrentSelection(this.selectorMatches);
-        }
+        this.selection.levels[this.selectionIndex].selection = this.selectorMatches;
     }
 
     private void unmarkCurrentSelection() {
-        if (this.selectionAwareSelectedMarkupHandler != null) {
-            this.selectionAwareSelectedMarkupHandler.setCurrentSelection(null);
-        }
+        this.selection.levels[this.selectionIndex].selection = null;
     }
 
 

@@ -28,22 +28,20 @@ import org.attoparser.ParseException;
  * @author Daniel Fernandez
  * @since 2.0.0
  */
-public class OpenCloseAttributeMarkingSelectedSelectorEventHandler
-            extends AbstractChainedMarkupHandler
-            implements ISelectionAwareMarkupHandler {
+public class OpenCloseAttributeSelectionMarkingMarkupHandler
+            extends AbstractChainedMarkupHandler {
 
     private static final char[] SELECTOR_ATTRIBUTE_NAME = "selectors".toCharArray();
     private static final char[] INNER_WHITESPACE_BUFFER = " ".toCharArray();
     private static final int SELECTOR_ATTRIBUTE_BUFFER_LEN = 40;
 
-    private String[] selectors = null;
-    private boolean[] currentSelection = null;
+    private ParseSelection selection;
 
     private boolean lastWasInnerWhiteSpace = false;
     private char[] selectorAttributeBuffer;
 
 
-    public OpenCloseAttributeMarkingSelectedSelectorEventHandler(final IMarkupHandler handler) {
+    public OpenCloseAttributeSelectionMarkingMarkupHandler(final IMarkupHandler handler) {
 
         super(handler);
 
@@ -55,15 +53,10 @@ public class OpenCloseAttributeMarkingSelectedSelectorEventHandler
     }
 
 
-
-
-    public void setSelectors(final String[] selectors) {
-        this.selectors = selectors;
-    }
-
-
-    public void setCurrentSelection(final boolean[] currentSelection) {
-        this.currentSelection = currentSelection;
+    @Override
+    public void setParseSelection(final ParseSelection selection) {
+        this.selection = selection;
+        super.setParseSelection(selection);
     }
 
 
@@ -97,29 +90,14 @@ public class OpenCloseAttributeMarkingSelectedSelectorEventHandler
             final int line, final int col)
             throws ParseException {
 
-        if (!this.lastWasInnerWhiteSpace) {
-            getNext().handleInnerWhiteSpace(INNER_WHITESPACE_BUFFER, 0, INNER_WHITESPACE_BUFFER.length, line, col);
-            this.lastWasInnerWhiteSpace = true;
-        }
+        if (this.selection.isMatchingAny()) {
 
-        StringBuilder selectorValues = null;
-
-        if (this.selectors != null && this.currentSelection != null) {
-
-            for (int i = 0; i < selectors.length; i++) {
-                if (this.currentSelection[i]) {
-                    if (selectorValues != null) {
-                        selectorValues.append(' ');
-                    } else {
-                        selectorValues = new StringBuilder(30);
-                    }
-                    selectorValues.append(selectors[i]);
-                }
+            if (!this.lastWasInnerWhiteSpace) {
+                getNext().handleInnerWhiteSpace(INNER_WHITESPACE_BUFFER, 0, INNER_WHITESPACE_BUFFER.length, line, col);
+                this.lastWasInnerWhiteSpace = true;
             }
 
-        }
-
-        if (selectorValues != null) {
+            final String selectorValues = this.selection.toString();
 
             final int selectorValuesLen = selectorValues.length();
             checkSelectorAttributeLen(selectorValuesLen);
@@ -148,29 +126,14 @@ public class OpenCloseAttributeMarkingSelectedSelectorEventHandler
             final int line, final int col)
             throws ParseException {
 
-        if (!this.lastWasInnerWhiteSpace) {
-            getNext().handleInnerWhiteSpace(INNER_WHITESPACE_BUFFER, 0, INNER_WHITESPACE_BUFFER.length, line, col);
-            this.lastWasInnerWhiteSpace = true;
-        }
+        if (this.selection.isMatchingAny()) {
 
-        StringBuilder selectorValues = null;
-
-        if (this.selectors != null && this.currentSelection != null) {
-
-            for (int i = 0; i < selectors.length; i++) {
-                if (this.currentSelection[i]) {
-                    if (selectorValues != null) {
-                        selectorValues.append(' ');
-                    } else {
-                        selectorValues = new StringBuilder(30);
-                    }
-                    selectorValues.append(selectors[i]);
-                }
+            if (!this.lastWasInnerWhiteSpace) {
+                getNext().handleInnerWhiteSpace(INNER_WHITESPACE_BUFFER, 0, INNER_WHITESPACE_BUFFER.length, line, col);
+                this.lastWasInnerWhiteSpace = true;
             }
 
-        }
-
-        if (selectorValues != null) {
+            final String selectorValues = this.selection.toString();
 
             final int selectorValuesLen = selectorValues.length();
             checkSelectorAttributeLen(selectorValuesLen);
@@ -199,29 +162,14 @@ public class OpenCloseAttributeMarkingSelectedSelectorEventHandler
             final int line, final int col)
             throws ParseException {
 
-        if (!this.lastWasInnerWhiteSpace) {
-            getNext().handleInnerWhiteSpace(INNER_WHITESPACE_BUFFER, 0, INNER_WHITESPACE_BUFFER.length, line, col);
-            this.lastWasInnerWhiteSpace = true;
-        }
+        if (this.selection.isMatchingAny()) {
 
-        StringBuilder selectorValues = null;
-
-        if (this.selectors != null && this.currentSelection != null) {
-
-            for (int i = 0; i < selectors.length; i++) {
-                if (this.currentSelection[i]) {
-                    if (selectorValues != null) {
-                        selectorValues.append(' ');
-                    } else {
-                        selectorValues = new StringBuilder(30);
-                    }
-                    selectorValues.append(selectors[i]);
-                }
+            if (!this.lastWasInnerWhiteSpace) {
+                getNext().handleInnerWhiteSpace(INNER_WHITESPACE_BUFFER, 0, INNER_WHITESPACE_BUFFER.length, line, col);
+                this.lastWasInnerWhiteSpace = true;
             }
 
-        }
-
-        if (selectorValues != null) {
+            final String selectorValues = this.selection.toString();
 
             final int selectorValuesLen = selectorValues.length();
             checkSelectorAttributeLen(selectorValuesLen);
@@ -250,29 +198,14 @@ public class OpenCloseAttributeMarkingSelectedSelectorEventHandler
             final int line, final int col)
             throws ParseException {
 
-        if (!this.lastWasInnerWhiteSpace) {
-            getNext().handleInnerWhiteSpace(INNER_WHITESPACE_BUFFER, 0, INNER_WHITESPACE_BUFFER.length, line, col);
-            this.lastWasInnerWhiteSpace = true;
-        }
+        if (this.selection.isMatchingAny()) {
 
-        StringBuilder selectorValues = null;
-
-        if (this.selectors != null && this.currentSelection != null) {
-
-            for (int i = 0; i < selectors.length; i++) {
-                if (this.currentSelection[i]) {
-                    if (selectorValues != null) {
-                        selectorValues.append(' ');
-                    } else {
-                        selectorValues = new StringBuilder(30);
-                    }
-                    selectorValues.append(selectors[i]);
-                }
+            if (!this.lastWasInnerWhiteSpace) {
+                getNext().handleInnerWhiteSpace(INNER_WHITESPACE_BUFFER, 0, INNER_WHITESPACE_BUFFER.length, line, col);
+                this.lastWasInnerWhiteSpace = true;
             }
 
-        }
-
-        if (selectorValues != null) {
+            final String selectorValues = this.selection.toString();
 
             final int selectorValuesLen = selectorValues.length();
             checkSelectorAttributeLen(selectorValuesLen);

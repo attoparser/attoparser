@@ -21,6 +21,7 @@ package org.attoparser;
 
 
 import org.attoparser.config.ParseConfiguration;
+import org.attoparser.select.ParseSelection;
 
 /*
  * Special implementation of the IMarkupHandler interface which implements the logic required to parse HTML
@@ -67,6 +68,14 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
         // This will be ALWAYS called, so there is no need to actually check whether this property is null when using it
         this.status = status;
         this.next.setParseStatus(status);
+    }
+
+
+
+    @Override
+    public void setParseSelection(final ParseSelection selection) {
+        // This will be ALWAYS called, so there is no need to actually check whether this property is null when using it
+        this.next.setParseSelection(selection);
     }
 
 

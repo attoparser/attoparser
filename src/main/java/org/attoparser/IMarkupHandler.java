@@ -20,6 +20,7 @@
 package org.attoparser;
 
 import org.attoparser.config.ParseConfiguration;
+import org.attoparser.select.ParseSelection;
 
 /**
  * <p>
@@ -109,6 +110,12 @@ import org.attoparser.config.ParseConfiguration;
  *     of specified <em>markup selectors</em> (see {@link org.attoparser.select}).
  *   </dd>
  *
+ *   <dt>{@link org.attoparser.select.AttributeSelectionMarkingMarkupHandler}</dt>
+ *   <dd>
+ *     For synthetically adding an attribute (with the specified name) to markup elements displaying which of the
+ *     specified selectors (block or node) match those markup elements.
+ *   </dd>
+ *
  *   <dt>{@link org.attoparser.duplicate.DuplicateMarkupHandler}</dt>
  *   <dd>
  *     For duplicating parsing events, sending each
@@ -156,7 +163,7 @@ public interface IMarkupHandler {
      * </p>
      * <p>
      *   Note that this method can be <strong>safely ignored by most implementations</strong>, as there are
-     *   very few and very specific scenarios in which the handler needs to know configuration details at all.
+     *   very few scenarios in which this kind of interaction would be consisdered relevant.
      * </p>
      *
      * @param parseConfiguration the configuration object.
@@ -186,6 +193,24 @@ public interface IMarkupHandler {
 
     /**
      * <p>
+     *   Sets the {@link org.attoparser.select.ParseSelection} object that represents the different levels of
+     *   selectors (if any) that are currently active for the fired events.
+     * </p>
+     * <p>
+     *   This method is always called by the parser <strong>before</strong> calling any other event handling method.
+     * </p>
+     * <p>
+     *   Note that this method can be <strong>safely ignored by most implementations</strong>, as there are
+     *   very few scenarios in which this kind of interaction would be consisdered relevant.
+     * </p>
+     *
+     * @param selection the selection object.
+     */
+    public void setParseSelection(final ParseSelection selection);
+
+
+    /**
+     * <p>
      *   Sets the {@link org.attoparser.IMarkupParser} object that will be actually parsing the document and calling
      *   this handler's methods.
      * </p>
@@ -195,7 +220,7 @@ public interface IMarkupHandler {
      * <p>
      *   Note that this method can be <strong>safely ignored by most implementations</strong>, as there are
      *   very few and very specific scenarios in which this kind of interaction with the parser would be needed.
-     *   It is therefore mainly for internal use.
+     *   It is therefore mainly (though not only) for internal use.
      * </p>
      *
      * @param parser the parser object.
@@ -216,7 +241,7 @@ public interface IMarkupHandler {
      * <p>
      *   Note that this method can be <strong>safely ignored by most implementations</strong>, as there are
      *   very few and very specific scenarios in which this kind of interaction with the parser would be needed.
-     *   It is therefore mainly for internal use.
+     *   It is therefore mainly (though not only) for internal use.
      * </p>
      *
      * @param handlerChain the status object.

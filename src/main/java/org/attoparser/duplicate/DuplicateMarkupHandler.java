@@ -25,6 +25,7 @@ import org.attoparser.IMarkupParser;
 import org.attoparser.ParseException;
 import org.attoparser.ParseStatus;
 import org.attoparser.config.ParseConfiguration;
+import org.attoparser.select.ParseSelection;
 
 
 /**
@@ -101,6 +102,13 @@ public final class DuplicateMarkupHandler extends AbstractMarkupHandler {
     public void setParseStatus(final ParseStatus status) {
         this.handler1.setParseStatus(status);
         this.handler2.setParseStatus(status);
+    }
+
+
+    @Override
+    public void setParseSelection(final ParseSelection selection) {
+        this.handler1.setParseSelection(selection);
+        this.handler2.setParseSelection(selection);
     }
 
 

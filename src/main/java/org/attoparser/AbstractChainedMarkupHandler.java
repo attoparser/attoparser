@@ -21,6 +21,7 @@ package org.attoparser;
 
 
 import org.attoparser.config.ParseConfiguration;
+import org.attoparser.select.ParseSelection;
 
 /**
  * <p>
@@ -33,8 +34,8 @@ import org.attoparser.config.ParseConfiguration;
  * </p>
  * <p>
  *   Methods like {@link #setParseConfiguration(org.attoparser.config.ParseConfiguration)},
- *   {@link #setParseStatus(ParseStatus)}, {@link #setParser(IMarkupParser)} and
- *   {@link #setHandlerChain(IMarkupHandler)} are also delegated to
+ *   {@link #setParseStatus(ParseStatus)}, {@link #setParseSelection(org.attoparser.select.ParseSelection)},
+ *   {@link #setParser(IMarkupParser)} and {@link #setHandlerChain(IMarkupHandler)} are also delegated to
  *   the chain.
  * </p>
  * <p>
@@ -93,6 +94,12 @@ public abstract class AbstractChainedMarkupHandler
 
     public void setParseStatus(final ParseStatus status) {
         this.next.setParseStatus(status);
+    }
+
+
+
+    public void setParseSelection(final ParseSelection selection) {
+        this.next.setParseSelection(selection);
     }
 
 
