@@ -85,7 +85,7 @@ import org.attoparser.select.ParseSelection;
  *     parsing events into a much simpler format, removing much of the complexity of these parsing events
  *     and allowing users to create their handlers by means of the
  *     {@link org.attoparser.simple.ISimpleMarkupHandler} interface. Note this handler can be more easily
- *     applied by using the convenience ad-hob parser class {@link org.attoparser.simple.SimpleMarkupParser}.
+ *     applied by using the convenience ad-hoc parser class {@link org.attoparser.simple.SimpleMarkupParser}.
  *   </dd>
  *
  *   <dt>{@link org.attoparser.minimize.MinimizeHtmlMarkupHandler}</dt>
