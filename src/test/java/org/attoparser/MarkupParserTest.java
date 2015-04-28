@@ -117,6 +117,11 @@ public class MarkupParserTest extends TestCase {
         assertEquals("[DT(html)(aaa)()(<!ELEMENT>){1,1}]", sw4.toString());
 
 
+        testDoc(
+            "<div class= s>",
+            "[OES(div){1,1}IWS( ){1,5}A(class){1,6}(= ){1,11}(s){1,13}OEE(div){1,14}ACES(div){1,15}ACEE(div){1,15}]",
+            null,
+            noRestrictionsAutoClose);
         testHtmlDoc(
             "<html>",
             "[OES(html){1,1}OEE(html){1,6}AOES(head){1,7}AOEE(head){1,7}ACES(head){1,7}ACEE(head){1,7}AOES(body){1,7}AOEE(body){1,7}ACES(body){1,7}ACEE(body){1,7}ACES(html){1,7}ACEE(html){1,7}]",
