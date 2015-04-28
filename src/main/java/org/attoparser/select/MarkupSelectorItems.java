@@ -524,47 +524,61 @@ final class MarkupSelectorItems {
                     "Invalid syntax in selector: \"" + selectorSpec + "\"");
         }
 
+        boolean inDoubleLiteral = false;
+        boolean inSimpleLiteral = false;
         int nestingLevel = 0;
         int i = 0;
         while (i < textLen) {
 
             final char c = text.charAt(i);
-            if (c == '(') {
-                nestingLevel++;
+            if (c == '\'' && !inDoubleLiteral) {
+                inSimpleLiteral = !inSimpleLiteral;
+                i++;
                 continue;
             }
-            if (c == ')') {
-                nestingLevel--;
+            if (c == '"' && !inSimpleLiteral) {
+                inDoubleLiteral = !inDoubleLiteral;
+                i++;
                 continue;
             }
-            if (nestingLevel == 0 && (i + 4 < textLen) &&
-                    Character.isWhitespace(c) &&
-                    (text.charAt(i + 1) == 'a' || text.charAt(i + 1) == 'A') &&
-                    (text.charAt(i + 2) == 'n' || text.charAt(i + 2) == 'N') &&
-                    (text.charAt(i + 3) == 'd' || text.charAt(i + 3) == 'D') &&
-                    Character.isWhitespace(text.charAt(i + 4))) {
+            if (!inSimpleLiteral && !inDoubleLiteral) {
+                if (c == '(') {
+                    nestingLevel++;
+                    continue;
+                }
+                if (c == ')') {
+                    nestingLevel--;
+                    continue;
+                }
+                if (nestingLevel == 0 && (i + 4 < textLen) &&
+                        Character.isWhitespace(c) &&
+                        (text.charAt(i + 1) == 'a' || text.charAt(i + 1) == 'A') &&
+                        (text.charAt(i + 2) == 'n' || text.charAt(i + 2) == 'N') &&
+                        (text.charAt(i + 3) == 'd' || text.charAt(i + 3) == 'D') &&
+                        Character.isWhitespace(text.charAt(i + 4))) {
 
-                final MarkupSelectorItem.IAttributeCondition left =
-                        parseAttributeCondition(html, selectorSpec, text.substring(0,i));
-                final MarkupSelectorItem.IAttributeCondition right =
-                        parseAttributeCondition(html, selectorSpec, text.substring(i + 5,textLen));
-                return new MarkupSelectorItem.AttributeConditionRelation(
-                        MarkupSelectorItem.AttributeConditionRelation.Type.AND, left, right);
+                    final MarkupSelectorItem.IAttributeCondition left =
+                            parseAttributeCondition(html, selectorSpec, text.substring(0,i));
+                    final MarkupSelectorItem.IAttributeCondition right =
+                            parseAttributeCondition(html, selectorSpec, text.substring(i + 5,textLen));
+                    return new MarkupSelectorItem.AttributeConditionRelation(
+                            MarkupSelectorItem.AttributeConditionRelation.Type.AND, left, right);
 
-            }
-            if (nestingLevel == 0 && (i + 3 < textLen) &&
-                    Character.isWhitespace(c) &&
-                    (text.charAt(i + 1) == 'o' || text.charAt(i + 1) == 'O') &&
-                    (text.charAt(i + 2) == 'r' || text.charAt(i + 2) == 'R') &&
-                    Character.isWhitespace(text.charAt(i + 3))) {
+                }
+                if (nestingLevel == 0 && (i + 3 < textLen) &&
+                        Character.isWhitespace(c) &&
+                        (text.charAt(i + 1) == 'o' || text.charAt(i + 1) == 'O') &&
+                        (text.charAt(i + 2) == 'r' || text.charAt(i + 2) == 'R') &&
+                        Character.isWhitespace(text.charAt(i + 3))) {
 
-                final MarkupSelectorItem.IAttributeCondition left =
-                        parseAttributeCondition(html, selectorSpec, text.substring(0,i));
-                final MarkupSelectorItem.IAttributeCondition right =
-                        parseAttributeCondition(html, selectorSpec, text.substring(i + 4,textLen));
-                return new MarkupSelectorItem.AttributeConditionRelation(
-                        MarkupSelectorItem.AttributeConditionRelation.Type.OR, left, right);
+                    final MarkupSelectorItem.IAttributeCondition left =
+                            parseAttributeCondition(html, selectorSpec, text.substring(0,i));
+                    final MarkupSelectorItem.IAttributeCondition right =
+                            parseAttributeCondition(html, selectorSpec, text.substring(i + 4,textLen));
+                    return new MarkupSelectorItem.AttributeConditionRelation(
+                            MarkupSelectorItem.AttributeConditionRelation.Type.OR, left, right);
 
+                }
             }
 
             i++;
