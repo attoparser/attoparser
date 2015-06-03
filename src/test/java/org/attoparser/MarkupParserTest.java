@@ -1811,8 +1811,6 @@ public class MarkupParserTest extends TestCase {
 
                 final ParseStatus status = new ParseStatus();
                 final TraceBuilderMarkupHandler handler = new TraceBuilderMarkupHandler();
-                handler.setParser(parser);
-                handler.setHandlerChain(handler);
                 handler.setParseStatus(status);
                 handler.setParseConfiguration(parseConfiguration);
                 final ParseSelection selection = new ParseSelection();
@@ -1849,8 +1847,6 @@ public class MarkupParserTest extends TestCase {
 
                 final ParseStatus status = new ParseStatus();
                 final TraceBuilderMarkupHandler handler = new TraceBuilderMarkupHandler();
-                handler.setParser(parser);
-                handler.setHandlerChain(handler);
                 handler.setParseStatus(status);
                 handler.setParseConfiguration(parseConfiguration);
                 final ParseSelection selection = new ParseSelection();
@@ -1895,8 +1891,6 @@ public class MarkupParserTest extends TestCase {
 
                 final ParseStatus status = new ParseStatus();
                 final TraceBuilderMarkupHandler handler = new TraceBuilderMarkupHandler();
-                handler.setParser(parser);
-                handler.setHandlerChain(handler);
                 handler.setParseStatus(status);
                 handler.setParseConfiguration(parseConfiguration);
                 final ParseSelection selection = new ParseSelection();
@@ -1929,8 +1923,6 @@ public class MarkupParserTest extends TestCase {
                 final StringWriter sw = new StringWriter();
                 final ParseStatus status = new ParseStatus();
                 final IMarkupHandler handler = new OutputMarkupHandler(sw);
-                handler.setParser(parser);
-                handler.setHandlerChain(handler);
                 handler.setParseStatus(status);
                 handler.setParseConfiguration(parseConfiguration);
                 final ParseSelection selection = new ParseSelection();
@@ -1953,8 +1945,6 @@ public class MarkupParserTest extends TestCase {
                 final StringWriter sw = new StringWriter();
                 final ParseStatus status = new ParseStatus();
                 final IMarkupHandler handler = new OutputMarkupHandler(sw);
-                handler.setParser(parser);
-                handler.setHandlerChain(handler);
                 handler.setParseStatus(status);
                 handler.setParseConfiguration(parseConfiguration);
                 final ParseSelection selection = new ParseSelection();
@@ -1975,8 +1965,6 @@ public class MarkupParserTest extends TestCase {
                     final ParseStatus status = new ParseStatus();
                     final IMarkupHandler handler =
                             new SimplifierMarkupHandler(new TextTracerSimpleMarkupHandler(sw));
-                    handler.setParser(parser);
-                    handler.setHandlerChain(handler);
                     handler.setParseStatus(status);
                     handler.setParseConfiguration(parseConfiguration);
                     final ParseSelection selection = new ParseSelection();
@@ -2056,8 +2044,6 @@ public class MarkupParserTest extends TestCase {
                 final ParseStatus status = new ParseStatus();
                 final TraceBuilderMarkupHandler traceHandler = new TraceBuilderMarkupHandler();
                 final IMarkupHandler handler = new HtmlMarkupHandler(traceHandler);
-                handler.setParser(parser);
-                handler.setHandlerChain(handler);
                 handler.setParseStatus(status);
                 handler.setParseConfiguration(parseConfiguration);
                 final ParseSelection selection = new ParseSelection();

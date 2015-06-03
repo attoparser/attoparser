@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.attoparser.AbstractMarkupHandler;
 import org.attoparser.IMarkupHandler;
-import org.attoparser.IMarkupParser;
 import org.attoparser.ParseException;
 import org.attoparser.ParseStatus;
 import org.attoparser.config.ParseConfiguration;
@@ -368,27 +367,6 @@ public final class NodeSelectorMarkupHandler extends AbstractMarkupHandler {
         this.selectedHandler.setParseSelection(selection);
         if (this.nonSelectedHandler != this.selectedHandler) {
             this.nonSelectedHandler.setParseSelection(selection);
-        }
-    }
-
-
-
-
-    @Override
-    public void setParser(final IMarkupParser parser) {
-        this.selectedHandler.setParser(parser);
-        if (this.nonSelectedHandler != this.selectedHandler) {
-            this.nonSelectedHandler.setParser(parser);
-        }
-    }
-
-
-
-    @Override
-    public void setHandlerChain(final IMarkupHandler handlerChain) {
-        this.selectedHandler.setHandlerChain(handlerChain);
-        if (this.nonSelectedHandler != this.selectedHandler) {
-            this.nonSelectedHandler.setHandlerChain(handlerChain);
         }
     }
 

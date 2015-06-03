@@ -451,27 +451,6 @@ public final class BlockSelectorMarkupHandler extends AbstractMarkupHandler {
 
 
 
-    @Override
-    public void setParser(final IMarkupParser parser) {
-        this.selectedHandler.setParser(parser);
-        if (this.nonSelectedHandler != this.selectedHandler) {
-            this.nonSelectedHandler.setParser(parser);
-        }
-    }
-
-
-
-    @Override
-    public void setHandlerChain(final IMarkupHandler handlerChain) {
-        this.selectedHandler.setHandlerChain(handlerChain);
-        if (this.nonSelectedHandler != this.selectedHandler) {
-            this.nonSelectedHandler.setHandlerChain(handlerChain);
-        }
-    }
-
-
-
-
     /*
      * ---------------
      * Document events
