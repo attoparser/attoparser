@@ -34,9 +34,8 @@ import org.attoparser.select.ParseSelection;
  * </p>
  * <p>
  *   Methods like {@link #setParseConfiguration(org.attoparser.config.ParseConfiguration)},
- *   {@link #setParseStatus(ParseStatus)}, {@link #setParseSelection(org.attoparser.select.ParseSelection)},
- *   {@link #setParser(IMarkupParser)} and {@link #setHandlerChain(IMarkupHandler)} are also delegated to
- *   the chain.
+ *   {@link #setParseStatus(ParseStatus)} and {@link #setParseSelection(org.attoparser.select.ParseSelection)}
+ *   are also delegated to the chain.
  * </p>
  * <p>
  *   The next handler in the chain can be used in classes implementing this abstract class by calling the
@@ -100,18 +99,6 @@ public abstract class AbstractChainedMarkupHandler
 
     public void setParseSelection(final ParseSelection selection) {
         this.next.setParseSelection(selection);
-    }
-
-
-
-    public void setParser(final IMarkupParser parser) {
-        this.next.setParser(parser);
-    }
-
-
-
-    public void setHandlerChain(final IMarkupHandler handlerChain) {
-        this.next.setHandlerChain(handlerChain);
     }
 
 

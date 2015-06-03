@@ -95,20 +95,6 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
 
 
 
-    @Override
-    public void setParser(final IMarkupParser parser) {
-        this.next.setParser(parser);
-    }
-
-
-
-    @Override
-    public void setHandlerChain(final IMarkupHandler handlerChain) {
-        this.next.setHandlerChain(handlerChain);
-    }
-
-
-
 
     @Override
     public void handleDocumentStart(
