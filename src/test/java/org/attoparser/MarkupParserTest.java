@@ -239,8 +239,24 @@ public class MarkupParserTest extends TestCase {
             "[OES(template){1,1}OEE(template){1,10}T( if (a < 0) { do this} ){1,11}CES(template){1,34}CEE(template){1,44}]",
             noRestrictionsAutoClose);
         testHtmlDoc(
+            "<script> if (a < 0) { do this} </script>",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}OES(script){1,1}OEE(script){1,8}T( if (a < 0) { do this} ){1,9}CES(script){1,32}CEE(script){1,40}ACES(head){1,41}ACEE(head){1,41}AOES(body){1,41}AOEE(body){1,41}ACES(body){1,41}ACEE(body){1,41}ACES(html){1,41}ACEE(html){1,41}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<body><script> if (a < 0) { do this} </script>",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}ACES(head){1,1}ACEE(head){1,1}OES(body){1,1}OEE(body){1,6}OES(script){1,7}OEE(script){1,14}T( if (a < 0) { do this} ){1,15}CES(script){1,38}CEE(script){1,46}ACES(body){1,47}ACEE(body){1,47}ACES(html){1,47}ACEE(html){1,47}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
             "<template> if (a < 0) { do this} </template>",
             "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}OES(template){1,1}OEE(template){1,10}T( if (a < 0) { do this} ){1,11}CES(template){1,34}CEE(template){1,44}ACES(head){1,45}ACEE(head){1,45}AOES(body){1,45}AOEE(body){1,45}ACES(body){1,45}ACEE(body){1,45}ACES(html){1,45}ACEE(html){1,45}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<body><template> if (a < 0) { do this} </template>",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}ACES(head){1,1}ACEE(head){1,1}OES(body){1,1}OEE(body){1,6}OES(template){1,7}OEE(template){1,16}T( if (a < 0) { do this} ){1,17}CES(template){1,40}CEE(template){1,50}ACES(body){1,51}ACEE(body){1,51}ACES(html){1,51}ACEE(html){1,51}]",
+            noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+            "<body><template><p>something</p></template>",
+            "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}ACES(head){1,1}ACEE(head){1,1}OES(body){1,1}OEE(body){1,6}OES(template){1,7}OEE(template){1,16}OES(p){1,17}OEE(p){1,19}T(something){1,20}CES(p){1,29}CEE(p){1,32}CES(template){1,33}CEE(template){1,43}ACES(body){1,44}ACEE(body){1,44}ACES(html){1,44}ACEE(html){1,44}]",
             noRestrictionsAutoOpenClose);
         testHtmlDoc(
             "<head>",
