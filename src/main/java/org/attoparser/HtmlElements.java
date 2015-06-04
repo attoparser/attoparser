@@ -190,7 +190,7 @@ final class HtmlElements {
     static final HtmlElement DIALOG = new HtmlBodyElement("dialog");
 
     // WebComponents
-    static final HtmlElement TEMPLATE = new HtmlHeadCDATAContentElement("template");
+    static final HtmlElement TEMPLATE = new HtmlHeadElement("template");
     static final HtmlElement ELEMENT = new HtmlHeadElement("element");
     static final HtmlElement DECORATOR = new HtmlHeadElement("decorator");
     static final HtmlElement CONTENT = new HtmlHeadElement("content");
