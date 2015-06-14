@@ -97,7 +97,16 @@ public final class ParseStatus {
 
 
 
-    ParseStatus() {
+    /**
+     * <p>
+     *   Builds a new instance of this class.
+     * </p>
+     * <p>
+     *   This constructor is for internal use. As a general rule of thumb, there is no reason why any user of this
+     *   class would need to call this constructor.
+     * </p>
+     */
+    public ParseStatus() {
         super();
     }
 
