@@ -70,20 +70,6 @@ public abstract class AbstractMarkupHandler implements IMarkupHandler {
 
 
 
-    public void setParser(final IMarkupParser parser) {
-        // Nothing to do. By default handlers will not be interested in using this object at all.
-        // Implementations will have to explicitly override if they need to use it.
-    }
-
-
-
-    public void setHandlerChain(final IMarkupHandler handlerChain) {
-        // Nothing to do. By default handlers will not be interested in using this object at all.
-        // Implementations will have to explicitly override if they need to use it.
-    }
-
-
-
     public void handleDocumentStart(
             final long startTimeNanos, final int line, final int col)
             throws ParseException {
