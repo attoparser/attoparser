@@ -30,7 +30,7 @@ package org.attoparser;
  *
  * @author Daniel Fern&aacute;ndez
  * @since 2.0.0
- * @see {@link IMarkupHandler}
+ * @see org.attoparser.IMarkupHandler
  *
  */
 public interface IXMLDeclarationHandler {
