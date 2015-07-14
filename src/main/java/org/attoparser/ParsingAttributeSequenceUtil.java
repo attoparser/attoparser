@@ -20,13 +20,13 @@
 package org.attoparser;
 
 
-/*
- * Class containing utility methods for parsing attribute sequences.
+/**
+ * Class containing utility methods for parsing attribute sequences, like those in open/standalone elements.
  *
- * @author Daniel Fernandez
+ * @author Daniel Fern&aacute;ndez
  * @since 2.0.0
  */
-final class ParsingAttributeSequenceUtil {
+public final class ParsingAttributeSequenceUtil {
 
 
     
@@ -41,17 +41,19 @@ final class ParsingAttributeSequenceUtil {
     
     
     
-    static void parseAttributeSequence(
+    public static void parseAttributeSequence(
             final char[] buffer,
             final int offset, final int len,
-            final int[] locator,
-            final IMarkupEventAttributeSequenceProcessor eventProcessor)
+            final int line, final int col,
+            final IAttributeSequenceHandler handler)
             throws ParseException {
 
         // Any string will be recognized as an "attribute sequence", so this will always either return a not-null result
         // or raise an exception.
 
         final int maxi = offset + len;
+
+        final int[] locator = new int[] {line, col};
 
         int i = offset;
         int current = i;
@@ -74,7 +76,7 @@ final class ParsingAttributeSequenceUtil {
             if (wsEnd == -1) {
                 // Everything is whitespace until the end of the tag
                 
-                eventProcessor.processInnerWhiteSpace(buffer, current, (maxi - current), currentArtifactLine, currentArtifactCol);
+                handler.handleInnerWhiteSpace(buffer, current, (maxi - current), currentArtifactLine, currentArtifactCol);
 
                 i = maxi;
                 continue;
@@ -86,7 +88,7 @@ final class ParsingAttributeSequenceUtil {
                 final int wsOffset = current;
                 final int wsLen = wsEnd - current;
 
-                eventProcessor.processInnerWhiteSpace(buffer, wsOffset, wsLen, currentArtifactLine, currentArtifactCol);
+                handler.handleInnerWhiteSpace(buffer, wsOffset, wsLen, currentArtifactLine, currentArtifactCol);
 
                 i = wsEnd;
                 current = i;
@@ -108,7 +110,7 @@ final class ParsingAttributeSequenceUtil {
             if (attributeNameEnd == -1) {
                 // This is a no-value and no-equals-sign attribute, equivalent to value = ""
                 
-                eventProcessor.processAttribute(
+                handler.handleAttribute(
                         buffer,                                                               // name
                         current, (maxi - current),                                            // name
                         currentArtifactLine, currentArtifactCol,                              // name
@@ -167,7 +169,7 @@ final class ParsingAttributeSequenceUtil {
                     // It is a no value with equals, so we will consider everything
                     // to be an operator
 
-                    eventProcessor.processAttribute(
+                    handler.handleAttribute(
                             buffer,                                                                // name
                             attributeNameOffset, attributeNameLen,                                 // name
                             attributeNameLine, attributeNameCol,                                   // name
@@ -180,7 +182,7 @@ final class ParsingAttributeSequenceUtil {
                     // There is no "=", so we will first output the attribute with no
                     // operator and then a whitespace
 
-                    eventProcessor.processAttribute(
+                    handler.handleAttribute(
                             buffer,                                                                // name
                             attributeNameOffset, attributeNameLen,                                 // name
                             attributeNameLine, attributeNameCol,                                   // name
@@ -189,7 +191,7 @@ final class ParsingAttributeSequenceUtil {
                             0, 0, 0, 0,                                                            // value
                             currentArtifactLine, currentArtifactCol);                              // value
 
-                    eventProcessor.processInnerWhiteSpace(
+                    handler.handleInnerWhiteSpace(
                             buffer,
                             current, (maxi - current),
                             currentArtifactLine, currentArtifactCol);
@@ -215,7 +217,7 @@ final class ParsingAttributeSequenceUtil {
                 // It is not an operator, but a whitespace between this and the next attribute,
                 // so we will first output the attribute with no operator and then a whitespace
 
-                eventProcessor.processAttribute(
+                handler.handleAttribute(
                         buffer,                                                                // name
                         attributeNameOffset, attributeNameLen,                                 // name
                         attributeNameLine, attributeNameCol,                                   // name
@@ -224,7 +226,7 @@ final class ParsingAttributeSequenceUtil {
                         0, 0, 0, 0,                                                            // value
                         currentArtifactLine, currentArtifactCol);                              // value
 
-                eventProcessor.processInnerWhiteSpace(
+                handler.handleInnerWhiteSpace(
                         buffer,
                         current, (operatorEnd - current),
                         currentArtifactLine, currentArtifactCol);
@@ -270,7 +272,7 @@ final class ParsingAttributeSequenceUtil {
                     valueContentLen = valueContentLen - 2;
                 }
 
-                eventProcessor.processAttribute(
+                handler.handleAttribute(
                         buffer,                                                               // name
                         attributeNameOffset, attributeNameLen,                                // name
                         attributeNameLine, attributeNameCol,                                  // name
@@ -295,7 +297,7 @@ final class ParsingAttributeSequenceUtil {
                 valueContentLen = valueOuterLen - 2;
             }
 
-            eventProcessor.processAttribute(
+            handler.handleAttribute(
                     buffer,                                                               // name
                     attributeNameOffset, attributeNameLen,                                // name
                     attributeNameLine, attributeNameCol,                                  // name
@@ -318,38 +320,5 @@ final class ParsingAttributeSequenceUtil {
         return len >= 2 && ((buffer[offset] == '"' && buffer[offset + len - 1] == '"') || (buffer[offset] == '\'' && buffer[offset + len - 1] == '\''));
     }
 
-
-    /**
-     *
-     * @author Daniel Fern&aacute;ndez
-     *
-     * @since 2.0.0
-     *
-     */
-    static interface IMarkupEventAttributeSequenceProcessor {
-
-
-
-        void processAttribute(
-                final char[] buffer,
-                final int nameOffset, final int nameLen,
-                final int nameLine, final int nameCol,
-                final int operatorOffset, final int operatorLen,
-                final int operatorLine, final int operatorCol,
-                final int valueContentOffset, final int valueContentLen,
-                final int valueOuterOffset, final int valueOuterLen,
-                final int valueLine, final int valueCol)
-                throws ParseException;
-
-
-
-        void processInnerWhiteSpace(
-                final char[] buffer,
-                final int offset, final int len,
-                final int line, final int col)
-                throws ParseException;
-
-
-    }
 
 }

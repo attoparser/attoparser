@@ -202,9 +202,13 @@ public final class MarkupParser implements IMarkupParser {
             throw new IllegalArgumentException("Handler cannot be null");
         }
 
-        final IMarkupHandler markupHandler =
+        IMarkupHandler markupHandler =
                 (ParseConfiguration.ParsingMode.HTML.equals(this.configuration.getMode()) ?
                         new HtmlMarkupHandler(handler) : handler);
+
+        // We will not report directly to the specified handler, but instead to an intermediate class that will be in
+        // charge of applying the required markup logic and rules, according to the specified configuration
+        markupHandler = new MarkupEventProcessorHandler(markupHandler);
 
         markupHandler.setParseConfiguration(this.configuration);
 
@@ -214,13 +218,8 @@ public final class MarkupParser implements IMarkupParser {
         final ParseSelection selection = new ParseSelection();
         markupHandler.setParseSelection(selection);
 
-        // We will not report directly to the handler, but instead to an intermediate class that will be in
-        // charge of applying the required markup logic and rules, according to the specified configuration
-        final MarkupEventProcessor eventProcessor =
-                new MarkupEventProcessor(markupHandler, status, this.configuration);
-
         // We already have a suitable char[] buffer, so there is no need to use one from the pool.
-        parseDocument(document, offset, len, eventProcessor, status);
+        parseDocument(document, offset, len, markupHandler, status);
 
     }
 
@@ -238,9 +237,13 @@ public final class MarkupParser implements IMarkupParser {
             throw new IllegalArgumentException("Handler cannot be null");
         }
 
-        final IMarkupHandler markupHandler =
+        IMarkupHandler markupHandler =
                 (ParseConfiguration.ParsingMode.HTML.equals(this.configuration.getMode()) ?
                         new HtmlMarkupHandler(handler) : handler);
+
+        // We will not report directly to the specified handler, but instead to an intermediate class that will be in
+        // charge of applying the required markup logic and rules, according to the specified configuration
+        markupHandler = new MarkupEventProcessorHandler(markupHandler);
 
         markupHandler.setParseConfiguration(this.configuration);
 
@@ -250,14 +253,8 @@ public final class MarkupParser implements IMarkupParser {
         final ParseSelection selection = new ParseSelection();
         markupHandler.setParseSelection(selection);
 
-        // We will not report directly to the handler, but instead to an intermediate class that will be in
-        // charge of applying the required markup logic and rules, according to the specified configuration
-        final MarkupEventProcessor eventProcessor =
-                new MarkupEventProcessor(markupHandler, status, this.configuration);
-
-        // We don't already have a suitable char[] buffer, so we specify null for it and expect the parser
-        // to use one of its pooled buffers.
-        parseDocument(reader, this.pool.poolBufferSize, eventProcessor, status);
+        // We don't already have a suitable char[] buffer, so we expect the parser to use one of its pooled buffers.
+        parseDocument(reader, this.pool.poolBufferSize, markupHandler, status);
 
     }
 
@@ -271,7 +268,7 @@ public final class MarkupParser implements IMarkupParser {
      */
     void parseDocument(
             final Reader reader, final int suggestedBufferSize,
-            final MarkupEventProcessor eventProcessor, final ParseStatus status)
+            final IMarkupHandler handler, final ParseStatus status)
             throws ParseException {
 
 
@@ -281,7 +278,7 @@ public final class MarkupParser implements IMarkupParser {
 
         try {
 
-            eventProcessor.processDocumentStart(parsingStartTimeNanos, 1, 1);
+            handler.handleDocumentStart(parsingStartTimeNanos, 1, 1);
 
             int bufferSize = suggestedBufferSize;
             buffer = this.pool.allocateBuffer(bufferSize);
@@ -301,7 +298,7 @@ public final class MarkupParser implements IMarkupParser {
 
             while (cont) {
 
-                parseBuffer(buffer, 0, bufferContentSize, eventProcessor, status);
+                parseBuffer(buffer, 0, bufferContentSize, handler, status);
 
                 int readOffset = 0;
                 int readLen = bufferSize;
@@ -370,7 +367,7 @@ public final class MarkupParser implements IMarkupParser {
                             "Incomplete structure: \"" + new String(buffer, lastStart, lastLen) + "\"", status.line, status.col);
                 }
 
-                eventProcessor.processText(buffer, lastStart, lastLen, status.line, status.col);
+                handler.handleText(buffer, lastStart, lastLen, status.line, status.col);
 
                 // As we have produced an additional text event, we need to fast-forward the
                 // lastLine and lastCol position to include the last text structure.
@@ -388,7 +385,7 @@ public final class MarkupParser implements IMarkupParser {
             }
 
             final long parsingEndTimeNanos = System.nanoTime();
-            eventProcessor.processDocumentEnd(parsingEndTimeNanos, (parsingEndTimeNanos - parsingStartTimeNanos), lastLine, lastCol);
+            handler.handleDocumentEnd(parsingEndTimeNanos, (parsingEndTimeNanos - parsingStartTimeNanos), lastLine, lastCol);
 
         } catch (final ParseException e) {
             throw e;
@@ -419,7 +416,7 @@ public final class MarkupParser implements IMarkupParser {
      */
     void parseDocument(
             final char[] buffer, final int offset, final int len,
-            final MarkupEventProcessor eventProcessor, final ParseStatus status)
+            final IMarkupHandler handler, final ParseStatus status)
             throws ParseException {
 
 
@@ -427,7 +424,7 @@ public final class MarkupParser implements IMarkupParser {
 
         try {
 
-            eventProcessor.processDocumentStart(parsingStartTimeNanos, 1, 1);
+            handler.handleDocumentStart(parsingStartTimeNanos, 1, 1);
 
             status.offset = -1;
             status.line = 1;
@@ -438,7 +435,7 @@ public final class MarkupParser implements IMarkupParser {
             status.autoCloseRequired = null;
             status.autoCloseLimits = null;
 
-            parseBuffer(buffer, offset, len, eventProcessor, status);
+            parseBuffer(buffer, offset, len, handler, status);
 
             // First parse done, now it's time to clean up in case we still have some text to be notified
 
@@ -455,7 +452,7 @@ public final class MarkupParser implements IMarkupParser {
                             "Incomplete structure: \"" + new String(buffer, lastStart, lastLen) + "\"", status.line, status.col);
                 }
 
-                eventProcessor.processText(buffer, lastStart, lastLen, status.line, status.col);
+                handler.handleText(buffer, lastStart, lastLen, status.line, status.col);
 
                 // As we have produced an additional text event, we need to fast-forward the
                 // lastLine and lastCol position to include the last text structure.
@@ -473,7 +470,7 @@ public final class MarkupParser implements IMarkupParser {
             }
 
             final long parsingEndTimeNanos = System.nanoTime();
-            eventProcessor.processDocumentEnd(parsingEndTimeNanos, (parsingEndTimeNanos - parsingStartTimeNanos), lastLine, lastCol);
+            handler.handleDocumentEnd(parsingEndTimeNanos, (parsingEndTimeNanos - parsingStartTimeNanos), lastLine, lastCol);
 
         } catch (final ParseException e) {
             throw e;
@@ -498,7 +495,7 @@ public final class MarkupParser implements IMarkupParser {
     
     private void parseBuffer(
             final char[] buffer, final int offset, final int len,
-            final MarkupEventProcessor eventProcessor,
+            final IMarkupHandler handler,
             final ParseStatus status)
             throws ParseException {
 
@@ -539,7 +536,7 @@ public final class MarkupParser implements IMarkupParser {
 
                     // Not found, should ask for more buffer
                     if (this.configuration.isTextSplittable()) {
-                        eventProcessor.processText(buffer, current, len - current, currentLine, currentCol);
+                        handler.handleText(buffer, current, len - current, currentLine, currentCol);
                         // No need to change the disability limit, as we havent reached the sequence yet
                         current = len;
                     }
@@ -557,7 +554,7 @@ public final class MarkupParser implements IMarkupParser {
                 // a returned Text event (if parsing is not re-enabled with a structure). Parsing-disabled and
                 // parsing-enabled events should not be mixed in order to improve event handling.
 
-                eventProcessor.processText(buffer, current, sequenceIndex - current, currentLine, currentCol);
+                handler.handleText(buffer, current, sequenceIndex - current, currentLine, currentCol);
                 status.parsingDisabledLimitSequence = null;
                 status.parsingDisabled = true;
 
@@ -577,7 +574,7 @@ public final class MarkupParser implements IMarkupParser {
 
                     if (this.configuration.isTextSplittable()) {
 
-                        eventProcessor.processText(buffer, current, len - current, currentLine, currentCol);
+                        handler.handleText(buffer, current, len - current, currentLine, currentCol);
                         if (status.parsingDisabledLimitSequence != null) {
                             status.parsingDisabled = false;
                         }
@@ -662,7 +659,7 @@ public final class MarkupParser implements IMarkupParser {
                 if (tagStart > current) {
                     // We avoid empty-string text events
 
-                    eventProcessor.processText(
+                    handler.handleText(
                             buffer, current, (tagStart - current),
                             currentLine, currentCol);
 
@@ -707,11 +704,11 @@ public final class MarkupParser implements IMarkupParser {
                     if ((buffer[tagEnd - 1] == '/')) {
                         ParsingElementMarkupUtil.
                                 parseStandaloneElement(
-                                        buffer, current + 1, ((tagEnd - current) + 1) - 3, current, (tagEnd - current) + 1, currentLine, currentCol, eventProcessor);
+                                        buffer, current, (tagEnd - current) + 1, currentLine, currentCol, handler);
                     } else {
                         ParsingElementMarkupUtil.
                                 parseOpenElement(
-                                        buffer, current + 1, ((tagEnd - current) + 1) - 2, current, (tagEnd - current) + 1, currentLine, currentCol, eventProcessor);
+                                        buffer, current, (tagEnd - current) + 1, currentLine, currentCol, handler);
                     }
 
 
@@ -726,7 +723,7 @@ public final class MarkupParser implements IMarkupParser {
 
                     ParsingElementMarkupUtil.
                             parseCloseElement(
-                                    buffer, current + 2, ((tagEnd - current) + 1) - 3, current, (tagEnd - current) + 1, currentLine, currentCol, eventProcessor);
+                                    buffer, current, (tagEnd - current) + 1, currentLine, currentCol, handler);
 
                     if (status.parsingDisabledLimitSequence != null) {
                         status.parsingDisabled = false;
@@ -753,7 +750,7 @@ public final class MarkupParser implements IMarkupParser {
                         
                     }
 
-                    eventProcessor.processComment(buffer, current + 4, ((tagEnd - current) + 1) - 7, current, (tagEnd - current) + 1, currentLine, currentCol);
+                    ParsingCommentMarkupUtil.parseComment(buffer, current, (tagEnd - current) + 1, currentLine, currentCol, handler);
 
                     if (status.parsingDisabledLimitSequence != null) {
                         status.parsingDisabled = false;
@@ -780,7 +777,7 @@ public final class MarkupParser implements IMarkupParser {
                         
                     }
 
-                    eventProcessor.processCDATASection(buffer, current + 9, ((tagEnd - current) + 1) - 12, current, (tagEnd - current) + 1, currentLine, currentCol);
+                    ParsingCDATASectionMarkupUtil.parseCDATASection(buffer, current, (tagEnd - current) + 1, currentLine, currentCol, handler);
 
                     if (status.parsingDisabledLimitSequence != null) {
                         status.parsingDisabled = false;
@@ -792,7 +789,7 @@ public final class MarkupParser implements IMarkupParser {
                     // This is a DOCTYPE clause
 
                     ParsingDocTypeMarkupUtil.parseDocType(
-                            buffer, current, ((tagEnd - current) + 1), currentLine, currentCol, eventProcessor);
+                            buffer, current, ((tagEnd - current) + 1), currentLine, currentCol, handler);
 
                     if (status.parsingDisabledLimitSequence != null) {
                         status.parsingDisabled = false;
@@ -804,7 +801,7 @@ public final class MarkupParser implements IMarkupParser {
                     // This is an XML Declaration
 
                     ParsingXmlDeclarationMarkupUtil.parseXmlDeclaration(
-                            buffer, current + 2, ((tagEnd - current) + 1) - 4, current, (tagEnd - current) + 1, currentLine, currentCol, eventProcessor);
+                            buffer, current, (tagEnd - current) + 1, currentLine, currentCol, handler);
 
                     if (status.parsingDisabledLimitSequence != null) {
                         status.parsingDisabled = false;
@@ -832,7 +829,7 @@ public final class MarkupParser implements IMarkupParser {
                     }
 
                     ParsingProcessingInstructionUtil.parseProcessingInstruction(
-                            buffer, current + 2, ((tagEnd - current) + 1) - 4, current, (tagEnd - current) + 1, currentLine, currentCol, eventProcessor);
+                            buffer, current, (tagEnd - current) + 1, currentLine, currentCol, handler);
 
                     if (status.parsingDisabledLimitSequence != null) {
                         status.parsingDisabled = false;

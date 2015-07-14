@@ -42,40 +42,39 @@ import org.attoparser.util.TextUtil;
  * @author Daniel Fernandez
  * @since 2.0.0
  */
-final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkupEventAttributeSequenceProcessor {
+final class MarkupEventProcessorHandler extends AbstractChainedMarkupHandler {
 
 
     private static final int DEFAULT_STACK_LEN = 10;
     private static final int DEFAULT_ATTRIBUTE_NAMES_LEN = 3;
 
-    private final IMarkupHandler handler;
-    private final ParseStatus status;
+    private ParseStatus status;
 
-    private final boolean useStack;
+    private boolean useStack;
 
-    private final boolean autoOpen;
-    private final boolean autoClose;
+    private boolean autoOpen;
+    private boolean autoClose;
 
-    private final boolean requireBalancedElements;
-    private final boolean requireNoUnmatchedCloseElements;
+    private boolean requireBalancedElements;
+    private boolean requireNoUnmatchedCloseElements;
 
-    private final ParseConfiguration.PrologParseConfiguration prologParseConfiguration;
-    private final ParseConfiguration.UniqueRootElementPresence uniqueRootElementPresence;
+    private ParseConfiguration.PrologParseConfiguration prologParseConfiguration;
+    private ParseConfiguration.UniqueRootElementPresence uniqueRootElementPresence;
 
-    private final boolean caseSensitive;
+    private boolean caseSensitive;
 
-    private final boolean requireWellFormedAttributeValues;
-    private final boolean requireUniqueAttributesInElement;
+    private boolean requireWellFormedAttributeValues;
+    private boolean requireUniqueAttributesInElement;
 
-    private final boolean validateProlog;
-    private final boolean prologPresenceForbidden;
-    private final boolean xmlDeclarationPresenceForbidden;
-    private final boolean doctypePresenceForbidden;
+    private boolean validateProlog;
+    private boolean prologPresenceForbidden;
+    private boolean xmlDeclarationPresenceForbidden;
+    private boolean doctypePresenceForbidden;
 
     // Will be used as an element name cache in order to avoid creating a new
     // char[] object each time an element is pushed into the stack or an attribute
     // is processed to check its uniqueness.
-    private final StructureNamesRepository structureNamesRepository;
+    private StructureNamesRepository structureNamesRepository;
 
     private char[][] elementStack;
     private int elementStackSize;
@@ -91,17 +90,33 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
     private boolean closeElementIsMatched = true;
 
 
-    MarkupEventProcessor(final IMarkupHandler handler, final ParseStatus status, final ParseConfiguration parseConfiguration) {
+    MarkupEventProcessorHandler(final IMarkupHandler handler) {
 
-        super();
+        super(handler);
 
-        this.handler = handler;
+
+
+    }
+
+
+
+
+    @Override
+    public void setParseStatus(final ParseStatus status) {
         this.status = status;
+        super.setParseStatus(status);
+    }
+
+
+
+
+    @Override
+    public void setParseConfiguration(final ParseConfiguration parseConfiguration) {
 
         this.caseSensitive = parseConfiguration.isCaseSensitive();
 
         this.useStack = (ParseConfiguration.ElementBalancing.NO_BALANCING != parseConfiguration.getElementBalancing() ||
-                         parseConfiguration.isUniqueAttributesInElementRequired() || parseConfiguration.isNoUnmatchedCloseElementsRequired() ||
+                parseConfiguration.isUniqueAttributesInElementRequired() || parseConfiguration.isNoUnmatchedCloseElementsRequired() ||
                 ParseConfiguration.UniqueRootElementPresence.NOT_VALIDATED != parseConfiguration.getUniqueRootElementPresence());
 
 
@@ -143,19 +158,14 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
 
         }
 
+        super.setParseConfiguration(parseConfiguration);
+
     }
 
 
 
 
-    void processDocumentStart(final long startTimeNanos, final int line, final int col)
-            throws ParseException {
-        this.handler.handleDocumentStart(startTimeNanos, line, col);
-    }
-
-
-
-    void processDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
+    public void handleDocumentEnd(final long endTimeNanos, final long totalTimeNanos, final int line, final int col)
             throws ParseException {
 
         if (this.requireBalancedElements && this.elementStackSize > 0) {
@@ -177,67 +187,14 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
             cleanStack(line, col);
         }
 
-        this.handler.handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col);
+        getNext().handleDocumentEnd(endTimeNanos, totalTimeNanos, line, col);
 
     }
 
 
 
-    void processCDATASection(
-            final char[] buffer,
-            final int contentOffset, final int contentLen,
-            final int outerOffset, final int outerLen,
-            final int line, final int col)
-            throws ParseException {
-        this.handler.handleCDATASection(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
-    }
 
-
-
-
-    void processComment(
-            final char[] buffer,
-            final int contentOffset, final int contentLen,
-            final int outerOffset, final int outerLen,
-            final int line, final int col)
-            throws ParseException {
-        this.handler.handleComment(buffer, contentOffset, contentLen, outerOffset, outerLen, line, col);
-    }
-
-
-
-
-    void processText(
-            final char[] buffer,
-            final int offset, final int len,
-            final int line, final int col)
-            throws ParseException {
-        this.handler.handleText(buffer, offset, len, line, col);
-    }
-
-
-
-
-    void processProcessingInstruction(
-            final char[] buffer,
-            final int targetOffset, final int targetLen,
-            final int targetLine, final int targetCol,
-            final int contentOffset, final int contentLen,
-            final int contentLine, final int contentCol,
-            final int outerOffset, final int outerLen,
-            final int line, final int col)
-            throws ParseException {
-        this.handler.handleProcessingInstruction(
-                buffer,
-                targetOffset, targetLen, targetLine, targetCol,
-                contentOffset, contentLen, contentLine, contentCol,
-                outerOffset, outerLen, line, col);
-    }
-
-
-
-
-    void processXmlDeclaration(
+    public void handleXmlDeclaration(
             final char[] buffer,
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -282,7 +239,7 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
             this.validPrologXmlDeclarationRead = true;
         }
 
-        this.handler.handleXmlDeclaration(buffer, keywordOffset, keywordLen, keywordLine,
+        getNext().handleXmlDeclaration(buffer, keywordOffset, keywordLen, keywordLine,
                 keywordCol, versionOffset, versionLen, versionLine, versionCol,
                 encodingOffset, encodingLen, encodingLine, encodingCol,
                 standaloneOffset, standaloneLen, standaloneLine, standaloneCol,
@@ -291,7 +248,7 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
     }
 
 
-    void processStandaloneElementStart(
+    public void handleStandaloneElementStart(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final boolean minimized,
@@ -326,7 +283,7 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
         this.status.autoCloseLimits = null;
         this.status.avoidStacking = true; // Default for standalone elements is avoid stacking
 
-        this.handler.handleStandaloneElementStart(buffer, nameOffset, nameLen, minimized, line, col);
+        getNext().handleStandaloneElementStart(buffer, nameOffset, nameLen, minimized, line, col);
 
         if (this.useStack) {
             if (this.status.autoOpenParents != null || this.status.autoCloseRequired != null) {
@@ -340,7 +297,7 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
                 }
                 // Re-launching of the event
                 this.status.autoOpenCloseDone = true;
-                this.handler.handleStandaloneElementStart(buffer, nameOffset, nameLen, minimized, line, col);
+                getNext().handleStandaloneElementStart(buffer, nameOffset, nameLen, minimized, line, col);
             }
             if (!this.status.avoidStacking) {
                 pushToStack(buffer, nameOffset, nameLen);
@@ -350,7 +307,7 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
                 // We were required to perform auto* operations, but we have no stack, so we will
                 // just launch the event again
                 this.status.autoOpenCloseDone = true;
-                this.handler.handleStandaloneElementStart(buffer, nameOffset, nameLen, minimized, line, col);
+                getNext().handleStandaloneElementStart(buffer, nameOffset, nameLen, minimized, line, col);
             }
         }
 
@@ -359,7 +316,7 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
 
     }
 
-    void processStandaloneElementEnd(
+    public void handleStandaloneElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final boolean minimized,
@@ -367,12 +324,12 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
             throws ParseException {
 
         this.elementRead = true;
-        this.handler.handleStandaloneElementEnd(buffer, nameOffset, nameLen, minimized, line, col);
+        getNext().handleStandaloneElementEnd(buffer, nameOffset, nameLen, minimized, line, col);
 
     }
 
 
-    void processOpenElementStart(
+    public void handleOpenElementStart(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col)
@@ -404,7 +361,7 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
         this.status.autoCloseLimits = null;
         this.status.avoidStacking = false; // Default for open elements is not to avoid stacking
 
-        this.handler.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
+        getNext().handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
 
         if (this.useStack) {
             if (this.status.autoOpenParents != null || this.status.autoCloseRequired != null) {
@@ -418,7 +375,7 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
                 }
                 // Re-launching of the event
                 this.status.autoOpenCloseDone = true;
-                this.handler.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
+                getNext().handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
             }
             if (!this.status.avoidStacking) {
                 // Can be an HTML void element
@@ -429,25 +386,48 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
                 // We were required to perform auto* operations, but we have no stack, so we will
                 // just launch the event again
                 this.status.autoOpenCloseDone = true;
-                this.handler.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
+                getNext().handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
             }
         }
 
     }
 
-    void processOpenElementEnd(
+    public void handleOpenElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
 
         this.elementRead = true;
-        this.handler.handleOpenElementEnd(buffer, nameOffset, nameLen, line, col);
+        getNext().handleOpenElementEnd(buffer, nameOffset, nameLen, line, col);
 
     }
 
 
-    void processCloseElementStart(
+    public void handleAutoOpenElementStart(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
+            throws ParseException {
+
+        throw new IllegalStateException(
+                "handleAutoOpenElementStart should never be called on MarkupEventProcessor, as these events should originate in this class");
+
+    }
+
+    public void handleAutoOpenElementEnd(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
+            throws ParseException {
+
+        throw new IllegalStateException(
+                "handleAutoOpenElementEnd should never be called on MarkupEventProcessor, as these events should originate in this class");
+
+    }
+
+
+    public void handleCloseElementStart(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col)
@@ -464,20 +444,20 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
             }
 
             if (this.closeElementIsMatched) {
-                this.handler.handleCloseElementStart(buffer, nameOffset, nameLen, line, col);
+                getNext().handleCloseElementStart(buffer, nameOffset, nameLen, line, col);
                 return;
             } else {
-                this.handler.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col);
+                getNext().handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col);
                 return;
             }
 
         }
 
-        this.handler.handleCloseElementStart(buffer, nameOffset, nameLen, line, col);
+        getNext().handleCloseElementStart(buffer, nameOffset, nameLen, line, col);
 
     }
 
-    void processCloseElementEnd(
+    public void handleCloseElementEnd(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col)
@@ -486,16 +466,62 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
         this.elementRead = true;
 
         if (this.useStack && !this.closeElementIsMatched) {
-            this.handler.handleUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col);
+            getNext().handleUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col);
             return;
         }
 
-        this.handler.handleCloseElementEnd(buffer, nameOffset, nameLen, line, col);
+        getNext().handleCloseElementEnd(buffer, nameOffset, nameLen, line, col);
 
     }
 
 
-    public void processAttribute(
+    public void handleAutoCloseElementStart(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
+            throws ParseException {
+
+        throw new IllegalStateException(
+                "handleAutoCloseElementStart should never be called on MarkupEventProcessor, as these events should originate in this class");
+
+    }
+
+    public void handleAutoCloseElementEnd(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
+            throws ParseException {
+
+        throw new IllegalStateException(
+                "handleAutoCloseElementEnd should never be called on MarkupEventProcessor, as these events should originate in this class");
+
+    }
+
+
+    public void handleUnmatchedCloseElementStart(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
+            throws ParseException {
+
+        throw new IllegalStateException(
+                "handleUnmatchedCloseElementStart should never be called on MarkupEventProcessor, as these events should originate in this class");
+
+    }
+
+    public void handleUnmatchedCloseElementEnd(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col)
+            throws ParseException {
+
+        throw new IllegalStateException(
+                "handleUnmatchedCloseElementEnd should never be called on MarkupEventProcessor, as these events should originate in this class");
+
+    }
+
+
+    public void handleAttribute(
             final char[] buffer,
             final int nameOffset, final int nameLen,
             final int nameLine, final int nameCol,
@@ -564,7 +590,7 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
 
         }
 
-        this.handler.handleAttribute(
+        getNext().handleAttribute(
                 buffer,
                 nameOffset, nameLen, nameLine, nameCol,
                 operatorOffset, operatorLen, operatorLine, operatorCol,
@@ -574,19 +600,8 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
 
 
 
-    public void processInnerWhiteSpace(
-            final char[] buffer,
-            final int offset, final int len,
-            final int line, final int col)
-            throws ParseException {
 
-        this.handler.handleInnerWhiteSpace(buffer, offset, len, line, col);
-
-    }
-
-
-
-    void processDocType(
+    public void handleDocType(
             final char[] buffer,
             final int keywordOffset, final int keywordLen,
             final int keywordLine, final int keywordCol,
@@ -666,15 +681,15 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
             this.validPrologDocTypeRead = true;
         }
 
-        this.handler.handleDocType(
-                    buffer,
-                    keywordOffset, keywordLen, keywordLine, keywordCol,
-                    elementNameOffset, elementNameLen, elementNameLine, elementNameCol,
-                    typeOffset, typeLen, typeLine, typeCol,
-                    publicIdOffset, publicIdLen, publicIdLine, publicIdCol,
-                    systemIdOffset, systemIdLen, systemIdLine, systemIdCol,
-                    internalSubsetOffset, internalSubsetLen, internalSubsetLine, internalSubsetCol,
-                    outerOffset, outerLen, outerLine, outerCol);
+        getNext().handleDocType(
+                buffer,
+                keywordOffset, keywordLen, keywordLine, keywordCol,
+                elementNameOffset, elementNameLen, elementNameLine, elementNameCol,
+                typeOffset, typeLen, typeLine, typeCol,
+                publicIdOffset, publicIdLen, publicIdLine, publicIdCol,
+                systemIdOffset, systemIdLen, systemIdLine, systemIdCol,
+                internalSubsetOffset, internalSubsetLen, internalSubsetLine, internalSubsetCol,
+                outerOffset, outerLen, outerLine, outerCol);
 
     }
 
@@ -744,8 +759,8 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
                 for (int i = 0; i < peekDelta; i++) {
                     peek = popFromStack();
                     if (this.autoClose) {
-                        this.handler.handleAutoCloseElementStart(peek, 0, peek.length, line, col);
-                        this.handler.handleAutoCloseElementEnd(peek, 0, peek.length, line, col);
+                        getNext().handleAutoCloseElementStart(peek, 0, peek.length, line, col);
+                        getNext().handleAutoCloseElementEnd(peek, 0, peek.length, line, col);
                     } else {
                         // fixing unclosed non-optional tags by auto closing is forbidden!
                         throw new ParseException(
@@ -802,8 +817,8 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
             while (popped != null) {
 
                 if (this.autoClose) {
-                    this.handler.handleAutoCloseElementStart(popped, 0, popped.length, line, col);
-                    this.handler.handleAutoCloseElementEnd(popped, 0, popped.length, line, col);
+                    getNext().handleAutoCloseElementStart(popped, 0, popped.length, line, col);
+                    getNext().handleAutoCloseElementEnd(popped, 0, popped.length, line, col);
                 } else {
                     // fixing unclosed non-optional tags by auto closing is forbidden!
                     throw new ParseException(
@@ -883,8 +898,8 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
             }
 
             if (this.autoClose) {
-                this.handler.handleAutoCloseElementStart(peek, 0, peek.length, line, col);
-                this.handler.handleAutoCloseElementEnd(peek, 0, peek.length, line, col);
+                getNext().handleAutoCloseElementStart(peek, 0, peek.length, line, col);
+                getNext().handleAutoCloseElementEnd(peek, 0, peek.length, line, col);
             }
 
         }
@@ -975,8 +990,8 @@ final class MarkupEventProcessor implements ParsingAttributeSequenceUtil.IMarkup
 
         while (n-- != 0) {
 
-            this.handler.handleAutoOpenElementStart(autoOpenParents[i], 0, autoOpenParents[i].length, line, col);
-            this.handler.handleAutoOpenElementEnd(autoOpenParents[i], 0, autoOpenParents[i].length, line, col);
+            getNext().handleAutoOpenElementStart(autoOpenParents[i], 0, autoOpenParents[i].length, line, col);
+            getNext().handleAutoOpenElementEnd(autoOpenParents[i], 0, autoOpenParents[i].length, line, col);
 
             pushToStack(autoOpenParents[i], 0, autoOpenParents[i].length);
 

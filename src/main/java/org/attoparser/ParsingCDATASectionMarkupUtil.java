@@ -19,13 +19,13 @@
  */
 package org.attoparser;
 
-/*
+/**
  * Class containing utility methods for parsing CDATA sections.
  *
- * @author Daniel Fernandez
+ * @author Daniel Fern&aacute;ndez
  * @since 2.0.0
  */
-final class ParsingCDATASectionMarkupUtil {
+public final class ParsingCDATASectionMarkupUtil {
 
     
 
@@ -34,11 +34,37 @@ final class ParsingCDATASectionMarkupUtil {
         super();
     }
 
-    
 
 
 
-    
+
+
+    public static void parseCDATASection(
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col,
+            final ICDATASectionHandler handler)
+            throws ParseException {
+
+        if (!isCDATASectionStart(buffer, offset, offset + len) || !isCDATASectionEnd(buffer, offset, offset + len)) {
+            throw new ParseException(
+                    "Could not parse as a well-formed CDATA Section: \"" + new String(buffer, offset, len) + "\"", line, col);
+        }
+
+        final int contentOffset = offset + 9;
+        final int contentLen = len - 12;
+
+        handler.handleCDATASection(
+                buffer,
+                contentOffset, contentLen,
+                offset, len,
+                line, col);
+
+    }
+
+
+
+
     static boolean isCDATASectionStart(final char[] buffer, final int offset, final int maxi) {
         return ((maxi - offset > 8) && 
                     buffer[offset] == '<' &&
@@ -50,6 +76,14 @@ final class ParsingCDATASectionMarkupUtil {
                     (buffer[offset + 6] == 'T' || buffer[offset + 6] == 't') && 
                     (buffer[offset + 7] == 'A' || buffer[offset + 7] == 'a') && 
                     buffer[offset + 8] == '[');
+    }
+
+
+    static boolean isCDATASectionEnd(final char[] buffer, final int offset, final int maxi) {
+        return ((maxi - offset > 11) &&
+                buffer[maxi - 3] == ']' &&
+                buffer[maxi - 2] == ']' &&
+                buffer[maxi - 1] == '>');
     }
 
     

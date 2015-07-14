@@ -20,13 +20,13 @@
 package org.attoparser;
 
 
-/*
+/**
  * Class containing utility methods for parsing processing instructions.
  *
- * @author Daniel Fernandez
+ * @author Daniel Fern&aacute;ndez
  * @since 2.0.0
  */
-final class ParsingProcessingInstructionUtil {
+public final class ParsingProcessingInstructionUtil {
 
     
 
@@ -40,19 +40,26 @@ final class ParsingProcessingInstructionUtil {
 
     
     
-    static void parseProcessingInstruction(
+    public static void parseProcessingInstruction(
             final char[] buffer,
-            final int internalOffset, final int internalLen,
-            final int outerOffset, final int outerLen,
+            final int offset, final int len,
             final int line, final int col,
-            final MarkupEventProcessor eventProcessor)
+            final IProcessingInstructionHandler handler)
             throws ParseException {
 
-        final int maxi = internalOffset + internalLen;
+        if (!isProcessingInstructionStart(buffer, offset, offset + len) || !isProcessingInstructionEnd(buffer, offset, offset + len)) {
+            throw new ParseException(
+                    "Could not parse as a well-formed Processing Instruction: \"" + new String(buffer, offset, len) + "\"", line, col);
+        }
+
+        final int contentOffset = offset + 2;
+        final int contentLen = len - 4;
+
+        final int maxi = contentOffset + contentLen;
         
         final int[] locator = new int[] {line, col + 2};
         
-        int i = internalOffset;
+        int i = contentOffset;
         
         /*
          * Extract the target 
@@ -64,13 +71,13 @@ final class ParsingProcessingInstructionUtil {
         if (targetEnd == -1) {
             // There is no content, only target
             
-            eventProcessor.processProcessingInstruction(
-                    buffer, 
+            handler.handleProcessingInstruction(
+                    buffer,
                     i, maxi - i,                                      // target
                     line, col + 2,                                    // target
                     0, 0,                                             // content
                     locator[0], locator[1],                           // content
-                    outerOffset, outerLen,                            // outer 
+                    offset, len,                            // outer
                     line, col);                                       // outer
             return;
 
@@ -94,26 +101,26 @@ final class ParsingProcessingInstructionUtil {
         if (contentStart == -1) {
             // There is no content. Only whitespace until the end of the structure
             
-            eventProcessor.processProcessingInstruction(
-                    buffer, 
+            handler.handleProcessingInstruction(
+                    buffer,
                     targetOffset, targetLen,                          // target
                     line, col + 2,                                    // target
                     0, 0,                                             // content
                     locator[0], locator[1],                           // content
-                    outerOffset, outerLen,                            // outer 
+                    offset, len,                            // outer
                     line, col);                                       // outer
             return;
 
         }
 
         
-        eventProcessor.processProcessingInstruction(
-                buffer, 
+        handler.handleProcessingInstruction(
+                buffer,
                 targetOffset, targetLen,                          // target
                 line, col + 2,                                    // target
                 contentStart, maxi - contentStart,                // content
                 locator[0], locator[1],                           // content
-                outerOffset, outerLen,                            // outer 
+                offset, len,                            // outer
                 line, col);                                       // outer
 
     }
@@ -144,6 +151,18 @@ final class ParsingProcessingInstructionUtil {
                 buffer[offset + 1] == '?' &&
                 (buffer[offset + 2] != ' ' && !Character.isWhitespace(buffer[offset + 2])));
         
+    }
+
+
+
+    static boolean isProcessingInstructionEnd(final char[] buffer, final int offset, final int maxi) {
+
+        if (offset >= (maxi - 1) || buffer[maxi - 2] != '?') {
+            return false;
+        }
+
+        return buffer[maxi - 1] == '>';
+
     }
 
     

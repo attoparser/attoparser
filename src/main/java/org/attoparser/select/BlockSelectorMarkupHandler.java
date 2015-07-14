@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.attoparser.AbstractMarkupHandler;
 import org.attoparser.IMarkupHandler;
-import org.attoparser.IMarkupParser;
 import org.attoparser.ParseException;
 import org.attoparser.ParseStatus;
 import org.attoparser.config.ParseConfiguration;

@@ -1826,20 +1826,20 @@ public class MarkupParserTest extends TestCase {
             {
 
                 final ParseStatus status = new ParseStatus();
-                final TraceBuilderMarkupHandler handler = new TraceBuilderMarkupHandler();
+                final TraceBuilderMarkupHandler traceHandler = new TraceBuilderMarkupHandler();
+                IMarkupHandler handler = new MarkupEventProcessorHandler(traceHandler);
                 handler.setParseStatus(status);
                 handler.setParseConfiguration(parseConfiguration);
                 final ParseSelection selection = new ParseSelection();
                 handler.setParseSelection(selection);
-                final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
 
                 if (offset == 0 && len == input.length) {
-                    parser.parseDocument(new CharArrayReader(input), bufferSize, eventProcessor, status);
+                    parser.parseDocument(new CharArrayReader(input), bufferSize, handler, status);
                 } else { 
-                    parser.parseDocument(new CharArrayReader(input, offset, len), bufferSize, eventProcessor, status);
+                    parser.parseDocument(new CharArrayReader(input, offset, len), bufferSize, handler, status);
                 }
 
-                final List<MarkupTraceEvent> trace = handler.getTrace();
+                final List<MarkupTraceEvent> trace = traceHandler.getTrace();
                 final StringBuilder strBuilder = new StringBuilder();
                 for (final MarkupTraceEvent event : trace) {
                     if (event.getEventType().equals(MarkupTraceEvent.EventType.DOCUMENT_START)) {
@@ -1862,16 +1862,16 @@ public class MarkupParserTest extends TestCase {
             {
 
                 final ParseStatus status = new ParseStatus();
-                final TraceBuilderMarkupHandler handler = new TraceBuilderMarkupHandler();
+                final TraceBuilderMarkupHandler traceHandler = new TraceBuilderMarkupHandler();
+                IMarkupHandler handler = new MarkupEventProcessorHandler(traceHandler);
                 handler.setParseStatus(status);
                 handler.setParseConfiguration(parseConfiguration);
                 final ParseSelection selection = new ParseSelection();
                 handler.setParseSelection(selection);
-                final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
 
-                parser.parseDocument(input, offset, len, eventProcessor, status);
+                parser.parseDocument(input, offset, len, handler, status);
 
-                final List<MarkupTraceEvent> trace = handler.getTrace();
+                final List<MarkupTraceEvent> trace = traceHandler.getTrace();
                 final StringBuilder strBuilder = new StringBuilder();
                 for (final MarkupTraceEvent event : trace) {
                     if (event.getEventType().equals(MarkupTraceEvent.EventType.DOCUMENT_START)) {
@@ -1906,16 +1906,16 @@ public class MarkupParserTest extends TestCase {
                 newInput[newInput.length - 5] = 'X';
 
                 final ParseStatus status = new ParseStatus();
-                final TraceBuilderMarkupHandler handler = new TraceBuilderMarkupHandler();
+                final TraceBuilderMarkupHandler traceHandler = new TraceBuilderMarkupHandler();
+                IMarkupHandler handler = new MarkupEventProcessorHandler(traceHandler);
                 handler.setParseStatus(status);
                 handler.setParseConfiguration(parseConfiguration);
                 final ParseSelection selection = new ParseSelection();
                 handler.setParseSelection(selection);
-                final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
 
-                parser.parseDocument(newInput, 5, len, eventProcessor, status);
+                parser.parseDocument(newInput, 5, len, handler, status);
 
-                final List<MarkupTraceEvent> trace = handler.getTrace();
+                final List<MarkupTraceEvent> trace = traceHandler.getTrace();
                 final StringBuilder strBuilder = new StringBuilder();
                 for (final MarkupTraceEvent event : trace) {
                     if (event.getEventType().equals(MarkupTraceEvent.EventType.DOCUMENT_START)) {
@@ -1938,16 +1938,17 @@ public class MarkupParserTest extends TestCase {
             {
                 final StringWriter sw = new StringWriter();
                 final ParseStatus status = new ParseStatus();
-                final IMarkupHandler handler = new OutputMarkupHandler(sw);
+                IMarkupHandler handler = new OutputMarkupHandler(sw);
+                handler = new MarkupEventProcessorHandler(handler);
                 handler.setParseStatus(status);
                 handler.setParseConfiguration(parseConfiguration);
                 final ParseSelection selection = new ParseSelection();
                 handler.setParseSelection(selection);
-                final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
+
                 if (offset == 0 && len == input.length) {
-                    parser.parseDocument(new CharArrayReader(input), bufferSize, eventProcessor, status);
+                    parser.parseDocument(new CharArrayReader(input), bufferSize, handler, status);
                 } else { 
-                    parser.parseDocument(new CharArrayReader(input, offset, len), bufferSize, eventProcessor, status);
+                    parser.parseDocument(new CharArrayReader(input, offset, len), bufferSize, handler, status);
                 }
                 final String desired =
                         (offset == 0 && len == input.length ? new String(input) : new String(input, offset, len));
@@ -1960,13 +1961,14 @@ public class MarkupParserTest extends TestCase {
             {
                 final StringWriter sw = new StringWriter();
                 final ParseStatus status = new ParseStatus();
-                final IMarkupHandler handler = new OutputMarkupHandler(sw);
+                IMarkupHandler handler = new OutputMarkupHandler(sw);
+                handler = new MarkupEventProcessorHandler(handler);
                 handler.setParseStatus(status);
                 handler.setParseConfiguration(parseConfiguration);
                 final ParseSelection selection = new ParseSelection();
                 handler.setParseSelection(selection);
-                final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
-                parser.parseDocument(input, offset, len, eventProcessor, status);
+
+                parser.parseDocument(input, offset, len, handler, status);
                 final String desired =
                         (offset == 0 && len == input.length ? new String(input) : new String(input, offset, len));
                 final String result = sw.toString();
@@ -1979,17 +1981,17 @@ public class MarkupParserTest extends TestCase {
                 {
                     final StringWriter sw = new StringWriter();
                     final ParseStatus status = new ParseStatus();
-                    final IMarkupHandler handler =
-                            new SimplifierMarkupHandler(new TextTracerSimpleMarkupHandler(sw));
+                    IMarkupHandler handler = new SimplifierMarkupHandler(new TextTracerSimpleMarkupHandler(sw));
+                    handler = new MarkupEventProcessorHandler(handler);
                     handler.setParseStatus(status);
                     handler.setParseConfiguration(parseConfiguration);
                     final ParseSelection selection = new ParseSelection();
                     handler.setParseSelection(selection);
-                    final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
+
                     if (offset == 0 && len == input.length) {
-                        parser.parseDocument(new CharArrayReader(input), bufferSize, eventProcessor, status);
+                        parser.parseDocument(new CharArrayReader(input), bufferSize, handler, status);
                     } else { 
-                        parser.parseDocument(new CharArrayReader(input, offset, len), bufferSize, eventProcessor, status);
+                        parser.parseDocument(new CharArrayReader(input, offset, len), bufferSize, handler, status);
                     }
                     final String result = sw.toString();
                     assertEquals(outputSimple, result);
@@ -2059,17 +2061,17 @@ public class MarkupParserTest extends TestCase {
             {
                 final ParseStatus status = new ParseStatus();
                 final TraceBuilderMarkupHandler traceHandler = new TraceBuilderMarkupHandler();
-                final IMarkupHandler handler = new HtmlMarkupHandler(traceHandler);
+                IMarkupHandler handler = new HtmlMarkupHandler(traceHandler);
+                handler = new MarkupEventProcessorHandler(handler);
                 handler.setParseStatus(status);
                 handler.setParseConfiguration(parseConfiguration);
                 final ParseSelection selection = new ParseSelection();
                 handler.setParseSelection(selection);
-                final MarkupEventProcessor eventProcessor = new MarkupEventProcessor(handler, status, parseConfiguration);
 
                 if (offset == 0 && len == input.length) {
-                    parser.parseDocument(new CharArrayReader(input), bufferSize, eventProcessor, status);
+                    parser.parseDocument(new CharArrayReader(input), bufferSize, handler, status);
                 } else {
-                    parser.parseDocument(new CharArrayReader(input, offset, len), bufferSize, eventProcessor, status);
+                    parser.parseDocument(new CharArrayReader(input, offset, len), bufferSize, handler, status);
                 }
 
                 final List<MarkupTraceEvent> trace = traceHandler.getTrace();

@@ -20,13 +20,13 @@
 package org.attoparser;
 
 
-/*
+/**
  * Class containing utility methods for parsing elements (tags).
  *
- * @author Daniel Fernandez
+ * @author Daniel Fern&aacute;ndez
  * @since 2.0.0
  */
-final class ParsingElementMarkupUtil {
+public final class ParsingElementMarkupUtil {
 
 
     
@@ -39,13 +39,20 @@ final class ParsingElementMarkupUtil {
 
 
 
-    static void parseStandaloneElement(
+    public static void parseStandaloneElement(
             final char[] buffer,
-            final int contentOffset, final int contentLen,
-            @SuppressWarnings("unused") final int outerOffset, @SuppressWarnings("unused") final int outerLen,
+            final int offset, final int len,
             final int line, final int col,
-            final MarkupEventProcessor eventProcessor)
+            final IMarkupHandler markupHandler)
             throws ParseException {
+
+        if (!isOpenElementStart(buffer, offset, offset + len) || !isElementEnd(buffer, offset, offset + len, true)) {
+            throw new ParseException(
+                    "Could not parse as a well-formed standalone element: \"" + new String(buffer, offset, len) + "\"", line, col);
+        }
+
+        final int contentOffset = offset + 1;
+        final int contentLen = len - 3;
 
         final int maxi = contentOffset + contentLen;
         
@@ -61,11 +68,11 @@ final class ParsingElementMarkupUtil {
         if (elementNameEnd == -1) {
             // The buffer only contains the element name
             
-            eventProcessor.processStandaloneElementStart(
+            markupHandler.handleStandaloneElementStart(
                     buffer, contentOffset, contentLen,
                     true, line, col);
 
-            eventProcessor.processStandaloneElementEnd(
+            markupHandler.handleStandaloneElementEnd(
                     buffer, contentOffset, contentLen,
                     true, locator[0], locator[1]);
 
@@ -74,17 +81,19 @@ final class ParsingElementMarkupUtil {
         }
 
 
-        eventProcessor.processStandaloneElementStart(
+        markupHandler.handleStandaloneElementStart(
                 buffer, contentOffset, (elementNameEnd - contentOffset),
                 true, line, col);
 
 
         // This parseAttributeSequence will take care of calling handleInnerWhitespace when appropriate.
         ParsingAttributeSequenceUtil.parseAttributeSequence(
-                buffer, elementNameEnd, maxi - elementNameEnd, locator, eventProcessor);
+                buffer, elementNameEnd, maxi - elementNameEnd, locator[0], locator[1], markupHandler);
 
+        // We need to forward the locator to the position corresponding with the element end (note we are discarding result)
+        ParsingMarkupUtil.findNextStructureEndAvoidQuotes(buffer, elementNameEnd, maxi, locator);
 
-        eventProcessor.processStandaloneElementEnd(
+        markupHandler.handleStandaloneElementEnd(
                 buffer, contentOffset, (elementNameEnd - contentOffset),
                 true, locator[0], locator[1]);
 
@@ -93,13 +102,20 @@ final class ParsingElementMarkupUtil {
 
 
 
-    static void parseOpenElement(
+    public static void parseOpenElement(
             final char[] buffer,
-            final int contentOffset, final int contentLen,
-            @SuppressWarnings("unused") final int outerOffset, @SuppressWarnings("unused") final int outerLen,
+            final int offset, final int len,
             final int line, final int col,
-            final MarkupEventProcessor eventProcessor)
+            final IMarkupHandler markupHandler)
             throws ParseException {
+
+        if (!isOpenElementStart(buffer, offset, offset + len) || !isElementEnd(buffer, offset, offset + len, false)) {
+            throw new ParseException(
+                    "Could not parse as a well-formed open element: \"" + new String(buffer, offset, len) + "\"", line, col);
+        }
+
+        final int contentOffset = offset + 1;
+        final int contentLen = len - 2;
 
         final int maxi = contentOffset + contentLen;
 
@@ -115,11 +131,11 @@ final class ParsingElementMarkupUtil {
         if (elementNameEnd == -1) {
             // The buffer only contains the element name
 
-            eventProcessor.processOpenElementStart(
+            markupHandler.handleOpenElementStart(
                     buffer, contentOffset, contentLen,
                     line, col);
 
-            eventProcessor.processOpenElementEnd(
+            markupHandler.handleOpenElementEnd(
                     buffer, contentOffset, contentLen,
                     locator[0], locator[1]);
 
@@ -128,17 +144,19 @@ final class ParsingElementMarkupUtil {
         }
 
 
-        eventProcessor.processOpenElementStart(
+        markupHandler.handleOpenElementStart(
                 buffer, contentOffset, (elementNameEnd - contentOffset),
                 line, col);
 
 
         // This parseAttributeSequence will take care of calling handleInnerWhitespace when appropriate.
         ParsingAttributeSequenceUtil.parseAttributeSequence(
-                buffer, elementNameEnd, maxi - elementNameEnd, locator, eventProcessor);
+                buffer, elementNameEnd, maxi - elementNameEnd, locator[0], locator[1], markupHandler);
 
+        // We need to forward the locator to the position corresponding with the element end (note we are discarding result)
+        ParsingMarkupUtil.findNextStructureEndAvoidQuotes(buffer, elementNameEnd, maxi, locator);
 
-        eventProcessor.processOpenElementEnd(
+        markupHandler.handleOpenElementEnd(
                 buffer, contentOffset, (elementNameEnd - contentOffset),
                 locator[0], locator[1]);
 
@@ -147,13 +165,20 @@ final class ParsingElementMarkupUtil {
 
 
 
-    static void parseCloseElement(
+    public static void parseCloseElement(
             final char[] buffer,
-            final int contentOffset, final int contentLen,
-            final int outerOffset, final int outerLen,
+            final int offset, final int len,
             final int line, final int col,
-            final MarkupEventProcessor eventProcessor)
+            final IMarkupHandler markupHandler)
             throws ParseException {
+
+        if (!isCloseElementStart(buffer, offset, offset + len) || !isElementEnd(buffer, offset, offset + len, false)) {
+            throw new ParseException(
+                    "Could not parse as a well-formed close element: \"" + new String(buffer, offset, len) + "\"", line, col);
+        }
+
+        final int contentOffset = offset + 2;
+        final int contentLen = len - 3;
 
         final int maxi = contentOffset + contentLen;
         
@@ -169,11 +194,11 @@ final class ParsingElementMarkupUtil {
         if (elementNameEnd == -1) {
             // The buffer only contains the element name
 
-            eventProcessor.processCloseElementStart(
+            markupHandler.handleCloseElementStart(
                     buffer, contentOffset, contentLen,
                     line, col);
 
-            eventProcessor.processCloseElementEnd(
+            markupHandler.handleCloseElementEnd(
                     buffer, contentOffset, contentLen,
                     locator[0], locator[1]);
             
@@ -182,7 +207,7 @@ final class ParsingElementMarkupUtil {
         }
 
 
-        eventProcessor.processCloseElementStart(
+        markupHandler.handleCloseElementStart(
                 buffer, contentOffset, (elementNameEnd - contentOffset),
                 line, col);
         
@@ -198,15 +223,15 @@ final class ParsingElementMarkupUtil {
             // until the end of the close tag
             throw new ParseException(
                     "Could not parse as a well-formed closing element " +
-                    "\"" + new String(buffer, outerOffset, outerLen) + "\"" +
+                    "\"</" + new String(buffer, contentOffset, contentLen) + ">\"" +
                     ": No attributes are allowed here", line, col);
         }
 
 
-        eventProcessor.processInnerWhiteSpace(buffer, elementNameEnd, (maxi - elementNameEnd), currentArtifactLine, currentArtifactCol);
+        markupHandler.handleInnerWhiteSpace(buffer, elementNameEnd, (maxi - elementNameEnd), currentArtifactLine, currentArtifactCol);
 
 
-        eventProcessor.processCloseElementEnd(
+        markupHandler.handleCloseElementEnd(
                 buffer, contentOffset, (elementNameEnd - contentOffset),
                 locator[0], locator[1]);
 
@@ -238,6 +263,20 @@ final class ParsingElementMarkupUtil {
                     isElementName(buffer, offset + 2, maxi));
         
     }
+
+
+    static boolean isElementEnd(final char[] buffer, final int offset, final int maxi, final boolean minimized) {
+
+        if (minimized) {
+            if (offset >= (maxi - 1) || buffer[maxi - 2] != '/') {
+                return false;
+            }
+        }
+
+        return buffer[maxi - 1] == '>';
+
+    }
+
 
 
     

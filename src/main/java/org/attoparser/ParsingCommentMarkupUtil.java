@@ -19,13 +19,13 @@
  */
 package org.attoparser;
 
-/*
+/**
  * Class containing utility methods for parsing comments.
  *
- * @author Daniel Fernandez
+ * @author Daniel Fern&aacute;ndez
  * @since 2.0.0
  */
-final class ParsingCommentMarkupUtil {
+public final class ParsingCommentMarkupUtil {
     
 
 
@@ -34,7 +34,31 @@ final class ParsingCommentMarkupUtil {
         super();
     }
 
-    
+
+
+    public static void parseComment(
+            final char[] buffer,
+            final int offset, final int len,
+            final int line, final int col,
+            final ICommentHandler handler)
+            throws ParseException {
+
+        if (!isCommentStart(buffer, offset, offset + len) || !isCommentEnd(buffer, offset, offset + len)) {
+            throw new ParseException(
+                    "Could not parse as a well-formed Comment: \"" + new String(buffer, offset, len) + "\"", line, col);
+        }
+
+        final int contentOffset = offset + 4;
+        final int contentLen = len - 7;
+
+        handler.handleComment(
+                buffer,
+                contentOffset, contentLen,
+                offset, len,
+                line, col);
+
+    }
+
 
 
     
@@ -45,5 +69,13 @@ final class ParsingCommentMarkupUtil {
                     buffer[offset + 2] == '-' && 
                     buffer[offset + 3] == '-');
     }
-    
+
+
+    static boolean isCommentEnd(final char[] buffer, final int offset, final int maxi) {
+        return ((maxi - offset > 6) &&
+                buffer[maxi - 3] == '-' &&
+                buffer[maxi - 2] == '-' &&
+                buffer[maxi - 1] == '>');
+    }
+
 }

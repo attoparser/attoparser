@@ -20,13 +20,13 @@
 package org.attoparser;
 
 
-/*
+/**
  * Class containing utility methods for parsing XML Declarations.
  *
- * @author Daniel Fernandez
+ * @author Daniel Fern&aacute;ndez
  * @since 2.0.0
  */
-final class ParsingXmlDeclarationMarkupUtil {
+public final class ParsingXmlDeclarationMarkupUtil {
 
 
     
@@ -44,13 +44,20 @@ final class ParsingXmlDeclarationMarkupUtil {
 
 
     
-    static void parseXmlDeclaration(
+    public static void parseXmlDeclaration(
             final char[] buffer,
-            final int internalOffset, final int internalLen,
-            final int outerOffset, final int outerLen,
+            final int offset, final int len,
             final int line, final int col,
-            final MarkupEventProcessor eventProcessor)
+            final IXMLDeclarationHandler handler)
             throws ParseException {
+
+        if (!isXmlDeclarationStart(buffer, offset, offset + len) || !isXmlDeclarationEnd(buffer, offset, offset + len)) {
+            throw new ParseException(
+                    "Could not parse as a well-formed XML Declaration: \"" + new String(buffer, offset, len) + "\"", line, col);
+        }
+
+        final int internalOffset = offset + 2;
+        final int internalLen = len - 4;
 
         final int maxi = internalOffset + internalLen;
         
@@ -75,7 +82,7 @@ final class ParsingXmlDeclarationMarkupUtil {
             
             throw new ParseException(
                     "XML Declaration must at least contain a \"version\" attribute: " +
-                    "\"" + new String(buffer, outerOffset, outerLen) + "\"", line, col);
+                    "\"" + new String(buffer, offset, len) + "\"", line, col);
             
         }
         
@@ -100,23 +107,26 @@ final class ParsingXmlDeclarationMarkupUtil {
             
             throw new ParseException(
                     "XML Declaration must at least contain a \"version\" attribute: " +
-                    "\"" + new String(buffer, outerOffset, outerLen) + "\"", line, col);
+                    "\"" + new String(buffer, offset, len) + "\"", line, col);
             
         }
         
         final int contentLen = maxi - contentOffset;
         
         final XmlDeclarationAttributeProcessor attHandling =
-                new XmlDeclarationAttributeProcessor(outerOffset, outerLen, line, col);
+                new XmlDeclarationAttributeProcessor(offset, len, line, col);
 
 
         ParsingAttributeSequenceUtil.
-                parseAttributeSequence(buffer, contentOffset, contentLen, locator, attHandling);
+                parseAttributeSequence(buffer, contentOffset, contentLen, locator[0], locator[1], attHandling);
+
+        // We need to forward the locator to the position corresponding with the structure end (note we are discarding result)
+        ParsingMarkupUtil.findNextStructureEndAvoidQuotes(buffer, contentOffset, maxi, locator);
 
         attHandling.finalChecks(locator, buffer);
 
 
-        eventProcessor.processXmlDeclaration(
+        handler.handleXmlDeclaration(
                 buffer,
                 keywordOffset, keywordLen,                                // keyword
                 keywordLine, keywordCol,                                  // keyword
@@ -126,7 +136,7 @@ final class ParsingXmlDeclarationMarkupUtil {
                 attHandling.encodingLine, attHandling.encodingCol,        // encoding
                 attHandling.standaloneOffset, attHandling.standaloneLen,  // standalone
                 attHandling.standaloneLine, attHandling.standaloneCol,    // standalone
-                outerOffset, outerLen,                                    // outer
+                offset, len,                                              // outer
                 line, col);                                               // outer
 
     }
@@ -148,13 +158,25 @@ final class ParsingXmlDeclarationMarkupUtil {
                             ((maxi - offset > 6) && buffer[offset + 5] == '?' && buffer[offset + 6] == '>')));
     }
 
+
+
+    static boolean isXmlDeclarationEnd(final char[] buffer, final int offset, final int maxi) {
+
+        if (offset >= (maxi - 1) || buffer[maxi - 2] != '?') {
+            return false;
+        }
+
+        return buffer[maxi - 1] == '>';
+
+    }
+
     
     
     
 
     
     
-    private static class XmlDeclarationAttributeProcessor implements ParsingAttributeSequenceUtil.IMarkupEventAttributeSequenceProcessor {
+    private static class XmlDeclarationAttributeProcessor implements IAttributeSequenceHandler {
 
         private final int outerOffset;
         private final int outerLen;
@@ -196,7 +218,7 @@ final class ParsingXmlDeclarationMarkupUtil {
             this.outerCol = outerCol;
         }
 
-        public void processAttribute(
+        public void handleAttribute(
                 final char[] buffer, 
                 final int nameOffset, final int nameLen,
                 final int nameLine, final int nameCol, 
@@ -279,7 +301,7 @@ final class ParsingXmlDeclarationMarkupUtil {
         }
         
 
-        public void processInnerWhiteSpace(
+        public void handleInnerWhiteSpace(
                 final char[] buffer, 
                 final int offset, final int len,
                 final int line, final int col)

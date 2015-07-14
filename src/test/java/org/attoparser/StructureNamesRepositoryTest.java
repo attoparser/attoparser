@@ -33,7 +33,7 @@ public class StructureNamesRepositoryTest extends TestCase {
 
     public void test() throws Exception {
 
-        final MarkupEventProcessor.StructureNamesRepository structureNamesRepository = new MarkupEventProcessor.StructureNamesRepository();
+        final MarkupEventProcessorHandler.StructureNamesRepository structureNamesRepository = new MarkupEventProcessorHandler.StructureNamesRepository();
 
 
         final char[][] structureNamesArr = new char[HtmlNames.ALL_STANDARD_ELEMENT_NAMES.size() * 2 + HtmlNames.ALL_STANDARD_ATTRIBUTE_NAMES.size() * 2][];
