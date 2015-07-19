@@ -52,7 +52,7 @@ public final class ParsingDocTypeMarkupUtil {
             final IDocTypeHandler handler)
             throws ParseException {
 
-        if (!isDocTypeStart(buffer, offset, offset + len) || !isDocTypeEnd(buffer, offset, offset + len)) {
+        if (len < 10 || !isDocTypeStart(buffer, offset, offset + len) || !isDocTypeEnd(buffer, (offset + len) - 1, offset + len)) {
             throw new ParseException(
                 "Could not parse as a well-formed DOCTYPE clause: \"" + new String(buffer, offset, len) + "\"", line, col);
         }
@@ -680,7 +680,7 @@ public final class ParsingDocTypeMarkupUtil {
 
 
     static boolean isDocTypeEnd(final char[] buffer, final int offset, final int maxi) {
-        return buffer[maxi - 1] == '>';
+        return (maxi - offset > 0 && buffer[offset] == '>');
     }
 
 

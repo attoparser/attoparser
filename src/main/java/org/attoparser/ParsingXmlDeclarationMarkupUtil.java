@@ -51,7 +51,7 @@ public final class ParsingXmlDeclarationMarkupUtil {
             final IXMLDeclarationHandler handler)
             throws ParseException {
 
-        if (!isXmlDeclarationStart(buffer, offset, offset + len) || !isXmlDeclarationEnd(buffer, offset, offset + len)) {
+        if (len < 7 || !isXmlDeclarationStart(buffer, offset, offset + len) || !isXmlDeclarationEnd(buffer, (offset + len) - 2, offset + len)) {
             throw new ParseException(
                     "Could not parse as a well-formed XML Declaration: \"" + new String(buffer, offset, len) + "\"", line, col);
         }
@@ -161,13 +161,9 @@ public final class ParsingXmlDeclarationMarkupUtil {
 
 
     static boolean isXmlDeclarationEnd(final char[] buffer, final int offset, final int maxi) {
-
-        if (offset >= (maxi - 1) || buffer[maxi - 2] != '?') {
-            return false;
-        }
-
-        return buffer[maxi - 1] == '>';
-
+        return (maxi - offset > 1 &&
+                buffer[offset] == '?' &&
+                buffer[offset + 1] == '>');
     }
 
     

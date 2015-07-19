@@ -47,7 +47,7 @@ public final class ParsingProcessingInstructionUtil {
             final IProcessingInstructionHandler handler)
             throws ParseException {
 
-        if (!isProcessingInstructionStart(buffer, offset, offset + len) || !isProcessingInstructionEnd(buffer, offset, offset + len)) {
+        if (len < 4 || !isProcessingInstructionStart(buffer, offset, offset + len) || !isProcessingInstructionEnd(buffer, (offset + len) - 2, offset + len)) {
             throw new ParseException(
                     "Could not parse as a well-formed Processing Instruction: \"" + new String(buffer, offset, len) + "\"", line, col);
         }
@@ -156,13 +156,9 @@ public final class ParsingProcessingInstructionUtil {
 
 
     static boolean isProcessingInstructionEnd(final char[] buffer, final int offset, final int maxi) {
-
-        if (offset >= (maxi - 1) || buffer[maxi - 2] != '?') {
-            return false;
-        }
-
-        return buffer[maxi - 1] == '>';
-
+        return (maxi - offset > 1 &&
+                buffer[offset] == '?' &&
+                buffer[offset + 1] == '>');
     }
 
     

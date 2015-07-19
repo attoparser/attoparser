@@ -43,7 +43,7 @@ public final class ParsingCommentMarkupUtil {
             final ICommentHandler handler)
             throws ParseException {
 
-        if (!isCommentStart(buffer, offset, offset + len) || !isCommentEnd(buffer, offset, offset + len)) {
+        if (len < 7 || !isCommentStart(buffer, offset, offset + len) || !isCommentEnd(buffer, (offset + len) - 3, offset + len)) {
             throw new ParseException(
                     "Could not parse as a well-formed Comment: \"" + new String(buffer, offset, len) + "\"", line, col);
         }
@@ -72,10 +72,10 @@ public final class ParsingCommentMarkupUtil {
 
 
     static boolean isCommentEnd(final char[] buffer, final int offset, final int maxi) {
-        return ((maxi - offset > 6) &&
-                buffer[maxi - 3] == '-' &&
-                buffer[maxi - 2] == '-' &&
-                buffer[maxi - 1] == '>');
+        return ((maxi - offset > 2) &&
+                buffer[offset] == '-' &&
+                buffer[offset + 1] == '-' &&
+                buffer[offset + 2] == '>');
     }
 
 }

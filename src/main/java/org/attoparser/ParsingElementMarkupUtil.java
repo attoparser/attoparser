@@ -46,7 +46,7 @@ public final class ParsingElementMarkupUtil {
             final IMarkupHandler markupHandler)
             throws ParseException {
 
-        if (!isOpenElementStart(buffer, offset, offset + len) || !isElementEnd(buffer, offset, offset + len, true)) {
+        if (len < 4 || !isOpenElementStart(buffer, offset, offset + len) || !isElementEnd(buffer, (offset + len) - 2, offset + len, true)) {
             throw new ParseException(
                     "Could not parse as a well-formed standalone element: \"" + new String(buffer, offset, len) + "\"", line, col);
         }
@@ -109,7 +109,7 @@ public final class ParsingElementMarkupUtil {
             final IMarkupHandler markupHandler)
             throws ParseException {
 
-        if (!isOpenElementStart(buffer, offset, offset + len) || !isElementEnd(buffer, offset, offset + len, false)) {
+        if (len < 3 || !isOpenElementStart(buffer, offset, offset + len) || !isElementEnd(buffer, (offset + len) - 1, offset + len, false)) {
             throw new ParseException(
                     "Could not parse as a well-formed open element: \"" + new String(buffer, offset, len) + "\"", line, col);
         }
@@ -172,7 +172,7 @@ public final class ParsingElementMarkupUtil {
             final IMarkupHandler markupHandler)
             throws ParseException {
 
-        if (!isCloseElementStart(buffer, offset, offset + len) || !isElementEnd(buffer, offset, offset + len, false)) {
+        if (len < 4 || !isCloseElementStart(buffer, offset, offset + len) || !isElementEnd(buffer, (offset + len) - 1, offset + len, false)) {
             throw new ParseException(
                     "Could not parse as a well-formed close element: \"" + new String(buffer, offset, len) + "\"", line, col);
         }
@@ -267,13 +267,20 @@ public final class ParsingElementMarkupUtil {
 
     static boolean isElementEnd(final char[] buffer, final int offset, final int maxi, final boolean minimized) {
 
-        if (minimized) {
-            if (offset >= (maxi - 1) || buffer[maxi - 2] != '/') {
-                return false;
-            }
+        final int len = maxi - offset;
+
+        if (len < 1) {
+            return false; // won't fit
         }
 
-        return buffer[maxi - 1] == '>';
+        if (minimized) {
+            if (len < 2 || buffer[offset] != '/') {
+                return false;
+            }
+            return buffer[offset + 1] == '>';
+        }
+
+        return buffer[offset] == '>';
 
     }
 

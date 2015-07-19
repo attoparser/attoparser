@@ -46,7 +46,7 @@ public final class ParsingCDATASectionMarkupUtil {
             final ICDATASectionHandler handler)
             throws ParseException {
 
-        if (!isCDATASectionStart(buffer, offset, offset + len) || !isCDATASectionEnd(buffer, offset, offset + len)) {
+        if (len < 12 || !isCDATASectionStart(buffer, offset, offset + len) || !isCDATASectionEnd(buffer, (offset + len) - 3, offset + len)) {
             throw new ParseException(
                     "Could not parse as a well-formed CDATA Section: \"" + new String(buffer, offset, len) + "\"", line, col);
         }
@@ -80,10 +80,10 @@ public final class ParsingCDATASectionMarkupUtil {
 
 
     static boolean isCDATASectionEnd(final char[] buffer, final int offset, final int maxi) {
-        return ((maxi - offset > 11) &&
-                buffer[maxi - 3] == ']' &&
-                buffer[maxi - 2] == ']' &&
-                buffer[maxi - 1] == '>');
+        return ((maxi - offset > 2) &&
+                buffer[offset] == ']' &&
+                buffer[offset + 1] == ']' &&
+                buffer[offset + 2] == '>');
     }
 
     
