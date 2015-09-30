@@ -35,6 +35,9 @@ import org.attoparser.util.TextUtil;
  */
 class HtmlCDATAContentElement extends HtmlElement {
 
+    private static final char[] ELEMENT_SCRIPT_NAME = "script".toCharArray();
+    private static final char[] ATTRIBUTE_TYPE_NAME = "type".toCharArray();
+    private static final char[] ATTRIBUTE_TYPE_TEMPLATE_VALUE = "text/template".toCharArray();
 
     private final char[] nameLower;
     private final char[] nameUpper;
@@ -59,7 +62,26 @@ class HtmlCDATAContentElement extends HtmlElement {
     }
 
 
-    
+
+
+    @Override
+    public void handleOpenElementStart(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int line, final int col,
+            final IMarkupHandler handler,
+            final ParseStatus status,
+            final boolean autoOpenEnabled, final boolean autoCloseEnabled)
+            throws ParseException {
+
+        status.shouldDisableParsing = true;
+
+        handler.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
+
+    }
+
+
+
     @Override
     public void handleOpenElementEnd(
             final char[] buffer,
@@ -73,8 +95,48 @@ class HtmlCDATAContentElement extends HtmlElement {
 
         handler.handleOpenElementEnd(buffer, nameOffset, nameLen, line, col);
 
-        // This is an element with CDATA body, so we should disable parsing until we find the corresponding closing tag
-        status.setParsingDisabled(computeLimitSequence(buffer, nameOffset, nameLen));
+        if (status.shouldDisableParsing) {
+            // This is an element with CDATA body, so we should disable parsing until we find the corresponding closing tag
+            status.setParsingDisabled(computeLimitSequence(buffer, nameOffset, nameLen));
+            // Clean the flag
+            status.shouldDisableParsing = false;
+        }
+
+    }
+
+
+
+    @Override
+    public void handleAttribute(
+            final char[] buffer,
+            final int nameOffset, final int nameLen,
+            final int nameLine, final int nameCol,
+            final int operatorOffset, final int operatorLen,
+            final int operatorLine, final int operatorCol,
+            final int valueContentOffset, final int valueContentLen,
+            final int valueOuterOffset, final int valueOuterLen,
+            final int valueLine, final int valueCol,
+            final IMarkupHandler handler,
+            final ParseStatus status,
+            final boolean autoOpenEnabled, final boolean autoCloseEnabled)
+            throws ParseException {
+
+        if (TextUtil.equals(false, ATTRIBUTE_TYPE_NAME, 0, ATTRIBUTE_TYPE_NAME.length, buffer, nameOffset, nameLen)) {
+            // We are processing a 'type' attribute...
+            if (TextUtil.equals(true, ELEMENT_SCRIPT_NAME, 0, ELEMENT_SCRIPT_NAME.length, this.nameLower, 0, this.nameLower.length)) {
+                // ...and this is a <script> tag...
+                if (TextUtil.equals(false, ATTRIBUTE_TYPE_TEMPLATE_VALUE, 0, ATTRIBUTE_TYPE_TEMPLATE_VALUE.length, buffer, valueContentOffset, valueContentLen)) {
+                    // ...and value is 'text/template', so we don't have to disable parsing!
+                    status.shouldDisableParsing = false;
+                }
+            }
+        }
+
+        handler.handleAttribute(
+                buffer,
+                nameOffset, nameLen, nameLine, nameCol,
+                operatorOffset, operatorLen, operatorLine, operatorCol,
+                valueContentOffset, valueContentLen, valueOuterOffset, valueOuterLen, valueLine, valueCol);
 
     }
 

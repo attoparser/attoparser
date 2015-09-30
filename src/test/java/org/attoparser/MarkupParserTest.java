@@ -117,6 +117,26 @@ public class MarkupParserTest extends TestCase {
         assertEquals("[DT(html)(aaa)()(<!ELEMENT>){1,1}]", sw4.toString());
 
 
+        testHtmlDoc(
+            "<script type=\"text/template\"><p>something</p></script>",
+            "[OES(script){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/template\"){1,14}OEE(script){1,29}OES(p){1,30}OEE(p){1,32}T(something){1,33}CES(p){1,42}CEE(p){1,45}CES(script){1,46}CEE(script){1,54}]",
+            noRestrictionsAutoClose);
+        testHtmlDoc(
+            "<style type=\"text/template\"><p>something</p></style>",
+            "[OES(style){1,1}IWS( ){1,7}A(type){1,8}(=){1,12}(\"text/template\"){1,13}OEE(style){1,28}T(<p>something</p>){1,29}CES(style){1,45}CEE(style){1,52}]",
+            noRestrictionsAutoClose);
+        testHtmlDoc(
+            "<template><p>something</p></template>",
+            "[OES(template){1,1}OEE(template){1,10}OES(p){1,11}OEE(p){1,13}T(something){1,14}CES(p){1,23}CEE(p){1,26}CES(template){1,27}CEE(template){1,37}]",
+            noRestrictionsAutoClose);
+        testHtmlDoc(
+            "<script type=\"text/javascript\"><p>something</p></script>",
+            "[OES(script){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE(script){1,31}T(<p>something</p>){1,32}CES(script){1,48}CEE(script){1,56}]",
+            noRestrictionsAutoClose);
+        testHtmlDoc(
+            "<script><p>something</p></script>",
+            "[OES(script){1,1}OEE(script){1,8}T(<p>something</p>){1,9}CES(script){1,25}CEE(script){1,33}]",
+            noRestrictionsAutoClose);
         testDoc(
             "<div class= s>",
             "[OES(div){1,1}IWS( ){1,5}A(class){1,6}(= ){1,11}(s){1,13}OEE(div){1,14}ACES(div){1,15}ACEE(div){1,15}]",

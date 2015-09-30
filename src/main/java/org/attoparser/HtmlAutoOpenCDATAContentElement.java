@@ -82,7 +82,8 @@ class HtmlAutoOpenCDATAContentElement extends HtmlCDATAContentElement {
             return;
         }
 
-        handler.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
+        super.handleOpenElementStart(
+                buffer, nameOffset, nameLen, line, col, handler, status, autoOpenEnabled, autoCloseEnabled);
 
     }
 
@@ -104,7 +105,8 @@ class HtmlAutoOpenCDATAContentElement extends HtmlCDATAContentElement {
             return;
         }
 
-        handler.handleStandaloneElementStart(buffer, nameOffset, nameLen, minimized, line, col);
+        super.handleStandaloneElementStart(
+                buffer, nameOffset, nameLen, minimized, line, col, handler, status, autoOpenEnabled, autoCloseEnabled);
 
     }
 

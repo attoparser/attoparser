@@ -43,6 +43,7 @@ public final class ParseStatus {
     int col;
     boolean inStructure;
 
+    boolean shouldDisableParsing; // This is meant to be modified only inside CDATA elements (disabling can depend on an attribute)
     boolean parsingDisabled;
     char[] parsingDisabledLimitSequence;
 
