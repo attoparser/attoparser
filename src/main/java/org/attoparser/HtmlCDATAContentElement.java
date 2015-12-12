@@ -37,7 +37,15 @@ class HtmlCDATAContentElement extends HtmlElement {
 
     private static final char[] ELEMENT_SCRIPT_NAME = "script".toCharArray();
     private static final char[] ATTRIBUTE_TYPE_NAME = "type".toCharArray();
-    private static final char[] ATTRIBUTE_TYPE_TEMPLATE_VALUE = "text/template".toCharArray();
+
+    // We will consider a script tag CDATA only if it has no "type" attribute, or a "type" attribute with
+    // any of these values
+    private static final char[] ATTRIBUTE_TYPE_JAVASCRIPT_VALUE = "javascript".toCharArray();
+    private static final char[] ATTRIBUTE_TYPE_ECMASCRIPT_VALUE = "ecmascript".toCharArray();
+    private static final char[] ATTRIBUTE_TYPE_TEXT_JAVASCRIPT_VALUE = "text/javascript".toCharArray();
+    private static final char[] ATTRIBUTE_TYPE_TEXT_ECMASCRIPT_VALUE = "text/ecmascript".toCharArray();
+    private static final char[] ATTRIBUTE_TYPE_APPLICATION_JAVASCRIPT_VALUE = "application/javascript".toCharArray();
+    private static final char[] ATTRIBUTE_TYPE_APPLICATION_ECMASCRIPT_VALUE = "application/ecmascript".toCharArray();
 
     private final char[] nameLower;
     private final char[] nameUpper;
@@ -121,13 +129,35 @@ class HtmlCDATAContentElement extends HtmlElement {
             final boolean autoOpenEnabled, final boolean autoCloseEnabled)
             throws ParseException {
 
-        if (TextUtil.equals(false, ATTRIBUTE_TYPE_NAME, 0, ATTRIBUTE_TYPE_NAME.length, buffer, nameOffset, nameLen)) {
+        if (TextUtil.equals(false, buffer, nameOffset, nameLen, ATTRIBUTE_TYPE_NAME, 0, ATTRIBUTE_TYPE_NAME.length)) {
             // We are processing a 'type' attribute...
-            if (TextUtil.equals(true, ELEMENT_SCRIPT_NAME, 0, ELEMENT_SCRIPT_NAME.length, this.nameLower, 0, this.nameLower.length)) {
-                // ...and this is a <script> tag...
-                if (TextUtil.equals(false, ATTRIBUTE_TYPE_TEMPLATE_VALUE, 0, ATTRIBUTE_TYPE_TEMPLATE_VALUE.length, buffer, valueContentOffset, valueContentLen)) {
-                    // ...and value is 'text/template', so we don't have to disable parsing!
-                    status.shouldDisableParsing = false;
+            if (TextUtil.equals(true, this.nameLower, 0, this.nameLower.length, ELEMENT_SCRIPT_NAME, 0, ELEMENT_SCRIPT_NAME.length)) {
+                // ...and this is a <script> tag... so unles the "type" value we find here is one of the types
+                // that disable parsing (javascript/ecmascript ones), we should consider it enabled again
+
+                status.shouldDisableParsing = false;
+
+                if (TextUtil.endsWith(false, buffer, valueContentOffset, valueContentLen, ATTRIBUTE_TYPE_JAVASCRIPT_VALUE, 0, ATTRIBUTE_TYPE_JAVASCRIPT_VALUE.length) ||
+                    TextUtil.endsWith(false, buffer, valueContentOffset, valueContentLen, ATTRIBUTE_TYPE_ECMASCRIPT_VALUE, 0, ATTRIBUTE_TYPE_ECMASCRIPT_VALUE.length)) {
+                    // The script type might be one of the types that disable parsing for script tags
+
+                    if (TextUtil.equals(false, buffer, valueContentOffset, valueContentLen, ATTRIBUTE_TYPE_JAVASCRIPT_VALUE, 0, ATTRIBUTE_TYPE_JAVASCRIPT_VALUE.length) ||
+                        TextUtil.equals(false, buffer, valueContentOffset, valueContentLen, ATTRIBUTE_TYPE_ECMASCRIPT_VALUE, 0, ATTRIBUTE_TYPE_ECMASCRIPT_VALUE.length)) {
+
+                        status.shouldDisableParsing = true;
+
+                    } else if (TextUtil.equals(false, buffer, valueContentOffset, valueContentLen, ATTRIBUTE_TYPE_TEXT_JAVASCRIPT_VALUE, 0, ATTRIBUTE_TYPE_TEXT_JAVASCRIPT_VALUE.length) ||
+                               TextUtil.equals(false, buffer, valueContentOffset, valueContentLen, ATTRIBUTE_TYPE_TEXT_ECMASCRIPT_VALUE, 0, ATTRIBUTE_TYPE_TEXT_ECMASCRIPT_VALUE.length)) {
+
+                        status.shouldDisableParsing = true;
+
+                    } else if (TextUtil.equals(false, buffer, valueContentOffset, valueContentLen, ATTRIBUTE_TYPE_APPLICATION_JAVASCRIPT_VALUE, 0, ATTRIBUTE_TYPE_APPLICATION_JAVASCRIPT_VALUE.length) ||
+                               TextUtil.equals(false, buffer, valueContentOffset, valueContentLen, ATTRIBUTE_TYPE_APPLICATION_ECMASCRIPT_VALUE, 0, ATTRIBUTE_TYPE_APPLICATION_ECMASCRIPT_VALUE.length)) {
+
+                        status.shouldDisableParsing = true;
+
+                    }
+
                 }
             }
         }
