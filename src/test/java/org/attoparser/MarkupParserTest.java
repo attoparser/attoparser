@@ -126,6 +126,30 @@ public class MarkupParserTest extends TestCase {
             "[OES(style){1,1}IWS( ){1,7}A(type){1,8}(=){1,12}(\"text/template\"){1,13}OEE(style){1,28}T(<p>something</p>){1,29}CES(style){1,45}CEE(style){1,52}]",
             noRestrictionsAutoClose);
         testHtmlDoc(
+            "<script type=\"text/javascript\"><p>something</p></script>",
+            "[OES(script){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/javascript\"){1,14}OEE(script){1,31}T(<p>something</p>){1,32}CES(script){1,48}CEE(script){1,56}]",
+            noRestrictionsAutoClose);
+        testHtmlDoc(
+            "<style type=\"text/ecmascript\"><p>something</p></style>",
+            "[OES(style){1,1}IWS( ){1,7}A(type){1,8}(=){1,12}(\"text/ecmascript\"){1,13}OEE(style){1,30}T(<p>something</p>){1,31}CES(style){1,47}CEE(style){1,54}]",
+            noRestrictionsAutoClose);
+        testHtmlDoc(
+            "<script type=\"application/javascript\"><p>something</p></script>",
+            "[OES(script){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"application/javascript\"){1,14}OEE(script){1,38}T(<p>something</p>){1,39}CES(script){1,55}CEE(script){1,63}]",
+            noRestrictionsAutoClose);
+        testHtmlDoc(
+            "<style type=\"application/ecmascript\"><p>something</p></style>",
+            "[OES(style){1,1}IWS( ){1,7}A(type){1,8}(=){1,12}(\"application/ecmascript\"){1,13}OEE(style){1,37}T(<p>something</p>){1,38}CES(style){1,54}CEE(style){1,61}]",
+            noRestrictionsAutoClose);
+        testHtmlDoc(
+            "<SCRIPT TYPE=\"TEXT/JAVASCRIPT\"><p>something</p></SCRIPT>",
+            "[OES(SCRIPT){1,1}IWS( ){1,8}A(TYPE){1,9}(=){1,13}(\"TEXT/JAVASCRIPT\"){1,14}OEE(SCRIPT){1,31}T(<p>something</p>){1,32}CES(SCRIPT){1,48}CEE(SCRIPT){1,56}]",
+            noRestrictionsAutoClose);
+        testHtmlDoc(
+            "<SCRIPT type=\"TEXT/ECMASCRIPT\"><p>something</p></SCRIPT>",
+            "[OES(SCRIPT){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"TEXT/ECMASCRIPT\"){1,14}OEE(SCRIPT){1,31}T(<p>something</p>){1,32}CES(SCRIPT){1,48}CEE(SCRIPT){1,56}]",
+            noRestrictionsAutoClose);
+        testHtmlDoc(
             "<template><p>something</p></template>",
             "[OES(template){1,1}OEE(template){1,10}OES(p){1,11}OEE(p){1,13}T(something){1,14}CES(p){1,23}CEE(p){1,26}CES(template){1,27}CEE(template){1,37}]",
             noRestrictionsAutoClose);
