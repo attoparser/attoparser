@@ -299,6 +299,10 @@ final class SelectorElementBuffer {
             System.arraycopy(this.elementInnerWhiteSpaceBuffers, 0, newElementInnerWhiteSpaceBuffers, 0, this.elementInnerWhiteSpaceCount);
             this.elementInnerWhiteSpaceBuffers = newElementInnerWhiteSpaceBuffers;
 
+            final int[] newElementInnerWhiteSpaceLens = new int[this.elementInnerWhiteSpaceCount + DEFAULT_ATTRIBUTES_INC];
+            System.arraycopy(this.elementInnerWhiteSpaceLens, 0, newElementInnerWhiteSpaceLens, 0, this.elementInnerWhiteSpaceCount);
+            this.elementInnerWhiteSpaceLens = newElementInnerWhiteSpaceLens;
+
             final int[] newElementInnerWhiteSpaceLines = new int[this.elementInnerWhiteSpaceCount + DEFAULT_ATTRIBUTES_INC];
             final int[] newElementInnerWhiteSpaceCols = new int[this.elementInnerWhiteSpaceCount + DEFAULT_ATTRIBUTES_INC];
             System.arraycopy(this.elementInnerWhiteSpaceLines, 0, newElementInnerWhiteSpaceLines, 0, this.elementInnerWhiteSpaceCount);
