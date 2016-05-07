@@ -43,7 +43,7 @@ import org.attoparser.ParseException;
  *   final Reader documentReader = ...;
  *
  *   // Create the handler instance. Extending the no-op AbstractSimpleMarkupHandler is a good start
- *   final ISimpleMarkupHandler handler = new AbstractSimpleMarkupHandler() {
+ *   final ISimpleMarkupHandler simpleHandler = new AbstractSimpleMarkupHandler() {
  *       ... // some events implemented
  *   };
  *
