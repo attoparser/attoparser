@@ -31,9 +31,10 @@ final class HtmlVoidBodyElement extends HtmlVoidAutoOpenCloseElement {
 
     private static final String[] ARRAY_HTML_BODY = new String[] { "html", "body" };
     private static final String[] ARRAY_HEAD = new String[] { "head" };
+    private static final String[] AUTO_CLOSE_LIMITS = new String[] { "script", "template", "element", "decorator", "content", "shadow"};
 
     HtmlVoidBodyElement(final String name) {
-        super(name, ARRAY_HTML_BODY, null, ARRAY_HEAD, null);
+        super(name, ARRAY_HTML_BODY, null, ARRAY_HEAD, AUTO_CLOSE_LIMITS);
    }
 
 

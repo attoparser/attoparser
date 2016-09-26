@@ -118,6 +118,75 @@ public class MarkupParserTest extends TestCase {
 
 
         testHtmlDoc(
+                "<head><script type=\"text/x-jquery-tmpl\"><p>something</p></script></head>",
+                "[OES(head){1,1}OEE(head){1,6}OES(script){1,7}IWS( ){1,14}A(type){1,15}(=){1,19}(\"text/x-jquery-tmpl\"){1,20}OEE(script){1,40}OES(p){1,41}OEE(p){1,43}T(something){1,44}CES(p){1,53}CEE(p){1,56}CES(script){1,57}CEE(script){1,65}CES(head){1,66}CEE(head){1,72}]",
+                noRestrictionsAutoClose);
+        testHtmlDoc(
+                "<head><script type=\"text/x-jquery-tmpl\"><div>something</div></script></head>",
+                "[OES(head){1,1}OEE(head){1,6}OES(script){1,7}IWS( ){1,14}A(type){1,15}(=){1,19}(\"text/x-jquery-tmpl\"){1,20}OEE(script){1,40}OES(div){1,41}OEE(div){1,45}T(something){1,46}CES(div){1,55}CEE(div){1,60}CES(script){1,61}CEE(script){1,69}CES(head){1,70}CEE(head){1,76}]",
+                noRestrictionsAutoClose);
+        testHtmlDoc(
+                "<head><script type=\"text/x-jquery-tmpl\"><p>something</p></script></head>",
+                "[AOES(html){1,1}AOEE(html){1,1}OES(head){1,1}OEE(head){1,6}OES(script){1,7}IWS( ){1,14}A(type){1,15}(=){1,19}(\"text/x-jquery-tmpl\"){1,20}OEE(script){1,40}OES(p){1,41}OEE(p){1,43}T(something){1,44}CES(p){1,53}CEE(p){1,56}CES(script){1,57}CEE(script){1,65}CES(head){1,66}CEE(head){1,72}AOES(body){1,73}AOEE(body){1,73}ACES(body){1,73}ACEE(body){1,73}ACES(html){1,73}ACEE(html){1,73}]",
+                noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+                "<head><script type=\"text/x-jquery-tmpl\"><div>something</div></script></head>",
+                "[AOES(html){1,1}AOEE(html){1,1}OES(head){1,1}OEE(head){1,6}OES(script){1,7}IWS( ){1,14}A(type){1,15}(=){1,19}(\"text/x-jquery-tmpl\"){1,20}OEE(script){1,40}OES(div){1,41}OEE(div){1,45}T(something){1,46}CES(div){1,55}CEE(div){1,60}CES(script){1,61}CEE(script){1,69}CES(head){1,70}CEE(head){1,76}AOES(body){1,77}AOEE(body){1,77}ACES(body){1,77}ACEE(body){1,77}ACES(html){1,77}ACEE(html){1,77}]",
+                noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+                "<body><script type=\"text/x-jquery-tmpl\"><p>something</p></script></body>",
+                "[OES(body){1,1}OEE(body){1,6}OES(script){1,7}IWS( ){1,14}A(type){1,15}(=){1,19}(\"text/x-jquery-tmpl\"){1,20}OEE(script){1,40}OES(p){1,41}OEE(p){1,43}T(something){1,44}CES(p){1,53}CEE(p){1,56}CES(script){1,57}CEE(script){1,65}CES(body){1,66}CEE(body){1,72}]",
+                noRestrictionsAutoClose);
+        testHtmlDoc(
+                "<body><script type=\"text/x-jquery-tmpl\"><div>something</div></script></body>",
+                "[OES(body){1,1}OEE(body){1,6}OES(script){1,7}IWS( ){1,14}A(type){1,15}(=){1,19}(\"text/x-jquery-tmpl\"){1,20}OEE(script){1,40}OES(div){1,41}OEE(div){1,45}T(something){1,46}CES(div){1,55}CEE(div){1,60}CES(script){1,61}CEE(script){1,69}CES(body){1,70}CEE(body){1,76}]",
+                noRestrictionsAutoClose);
+        testHtmlDoc(
+                "<body><script type=\"text/x-jquery-tmpl\"><p>something</p></script></body>",
+                "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}ACES(head){1,1}ACEE(head){1,1}OES(body){1,1}OEE(body){1,6}OES(script){1,7}IWS( ){1,14}A(type){1,15}(=){1,19}(\"text/x-jquery-tmpl\"){1,20}OEE(script){1,40}OES(p){1,41}OEE(p){1,43}T(something){1,44}CES(p){1,53}CEE(p){1,56}CES(script){1,57}CEE(script){1,65}CES(body){1,66}CEE(body){1,72}ACES(html){1,73}ACEE(html){1,73}]",
+                noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+                "<body><script type=\"text/x-jquery-tmpl\"><div>something</div></script></body>",
+                "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}ACES(head){1,1}ACEE(head){1,1}OES(body){1,1}OEE(body){1,6}OES(script){1,7}IWS( ){1,14}A(type){1,15}(=){1,19}(\"text/x-jquery-tmpl\"){1,20}OEE(script){1,40}OES(div){1,41}OEE(div){1,45}T(something){1,46}CES(div){1,55}CEE(div){1,60}CES(script){1,61}CEE(script){1,69}CES(body){1,70}CEE(body){1,76}ACES(html){1,77}ACEE(html){1,77}]",
+                noRestrictionsAutoOpenClose);
+
+
+        testHtmlDoc(
+                "<head><template><p>something</p></template></head>",
+                "[OES(head){1,1}OEE(head){1,6}OES(template){1,7}OEE(template){1,16}OES(p){1,17}OEE(p){1,19}T(something){1,20}CES(p){1,29}CEE(p){1,32}CES(template){1,33}CEE(template){1,43}CES(head){1,44}CEE(head){1,50}]",
+                noRestrictionsAutoClose);
+        testHtmlDoc(
+                "<head><template><div>something</div></template></head>",
+                "[OES(head){1,1}OEE(head){1,6}OES(template){1,7}OEE(template){1,16}OES(div){1,17}OEE(div){1,21}T(something){1,22}CES(div){1,31}CEE(div){1,36}CES(template){1,37}CEE(template){1,47}CES(head){1,48}CEE(head){1,54}]",
+                noRestrictionsAutoClose);
+        testHtmlDoc(
+                "<head><template><p>something</p></template></head>",
+                "[AOES(html){1,1}AOEE(html){1,1}OES(head){1,1}OEE(head){1,6}OES(template){1,7}OEE(template){1,16}OES(p){1,17}OEE(p){1,19}T(something){1,20}CES(p){1,29}CEE(p){1,32}CES(template){1,33}CEE(template){1,43}CES(head){1,44}CEE(head){1,50}AOES(body){1,51}AOEE(body){1,51}ACES(body){1,51}ACEE(body){1,51}ACES(html){1,51}ACEE(html){1,51}]",
+                noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+                "<head><template><div>something</div></template></head>",
+                "[AOES(html){1,1}AOEE(html){1,1}OES(head){1,1}OEE(head){1,6}OES(template){1,7}OEE(template){1,16}OES(div){1,17}OEE(div){1,21}T(something){1,22}CES(div){1,31}CEE(div){1,36}CES(template){1,37}CEE(template){1,47}CES(head){1,48}CEE(head){1,54}AOES(body){1,55}AOEE(body){1,55}ACES(body){1,55}ACEE(body){1,55}ACES(html){1,55}ACEE(html){1,55}]",
+                noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+                "<body><template><p>something</p></template></body>",
+                "[OES(body){1,1}OEE(body){1,6}OES(template){1,7}OEE(template){1,16}OES(p){1,17}OEE(p){1,19}T(something){1,20}CES(p){1,29}CEE(p){1,32}CES(template){1,33}CEE(template){1,43}CES(body){1,44}CEE(body){1,50}]",
+                noRestrictionsAutoClose);
+        testHtmlDoc(
+                "<body><template><div>something</div></template></body>",
+                "[OES(body){1,1}OEE(body){1,6}OES(template){1,7}OEE(template){1,16}OES(div){1,17}OEE(div){1,21}T(something){1,22}CES(div){1,31}CEE(div){1,36}CES(template){1,37}CEE(template){1,47}CES(body){1,48}CEE(body){1,54}]",
+                noRestrictionsAutoClose);
+        testHtmlDoc(
+                "<body><template><p>something</p></template></body>",
+                "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}ACES(head){1,1}ACEE(head){1,1}OES(body){1,1}OEE(body){1,6}OES(template){1,7}OEE(template){1,16}OES(p){1,17}OEE(p){1,19}T(something){1,20}CES(p){1,29}CEE(p){1,32}CES(template){1,33}CEE(template){1,43}CES(body){1,44}CEE(body){1,50}ACES(html){1,51}ACEE(html){1,51}]",
+                noRestrictionsAutoOpenClose);
+        testHtmlDoc(
+                "<body><template><div>something</div></template></body>",
+                "[AOES(html){1,1}AOEE(html){1,1}AOES(head){1,1}AOEE(head){1,1}ACES(head){1,1}ACEE(head){1,1}OES(body){1,1}OEE(body){1,6}OES(template){1,7}OEE(template){1,16}OES(div){1,17}OEE(div){1,21}T(something){1,22}CES(div){1,31}CEE(div){1,36}CES(template){1,37}CEE(template){1,47}CES(body){1,48}CEE(body){1,54}ACES(html){1,55}ACEE(html){1,55}]",
+                noRestrictionsAutoOpenClose);
+
+
+
+        testHtmlDoc(
             "<script type=\"text/template\"><p>something</p></script>",
             "[OES(script){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"text/template\"){1,14}OEE(script){1,29}OES(p){1,30}OEE(p){1,32}T(something){1,33}CES(p){1,42}CEE(p){1,45}CES(script){1,46}CEE(script){1,54}]",
             noRestrictionsAutoClose);

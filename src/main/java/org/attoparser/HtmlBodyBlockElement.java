@@ -32,9 +32,10 @@ final class HtmlBodyBlockElement extends HtmlAutoOpenCloseElement {
 
     private static final String[] ARRAY_HTML_BODY = new String[] { "html", "body" };
     private static final String[] ARRAY_P_HEAD = new String[] { "p", "head" };
+    private static final String[] AUTO_CLOSE_LIMITS = new String[] { "script", "template", "element", "decorator", "content", "shadow"};
 
     HtmlBodyBlockElement(final String name) {
-        super(name, ARRAY_HTML_BODY, null, ARRAY_P_HEAD, null);
+        super(name, ARRAY_HTML_BODY, null, ARRAY_P_HEAD, AUTO_CLOSE_LIMITS);
     }
 
 
