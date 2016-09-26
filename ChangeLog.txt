@@ -1,6 +1,6 @@
 2.0.1
 =======
--
+- Avoid aggressive auto-closing of head elements inside script or template-related tags.
 
 
 2.0.0
