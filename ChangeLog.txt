@@ -1,3 +1,8 @@
+2.0.1
+=======
+-
+
+
 2.0.0
 =======
 - Refactored all handler interfaces so that event handling methods now return a result object capable of
