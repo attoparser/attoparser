@@ -1,3 +1,8 @@
+2.0.2
+=======
+- Avoid empty comments (<!---->) not being propery recognized.
+
+
 2.0.1
 =======
 - Avoid aggressive auto-closing of head elements inside script or template-related tags.

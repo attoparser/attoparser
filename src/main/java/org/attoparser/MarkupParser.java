@@ -734,7 +734,7 @@ public final class MarkupParser implements IMarkupParser {
                 } else if (inComment) {
                     // This is a comment! (obviously ;-))
                     
-                    while (tagEnd - current < 7 || buffer[tagEnd - 1] != '-' || buffer[tagEnd - 2] != '-') {
+                    while (tagEnd - current < 6 || buffer[tagEnd - 1] != '-' || buffer[tagEnd - 2] != '-') {
                         // the '>' we chose is not the comment-closing one. Let's find again
                         
                         ParsingLocatorUtil.countChar(locator, buffer[tagEnd]);
