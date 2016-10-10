@@ -118,6 +118,18 @@ public class MarkupParserTest extends TestCase {
 
 
         testHtmlDoc(
+                "<!---->",
+                "[C(){1,1}]",
+                noRestrictionsAutoClose);
+        testHtmlDoc(
+                "<!-- -->",
+                "[C( ){1,1}]",
+                noRestrictionsAutoClose);
+        testHtmlDoc(
+                "<!--\n-->",
+                "[C(\n){1,1}]",
+                noRestrictionsAutoClose);
+        testHtmlDoc(
                 "<head><script type=\"text/x-jquery-tmpl\"><p>something</p></script></head>",
                 "[OES(head){1,1}OEE(head){1,6}OES(script){1,7}IWS( ){1,14}A(type){1,15}(=){1,19}(\"text/x-jquery-tmpl\"){1,20}OEE(script){1,40}OES(p){1,41}OEE(p){1,43}T(something){1,44}CES(p){1,53}CEE(p){1,56}CES(script){1,57}CEE(script){1,65}CES(head){1,66}CEE(head){1,72}]",
                 noRestrictionsAutoClose);
