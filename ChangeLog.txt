@@ -1,6 +1,7 @@
 2.0.2
 =======
 - Avoid empty comments (<!---->) not being propery recognized.
+- Fix <col> tags auto-closing their containing <colgroup> tags.
 
 
 2.0.1

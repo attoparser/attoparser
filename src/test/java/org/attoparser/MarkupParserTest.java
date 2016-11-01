@@ -118,6 +118,10 @@ public class MarkupParserTest extends TestCase {
 
 
         testHtmlDoc(
+                "<colgroup><col /></colgroup>",
+                "[OES(colgroup){1,1}OEE(colgroup){1,10}SES(col){1,11}IWS( ){1,15}SEE(col){1,16}CES(colgroup){1,18}CEE(colgroup){1,28}]",
+                noRestrictionsAutoClose);
+        testHtmlDoc(
                 "<!---->",
                 "[C(){1,1}]",
                 noRestrictionsAutoClose);

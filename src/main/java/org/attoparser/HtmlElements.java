@@ -156,7 +156,7 @@ final class HtmlElements {
     static final HtmlElement TABLE = new HtmlBodyBlockElement("table");
     static final HtmlElement CAPTION = new HtmlBodyAutoCloseElement("caption", new String[] { "tr", "td", "th", "thead", "tfoot", "tbody", "caption", "colgroup" }, new String[] { "table" });
     static final HtmlElement COLGROUP = new HtmlBodyAutoCloseElement("colgroup", new String[] { "tr", "td", "th", "thead", "tfoot", "tbody", "caption", "colgroup" }, new String[] { "table" });
-    static final HtmlElement COL = new HtmlVoidAutoOpenCloseElement("col", new String[] { "colgroup" }, new String[] { "colgroup" }, new String[] { "tr", "td", "th", "thead", "tfoot", "tbody", "caption", "colgroup" }, new String[] { "table" });
+    static final HtmlElement COL = new HtmlVoidAutoOpenCloseElement("col", new String[] { "colgroup" }, new String[] { "colgroup" }, new String[] { "tr", "td", "th", "thead", "tfoot", "tbody", "caption" }, new String[] { "table" });
     static final HtmlElement TBODY = new HtmlBodyAutoCloseElement("tbody", new String[] { "tr", "td", "th", "thead", "tfoot", "tbody", "caption", "colgroup" }, new String[] { "table" });
     static final HtmlElement THEAD = new HtmlBodyAutoCloseElement("thead", new String[] { "tr", "td", "th", "thead", "tfoot", "tbody", "caption", "colgroup" }, new String[] { "table" });
     static final HtmlElement TFOOT = new HtmlBodyAutoCloseElement("tfoot", new String[] { "tr", "td", "th", "thead", "tfoot", "tbody", "caption", "colgroup" }, new String[] { "table" });
