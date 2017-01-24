@@ -32,6 +32,7 @@ import org.attoparser.util.TextUtil;
  */
 final class MarkupSelectorItem implements IMarkupSelectorItem {
 
+    static final String CONTENT_SELECTOR = "content()";
     static final String TEXT_SELECTOR = "text()";
     static final String COMMENT_SELECTOR = "comment()";
     static final String CDATA_SECTION_SELECTOR = "cdata()";
@@ -52,14 +53,15 @@ final class MarkupSelectorItem implements IMarkupSelectorItem {
 
     private final boolean html;
     private final boolean anyLevel;
+    private final boolean contentSelector;
     private final boolean textSelector;
     private final boolean commentSelector;
     private final boolean cdataSectionSelector;
     private final boolean docTypeClauseSelector;
     private final boolean xmlDeclarationSelector;
     private final boolean processingInstructionSelector;
-    private final String elementName;
-    private final int elementNameLen;
+    private final String selectorPath;
+    private final int selectorPathLen;
     private final IndexCondition index;
     private final IAttributeCondition attributeCondition;
     private final boolean requiresAttributesInElement;
@@ -68,23 +70,24 @@ final class MarkupSelectorItem implements IMarkupSelectorItem {
 
     MarkupSelectorItem(
             final boolean html, final boolean anyLevel,
-            final boolean textSelector, final boolean commentSelector,
+            final boolean contentSelector, final boolean textSelector, final boolean commentSelector,
             final boolean cdataSectionSelector, final boolean docTypeClauseSelector,
             final boolean xmlDeclarationSelector, final boolean processingInstructionSelector,
-            final String elementName, final IndexCondition index, final IAttributeCondition attributeCondition) {
+            final String selectorPath, final IndexCondition index, final IAttributeCondition attributeCondition) {
 
         super();
 
         this.html = html;
         this.anyLevel = anyLevel;
+        this.contentSelector = contentSelector;
         this.textSelector = textSelector;
         this.commentSelector = commentSelector;
         this.cdataSectionSelector = cdataSectionSelector;
         this.docTypeClauseSelector = docTypeClauseSelector;
         this.xmlDeclarationSelector = xmlDeclarationSelector;
         this.processingInstructionSelector = processingInstructionSelector;
-        this.elementName = elementName;
-        this.elementNameLen = (elementName != null? elementName.length() : 0);
+        this.selectorPath = selectorPath;
+        this.selectorPathLen = (selectorPath != null? selectorPath.length() : 0);
         this.index = index;
         this.attributeCondition = attributeCondition;
 
@@ -126,8 +129,10 @@ final class MarkupSelectorItem implements IMarkupSelectorItem {
             strBuilder.append("/");
         }
 
-        if (this.elementName != null) {
-            strBuilder.append(this.elementName);
+        if (this.selectorPath != null) {
+            strBuilder.append(this.selectorPath);
+        } else if (this.contentSelector) {
+            strBuilder.append(CONTENT_SELECTOR);
         } else if (this.textSelector) {
             strBuilder.append(TEXT_SELECTOR);
         } else if (this.commentSelector) {
@@ -289,7 +294,7 @@ final class MarkupSelectorItem implements IMarkupSelectorItem {
     public boolean matchesText(
             final int markupBlockIndex, final MarkupSelectorFilter.MarkupBlockMatchingCounter markupBlockMatchingCounter) {
 
-        return this.textSelector && !(this.index != null && !matchesIndex(markupBlockIndex, markupBlockMatchingCounter, this.index));
+        return (this.contentSelector || this.textSelector) && !(this.index != null && !matchesIndex(markupBlockIndex, markupBlockMatchingCounter, this.index));
 
     }
 
@@ -297,7 +302,7 @@ final class MarkupSelectorItem implements IMarkupSelectorItem {
     public boolean matchesComment(
             final int markupBlockIndex, final MarkupSelectorFilter.MarkupBlockMatchingCounter markupBlockMatchingCounter) {
 
-        return this.commentSelector && !(this.index != null && !matchesIndex(markupBlockIndex, markupBlockMatchingCounter, this.index));
+        return (this.contentSelector || this.commentSelector) && !(this.index != null && !matchesIndex(markupBlockIndex, markupBlockMatchingCounter, this.index));
 
     }
 
@@ -305,7 +310,7 @@ final class MarkupSelectorItem implements IMarkupSelectorItem {
     public boolean matchesCDATASection(
             final int markupBlockIndex, final MarkupSelectorFilter.MarkupBlockMatchingCounter markupBlockMatchingCounter) {
 
-        return this.cdataSectionSelector && !(this.index != null && !matchesIndex(markupBlockIndex, markupBlockMatchingCounter, this.index));
+        return (this.contentSelector || this.cdataSectionSelector) && !(this.index != null && !matchesIndex(markupBlockIndex, markupBlockMatchingCounter, this.index));
 
     }
 
@@ -313,7 +318,7 @@ final class MarkupSelectorItem implements IMarkupSelectorItem {
     public boolean matchesDocTypeClause(
             final int markupBlockIndex, final MarkupSelectorFilter.MarkupBlockMatchingCounter markupBlockMatchingCounter) {
 
-        return this.docTypeClauseSelector && !(this.index != null && !matchesIndex(markupBlockIndex, markupBlockMatchingCounter, this.index));
+        return (this.contentSelector || this.docTypeClauseSelector) && !(this.index != null && !matchesIndex(markupBlockIndex, markupBlockMatchingCounter, this.index));
 
     }
 
@@ -321,7 +326,7 @@ final class MarkupSelectorItem implements IMarkupSelectorItem {
     public boolean matchesXmlDeclaration(
             final int markupBlockIndex, final MarkupSelectorFilter.MarkupBlockMatchingCounter markupBlockMatchingCounter) {
 
-        return this.xmlDeclarationSelector && !(this.index != null && !matchesIndex(markupBlockIndex, markupBlockMatchingCounter, this.index));
+        return (this.contentSelector || this.xmlDeclarationSelector) && !(this.index != null && !matchesIndex(markupBlockIndex, markupBlockMatchingCounter, this.index));
 
     }
 
@@ -329,7 +334,7 @@ final class MarkupSelectorItem implements IMarkupSelectorItem {
     public boolean matchesProcessingInstruction(
             final int markupBlockIndex, final MarkupSelectorFilter.MarkupBlockMatchingCounter markupBlockMatchingCounter) {
 
-        return this.processingInstructionSelector && !(this.index != null && !matchesIndex(markupBlockIndex, markupBlockMatchingCounter, this.index));
+        return (this.contentSelector || this.processingInstructionSelector) && !(this.index != null && !matchesIndex(markupBlockIndex, markupBlockMatchingCounter, this.index));
 
     }
 
@@ -340,26 +345,26 @@ final class MarkupSelectorItem implements IMarkupSelectorItem {
         if (this.textSelector || this.commentSelector || this.cdataSectionSelector ||
                 this.docTypeClauseSelector || this.xmlDeclarationSelector || this.processingInstructionSelector) {
             return false;
-        }
+        } // else matches content or elements
 
         // Quick check on attributes: if selector needs at least one and this element has none (very common case),
         // we know matching will be false.
-        if (this.requiresAttributesInElement && elementBuffer.attributeCount == 0) {
+        if (!this.contentSelector && this.requiresAttributesInElement && elementBuffer.attributeCount == 0) {
             return false;
         }
 
         // Check the element name. We will check equality in case-sensitive or insensitive mode depending on the
         // mode being used.
-        if (this.elementName != null &&
+        if (!this.contentSelector && this.selectorPath != null &&
                 !TextUtil.equals(
                         !this.html,
-                        this.elementName, 0, this.elementNameLen,
+                        this.selectorPath, 0, this.selectorPathLen,
                         elementBuffer.elementName, 0, elementBuffer.elementNameLen)) {
             return false;
         }
 
         // Check the attribute conditions (if any)
-        if (this.attributeCondition != null &&
+        if (!this.contentSelector && this.attributeCondition != null &&
                 !matchesAttributeCondition(this.html, elementBuffer, this.attributeCondition)) {
             return false;
         }

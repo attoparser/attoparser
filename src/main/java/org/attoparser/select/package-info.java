@@ -86,6 +86,12 @@
  *         will select, respectively: text nodes, comments, CDATA sections, DOCTYPE clauses, XML Declarations and
  *         Processing Instructions.
  *     </dd>
+ *
+ *     <dt><tt>content()</tt></dt>
+ *     <dd>
+ *         This selector can be used for selecting the entire contents of an element (i.e. all its body), including
+ *         all texts, comments, elements, etc. inside it. But, note, not the container element itself.
+ *     </dd>
  * </dl>
  *
  * <br>

@@ -292,6 +292,7 @@ final class MarkupSelectorItems {
          *    - COMMENT selector: "comment()"
          */
 
+        final boolean contentSelector = MarkupSelectorItem.CONTENT_SELECTOR.equals(path);
         final boolean textSelector = MarkupSelectorItem.TEXT_SELECTOR.equals(path);
         final boolean commentSelector = MarkupSelectorItem.COMMENT_SELECTOR.equals(path);
         final boolean cdataSectionSelector = MarkupSelectorItem.CDATA_SECTION_SELECTOR.equals(path);
@@ -389,7 +390,7 @@ final class MarkupSelectorItems {
 
         IMarkupSelectorItem thisItem =
                 new MarkupSelectorItem(
-                        html, anyLevel,
+                        html, anyLevel, contentSelector,
                         textSelector, commentSelector, cdataSectionSelector, docTypeClauseSelector, xmlDeclarationSelector, processingInstructionSelector,
                         selectorPath, index, attributeCondition);
 

@@ -1,3 +1,9 @@
+2.0.3
+=======
+- Added '/content()' selector to Markup Selector syntax in order to select all the contents (the body)
+  of a selected tag/element.
+
+
 2.0.2
 =======
 - Avoid empty comments (<!---->) not being propery recognized.
