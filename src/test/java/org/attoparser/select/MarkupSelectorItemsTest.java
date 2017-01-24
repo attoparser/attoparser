@@ -40,6 +40,7 @@ public class MarkupSelectorItemsTest extends TestCase {
     
     public void test() throws Exception {
 
+        checkNoRef(true, "//div/content()", "//div/content()");
         check(true, "//div", "(//div || //*[th:fragment='div' OR data-th-fragment='div'])");
         check(true, "//DIV", "(//div || //*[th:fragment='DIV' OR data-th-fragment='DIV'])");
         check(false, "//DIV", "(//DIV || //*[th:fragment='DIV' OR data-th-fragment='DIV'])");
