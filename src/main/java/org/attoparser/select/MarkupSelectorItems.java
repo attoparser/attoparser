@@ -301,7 +301,8 @@ final class MarkupSelectorItems {
         final boolean processingInstructionSelector = MarkupSelectorItem.PROCESSING_INSTRUCTION_SELECTOR.equals(path);
 
         final boolean isNonElementSelector =
-                (textSelector || commentSelector || cdataSectionSelector || docTypeClauseSelector || xmlDeclarationSelector || processingInstructionSelector);
+                (contentSelector || textSelector || commentSelector || cdataSectionSelector || docTypeClauseSelector
+                        || xmlDeclarationSelector || processingInstructionSelector);
 
         /*
          * Compute the final path selector we're left with (if any)
