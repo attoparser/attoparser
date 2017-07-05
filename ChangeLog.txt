@@ -1,3 +1,8 @@
+2.0.5
+=======
+- Added class org.attoparser.AttoParser in order to report the version of the library being used.
+
+
 2.0.4
 =======
 - Fixed content selector (/content()) not being adequately parsed in some scenarios.

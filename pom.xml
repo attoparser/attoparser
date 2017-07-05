@@ -83,10 +83,22 @@
   <build>
   
     <resources>
+
       <resource>
         <directory>src/main/resources</directory>
+        <excludes>
+          <exclude>org/attoparser/attoparser.properties</exclude>
+        </excludes>
       </resource>
-    
+
+      <resource>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>org/attoparser/attoparser.properties</include>
+        </includes>
+        <filtering>true</filtering>
+      </resource>
+
       <resource>
           <directory>.</directory>
           <targetPath>META-INF</targetPath>
