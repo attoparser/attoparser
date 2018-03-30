@@ -1,6 +1,7 @@
 2.0.5
 =======
 - Added class org.attoparser.AttoParser in order to report the version of the library being used.
+- Set compilation baseline to Java 6.
 
 
 2.0.4
