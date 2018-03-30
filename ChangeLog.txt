@@ -2,6 +2,7 @@
 =======
 - Added class org.attoparser.AttoParser in order to report the version of the library being used.
 - Set compilation baseline to Java 6.
+- Added "Automatic-Module-Name: attoparser" to MANIFEST.MF for Java 9+ JPMS.
 
 
 2.0.4
