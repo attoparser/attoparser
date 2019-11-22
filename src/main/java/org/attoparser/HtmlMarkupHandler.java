@@ -1,20 +1,20 @@
 /*
  * =============================================================================
- * 
+ *
  *   Copyright (c) 2012-2014, The ATTOPARSER team (http://www.attoparser.org)
- * 
+ *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
  *   You may obtain a copy of the License at
- * 
+ *
  *       http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  *   Unless required by applicable law or agreed to in writing, software
  *   distributed under the License is distributed on an "AS IS" BASIS,
  *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
- * 
+ *
  * =============================================================================
  */
 package org.attoparser;
@@ -29,7 +29,7 @@ import org.attoparser.select.ParseSelection;
  * but resolving first the HTML elements that are being referenced in parsing events and allowing these elements
  * to introduce their inner logic in the parsing process; like e.g. letting VOID elements declare they are
  * 'standalone' elements even if they are specified as 'open' ones in markup code.
- * 
+ *
  * @author Daniel Fernandez
  * @since 2.0.0
  */
@@ -217,7 +217,7 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
             final int nameOffset, final int nameLen,
             final boolean minimized, final int line, final int col)
             throws ParseException {
-        
+
         this.currentElement = HtmlElements.forName(buffer, nameOffset, nameLen);
         this.currentElement.handleStandaloneElementStart(buffer, nameOffset, nameLen, minimized, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
 
@@ -229,7 +229,7 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
             final int nameOffset, final int nameLen,
             final boolean minimized, final int line, final int col)
             throws ParseException {
-        
+
         if (this.currentElement == null) {
             throw new IllegalStateException("Cannot end element: no current element");
         }
@@ -243,15 +243,15 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
     }
 
 
-    
-    
+
+
     @Override
     public void handleOpenElementStart(
-            final char[] buffer, 
+            final char[] buffer,
             final int nameOffset, final int nameLen,
-            final int line, final int col) 
+            final int line, final int col)
             throws ParseException {
-        
+
         this.currentElement = HtmlElements.forName(buffer, nameOffset, nameLen);
 
         if (this.autoOpenEnabled) {
@@ -353,14 +353,14 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
 
     }
 
-    
-    
-    
+
+
+
     @Override
     public void handleCloseElementStart(
-            final char[] buffer, 
+            final char[] buffer,
             final int nameOffset, final int nameLen,
-            final int line, final int col) 
+            final int line, final int col)
             throws ParseException {
 
         this.markupLevel--;
@@ -391,7 +391,7 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
         }
 
         this.currentElement.handleCloseElementStart(buffer, nameOffset, nameLen, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
-        
+
     }
 
     @Override
@@ -413,12 +413,12 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
 
     }
 
-    
-    
-    
+
+
+
     @Override
     public void handleAutoCloseElementStart(
-            final char[] buffer, 
+            final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
@@ -451,7 +451,7 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
         }
 
         this.currentElement.handleAutoCloseElementStart(buffer, nameOffset, nameLen, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
-        
+
     }
 
     @Override
@@ -473,19 +473,19 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
 
     }
 
-    
-    
-    
+
+
+
     @Override
     public void handleUnmatchedCloseElementStart(
-            final char[] buffer, 
+            final char[] buffer,
             final int nameOffset, final int nameLen,
             final int line, final int col)
             throws ParseException {
-        
+
         this.currentElement = HtmlElements.forName(buffer, nameOffset, nameLen);
         this.currentElement.handleUnmatchedCloseElementStart(buffer, nameOffset, nameLen, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
-        
+
     }
 
     @Override
@@ -506,18 +506,18 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
         element.handleUnmatchedCloseElementEnd(buffer, nameOffset, nameLen, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
 
     }
-    
-    
-    
-    
+
+
+
+
     @Override
     public void handleAttribute(
-            final char[] buffer, 
+            final char[] buffer,
             final int nameOffset, final int nameLen,
-            final int nameLine, final int nameCol, 
+            final int nameLine, final int nameCol,
             final int operatorOffset, final int operatorLen,
-            final int operatorLine, final int operatorCol, 
-            final int valueContentOffset, final int valueContentLen, 
+            final int operatorLine, final int operatorCol,
+            final int valueContentOffset, final int valueContentLen,
             final int valueOuterOffset, final int valueOuterLen,
             final int valueLine, final int valueCol)
             throws ParseException {
@@ -525,12 +525,12 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
         if (this.currentElement == null) {
             throw new IllegalStateException("Cannot handle attribute: no current element");
         }
-        
+
         this.currentElement.handleAttribute(buffer, nameOffset, nameLen, nameLine, nameCol,
                 operatorOffset, operatorLen, operatorLine, operatorCol,
                 valueContentOffset, valueContentLen, valueOuterOffset, valueOuterLen,
                 valueLine, valueCol, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
-        
+
     }
 
 
@@ -538,7 +538,7 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
 
     @Override
     public void handleInnerWhiteSpace(
-            final char[] buffer, 
+            final char[] buffer,
             final int offset, final int len,
             final int line, final int col)
             throws ParseException {
@@ -546,9 +546,9 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
         if (this.currentElement == null) {
             throw new IllegalStateException("Cannot handle attribute: no current element");
         }
-        
+
         this.currentElement.handleInnerWhiteSpace(buffer, offset, len, line, col, this.next, this.status, this.autoOpenEnabled, this.autoCloseEnabled);
-        
+
     }
 
 
@@ -572,5 +572,8 @@ final class HtmlMarkupHandler extends AbstractMarkupHandler {
 
     }
 
-
+    @Override
+    public void handleCloseTagEndBadSymbol(char[] buffer, int offset, int len, int line, int col) throws ParseException {
+        this.next.handleCloseTagEndBadSymbol(buffer, offset, len, line, col);
+    }
 }
