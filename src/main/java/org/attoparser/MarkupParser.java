@@ -390,7 +390,7 @@ public final class MarkupParser implements IMarkupParser {
         } catch (final ParseException e) {
             throw e;
         } catch (final Exception e) {
-            throw new ParseException(e);
+            throw new ParseException(e, status.line, status.col);
         } finally {
             this.pool.releaseBuffer(buffer);
             try {
