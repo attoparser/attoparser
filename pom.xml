@@ -2,13 +2,13 @@
 
 <!-- ============================================================================ -->
 <!--                                                                              -->
-<!--   Copyright (c) 2012-2014, The ATTOPARSER team (http://www.attoparser.org)   -->
+<!--   Copyright (c) 2012-2022, The ATTOPARSER team (https://www.attoparser.org)  -->
 <!--                                                                              -->
 <!--   Licensed under the Apache License, Version 2.0 (the "License");            -->
 <!--   you may not use this file except in compliance with the License.           -->
 <!--   You may obtain a copy of the License at                                    -->
 <!--                                                                              -->
-<!--       http://www.apache.org/licenses/LICENSE-2.0                             -->
+<!--       https://www.apache.org/licenses/LICENSE-2.0                            -->
 <!--                                                                              -->
 <!--   Unless required by applicable law or agreed to in writing, software        -->
 <!--   distributed under the License is distributed on an "AS IS" BASIS,          -->
@@ -26,21 +26,21 @@
   <packaging>jar</packaging>
   <version>2.0.6.BUILD-SNAPSHOT</version>
   <name>attoparser</name>
-  <url>http://www.attoparser.org</url>
+  <url>https://www.attoparser.org</url>
 
   <description>Powerful, fast and easy to use HTML and XML parser for Java</description>
 
   <licenses>
     <license>
       <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
       <distribution>repo</distribution>
     </license>
   </licenses>
 
   <organization>
     <name>The ATTOPARSER team</name>
-    <url>http://www.attoparser.org</url>
+    <url>https://www.attoparser.org</url>
   </organization>
   
   <scm>
@@ -214,7 +214,7 @@
             <manifestEntries>
               <!-- These two entries are non-standard, specified by the Apache Software Foundation in -->
               <!-- their release preparation procedures as a way to pass this information on to the   -->
-              <!-- library users. See: http://commons.apache.org/releases/prepare.html                -->
+              <!-- library users. See: https://commons.apache.org/releases/prepare.html               -->
               <X-Compile-Source-JDK>${maven.compile.source}</X-Compile-Source-JDK>
               <X-Compile-Target-JDK>${maven.compile.target}</X-Compile-Target-JDK>
               <!-- Set the Built-By attribute in MANIFEST.MF to avoid displaying specific user names. -->
