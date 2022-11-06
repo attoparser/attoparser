@@ -515,12 +515,7 @@ final class MarkupSelectorItems {
     private static MarkupSelectorItem.IAttributeCondition parseAttributeCondition(
             final boolean html, final String selectorSpec, final String attrGroup) {
 
-        String text = attrGroup.trim();
-        if (text.startsWith("(") && text.endsWith(")")) {
-            text = text.substring(1, text.length() - 1);
-        }
-
-        final int textLen = text.length();
+        final String text = removeEnvelopingParentheses(attrGroup != null? attrGroup.trim() : null);
         if (isEmptyOrWhitespace(text)) {
             throw new IllegalArgumentException(
                     "Invalid syntax in selector: \"" + selectorSpec + "\"");
@@ -530,6 +525,7 @@ final class MarkupSelectorItems {
         boolean inSimpleLiteral = false;
         int nestingLevel = 0;
         int i = 0;
+        final int textLen = text.length();
         while (i < textLen) {
 
             final char c = text.charAt(i);
@@ -546,10 +542,12 @@ final class MarkupSelectorItems {
             if (!inSimpleLiteral && !inDoubleLiteral) {
                 if (c == '(') {
                     nestingLevel++;
+                    i++;
                     continue;
                 }
                 if (c == ')') {
                     nestingLevel--;
+                    i++;
                     continue;
                 }
                 if (nestingLevel == 0 && (i + 4 < textLen) &&
@@ -590,6 +588,54 @@ final class MarkupSelectorItems {
         return parseSimpleAttributeCondition(html, selectorSpec, text);
 
     }
+
+
+    static String removeEnvelopingParentheses(final String target) {
+
+        if (target == null) {
+            return null;
+        }
+
+        final String text = target.trim();
+        final int textLen = text.length();
+
+        if (textLen > 1 && text.charAt(0) == '(' && text.charAt(textLen-1) == ')') {
+            boolean inDoubleLiteral = false;
+            boolean inSimpleLiteral = false;
+            int nestingLevel = 1;
+            int i = 1;
+            char c;
+            while (i < textLen) {
+                if (nestingLevel == 0) {
+                    // We closed first-level parentheses before consuming the last character, so
+                    // these parentheses that started at the first char were not an envelope.
+                    return text;
+                }
+                c = text.charAt(i++);
+                if (c == '\'' && !inDoubleLiteral) {
+                    inSimpleLiteral = !inSimpleLiteral;
+                } else if (c == '"' && !inSimpleLiteral) {
+                    inDoubleLiteral = !inDoubleLiteral;
+                } else if (!inSimpleLiteral && !inDoubleLiteral) {
+                    if (c == '(') {
+                        nestingLevel++;
+                    } else if (c == ')') {
+                        nestingLevel--;
+                    }
+                }
+            }
+            if (nestingLevel > 0) {
+                // At this point we do need nestingLevel to have gone down to 0
+                return text;
+            }
+            // Last, call again just in case there are more than one set of enveloping parentheses
+            return removeEnvelopingParentheses(text.substring(1, textLen-1));
+        }
+
+        return text;
+
+    }
+
 
 
     private static MarkupSelectorItem.AttributeCondition parseSimpleAttributeCondition(

@@ -126,6 +126,10 @@ public class MarkupSelectorItemsTest extends TestCase {
         checkNoRef(true, "p//procinstr()[even()]","//p//procinstr()[even()]");
         checkNoRef(true, "/p[a OR !b]", "/p[a* OR b!]");
         checkNoRef(true, "/p[a OR b!]", "/p[a* OR b!*]");
+        check(true, "p[(id='x') OR (id='y')]", "(//p[id='x' OR id='y'] || //*[(id='x' OR id='y') AND (th:fragment='p' OR data-th-fragment='p')])");
+        check(true, "p[id='x'x'x'(']", "(//p[id='x'x'x'('] || //*[id='x'x'x'(' AND (th:fragment='p' OR data-th-fragment='p')])");
+        check(true, "x'x'x'(", "(//x'x'x'( || //*[th:fragment='x'x'x'(' or data-th-fragment='x'x'x'('])");
+        check(true, "x'x'x'", "(//x'x'x' || //*[th:fragment='x'x'x'' or data-th-fragment='x'x'x''])");
     }
     
 
