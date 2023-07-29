@@ -46,6 +46,7 @@ class HtmlCDATAContentElement extends HtmlElement {
     private static final char[] ATTRIBUTE_TYPE_TEXT_ECMASCRIPT_VALUE = "text/ecmascript".toCharArray();
     private static final char[] ATTRIBUTE_TYPE_APPLICATION_JAVASCRIPT_VALUE = "application/javascript".toCharArray();
     private static final char[] ATTRIBUTE_TYPE_APPLICATION_ECMASCRIPT_VALUE = "application/ecmascript".toCharArray();
+    private static final char[] ATTRIBUTE_TYPE_MODULE_VALUE = "module".toCharArray();
 
     private final char[] nameLower;
     private final char[] nameUpper;
@@ -132,13 +133,14 @@ class HtmlCDATAContentElement extends HtmlElement {
         if (TextUtil.equals(false, buffer, nameOffset, nameLen, ATTRIBUTE_TYPE_NAME, 0, ATTRIBUTE_TYPE_NAME.length)) {
             // We are processing a 'type' attribute...
             if (TextUtil.equals(true, this.nameLower, 0, this.nameLower.length, ELEMENT_SCRIPT_NAME, 0, ELEMENT_SCRIPT_NAME.length)) {
-                // ...and this is a <script> tag... so unles the "type" value we find here is one of the types
+                // ...and this is a <script> tag... so unless the "type" value we find here is one of the types
                 // that disable parsing (javascript/ecmascript ones), we should consider it enabled again
 
                 status.shouldDisableParsing = false;
 
                 if (TextUtil.endsWith(false, buffer, valueContentOffset, valueContentLen, ATTRIBUTE_TYPE_JAVASCRIPT_VALUE, 0, ATTRIBUTE_TYPE_JAVASCRIPT_VALUE.length) ||
-                    TextUtil.endsWith(false, buffer, valueContentOffset, valueContentLen, ATTRIBUTE_TYPE_ECMASCRIPT_VALUE, 0, ATTRIBUTE_TYPE_ECMASCRIPT_VALUE.length)) {
+                    TextUtil.endsWith(false, buffer, valueContentOffset, valueContentLen, ATTRIBUTE_TYPE_ECMASCRIPT_VALUE, 0, ATTRIBUTE_TYPE_ECMASCRIPT_VALUE.length) ||
+                    TextUtil.endsWith(false, buffer, valueContentOffset, valueContentLen, ATTRIBUTE_TYPE_MODULE_VALUE, 0, ATTRIBUTE_TYPE_MODULE_VALUE.length)) {
                     // The script type might be one of the types that disable parsing for script tags
 
                     if (TextUtil.equals(false, buffer, valueContentOffset, valueContentLen, ATTRIBUTE_TYPE_JAVASCRIPT_VALUE, 0, ATTRIBUTE_TYPE_JAVASCRIPT_VALUE.length) ||
@@ -153,6 +155,10 @@ class HtmlCDATAContentElement extends HtmlElement {
 
                     } else if (TextUtil.equals(false, buffer, valueContentOffset, valueContentLen, ATTRIBUTE_TYPE_APPLICATION_JAVASCRIPT_VALUE, 0, ATTRIBUTE_TYPE_APPLICATION_JAVASCRIPT_VALUE.length) ||
                                TextUtil.equals(false, buffer, valueContentOffset, valueContentLen, ATTRIBUTE_TYPE_APPLICATION_ECMASCRIPT_VALUE, 0, ATTRIBUTE_TYPE_APPLICATION_ECMASCRIPT_VALUE.length)) {
+
+                        status.shouldDisableParsing = true;
+
+                    } else if (TextUtil.equals(false, buffer, valueContentOffset, valueContentLen, ATTRIBUTE_TYPE_MODULE_VALUE, 0, ATTRIBUTE_TYPE_MODULE_VALUE.length)) {
 
                         status.shouldDisableParsing = true;
 
