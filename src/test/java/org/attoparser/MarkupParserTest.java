@@ -244,6 +244,10 @@ public class MarkupParserTest extends TestCase {
             "[OES(SCRIPT){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"TEXT/ECMASCRIPT\"){1,14}OEE(SCRIPT){1,31}T(<p>something</p>){1,32}CES(SCRIPT){1,48}CEE(SCRIPT){1,56}]",
             noRestrictionsAutoClose);
         testHtmlDoc(
+            "<script type=\"module\"><p>something</p></script>",
+            "[OES(script){1,1}IWS( ){1,8}A(type){1,9}(=){1,13}(\"module\"){1,14}OEE(script){1,22}T(<p>something</p>){1,23}CES(script){1,39}CEE(script){1,47}]",
+            noRestrictionsAutoClose);
+        testHtmlDoc(
             "<template><p>something</p></template>",
             "[OES(template){1,1}OEE(template){1,10}OES(p){1,11}OEE(p){1,13}T(something){1,14}CES(p){1,23}CEE(p){1,26}CES(template){1,27}CEE(template){1,37}]",
             noRestrictionsAutoClose);
