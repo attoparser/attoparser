@@ -41,8 +41,8 @@ import org.attoparser.discard.DiscardMarkupHandler;
  * <p>
  *   This markup handler will apply the specified <strong>markup selectors</strong> and divide parsing events
  *   between two (possibly different) chained markup handlers implementing {@link org.attoparser.IMarkupHandler}:
- *   the <tt>selectedHandler</tt> and the <tt>nonSelectedHandler</tt>. Also, document start/end events will be
- *   sent to the <tt>selectedHandler</tt> unless specified otherwise by means of the
+ *   the <kbd>selectedHandler</kbd> and the <kbd>nonSelectedHandler</kbd>. Also, document start/end events will be
+ *   sent to the <kbd>selectedHandler</kbd> unless specified otherwise by means of the
  *   {@link #setDocumentStartEndHandler(org.attoparser.IMarkupHandler)} method.
  * </p>
  * <p>
@@ -54,7 +54,7 @@ import org.attoparser.discard.DiscardMarkupHandler;
  * </p>
  * <p>
  *   Also note that this filtering will be done in the most memory-efficient way, without the need to create any
- *   large extra <tt>String</tt> or <tt>char[]</tt> objects apart from a minimal <em>element buffer</em> object which
+ *   large extra <kbd>String</kbd> or <kbd>char[]</kbd> objects apart from a minimal <em>element buffer</em> object which
  *   will be reused throughout all the parsing process. This makes the execution of this handler extremely fast
  *   and integrated with the parsing process itself.
  * </p>
@@ -76,12 +76,12 @@ import org.attoparser.discard.DiscardMarkupHandler;
  *   ...and a {@link org.attoparser.select.BlockSelectorMarkupHandler} initialized with:
  * </p>
  * <ul>
- *   <li>An {@link org.attoparser.output.OutputMarkupHandler} object as <tt>selectedHandler</tt>.</li>
- *   <li>A {@link org.attoparser.discard.DiscardMarkupHandler} object as <tt>nonSelectedHandler</tt>. This
+ *   <li>An {@link org.attoparser.output.OutputMarkupHandler} object as <kbd>selectedHandler</kbd>.</li>
+ *   <li>A {@link org.attoparser.discard.DiscardMarkupHandler} object as <kbd>nonSelectedHandler</kbd>. This
  *       is the default <em>non-selected</em> handler used when none is specified.</li>
  * </ul>
  * <p>
- *   Using selector <tt>"div.content"</tt>, we would get:
+ *   Using selector <kbd>"div.content"</kbd>, we would get:
  * </p>
  * <pre><code>
  * &lt;div class="content"&gt;
@@ -89,7 +89,7 @@ import org.attoparser.discard.DiscardMarkupHandler;
  *     &lt;/div&gt;
  * </code></pre>
  * <p>
- *   If we had two selectors, <tt>"h1"</tt> and <tt>"div//text()"</tt>, we would get:
+ *   If we had two selectors, <kbd>"h1"</kbd> and <kbd>"div//text()"</kbd>, we would get:
  * </p>
  * <pre><code>
  * &lt;h1&gt;AttoParser&lt;/h1&gt;

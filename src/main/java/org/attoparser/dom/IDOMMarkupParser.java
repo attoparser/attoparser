@@ -30,7 +30,7 @@ import org.attoparser.ParseException;
  *   Default implementation is {@link org.attoparser.dom.DOMMarkupParser}.
  * </p>
  * <p>
- *   DOM trees created by this class are made with objects of the classes from the <tt>org.attoparser.dom</tt>
+ *   DOM trees created by this class are made with objects of the classes from the <kbd>org.attoparser.dom</kbd>
  *   package.
  * </p>
  * <p>
@@ -68,7 +68,7 @@ public interface IDOMMarkupParser {
     /**
      * <p>
      *   Parse a document and convert it into a DOM tree, using the classes at the
-     *   <tt>org.attoparser.dom</tt> package.
+     *   <kbd>org.attoparser.dom</kbd> package.
      * </p>
      *
      * @param document the document to be parsed, as a String.
@@ -82,7 +82,7 @@ public interface IDOMMarkupParser {
     /**
      * <p>
      *   Parse a document and convert it into a DOM tree, using the classes at the
-     *   <tt>org.attoparser.dom</tt> package.
+     *   <kbd>org.attoparser.dom</kbd> package.
      * </p>
      *
      * @param document the document to be parsed, as a char[].
@@ -96,7 +96,7 @@ public interface IDOMMarkupParser {
     /**
      * <p>
      *   Parse a document and convert it into a DOM tree, using the classes at the
-     *   <tt>org.attoparser.dom</tt> package.
+     *   <kbd>org.attoparser.dom</kbd> package.
      * </p>
      *
      * @param document the document to be parsed, as a char[].
@@ -113,7 +113,7 @@ public interface IDOMMarkupParser {
     /**
      * <p>
      *   Parse a document and convert it into a DOM tree, using the classes at the
-     *   <tt>org.attoparser.dom</tt> package.
+     *   <kbd>org.attoparser.dom</kbd> package.
      * </p>
      * <p>
      *   Implementations of this interface must close the provided {@link Reader}
@@ -133,7 +133,7 @@ public interface IDOMMarkupParser {
     /**
      * <p>
      *   Parse a document and convert it into a DOM tree, using the classes at the
-     *   <tt>org.attoparser.dom</tt> package.
+     *   <kbd>org.attoparser.dom</kbd> package.
      * </p>
      *
      * @param documentName the name of the document to be parsed.
@@ -148,7 +148,7 @@ public interface IDOMMarkupParser {
     /**
      * <p>
      *   Parse a document and convert it into a DOM tree, using the classes at the
-     *   <tt>org.attoparser.dom</tt> package.
+     *   <kbd>org.attoparser.dom</kbd> package.
      * </p>
      *
      * @param documentName the name of the document to be parsed.
@@ -163,7 +163,7 @@ public interface IDOMMarkupParser {
     /**
      * <p>
      *   Parse a document and convert it into a DOM tree, using the classes at the
-     *   <tt>org.attoparser.dom</tt> package.
+     *   <kbd>org.attoparser.dom</kbd> package.
      * </p>
      *
      * @param documentName the name of the document to be parsed.
@@ -181,7 +181,7 @@ public interface IDOMMarkupParser {
     /**
      * <p>
      *   Parse a document and convert it into a DOM tree, using the classes at the
-     *   <tt>org.attoparser.dom</tt> package.
+     *   <kbd>org.attoparser.dom</kbd> package.
      * </p>
      * <p>
      *   Implementations of this interface must close the provided {@link Reader}

@@ -42,10 +42,10 @@ public interface IElementHandler extends IAttributeSequenceHandler {
      *   the element is also reported.
      * </p>
      * <p>
-     *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer
+     *   Artifacts are reported using the document <kbd>buffer</kbd> directly, and this buffer
      *   should not be considered to be immutable, so reported structures should be copied if they need
-     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
-     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification).
+     *   to be stored (either by copying <kbd>len</kbd> chars from the buffer <kbd>char[]</kbd> starting
+     *   in <kbd>offset</kbd> or by creating a <kbd>String</kbd> from it using the same specification).
      * </p>
      * <p>
      *   <b>Implementations of this handler should never modify the document buffer.</b>
@@ -71,10 +71,10 @@ public interface IElementHandler extends IAttributeSequenceHandler {
      *   Called when the end of a standalone element (an element with no closing tag) is found
      * </p>
      * <p>
-     *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer
+     *   Artifacts are reported using the document <kbd>buffer</kbd> directly, and this buffer
      *   should not be considered to be immutable, so reported structures should be copied if they need
-     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
-     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification).
+     *   to be stored (either by copying <kbd>len</kbd> chars from the buffer <kbd>char[]</kbd> starting
+     *   in <kbd>offset</kbd> or by creating a <kbd>String</kbd> from it using the same specification).
      * </p>
      * <p>
      *   <b>Implementations of this handler should never modify the document buffer.</b>
@@ -102,10 +102,10 @@ public interface IElementHandler extends IAttributeSequenceHandler {
      *   the element is also reported.
      * </p>
      * <p>
-     *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer
+     *   Artifacts are reported using the document <kbd>buffer</kbd> directly, and this buffer
      *   should not be considered to be immutable, so reported structures should be copied if they need
-     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
-     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification).
+     *   to be stored (either by copying <kbd>len</kbd> chars from the buffer <kbd>char[]</kbd> starting
+     *   in <kbd>offset</kbd> or by creating a <kbd>String</kbd> from it using the same specification).
      * </p>
      * <p>
      *   <b>Implementations of this handler should never modify the document buffer.</b>
@@ -129,10 +129,10 @@ public interface IElementHandler extends IAttributeSequenceHandler {
      *   Called when the end of an open element (an <i>open tag</i>) is found.
      * </p>
      * <p>
-     *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer
+     *   Artifacts are reported using the document <kbd>buffer</kbd> directly, and this buffer
      *   should not be considered to be immutable, so reported structures should be copied if they need
-     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
-     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification).
+     *   to be stored (either by copying <kbd>len</kbd> chars from the buffer <kbd>char[]</kbd> starting
+     *   in <kbd>offset</kbd> or by creating a <kbd>String</kbd> from it using the same specification).
      * </p>
      * <p>
      *   <b>Implementations of this handler should never modify the document buffer.</b>
@@ -159,10 +159,10 @@ public interface IElementHandler extends IAttributeSequenceHandler {
      *   element is also reported.
      * </p>
      * <p>
-     *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer
+     *   Artifacts are reported using the document <kbd>buffer</kbd> directly, and this buffer
      *   should not be considered to be immutable, so reported structures should be copied if they need
-     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
-     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification).
+     *   to be stored (either by copying <kbd>len</kbd> chars from the buffer <kbd>char[]</kbd> starting
+     *   in <kbd>offset</kbd> or by creating a <kbd>String</kbd> from it using the same specification).
      * </p>
      * <p>
      *   <b>Implementations of this handler should never modify the document buffer.</b>
@@ -188,10 +188,10 @@ public interface IElementHandler extends IAttributeSequenceHandler {
      *   element is also reported.
      * </p>
      * <p>
-     *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer
+     *   Artifacts are reported using the document <kbd>buffer</kbd> directly, and this buffer
      *   should not be considered to be immutable, so reported structures should be copied if they need
-     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
-     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification).
+     *   to be stored (either by copying <kbd>len</kbd> chars from the buffer <kbd>char[]</kbd> starting
+     *   in <kbd>offset</kbd> or by creating a <kbd>String</kbd> from it using the same specification).
      * </p>
      * <p>
      *   <b>Implementations of this handler should never modify the document buffer.</b>
@@ -217,10 +217,10 @@ public interface IElementHandler extends IAttributeSequenceHandler {
      *   the element is also reported.
      * </p>
      * <p>
-     *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer
+     *   Artifacts are reported using the document <kbd>buffer</kbd> directly, and this buffer
      *   should not be considered to be immutable, so reported structures should be copied if they need
-     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
-     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification).
+     *   to be stored (either by copying <kbd>len</kbd> chars from the buffer <kbd>char[]</kbd> starting
+     *   in <kbd>offset</kbd> or by creating a <kbd>String</kbd> from it using the same specification).
      * </p>
      * <p>
      *   <b>Implementations of this handler should never modify the document buffer.</b>
@@ -244,10 +244,10 @@ public interface IElementHandler extends IAttributeSequenceHandler {
      *   Called when the end of a close element (a <i>close tag</i>) is found.
      * </p>
      * <p>
-     *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer
+     *   Artifacts are reported using the document <kbd>buffer</kbd> directly, and this buffer
      *   should not be considered to be immutable, so reported structures should be copied if they need
-     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
-     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification).
+     *   to be stored (either by copying <kbd>len</kbd> chars from the buffer <kbd>char[]</kbd> starting
+     *   in <kbd>offset</kbd> or by creating a <kbd>String</kbd> from it using the same specification).
      * </p>
      * <p>
      *   <b>Implementations of this handler should never modify the document buffer.</b>
@@ -273,10 +273,10 @@ public interface IElementHandler extends IAttributeSequenceHandler {
      *   created for balancing an unclosed tag. The name of the element is also reported.
      * </p>
      * <p>
-     *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer
+     *   Artifacts are reported using the document <kbd>buffer</kbd> directly, and this buffer
      *   should not be considered to be immutable, so reported structures should be copied if they need
-     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
-     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification).
+     *   to be stored (either by copying <kbd>len</kbd> chars from the buffer <kbd>char[]</kbd> starting
+     *   in <kbd>offset</kbd> or by creating a <kbd>String</kbd> from it using the same specification).
      * </p>
      * <p>
      *   <b>Implementations of this handler should never modify the document buffer.</b>
@@ -301,10 +301,10 @@ public interface IElementHandler extends IAttributeSequenceHandler {
      *   balancing an unclosed tag.
      * </p>
      * <p>
-     *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer
+     *   Artifacts are reported using the document <kbd>buffer</kbd> directly, and this buffer
      *   should not be considered to be immutable, so reported structures should be copied if they need
-     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
-     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification).
+     *   to be stored (either by copying <kbd>len</kbd> chars from the buffer <kbd>char[]</kbd> starting
+     *   in <kbd>offset</kbd> or by creating a <kbd>String</kbd> from it using the same specification).
      * </p>
      * <p>
      *   <b>Implementations of this handler should never modify the document buffer.</b>
@@ -330,10 +330,10 @@ public interface IElementHandler extends IAttributeSequenceHandler {
      *   the element is also reported.
      * </p>
      * <p>
-     *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer
+     *   Artifacts are reported using the document <kbd>buffer</kbd> directly, and this buffer
      *   should not be considered to be immutable, so reported structures should be copied if they need
-     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
-     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification).
+     *   to be stored (either by copying <kbd>len</kbd> chars from the buffer <kbd>char[]</kbd> starting
+     *   in <kbd>offset</kbd> or by creating a <kbd>String</kbd> from it using the same specification).
      * </p>
      * <p>
      *   <b>Implementations of this handler should never modify the document buffer.</b>
@@ -357,10 +357,10 @@ public interface IElementHandler extends IAttributeSequenceHandler {
      *   Called when the end of an unmatched close element (<i>close tag</i>) is found.
      * </p>
      * <p>
-     *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer
+     *   Artifacts are reported using the document <kbd>buffer</kbd> directly, and this buffer
      *   should not be considered to be immutable, so reported structures should be copied if they need
-     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
-     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification).
+     *   to be stored (either by copying <kbd>len</kbd> chars from the buffer <kbd>char[]</kbd> starting
+     *   in <kbd>offset</kbd> or by creating a <kbd>String</kbd> from it using the same specification).
      * </p>
      * <p>
      *   <b>Implementations of this handler should never modify the document buffer.</b>

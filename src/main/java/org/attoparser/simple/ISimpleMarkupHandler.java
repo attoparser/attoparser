@@ -132,13 +132,13 @@ public interface ISimpleMarkupHandler {
      *   Called when a CDATA section is found.
      * </p>
      * <p>
-     *   This artifact is returned as a <tt>char[]</tt> instead of a <tt>String</tt>
-     *   because its contents can be large (so creating a <tt>String</tt> is avoided if it is
+     *   This artifact is returned as a <kbd>char[]</kbd> instead of a <kbd>String</kbd>
+     *   because its contents can be large (so creating a <kbd>String</kbd> is avoided if it is
      *   not considered <em>relevant</em>). In order to convert it to a
-     *   <tt>String</tt>, just do <tt>new String(buffer, offset, len)</tt>.
+     *   <kbd>String</kbd>, just do <kbd>new String(buffer, offset, len)</kbd>.
      * </p>
      * <p>
-     *   Please note <strong>the returned <tt>char[]</tt> buffer should never be modified</strong>.
+     *   Please note <strong>the returned <kbd>char[]</kbd> buffer should never be modified</strong>.
      * </p>
      *
      * @param buffer the document buffer.
@@ -160,13 +160,13 @@ public interface ISimpleMarkupHandler {
      *   Called when a comment is found.
      * </p>
      * <p>
-     *   This artifact is returned as a <tt>char[]</tt> instead of a <tt>String</tt>
-     *   because its contents can be large (so creating a <tt>String</tt> is avoided if it is
+     *   This artifact is returned as a <kbd>char[]</kbd> instead of a <kbd>String</kbd>
+     *   because its contents can be large (so creating a <kbd>String</kbd> is avoided if it is
      *   not considered <em>relevant</em>). In order to convert it to a
-     *   <tt>String</tt>, just do <tt>new String(buffer, offset, len)</tt>.
+     *   <kbd>String</kbd>, just do <kbd>new String(buffer, offset, len)</kbd>.
      * </p>
      * <p>
-     *   Please note <strong>the returned <tt>char[]</tt> buffer should never be modified</strong>.
+     *   Please note <strong>the returned <kbd>char[]</kbd> buffer should never be modified</strong>.
      * </p>
      *
      * @param buffer the document buffer.
@@ -196,13 +196,13 @@ public interface ISimpleMarkupHandler {
      *   Text sequences might include any number of new line and/or control characters.
      * </p>
      * <p>
-     *   This artifact is returned as a <tt>char[]</tt> instead of a <tt>String</tt>
-     *   because its contents can be large (so creating a <tt>String</tt> is avoided if it is
+     *   This artifact is returned as a <kbd>char[]</kbd> instead of a <kbd>String</kbd>
+     *   because its contents can be large (so creating a <kbd>String</kbd> is avoided if it is
      *   not considered <em>relevant</em>). In order to convert it to a
-     *   <tt>String</tt>, just do <tt>new String(buffer, offset, len)</tt>.
+     *   <kbd>String</kbd>, just do <kbd>new String(buffer, offset, len)</kbd>.
      * </p>
      * <p>
-     *   Please note <strong>the returned <tt>char[]</tt> buffer should never be modified</strong>.
+     *   Please note <strong>the returned <kbd>char[]</kbd> buffer should never be modified</strong>.
      * </p>
      *
      * @param buffer the document buffer (not copied)

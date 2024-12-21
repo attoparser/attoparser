@@ -45,16 +45,16 @@ public interface IAttributeSequenceHandler {
      *   <i>operator</i>, <i>valueContent</i> and <i>valueOuter</i>):
      * </p>
      * <p>
-     *   <tt>class="basic_column"</tt><br>
-     *   <tt><b>[NAM]*&nbsp;[VALUECONTE]|   (*) = [OPERATOR]</b></tt><br>
-     *   <tt><b>|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[VALUEOUTER--]</b></tt><br>
-     *   <tt><b>[OUTER-------------]</b></tt>
+     *   <kbd>class="basic_column"</kbd><br>
+     *   <kbd><b>[NAM]*&nbsp;[VALUECONTE]|   (*) = [OPERATOR]</b></kbd><br>
+     *   <kbd><b>|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[VALUEOUTER--]</b></kbd><br>
+     *   <kbd><b>[OUTER-------------]</b></kbd>
      * </p>
      * <p>
-     *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer
+     *   Artifacts are reported using the document <kbd>buffer</kbd> directly, and this buffer
      *   should not be considered to be immutable, so reported structures should be copied if they need
-     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
-     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification).
+     *   to be stored (either by copying <kbd>len</kbd> chars from the buffer <kbd>char[]</kbd> starting
+     *   in <kbd>offset</kbd> or by creating a <kbd>String</kbd> from it using the same specification).
      * </p>
      * <p>
      *   <b>Implementations of this handler should never modify the document buffer.</b>
@@ -98,14 +98,14 @@ public interface IAttributeSequenceHandler {
      *   line feeds:
      * </p>
      * <p>
-     *   <tt>&lt;div id="main"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;class="basic_column"&gt;</tt><br>
-     *   <tt><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[INNWSP]</b></tt><br>
+     *   <kbd>&lt;div id="main"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;class="basic_column"&gt;</kbd><br>
+     *   <kbd><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[INNWSP]</b></kbd><br>
      * </p>
      * <p>
-     *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer
+     *   Artifacts are reported using the document <kbd>buffer</kbd> directly, and this buffer
      *   should not be considered to be immutable, so reported structures should be copied if they need
-     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
-     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification).
+     *   to be stored (either by copying <kbd>len</kbd> chars from the buffer <kbd>char[]</kbd> starting
+     *   in <kbd>offset</kbd> or by creating a <kbd>String</kbd> from it using the same specification).
      * </p>
      * <p>
      *   <b>Implementations of this handler should never modify the document buffer.</b>

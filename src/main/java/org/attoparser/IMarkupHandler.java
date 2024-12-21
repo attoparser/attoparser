@@ -50,7 +50,7 @@ import org.attoparser.select.ParseSelection;
  *   AttoParser provides several useful implementations of this interface out-of-the-box:
  * </p>
  *
- * <h3>Markup output</h3>
+ * <h2>Markup output</h2>
  * <dl>
  *
  *   <dt>{@link org.attoparser.output.OutputMarkupHandler}</dt><dd>
@@ -68,13 +68,13 @@ import org.attoparser.select.ParseSelection;
  *   </dd>
  * </dl>
  *
- * <h3>Format conversion and transformation operations</h3>
+ * <h2>Format conversion and transformation operations</h2>
  * <dl>
  *
  *   <dt>{@link org.attoparser.dom.DOMBuilderMarkupHandler}</dt>
  *   <dd>
  *     For building a DOM tree as a result of parsing
- *     a document. This DOM tree will be created using the classes at the <tt>org.attoparser.dom</tt> package.
+ *     a document. This DOM tree will be created using the classes at the <kbd>org.attoparser.dom</kbd> package.
  *     This handler can be more easily applied by using the convenience ad-hoc parser
  *     class {@link org.attoparser.dom.DOMMarkupParser}.
  *   </dd>
@@ -95,7 +95,7 @@ import org.attoparser.select.ParseSelection;
  *
  * </dl>
  *
- * <h3>Fragment selection and event management</h3>
+ * <h2>Fragment selection and event management</h2>
  * <dl>
  *
  *   <dt>{@link org.attoparser.select.BlockSelectorMarkupHandler}</dt>
@@ -124,7 +124,7 @@ import org.attoparser.select.ParseSelection;
  *
  * </dl>
  *
- * <h3>Testing and Debugging</h3>
+ * <h2>Testing and Debugging</h2>
  * <dl>
  *
  *   <dt>{@link org.attoparser.prettyhtml.PrettyHtmlMarkupHandler}</dt>

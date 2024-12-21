@@ -74,22 +74,22 @@ public final class ParseConfiguration implements Serializable, Cloneable {
      *       fired events though.</li>
      *   <li>{@link #REQUIRE_BALANCED}: Require that elements are already correctly balanced in markup,
      *       throwing an exception if not. Note that when in HTML mode, this does not require the
-     *       specification of optional tags such as <tt>&lt;tbody&gt;</tt>. Also note that this
+     *       specification of optional tags such as <kbd>&lt;tbody&gt;</kbd>. Also note that this
      *       will automatically consider the
-     *       {@link #setNoUnmatchedCloseElementsRequired(boolean)} flag to be set to <tt>true</tt>.</li>
+     *       {@link #setNoUnmatchedCloseElementsRequired(boolean)} flag to be set to <kbd>true</kbd>.</li>
      *   <li>{@link #AUTO_OPEN_CLOSE}: Auto open and close elements, which includes both those elements that,
      *       according to the HTML spec (when in HTML mode) have optional start or end tags (see
      *       <a href="http://www.w3.org/html/wg/drafts/html/master/syntax.html#optional-tags">http://www.w3.org/html/wg/drafts/html/master/syntax.html#optional-tags</a>)
      *       and those that simply are unclosed at the moment a parent element needs to be closed (so their closing
      *       is forced). As an example of optional tags, the HTML5 spec
      *       establishes that &lt;html&gt;, &lt;body&gt; and &lt;tbody&gt; are optional, and
-     *       that an <tt>&lt;li&gt;</tt> will close any currently
-     *       open <tt>&lt;li&gt;</tt> elements. This is not really
+     *       that an <kbd>&lt;li&gt;</kbd> will close any currently
+     *       open <kbd>&lt;li&gt;</kbd> elements. This is not really
      *       <em>ill-formed code</em>, but something allowed by the spec. All of these will be
      *       reported as auto-* events by the parser.</li>
      *   <li>{@link #AUTO_CLOSE}: Equivalent to {@link #AUTO_OPEN_CLOSE} but not performing any auto-open
-     *       operations, so that processing of HTML fragments is possible (no <tt>&lt;html&gt;</tt> or
-     *       <tt>&lt;body&gt;</tt> elements are automatically added).</li>
+     *       operations, so that processing of HTML fragments is possible (no <kbd>&lt;html&gt;</kbd> or
+     *       <kbd>&lt;body&gt;</kbd> elements are automatically added).</li>
      * </ul>
      * <p>
      *   This enumeration is used at the {@link org.attoparser.config.ParseConfiguration} class.
@@ -244,7 +244,7 @@ public final class ParseConfiguration implements Serializable, Cloneable {
      * <p>
      *   Depending on the selected mode parsers will behave differently, given HTML has some specific
      *   rules which are not XML-compatible (like void elements which might appear <em>unclosed</em> like
-     *   <tt>&lt;meta&gt;</tt>.
+     *   <kbd>&lt;meta&gt;</kbd>.
      * </p>
      *
      * @return the parsing mode to be used.
@@ -261,7 +261,7 @@ public final class ParseConfiguration implements Serializable, Cloneable {
      * <p>
      *   Depending on the selected mode parsers will behave differently, given HTML has some specific
      *   rules which are not XML-compatible (like void elements which might appear <em>unclosed</em> like
-     *   <tt>&lt;meta&gt;</tt>.
+     *   <kbd>&lt;meta&gt;</kbd>.
      * </p>
      *
      * @param mode the parsing mode to be used.
@@ -284,7 +284,7 @@ public final class ParseConfiguration implements Serializable, Cloneable {
      *   open vs close elements, etc.)
      * </p>
      * <p>
-     *   HTML requires this parameter to be <tt>false</tt>. Default for XML is <tt>true</tt>.
+     *   HTML requires this parameter to be <kbd>false</kbd>. Default for XML is <kbd>true</kbd>.
      * </p>
      * 
      * @return whether validations should be case sensitive or not. 
@@ -301,7 +301,7 @@ public final class ParseConfiguration implements Serializable, Cloneable {
      *   open vs close elements, etc.)
      * </p>
      * <p>
-     *   HTML requires this parameter to be <tt>false</tt>. Default for XML is <tt>true</tt>.
+     *   HTML requires this parameter to be <kbd>false</kbd>. Default for XML is <kbd>true</kbd>.
      * </p>
      *
      * @param caseSensitive whether validations should be case sensitive or not.
@@ -323,7 +323,7 @@ public final class ParseConfiguration implements Serializable, Cloneable {
      *   occupies more than an entire buffer in size.
      * </p>
      * <p>
-     *   Default is <tt>false</tt>.
+     *   Default is <kbd>false</kbd>.
      * </p>
      *
      * @return whether text fragments can be split or not.
@@ -339,7 +339,7 @@ public final class ParseConfiguration implements Serializable, Cloneable {
      *   occupies more than an entire buffer in size.
      * </p>
      * <p>
-     *   Default is <tt>false</tt>.
+     *   Default is <kbd>false</kbd>.
      * </p>
      *
      * @param textSplittable whether text fragments can be split or not.
@@ -365,22 +365,22 @@ public final class ParseConfiguration implements Serializable, Cloneable {
      *       fired events though.</li>
      *   <li>{@link ElementBalancing#REQUIRE_BALANCED}: Require that elements are already correctly balanced in markup,
      *       throwing an exception if not. Note that when in HTML mode, this does not require the
-     *       specification of optional tags such as <tt>&lt;tbody&gt;</tt>. Also note that this
+     *       specification of optional tags such as <kbd>&lt;tbody&gt;</kbd>. Also note that this
      *       will automatically consider the
-     *       {@link #setNoUnmatchedCloseElementsRequired(boolean)} flag to be set to <tt>true</tt>.</li>
+     *       {@link #setNoUnmatchedCloseElementsRequired(boolean)} flag to be set to <kbd>true</kbd>.</li>
      *   <li>{@link ElementBalancing#AUTO_OPEN_CLOSE}: Auto open and close elements, which includes both those elements that,
      *       according to the HTML spec (when in HTML mode) have optional start or end tags (see
      *       <a href="http://www.w3.org/html/wg/drafts/html/master/syntax.html#optional-tags">http://www.w3.org/html/wg/drafts/html/master/syntax.html#optional-tags</a>)
      *       and those that simply are unclosed at the moment a parent element needs to be closed (so their closing
      *       is forced). As an example of optional tags, the HTML5 spec
-     *       establishes that <tt>&lt;html&gt;</tt>, <tt>&lt;body&gt;</tt> and <tt>&lt;tbody&gt;</tt> are optional, and
-     *       that an <tt>&lt;li&gt;</tt> will close any currently
-     *       open <tt>&lt;li&gt;</tt> elements. This is not really
+     *       establishes that <kbd>&lt;html&gt;</kbd>, <kbd>&lt;body&gt;</kbd> and <kbd>&lt;tbody&gt;</kbd> are optional, and
+     *       that an <kbd>&lt;li&gt;</kbd> will close any currently
+     *       open <kbd>&lt;li&gt;</kbd> elements. This is not really
      *       <em>ill-formed code</em>, but something allowed by the spec. All of these will be
      *       reported as auto-* events by the parser.</li>
      *   <li>{@link ElementBalancing#AUTO_CLOSE}: Equivalent to {@link ElementBalancing#AUTO_OPEN_CLOSE} but not performing any auto-open
-     *       operations, so that processing of HTML fragments is possible (no <tt>&lt;html&gt;</tt> or
-     *       <tt>&lt;body&gt;</tt> elements are automatically added).</li>
+     *       operations, so that processing of HTML fragments is possible (no <kbd>&lt;html&gt;</kbd> or
+     *       <kbd>&lt;body&gt;</kbd> elements are automatically added).</li>
      * </ul>
      * 
      * @return the level of element balancing.
@@ -404,22 +404,22 @@ public final class ParseConfiguration implements Serializable, Cloneable {
      *       fired events though.</li>
      *   <li>{@link ElementBalancing#REQUIRE_BALANCED}: Require that elements are already correctly balanced in markup,
      *       throwing an exception if not. Note that when in HTML mode, this does not require the
-     *       specification of optional tags such as <tt>&lt;tbody&gt;</tt>. Also note that this
+     *       specification of optional tags such as <kbd>&lt;tbody&gt;</kbd>. Also note that this
      *       will automatically consider the
-     *       {@link #setNoUnmatchedCloseElementsRequired(boolean)} flag to be set to <tt>true</tt>.</li>
+     *       {@link #setNoUnmatchedCloseElementsRequired(boolean)} flag to be set to <kbd>true</kbd>.</li>
      *   <li>{@link ElementBalancing#AUTO_OPEN_CLOSE}: Auto open and close elements, which includes both those elements that,
      *       according to the HTML spec (when in HTML mode) have optional start or end tags (see
      *       <a href="http://www.w3.org/html/wg/drafts/html/master/syntax.html#optional-tags">http://www.w3.org/html/wg/drafts/html/master/syntax.html#optional-tags</a>)
      *       and those that simply are unclosed at the moment a parent element needs to be closed (so their closing
      *       is forced). As an example of optional tags, the HTML5 spec
      *       establishes that &lt;html&gt;, &lt;body&gt; and &lt;tbody&gt; are optional, and
-     *       that an <tt>&lt;li&gt;</tt> will close any currently
-     *       open <tt>&lt;li&gt;</tt> elements. This is not really
+     *       that an <kbd>&lt;li&gt;</kbd> will close any currently
+     *       open <kbd>&lt;li&gt;</kbd> elements. This is not really
      *       <em>ill-formed code</em>, but something allowed by the spec. All of these will be
      *       reported as auto-* events by the parser.</li>
      *   <li>{@link ElementBalancing#AUTO_CLOSE}: Equivalent to {@link ElementBalancing#AUTO_OPEN_CLOSE} but not performing any auto-open
-     *       operations, so that processing of HTML fragments is possible (no <tt>&lt;html&gt;</tt> or
-     *       <tt>&lt;body&gt;</tt> elements are automatically added).</li>
+     *       operations, so that processing of HTML fragments is possible (no <kbd>&lt;html&gt;</kbd> or
+     *       <kbd>&lt;body&gt;</kbd> elements are automatically added).</li>
      * </ul>
      *
      * @param elementBalancing the level of element balancing.
@@ -452,7 +452,7 @@ public final class ParseConfiguration implements Serializable, Cloneable {
      *   allowed or not.
      * </p>
      *
-     * @return whether unmatched close elements will be allowed (<tt>false</tt>) or not (<tt>true</tt>).
+     * @return whether unmatched close elements will be allowed (<kbd>false</kbd>) or not (<kbd>true</kbd>).
      */
     public boolean isNoUnmatchedCloseElementsRequired() {
         return this.noUnmatchedCloseElementsRequired;
@@ -466,7 +466,7 @@ public final class ParseConfiguration implements Serializable, Cloneable {
      * </p>
      *
      * @param noUnmatchedCloseElementsRequired whether unmatched close elements will be allowed
-     *                                         (<tt>false</tt>) or not (<tt>true</tt>).
+     *                                         (<kbd>false</kbd>) or not (<kbd>true</kbd>).
      */
     public void setNoUnmatchedCloseElementsRequired(
             final boolean noUnmatchedCloseElementsRequired) {
@@ -704,7 +704,7 @@ public final class ParseConfiguration implements Serializable, Cloneable {
      *   number of root elements in the parsed document.
      * </p>
      * <p>
-     *   Root elements are the elements that appear at the root of the document (e.g. <tt>&lt;html&gt;</tt> in
+     *   Root elements are the elements that appear at the root of the document (e.g. <kbd>&lt;html&gt;</kbd> in
      *   complete HTML documents). This enumeration allows requiring that the root element is unique always,
      *   requiring it only if a document prolog (XML Declaration or DOCTYPE) is present, or not validating
      *   this at all.
@@ -751,16 +751,16 @@ public final class ParseConfiguration implements Serializable, Cloneable {
      *   and the DOCTYPE clause (if these exist).
      * </p>
      * <p>
-     *   If <tt>validateProlog</tt> is set to false, all other parameters
+     *   If <kbd>validateProlog</kbd> is set to false, all other parameters
      *   should be ignored.
      * </p>
      * <p>
-     *   If <tt>validateProlog</tt> is true, then the rest of the parameters
+     *   If <kbd>validateProlog</kbd> is true, then the rest of the parameters
      *   will be considered.
      * </p>
      * <p>
-     *   Not all combinations of values of the <tt>{@link #getPrologPresence()}</tt>, 
-     *   <tt>{@link #getXmlDeclarationPresence()}</tt> and <tt>{@link #getDoctypePresence()}</tt> 
+     *   Not all combinations of values of the <kbd>{@link #getPrologPresence()}</kbd>, 
+     *   <kbd>{@link #getXmlDeclarationPresence()}</kbd> and <kbd>{@link #getDoctypePresence()}</kbd> 
      *   are considered valid. See {@link #validateConfiguration()} for details.
      * </p>
      * 
@@ -789,11 +789,11 @@ public final class ParseConfiguration implements Serializable, Cloneable {
          *   Default values are:
          * </p>
          * <ul>
-         *   <li><tt>{@link #isValidateProlog()} = false</tt></li>
-         *   <li><tt>{@link #getPrologPresence()} = {@link PrologPresence#ALLOWED}</tt></li>
-         *   <li><tt>{@link #getXmlDeclarationPresence()} = {@link PrologPresence#ALLOWED}</tt></li>
-         *   <li><tt>{@link #getDoctypePresence()} = {@link PrologPresence#ALLOWED}</tt></li>
-         *   <li><tt>{@link #isRequireDoctypeKeywordsUpperCase()} = true</tt></li>
+         *   <li><kbd>{@link #isValidateProlog()} = false</kbd></li>
+         *   <li><kbd>{@link #getPrologPresence()} = {@link PrologPresence#ALLOWED}</kbd></li>
+         *   <li><kbd>{@link #getXmlDeclarationPresence()} = {@link PrologPresence#ALLOWED}</kbd></li>
+         *   <li><kbd>{@link #getDoctypePresence()} = {@link PrologPresence#ALLOWED}</kbd></li>
+         *   <li><kbd>{@link #isRequireDoctypeKeywordsUpperCase()} = true</kbd></li>
          * </ul>
          * 
          */
@@ -917,8 +917,8 @@ public final class ParseConfiguration implements Serializable, Cloneable {
         
         /**
          * <p>
-         *   Checks that the combination of values in the <tt>{@link #getPrologPresence()}</tt>, 
-         *   <tt>{@link #getXmlDeclarationPresence()}</tt> and <tt>{@link #getDoctypePresence()}</tt> 
+         *   Checks that the combination of values in the <kbd>{@link #getPrologPresence()}</kbd>, 
+         *   <kbd>{@link #getXmlDeclarationPresence()}</kbd> and <kbd>{@link #getDoctypePresence()}</kbd> 
          *   parameters makes sense.
          * </p>
          * <ol>

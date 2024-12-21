@@ -31,7 +31,7 @@ import org.attoparser.config.ParseConfiguration;
  *   Default implementation of the {@link org.attoparser.dom.IDOMMarkupParser} interface.
  * </p>
  * <p>
- *   DOM trees created by this class are made with objects of the classes from the <tt>org.attoparser.dom</tt>
+ *   DOM trees created by this class are made with objects of the classes from the <kbd>org.attoparser.dom</kbd>
  *   package.
  * </p>
  * <p>

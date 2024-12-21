@@ -118,7 +118,7 @@ public final class ParseStatus {
      * </p>
      * <p>
      *   Note this should not be used for event reference, because the parser cursor might be ahead of the events
-     *   it is reporting. In order to know the lines and cols an event was found at, use the <tt>(line,col)</tt>
+     *   it is reporting. In order to know the lines and cols an event was found at, use the <kbd>(line,col)</kbd>
      *   pairs reported with every event handler.
      * </p>
      *
@@ -135,7 +135,7 @@ public final class ParseStatus {
      * </p>
      * <p>
      *   Note this should not be used for event reference, because the parser cursor might be ahead of the events
-     *   it is reporting. In order to know the lines and cols an event was found at, use the <tt>(line,col)</tt>
+     *   it is reporting. In order to know the lines and cols an event was found at, use the <kbd>(line,col)</kbd>
      *   pairs reported with every event handler.
      * </p>
      *
@@ -151,7 +151,7 @@ public final class ParseStatus {
      * <p>
      *   Determines whether parsing is currently disabled or not. This only happens if an event handler calls the
      *   {@link #setParsingDisabled(char[])} method. In such case, every Text event that will be reported until
-     *   the specified limit sequence is found will return <tt>false</tt> for this method.
+     *   the specified limit sequence is found will return <kbd>false</kbd> for this method.
      * </p>
      *
      * @return whether parsing is currently disabled or not.
@@ -167,8 +167,8 @@ public final class ParseStatus {
      * </p>
      * <p>
      *   This is used by HTML parsers (like {@link org.attoparser.MarkupParser} itself, internally) in order to being
-     *   able to correctly report HTML elements such as <tt>&lt;script&gt;</tt> or <tt>&lt;style&gt;</tt>, which bodies
-     *   should not be parsed (they are <tt>CDATA</tt>).
+     *   able to correctly report HTML elements such as <kbd>&lt;script&gt;</kbd> or <kbd>&lt;style&gt;</kbd>, which bodies
+     *   should not be parsed (they are <kbd>CDATA</kbd>).
      * </p>
      *
      * @param limitSequence the char sequence that, once found in markup, will enable parsing again.
@@ -181,7 +181,7 @@ public final class ParseStatus {
     /**
      * <p>
      *   Indicates whether the parser has already performed a required auto-open or auto-close operation. This
-     *   flag set to <tt>true</tt> means that these operations have already been performed and that the event is
+     *   flag set to <kbd>true</kbd> means that these operations have already been performed and that the event is
      *   being relaunched after that (so the event can be propagated if needed).
      * </p>
      *
@@ -199,42 +199,42 @@ public final class ParseStatus {
      * </p>
      * <p>
      *   These attributes instruct the event processor to make sure an element is correctly stacked inside the elements
-     *   it needs to. For example, a <tt>&lt;tr&gt;</tt> element will ask for the auto-opening of a <tt>&lt;tbody&gt;</tt> element as its
-     *   parent, but it will specify as limits also <tt>&lt;thead&gt;</tt> and <tt>&lt;tfoot&gt;</tt> because these two elements are also valid
+     *   it needs to. For example, a <kbd>&lt;tr&gt;</kbd> element will ask for the auto-opening of a <kbd>&lt;tbody&gt;</kbd> element as its
+     *   parent, but it will specify as limits also <kbd>&lt;thead&gt;</kbd> and <kbd>&lt;tfoot&gt;</kbd> because these two elements are also valid
      *   parents for it (just not default).
      * </p>
      * <p>
      *   The limits array will be used for specifying: if not null, the IMMEDIATE parents that will be considered
      *   valid. If not null, that the parent element sequence should only be considered from the document root, and
-     *   that it should be completed if something is missing (e.g. there is <tt>&lt;html&gt;</tt> but no <tt>&lt;body&gt;</tt>).
+     *   that it should be completed if something is missing (e.g. there is <kbd>&lt;html&gt;</kbd> but no <kbd>&lt;body&gt;</kbd>).
      * </p>
      * <p>
      *   When in HTML, the auto-open elements will be:
      * </p>
      * <ul>
      *   <li>
-     *      <tt>&lt;tr&gt;</tt><br>
-     *      RULE: if (parent != <tt>&lt;tbody&gt;</tt> &amp;&amp; parent != <tt>&lt;tfoot&gt;</tt> &amp;&amp; parent != <tt>&lt;thead&gt;</tt>) : AUTO-OPEN <tt>&lt;tbody&gt;</tt><br>
+     *      <kbd>&lt;tr&gt;</kbd><br>
+     *      RULE: if (parent != <kbd>&lt;tbody&gt;</kbd> &amp;&amp; parent != <kbd>&lt;tfoot&gt;</kbd> &amp;&amp; parent != <kbd>&lt;thead&gt;</kbd>) : AUTO-OPEN <kbd>&lt;tbody&gt;</kbd><br>
      *      PARENTS: (tbody) LIMITS: (tbody,tfoot,thead)
      *   </li>
      *
      *   <li>
-     *      <tt>&lt;col&gt;</tt><br>
-     *      RULE: if (parent != <tt>&lt;colgroup&gt;</tt>) : AUTO-OPEN <tt>&lt;colgroup&gt;</tt><br>
+     *      <kbd>&lt;col&gt;</kbd><br>
+     *      RULE: if (parent != <kbd>&lt;colgroup&gt;</kbd>) : AUTO-OPEN <kbd>&lt;colgroup&gt;</kbd><br>
      *      PARENTS: (colgroup) LIMITS: (colgroup)
      *   </li>
      *
      *   <li>
-     *      <tt>&lt;meta&gt;</tt>, <tt>&lt;link&gt;</tt>, <tt>&lt;script&gt;</tt>, <tt>&lt;style&gt;</tt>, <tt>&lt;template&gt;</tt>, <tt>&lt;base&gt;</tt>, <tt>&lt;object&gt;</tt><br>
-     *      RULE: if (parent == null) : AUTO-OPEN <tt>&lt;html&gt;</tt>, <tt>&lt;head&gt;</tt><br>
-     *            if (parent == <tt>&lt;html&gt;</tt> &amp;&amp; <tt>&lt;html&gt;</tt>.parent == null) : AUTO-OPEN <tt>&lt;head&gt;</tt><br>
+     *      <kbd>&lt;meta&gt;</kbd>, <kbd>&lt;link&gt;</kbd>, <kbd>&lt;script&gt;</kbd>, <kbd>&lt;style&gt;</kbd>, <kbd>&lt;template&gt;</kbd>, <kbd>&lt;base&gt;</kbd>, <kbd>&lt;object&gt;</kbd><br>
+     *      RULE: if (parent == null) : AUTO-OPEN <kbd>&lt;html&gt;</kbd>, <kbd>&lt;head&gt;</kbd><br>
+     *            if (parent == <kbd>&lt;html&gt;</kbd> &amp;&amp; <kbd>&lt;html&gt;</kbd>.parent == null) : AUTO-OPEN <kbd>&lt;head&gt;</kbd><br>
      *      PARENTS: (html,head) LIMITS: (null)
      *   </li>
      *
      *   <li>
      *      All other standard HTML tags<br>
-     *      RULE: if (parent == null) : AUTO-OPEN <tt>&lt;html&gt;</tt>, <tt>&lt;body&gt;</tt><br>
-     *            if (parent == <tt>&lt;html&gt;</tt> &amp;&amp; <tt>&lt;html&gt;</tt>.parent == null) : AUTO-OPEN <tt>&lt;body&gt;</tt><br>
+     *      RULE: if (parent == null) : AUTO-OPEN <kbd>&lt;html&gt;</kbd>, <kbd>&lt;body&gt;</kbd><br>
+     *            if (parent == <kbd>&lt;html&gt;</kbd> &amp;&amp; <kbd>&lt;html&gt;</kbd>.parent == null) : AUTO-OPEN <kbd>&lt;body&gt;</kbd><br>
      *      PARENTS: (html,body) LIMITS: (null)
      *   </li>
      * </ul>
@@ -255,19 +255,19 @@ public final class ParseStatus {
      *   at the moment in the element stack.
      * </p>
      * <p>
-     *   The parser will auto-close all elements which names match one from the <tt>autoCloseRequired</tt> array,
+     *   The parser will auto-close all elements which names match one from the <kbd>autoCloseRequired</kbd> array,
      *   popping them from the stack until it finds an element with any of the names in the
-     *   <tt>autoCloseLimits</tt> array.
+     *   <kbd>autoCloseLimits</kbd> array.
      * </p>
      * <p>
-     *   For example, when parsing HTML an open <tt>&lt;li&gt;</tt> will require closing all currently open
-     *   <tt>&lt;li&gt;</tt>'s until an <tt>&lt;ul&gt;</tt> or <tt>&lt;ol&gt;</tt> is found.
+     *   For example, when parsing HTML an open <kbd>&lt;li&gt;</kbd> will require closing all currently open
+     *   <kbd>&lt;li&gt;</kbd>'s until an <kbd>&lt;ul&gt;</kbd> or <kbd>&lt;ol&gt;</kbd> is found.
      * </p>
      * <p>
      *   These flags will only be honored by the parser in <em>start</em> events for standalone or open elements, and
      *   after setting them the handler should never propagate the event to its delegate handler (if it exists),
      *   returning control back to the parser instead and letting the parser re-launch the event. When the event
-     *   is re-launched, the parser will have set the <tt>autoOpenCloseDone</tt> flag to true, which can be
+     *   is re-launched, the parser will have set the <kbd>autoOpenCloseDone</kbd> flag to true, which can be
      *   checked with the {@link #isAutoOpenCloseDone()} method.
      * </p>
      *
@@ -281,7 +281,7 @@ public final class ParseStatus {
 
     /**
      * <p>
-     *   Indicate the parser whether the element being handled (in the <tt>start</tt> event of a standalone
+     *   Indicate the parser whether the element being handled (in the <kbd>start</kbd> event of a standalone
      *   or open element) should be stacked or not.
      * </p>
      * <p>

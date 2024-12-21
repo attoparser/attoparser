@@ -73,14 +73,14 @@ import org.attoparser.select.ParseSelection;
  *   usually cannot.
  * </p>
  * <p>
- *   This parser class uses a (configurable) pool of <tt>char[]</tt> buffers, in order to reduce the amount of
+ *   This parser class uses a (configurable) pool of <kbd>char[]</kbd> buffers, in order to reduce the amount of
  *   memory used for parsing (buffers are large structures). This pool works in a non-blocking mode,
- *   so if a new buffer is needed and all are currently allocated, a new (unpooled) <tt>char[]</tt> object
+ *   so if a new buffer is needed and all are currently allocated, a new (unpooled) <kbd>char[]</kbd> object
  *   is created and returned without waiting for a pooled buffer to be available.
  * </p>
  * <p>
- *   <em>(Note that these pooled buffers will not be used when parsing documents specified as <tt>char[]</tt>
- *   objects. In such case, the <tt>char[]</tt> documents themselves will be used as buffers, avoiding the need
+ *   <em>(Note that these pooled buffers will not be used when parsing documents specified as <kbd>char[]</kbd>
+ *   objects. In such case, the <kbd>char[]</kbd> documents themselves will be used as buffers, avoiding the need
  *   to allocate pooled buffers or use any additional amount of memory.)</em>
  * </p>
  *
@@ -136,19 +136,19 @@ public final class MarkupParser implements IMarkupParser {
      *   Creates a new instance of this parser, specifying the pool and buffer size.
      * </p>
      * <p>
-     *   Buffer size (in chars) will be the size of the <tt>char[]</tt> structures used as buffers for parsing,
+     *   Buffer size (in chars) will be the size of the <kbd>char[]</kbd> structures used as buffers for parsing,
      *   which might grow if a certain markup structure does not fit inside (e.g. a text). Default size is
      *   {@link MarkupParser#DEFAULT_BUFFER_SIZE}.
      * </p>
      * <p>
-     *   Pool size is the size of the pool of <tt>char[]</tt> buffers that will be kept in memory in order to
+     *   Pool size is the size of the pool of <kbd>char[]</kbd> buffers that will be kept in memory in order to
      *   allow their reuse. This pool works in a non-exclusive mode, so that if pool size is 3 and a 4th request
      *   arrives, it is served a new non-pooled buffer without the need to block waiting for one of the pooled
      *   instances. Default size is {@link MarkupParser#DEFAULT_POOL_SIZE}.
      * </p>
      * <p>
-     *   Note that these pooled buffers will not be used when parsing documents specified as <tt>char[]</tt>
-     *   objects. In such case, the <tt>char[]</tt> documents themselves will be used as buffers, avoiding the need
+     *   Note that these pooled buffers will not be used when parsing documents specified as <kbd>char[]</kbd>
+     *   objects. In such case, the <kbd>char[]</kbd> documents themselves will be used as buffers, avoiding the need
      *   to allocate buffers or use any additional amount of memory.
      * </p>
      *

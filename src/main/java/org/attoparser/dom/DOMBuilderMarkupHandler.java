@@ -29,7 +29,7 @@ import org.attoparser.ParseException;
 /**
  * <p>
  *   Implementation of {@link org.attoparser.IMarkupHandler} that builds a DOM tree using objects of
- *   classes from package <tt>org.attoparser.dom</tt>.
+ *   classes from package <kbd>org.attoparser.dom</kbd>.
  * </p>
  * <p>
  *   Note that this handler, when not used as a part of a larger chain of handlers, can be more easily applied
@@ -162,7 +162,7 @@ public final class DOMBuilderMarkupHandler extends AbstractMarkupHandler {
      *   Returns whether parsing has already finished or not.
      * </p>
      * 
-     * @return <tt>true</tt> if parsing has finished, <tt>false</tt> if not.
+     * @return <kbd>true</kbd> if parsing has finished, <kbd>false</kbd> if not.
      */
     public boolean isParsingFinished() {
         return this.parsingFinished;

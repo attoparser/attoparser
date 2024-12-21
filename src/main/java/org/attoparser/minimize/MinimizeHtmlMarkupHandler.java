@@ -39,9 +39,9 @@ import org.attoparser.util.TextUtil;
  *   <li>Unquoting of attributes: quotes are removed from attributes which values contain only alphanumeric
  *       characters.</li>
  *   <li>Collapsing of boolean attributes: boolean attributes (selected, required, disabled, etc.) are detected
- *       and collapsed to their no-value form (e.g. <tt>selected="selected" -&gt; selected</tt>).</li>
+ *       and collapsed to their no-value form (e.g. <kbd>selected="selected" -&gt; selected</kbd>).</li>
  *   <li>Standalone minimized elements are de-minimized to save the slash char
- *       (e.g. <tt>&lt;meta /&gt; -&gt; &lt;meta&gt;</tt>).</li>
+ *       (e.g. <kbd>&lt;meta /&gt; -&gt; &lt;meta&gt;</kbd>).</li>
  * </ul>
  * <p>
  *   Note that, though theoretically possible per the HTML rules, no tags are created or removed during minimization

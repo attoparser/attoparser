@@ -49,10 +49,10 @@ public interface ITextHandler {
      *   Text sequences might include any number of new line and/or control characters.
      * </p>
      * <p>
-     *   Text artifacts are reported using the document <tt>buffer</tt> directly, and this buffer
+     *   Text artifacts are reported using the document <kbd>buffer</kbd> directly, and this buffer
      *   should not be considered to be immutable, so reported texts should be copied if they need
-     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
-     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification).
+     *   to be stored (either by copying <kbd>len</kbd> chars from the buffer <kbd>char[]</kbd> starting
+     *   in <kbd>offset</kbd> or by creating a <kbd>String</kbd> from it using the same specification).
      * </p>
      * <p>
      *   <b>Implementations of this handler should never modify the document buffer.</b>

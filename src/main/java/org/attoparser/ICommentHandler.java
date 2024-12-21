@@ -44,15 +44,15 @@ public interface ICommentHandler {
      *   Two [offset, len] pairs are provided for two partitions (<i>outer</i> and <i>content</i>):
      * </p>
      * <p>
-     *   <tt>&lt;!-- this is a comment --&gt;</tt><br>
-     *   <tt><b>|&nbsp;&nbsp;&nbsp;[CONTENT----------]&nbsp;&nbsp;|</b></tt><br>
-     *   <tt><b>[OUTER-------------------]</b></tt>
+     *   <kbd>&lt;!-- this is a comment --&gt;</kbd><br>
+     *   <kbd><b>|&nbsp;&nbsp;&nbsp;[CONTENT----------]&nbsp;&nbsp;|</b></kbd><br>
+     *   <kbd><b>[OUTER-------------------]</b></kbd>
      * </p>
      * <p>
-     *   Artifacts are reported using the document <tt>buffer</tt> directly, and this buffer
+     *   Artifacts are reported using the document <kbd>buffer</kbd> directly, and this buffer
      *   should not be considered to be immutable, so reported structures should be copied if they need
-     *   to be stored (either by copying <tt>len</tt> chars from the buffer <tt>char[]</tt> starting
-     *   in <tt>offset</tt> or by creating a <tt>String</tt> from it using the same specification).
+     *   to be stored (either by copying <kbd>len</kbd> chars from the buffer <kbd>char[]</kbd> starting
+     *   in <kbd>offset</kbd> or by creating a <kbd>String</kbd> from it using the same specification).
      * </p>
      * <p>
      *   <b>Implementations of this handler should never modify the document buffer.</b>

@@ -40,8 +40,8 @@ import org.attoparser.config.ParseConfiguration;
  * <p>
  *   This markup handler will apply the specified <strong>markup selectors</strong> and divide parsing events
  *   between two (possibly different) chained markup handlers implementing {@link org.attoparser.IMarkupHandler}:
- *   the <tt>selectedHandler</tt> and the <tt>nonSelectedHandler</tt>. Also, document start/end events will be
- *   sent to the <tt>selectedHandler</tt> unless specified otherwise by means of the
+ *   the <kbd>selectedHandler</kbd> and the <kbd>nonSelectedHandler</kbd>. Also, document start/end events will be
+ *   sent to the <kbd>selectedHandler</kbd> unless specified otherwise by means of the
  *   {@link #setDocumentStartEndHandler(org.attoparser.IMarkupHandler)} method.
  * </p>
  * <p>
@@ -53,7 +53,7 @@ import org.attoparser.config.ParseConfiguration;
  * </p>
  * <p>
  *   Also note that this filtering will be done in the most memory-efficient way, without the need to create any
- *   large extra <tt>String</tt> or <tt>char[]</tt> objects apart from a minimal <em>element buffer</em> object which
+ *   large extra <kbd>String</kbd> or <kbd>char[]</kbd> objects apart from a minimal <em>element buffer</em> object which
  *   will be reused throughout all the parsing process. This makes the execution of this handler extremely fast
  *   and integrated with the parsing process itself.
  * </p>
@@ -75,20 +75,20 @@ import org.attoparser.config.ParseConfiguration;
  *   ...and a {@link org.attoparser.select.NodeSelectorMarkupHandler} initialized with:
  * </p>
  * <ul>
- *   <li>An {@link org.attoparser.output.OutputMarkupHandler} object as <tt>selectedHandler</tt>.</li>
- *   <li>A {@link org.attoparser.discard.DiscardMarkupHandler} object as <tt>nonSelectedHandler</tt>.</li>
+ *   <li>An {@link org.attoparser.output.OutputMarkupHandler} object as <kbd>selectedHandler</kbd>.</li>
+ *   <li>A {@link org.attoparser.discard.DiscardMarkupHandler} object as <kbd>nonSelectedHandler</kbd>.</li>
  * </ul>
  * <p>
- *   Using selector <tt>"div.content"</tt>, we would get:
+ *   Using selector <kbd>"div.content"</kbd>, we would get:
  * </p>
  * <pre><code>
  * &lt;div class="content"&gt;&lt;/div&gt;
  * </code></pre>
  * <p>
- *   Note how selecting that <tt>div</tt> element does not mean selecting its entire subtree.
+ *   Note how selecting that <kbd>div</kbd> element does not mean selecting its entire subtree.
  * </p>
  * <p>
- *   If we had two selectors, <tt>"div.content"</tt> and <tt>"div.content//text()"</tt>, we would get:
+ *   If we had two selectors, <kbd>"div.content"</kbd> and <kbd>"div.content//text()"</kbd>, we would get:
  * </p>
  * <pre><code>
  *     &lt;div class="content"&gt;
@@ -96,9 +96,9 @@ import org.attoparser.config.ParseConfiguration;
  *     &lt;/div&gt;
  * </code></pre>
  * <p>
- *   Which, given we are not selecting the <tt>&lt;strong&gt;</tt> element at all, would effectively strip its open and
- *   close tags. Note however how the result would change if we used single-level nesting for the <tt>text()</tt> part,
- *   i.e. if we used selectors <tt>"div.content"</tt> and <tt>"div.content/text()"</tt>:
+ *   Which, given we are not selecting the <kbd>&lt;strong&gt;</kbd> element at all, would effectively strip its open and
+ *   close tags. Note however how the result would change if we used single-level nesting for the <kbd>text()</kbd> part,
+ *   i.e. if we used selectors <kbd>"div.content"</kbd> and <kbd>"div.content/text()"</kbd>:
  * </p>
  * <pre><code>
  *     &lt;div class="content"&gt;

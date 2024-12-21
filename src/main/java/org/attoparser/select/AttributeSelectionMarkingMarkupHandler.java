@@ -31,10 +31,10 @@ import org.attoparser.ParseException;
  *   {@link org.attoparser.select.NodeSelectorMarkupHandler} handler.
  * </p>
  * <p>
- *   So for example, given an instance of this handler configured to use <tt>"selectors"</tt> as its attribute name
- *   and an <tt>&lt;img href="logo.png"&gt;</tt> tag that matches both selectors <tt>"//img"</tt> and
- *   <tt>"div/img"</tt>, this handler would transform such tag in:
- *   <tt>&lt;img href="logo.png" selectors="[//img,div/img]"&gt;</tt>
+ *   So for example, given an instance of this handler configured to use <kbd>"selectors"</kbd> as its attribute name
+ *   and an <kbd>&lt;img href="logo.png"&gt;</kbd> tag that matches both selectors <kbd>"//img"</kbd> and
+ *   <kbd>"div/img"</kbd>, this handler would transform such tag in:
+ *   <kbd>&lt;img href="logo.png" selectors="[//img,div/img]"&gt;</kbd>
  * </p>
  *
  * @author Daniel Fern&aacute;ndez
