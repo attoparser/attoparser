@@ -22,10 +22,11 @@ package org.attoparser.output;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import junit.framework.TestCase;
 import org.attoparser.IMarkupParser;
 import org.attoparser.MarkupParser;
 import org.attoparser.config.ParseConfiguration;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 /*
@@ -33,9 +34,10 @@ import org.attoparser.config.ParseConfiguration;
  * @author Daniel Fernandez
  * @since 2.0.0
  */
-public class TextOutputMarkupHandlerTest extends TestCase {
+public class TextOutputMarkupHandlerTest {
 
 
+    @Test
     public void test() throws Exception {
 
         final ParseConfiguration xmlConfig = ParseConfiguration.xmlConfiguration();
@@ -76,7 +78,7 @@ public class TextOutputMarkupHandlerTest extends TestCase {
 
         final String output = writer.toString();
 
-        assertEquals(expectedOutput, output);
+        Assertions.assertEquals(expectedOutput, output);
 
     }
 

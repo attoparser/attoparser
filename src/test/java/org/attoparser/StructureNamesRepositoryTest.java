@@ -19,7 +19,8 @@
  */
 package org.attoparser;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 /*
@@ -27,10 +28,11 @@ import junit.framework.TestCase;
  * @author Daniel Fernandez
  * @since 2.0.0
  */
-public class StructureNamesRepositoryTest extends TestCase {
+public class StructureNamesRepositoryTest {
 
 
 
+    @Test
     public void test() throws Exception {
 
         final MarkupEventProcessorHandler.StructureNamesRepository structureNamesRepository = new MarkupEventProcessorHandler.StructureNamesRepository();
@@ -56,7 +58,7 @@ public class StructureNamesRepositoryTest extends TestCase {
             for (final char[] structureName : structureNamesArr) {
                 final char[] sn =
                         structureNamesRepository.getStructureName(structureName, 0, structureName.length);
-                assertSame(structureName, sn);
+                Assertions.assertSame(structureName, sn);
             }
         }
 

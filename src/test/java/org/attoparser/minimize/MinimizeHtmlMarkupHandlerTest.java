@@ -22,12 +22,13 @@ package org.attoparser.minimize;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import junit.framework.TestCase;
 import org.attoparser.IMarkupParser;
 import org.attoparser.MarkupParser;
 import org.attoparser.config.ParseConfiguration;
 import org.attoparser.minimize.MinimizeHtmlMarkupHandler.MinimizeMode;
 import org.attoparser.output.OutputMarkupHandler;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import static org.attoparser.minimize.MinimizeHtmlMarkupHandler.MinimizeMode.COMPLETE;
 import static org.attoparser.minimize.MinimizeHtmlMarkupHandler.MinimizeMode.ONLY_WHITE_SPACE;
@@ -37,9 +38,10 @@ import static org.attoparser.minimize.MinimizeHtmlMarkupHandler.MinimizeMode.ONL
  * @author Daniel Fernandez
  * @since 2.0.0
  */
-public class MinimizeHtmlMarkupHandlerTest extends TestCase {
+public class MinimizeHtmlMarkupHandlerTest {
 
 
+    @Test
     public void test() throws Exception {
 
         final ParseConfiguration htmlConfig = ParseConfiguration.htmlConfiguration();
@@ -114,7 +116,7 @@ public class MinimizeHtmlMarkupHandlerTest extends TestCase {
 
         final String output = writer.toString();
 
-        assertEquals(expectedOutput, output);
+        Assertions.assertEquals(expectedOutput, output);
 
     }
 

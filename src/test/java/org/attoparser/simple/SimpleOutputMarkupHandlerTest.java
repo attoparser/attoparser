@@ -22,9 +22,10 @@ package org.attoparser.simple;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.TestCase;
 import org.attoparser.ParseException;
 import org.attoparser.config.ParseConfiguration;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 /*
@@ -32,9 +33,10 @@ import org.attoparser.config.ParseConfiguration;
  * @author Daniel Fernandez
  * @since 2.0.0
  */
-public class SimpleOutputMarkupHandlerTest extends TestCase {
+public class SimpleOutputMarkupHandlerTest {
 
 
+    @Test
     public void test() throws Exception {
 
         final ParseConfiguration xmlConfig = ParseConfiguration.xmlConfiguration();
@@ -73,9 +75,9 @@ public class SimpleOutputMarkupHandlerTest extends TestCase {
 
         try {
             parser.parse(input, handler);
-            assertTrue(true);
+            Assertions.assertTrue(true);
         } catch (ParseException e) {
-            assertTrue(false);
+            Assertions.assertTrue(false);
         }
 
     }

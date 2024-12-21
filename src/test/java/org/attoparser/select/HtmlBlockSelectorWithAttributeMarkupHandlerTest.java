@@ -31,30 +31,32 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import junit.framework.TestCase;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.attoparser.discard.DiscardMarkupHandler;
 import org.attoparser.IMarkupHandler;
 import org.attoparser.IMarkupParser;
 import org.attoparser.MarkupParser;
 import org.attoparser.config.ParseConfiguration;
+import org.attoparser.discard.DiscardMarkupHandler;
 import org.attoparser.output.OutputMarkupHandler;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /*
  *
  * @author Daniel Fernandez
  * @since 2.0.0
  */
-public class HtmlBlockSelectorWithAttributeMarkupHandlerTest extends TestCase {
+public class HtmlBlockSelectorWithAttributeMarkupHandlerTest {
 
     private static final String RESOURCES_FOLDER = "htmlblockselectorwithattribute/";
 
     public HtmlBlockSelectorWithAttributeMarkupHandlerTest() {
         super();
     }
-    
-    
+
+
+    @Test
     public void test() throws Exception {
 
         final ParseConfiguration config = ParseConfiguration.htmlConfiguration();
@@ -64,10 +66,10 @@ public class HtmlBlockSelectorWithAttributeMarkupHandlerTest extends TestCase {
         final IMarkupSelectorReferenceResolver referenceResolver = new TestingFragmentReferenceResolver();
 
         final URL resourcesFolderURL = Thread.currentThread().getContextClassLoader().getResource(RESOURCES_FOLDER);
-        assertNotNull(resourcesFolderURL);
+        Assertions.assertNotNull(resourcesFolderURL);
 
         final File resourcesFolder = new File(resourcesFolderURL.toURI());
-        assertTrue(resourcesFolder.isDirectory());
+        Assertions.assertTrue(resourcesFolder.isDirectory());
 
         final List<File> resourceFolderFiles = new ArrayList<File>(Arrays.asList(resourcesFolder.listFiles()));
         Collections.sort(resourceFolderFiles, new Comparator<File>() {
@@ -130,7 +132,7 @@ public class HtmlBlockSelectorWithAttributeMarkupHandlerTest extends TestCase {
 
         parser.parse(reader, handler);
 
-        assertEquals("Test failed for file: " + templateName, output, writer.toString());
+        Assertions.assertEquals(output, writer.toString(), "Test failed for file: " + templateName);
 
     }
     

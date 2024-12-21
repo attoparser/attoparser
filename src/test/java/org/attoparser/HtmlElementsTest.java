@@ -19,7 +19,8 @@
  */
 package org.attoparser;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 /*
@@ -27,30 +28,31 @@ import junit.framework.TestCase;
  * @author Daniel Fernandez
  * @since 2.0.0
  */
-public class HtmlElementsTest extends TestCase {
+public class HtmlElementsTest {
 
 
+    @Test
     public void test() throws Exception {
 
         {
             final HtmlElement element1 = HtmlElements.forName("something".toCharArray(), 0, "something".length());
             final HtmlElement element2 = HtmlElements.forName("Something".toCharArray(), 0, "Something".length());
-            assertSame(element1, element2);
+            Assertions.assertSame(element1, element2);
         }
 
         {
 
             final HtmlElement element1 = HtmlElements.forName("something2".toCharArray(), 0, "something2".length());
             final HtmlElement element2 = HtmlElements.forName("Something2".toCharArray(), 0, "Something2".length());
-            assertSame(element1, element2);
+            Assertions.assertSame(element1, element2);
         }
 
         {
             final HtmlElement element1 = HtmlElements.forName("somethiNG".toCharArray(), 0, "something".length());
             final HtmlElement element2 = HtmlElements.forName("something".toCharArray(), 0, "something".length());
             final HtmlElement element3 = HtmlElements.forName("Something".toCharArray(), 0, "Something".length());
-            assertSame(element1, element2);
-            assertSame(element2, element3);
+            Assertions.assertSame(element1, element2);
+            Assertions.assertSame(element2, element3);
         }
 
         {
@@ -58,14 +60,14 @@ public class HtmlElementsTest extends TestCase {
             final HtmlElement element1 = HtmlElements.forName("somethiNG2".toCharArray(), 0, "somethiNG2".length());
             final HtmlElement element2 = HtmlElements.forName("something2".toCharArray(), 0, "Something2".length());
             final HtmlElement element3 = HtmlElements.forName("Something2".toCharArray(), 0, "Something2".length());
-            assertSame(element1, element2);
-            assertSame(element2, element3);
+            Assertions.assertSame(element1, element2);
+            Assertions.assertSame(element2, element3);
         }
 
         for (final String elementName : HtmlNames.ALL_STANDARD_ELEMENT_NAMES) {
             final HtmlElement element1 = HtmlElements.forName(elementName.toCharArray(), 0, elementName.length());
             final HtmlElement element2 = HtmlElements.forName(elementName.toUpperCase().toCharArray(), 0, elementName.toUpperCase().length());
-            assertSame(element1, element2);
+            Assertions.assertSame(element1, element2);
         }
 
 

@@ -23,8 +23,6 @@ import java.io.CharArrayReader;
 import java.io.StringWriter;
 import java.util.List;
 
-import junit.framework.ComparisonFailure;
-import junit.framework.TestCase;
 import org.attoparser.config.ParseConfiguration;
 import org.attoparser.config.ParseConfiguration.ElementBalancing;
 import org.attoparser.config.ParseConfiguration.PrologPresence;
@@ -37,6 +35,9 @@ import org.attoparser.simple.SimpleMarkupParser;
 import org.attoparser.simple.SimplifierMarkupHandler;
 import org.attoparser.trace.MarkupTraceEvent;
 import org.attoparser.trace.TraceBuilderMarkupHandler;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.opentest4j.AssertionFailedError;
 
 
 /*
@@ -44,11 +45,12 @@ import org.attoparser.trace.TraceBuilderMarkupHandler;
  * @author Daniel Fernandez
  * @since 2.0.0
  */
-public class MarkupParserTest extends TestCase {
+public class MarkupParserTest {
 
     private static int totalTestExecutions = 0;
-    
 
+
+    @Test
     public void test() throws Exception {
         
         
@@ -99,22 +101,22 @@ public class MarkupParserTest extends TestCase {
         StringWriter sw1 = new StringWriter();
         ISimpleMarkupHandler h = new TextTracerSimpleMarkupHandler(sw1);
         p.parse(dt1, h);
-        assertEquals("[DT()()()(){1,1}]", sw1.toString());
+        Assertions.assertEquals("[DT()()()(){1,1}]", sw1.toString());
 
         StringWriter sw2 = new StringWriter();
         h = new TextTracerSimpleMarkupHandler(sw2);
         p.parse(dt2, h);
-        assertEquals("[DT(html)()()(){1,1}]", sw2.toString());
+        Assertions.assertEquals("[DT(html)()()(){1,1}]", sw2.toString());
 
         StringWriter sw3 = new StringWriter();
         h = new TextTracerSimpleMarkupHandler(sw3);
         p.parse(dt3, h);
-        assertEquals("[DT(html)(lala)()(){1,1}]", sw3.toString());
+        Assertions.assertEquals("[DT(html)(lala)()(){1,1}]", sw3.toString());
 
         StringWriter sw4 = new StringWriter();
         h = new TextTracerSimpleMarkupHandler(sw4);
         p.parse(dt4, h);
-        assertEquals("[DT(html)(aaa)()(<!ELEMENT>){1,1}]", sw4.toString());
+        Assertions.assertEquals("[DT(html)(aaa)()(<!ELEMENT>){1,1}]", sw4.toString());
 
 
         testHtmlDoc(
@@ -1889,18 +1891,18 @@ public class MarkupParserTest extends TestCase {
     static void testDocError(final String input, final String outputBreakDown, final String outputSimple, final int errorLine, final int errorCol, final ParseConfiguration parseConfiguration) {
         try {
             testDoc(input, outputBreakDown, outputSimple, parseConfiguration);
-            throw new ComparisonFailure(null, "exception", "no exception");
-            
+            Assertions.fail("An exception should have happened");
+
         } catch (final ParseException e) {
             if (errorLine != -1) {
-                assertEquals(Integer.valueOf(errorLine), e.getLine());
+                Assertions.assertEquals(Integer.valueOf(errorLine), e.getLine());
             } else {
-                assertNull(e.getLine());
+                Assertions.assertNull(e.getLine());
             }
             if (errorCol != -1) {
-                assertEquals(Integer.valueOf(errorCol), e.getCol());
+                Assertions.assertEquals(Integer.valueOf(errorCol), e.getCol());
             } else {
-                assertNull(e.getCol());
+                Assertions.assertNull(e.getCol());
             }
         }
     }
@@ -1909,15 +1911,15 @@ public class MarkupParserTest extends TestCase {
     static void testDocError(final String input, final String outputBreakDown, final String outputSimple, final int offset, final int len, final int errorLine, final int errorCol, final ParseConfiguration parseConfiguration) {
         try {
             testDoc(input, outputBreakDown, outputSimple, offset, len, parseConfiguration);
-            throw new ComparisonFailure(null, "exception", "no exception");
-            
+            Assertions.fail("An exception should have happened");
+
         } catch (final ParseException e) {
             if (errorLine != -1 && errorCol != -1) {
-                assertEquals(Integer.valueOf(errorLine), e.getLine());
-                assertEquals(Integer.valueOf(errorCol), e.getCol());
+                Assertions.assertEquals(Integer.valueOf(errorLine), e.getLine());
+                Assertions.assertEquals(Integer.valueOf(errorCol), e.getCol());
             } else {
-                assertNull(e.getLine());
-                assertNull(e.getCol());
+                Assertions.assertNull(e.getLine());
+                Assertions.assertNull(e.getCol());
             }
         }
     }
@@ -1995,7 +1997,7 @@ public class MarkupParserTest extends TestCase {
 
                 final String result = strBuilder.toString();
                 if (outputBreakDown != null) {
-                    assertEquals(outputBreakDown, result);
+                    Assertions.assertEquals(outputBreakDown, result);
                 }
             }
 
@@ -2027,7 +2029,7 @@ public class MarkupParserTest extends TestCase {
 
                 final String result = strBuilder.toString();
                 if (outputBreakDown != null) {
-                    assertEquals(outputBreakDown, result);
+                    Assertions.assertEquals(outputBreakDown, result);
                 }
             }
 
@@ -2071,7 +2073,7 @@ public class MarkupParserTest extends TestCase {
 
                 final String result = strBuilder.toString();
                 if (outputBreakDown != null) {
-                    assertEquals(outputBreakDown, result);
+                    Assertions.assertEquals(outputBreakDown, result);
                 }
             }
 
@@ -2095,7 +2097,7 @@ public class MarkupParserTest extends TestCase {
                 final String desired =
                         (offset == 0 && len == input.length ? new String(input) : new String(input, offset, len));
                 final String result = sw.toString();
-                assertEquals(desired, result);
+                Assertions.assertEquals(desired, result);
             }
 
             
@@ -2114,7 +2116,7 @@ public class MarkupParserTest extends TestCase {
                 final String desired =
                         (offset == 0 && len == input.length ? new String(input) : new String(input, offset, len));
                 final String result = sw.toString();
-                assertEquals(desired, result);
+                Assertions.assertEquals(desired, result);
             }
 
             
@@ -2136,14 +2138,14 @@ public class MarkupParserTest extends TestCase {
                         parser.parseDocument(new CharArrayReader(input, offset, len), bufferSize, handler, status);
                     }
                     final String result = sw.toString();
-                    assertEquals(outputSimple, result);
+                    Assertions.assertEquals(outputSimple, result);
                 }
             }
 
             
             totalTestExecutions++;
             
-        } catch (final ComparisonFailure cf) {
+        } catch (final AssertionFailedError cf) {
             System.err.println("Error parsing text \"" + new String(input, offset, len) + "\" with buffer size: " + bufferSize);
             throw cf;
         } catch (final Exception e) {
@@ -2230,7 +2232,7 @@ public class MarkupParserTest extends TestCase {
 
                 final String result = strBuilder.toString();
                 if (outputBreakDown != null) {
-                    assertEquals(outputBreakDown, result);
+                    Assertions.assertEquals(outputBreakDown, result);
                 }
 
             }
@@ -2238,7 +2240,7 @@ public class MarkupParserTest extends TestCase {
 
             totalTestExecutions++;
 
-        } catch (final ComparisonFailure cf) {
+        } catch (final AssertionFailedError cf) {
             System.err.println("Error parsing text \"" + new String(input, offset, len) + "\" with buffer size: " + bufferSize);
             throw cf;
         } catch (final Exception e) {

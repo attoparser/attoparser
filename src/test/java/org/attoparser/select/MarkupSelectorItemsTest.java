@@ -21,15 +21,16 @@ package org.attoparser.select;
 
 import java.util.List;
 
-import junit.framework.TestCase;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /*
  *
  * @author Daniel Fernandez
  * @since 2.0.0
  */
-public class MarkupSelectorItemsTest extends TestCase {
+public class MarkupSelectorItemsTest {
 
     private static TestingFragmentReferenceResolver referenceResolver = new TestingFragmentReferenceResolver();
 
@@ -37,7 +38,8 @@ public class MarkupSelectorItemsTest extends TestCase {
         super();
     }
 
-    
+
+    @Test
     public void test() throws Exception {
 
         checkNoRef(true, "//div/content()", "//div/content()");
@@ -140,7 +142,7 @@ public class MarkupSelectorItemsTest extends TestCase {
 
         final List<IMarkupSelectorItem> items = MarkupSelectorItems.parseSelector(html, blockSelector, referenceResolver);
         final String result = StringUtils.join(items, "");
-        assertEquals(expected, result);
+        Assertions.assertEquals(expected, result);
 
     }
 
@@ -148,7 +150,7 @@ public class MarkupSelectorItemsTest extends TestCase {
 
         final List<IMarkupSelectorItem> items = MarkupSelectorItems.parseSelector(html, blockSelector, null);
         final String result = StringUtils.join(items, "");
-        assertEquals(expected, result);
+        Assertions.assertEquals(expected, result);
 
     }
 

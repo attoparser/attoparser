@@ -19,7 +19,8 @@
  */
 package org.attoparser.select;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import static org.attoparser.select.MarkupSelectorItems.removeEnvelopingParentheses;
 
@@ -28,30 +29,31 @@ import static org.attoparser.select.MarkupSelectorItems.removeEnvelopingParenthe
  * @author Daniel Fernandez
  * @since 2.0.6
  */
-public class MarkupSelectorEnvelopeParenthesesTest extends TestCase {
+public class MarkupSelectorEnvelopeParenthesesTest {
 
     public MarkupSelectorEnvelopeParenthesesTest() {
         super();
     }
 
-    
+
+    @Test
     public void test() throws Exception {
-        assertEquals("", removeEnvelopingParentheses(""));
-        assertEquals("", removeEnvelopingParentheses("()"));
-        assertEquals("", removeEnvelopingParentheses("(())"));
-        assertEquals("(", removeEnvelopingParentheses("("));
-        assertEquals("(id='a') OR (id='b')", removeEnvelopingParentheses("(id='a') OR (id='b')"));
-        assertEquals("(id='a') OR (id='b')", removeEnvelopingParentheses("((id='a') OR (id='b'))"));
-        assertEquals("(id='a') OR (id='b')", removeEnvelopingParentheses("(((id='a') OR (id='b')))"));
-        assertEquals("(id='a') OR (id='b')", removeEnvelopingParentheses("(((id='a') OR (id='b')))"));
-        assertEquals("id='a'", removeEnvelopingParentheses("(id='a')"));
-        assertEquals("id='a'", removeEnvelopingParentheses("((id='a'))"));
-        assertEquals("id='a'", removeEnvelopingParentheses("(((id='a')))"));
-        assertEquals("id='(a'", removeEnvelopingParentheses("(id='(a')"));
-        assertEquals("id='a)'", removeEnvelopingParentheses("(id='a)')"));
-        assertEquals("(id='a)'", removeEnvelopingParentheses("(id='a)'"));
-        assertEquals("(id='a)", removeEnvelopingParentheses("(id='a)"));
-        assertEquals("((id='a)')", removeEnvelopingParentheses("((id='a)')"));
+        Assertions.assertEquals("", removeEnvelopingParentheses(""));
+        Assertions.assertEquals("", removeEnvelopingParentheses("()"));
+        Assertions.assertEquals("", removeEnvelopingParentheses("(())"));
+        Assertions.assertEquals("(", removeEnvelopingParentheses("("));
+        Assertions.assertEquals("(id='a') OR (id='b')", removeEnvelopingParentheses("(id='a') OR (id='b')"));
+        Assertions.assertEquals("(id='a') OR (id='b')", removeEnvelopingParentheses("((id='a') OR (id='b'))"));
+        Assertions.assertEquals("(id='a') OR (id='b')", removeEnvelopingParentheses("(((id='a') OR (id='b')))"));
+        Assertions.assertEquals("(id='a') OR (id='b')", removeEnvelopingParentheses("(((id='a') OR (id='b')))"));
+        Assertions.assertEquals("id='a'", removeEnvelopingParentheses("(id='a')"));
+        Assertions.assertEquals("id='a'", removeEnvelopingParentheses("((id='a'))"));
+        Assertions.assertEquals("id='a'", removeEnvelopingParentheses("(((id='a')))"));
+        Assertions.assertEquals("id='(a'", removeEnvelopingParentheses("(id='(a')"));
+        Assertions.assertEquals("id='a)'", removeEnvelopingParentheses("(id='a)')"));
+        Assertions.assertEquals("(id='a)'", removeEnvelopingParentheses("(id='a)'"));
+        Assertions.assertEquals("(id='a)", removeEnvelopingParentheses("(id='a)"));
+        Assertions.assertEquals("((id='a)')", removeEnvelopingParentheses("((id='a)')"));
     }
     
 
