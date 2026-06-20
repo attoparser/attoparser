@@ -19,9 +19,9 @@
       <directory>${basedir}/target/</directory>
       <outputDirectory>/dist</outputDirectory>
       <includes>
-        <include>attoparser-${version}.jar</include>
-        <include>attoparser-${version}-javadoc.jar</include>
-        <include>attoparser-${version}-sources.jar</include>
+        <include>${project.artifactId}-${version}.jar</include>
+        <include>${project.artifactId}-${version}-javadoc.jar</include>
+        <include>${project.artifactId}-${version}-sources.jar</include>
       </includes>
     </fileSet>
     <fileSet>
