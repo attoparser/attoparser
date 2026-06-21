@@ -222,6 +222,7 @@ final class HtmlElements {
         for (final HtmlElement element : ALL_STANDARD_ELEMENTS) {
             ELEMENTS.storeStandardElement(element);
         }
+        ELEMENTS.sortRepositories();
 
 
     }
@@ -336,14 +337,25 @@ final class HtmlElements {
         private HtmlElement storeStandardElement(final HtmlElement element) {
 
             // This method will only be called from within the HtmlElements class itself, during initialization of
-            // standard elements.
+            // standard elements. Sorting is not done here but once, after all elements have been added, by means
+            // of the sortRepositories() method.
 
             this.standardRepository.add(element);
             this.repository.add(element);
-            Collections.sort(this.standardRepository,ElementComparator.INSTANCE);
-            Collections.sort(this.repository,ElementComparator.INSTANCE);
 
             return element;
+
+        }
+
+
+        private void sortRepositories() {
+
+            // Both repositories must be kept lexicographically ordered so that they can be binary-searched. As all
+            // standard elements are added in a single batch during initialization, we sort just once at the end
+            // instead of after every insertion.
+
+            Collections.sort(this.standardRepository, ElementComparator.INSTANCE);
+            Collections.sort(this.repository, ElementComparator.INSTANCE);
 
         }
 
