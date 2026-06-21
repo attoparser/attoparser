@@ -109,7 +109,7 @@ final class HtmlElements {
     static final HtmlElement SMALL = new HtmlBodyElement("small");
     static final HtmlElement S = new HtmlBodyElement("s");
     static final HtmlElement CITE = new HtmlBodyElement("cite");
-    static final HtmlElement G = new HtmlBodyElement("g");
+    static final HtmlElement Q = new HtmlBodyElement("q");
     static final HtmlElement DFN = new HtmlBodyElement("dfn");
     static final HtmlElement ABBR = new HtmlBodyElement("abbr");
     static final HtmlElement TIME = new HtmlBodyElement("time");
@@ -206,7 +206,7 @@ final class HtmlElements {
                                 HTML, HEAD, TITLE, BASE, LINK, META, STYLE, SCRIPT, NOSCRIPT, BODY, ARTICLE,
                                 SECTION, NAV, ASIDE, H1, H2, H3, H4, H5, H6, HGROUP, HEADER, FOOTER,
                                 ADDRESS, P, HR, PRE, BLOCKQUOTE, OL, UL, LI, DL, DT, DD, FIGURE,
-                                FIGCAPTION, DIV, A, EM, STRONG, SMALL, S, CITE, G, DFN, ABBR, TIME,
+                                FIGCAPTION, DIV, A, EM, STRONG, SMALL, S, CITE, Q, DFN, ABBR, TIME,
                                 CODE, VAR, SAMP, KBD, SUB, SUP, I, B, U, MARK, RUBY, RB, RT, RTC,
                                 RP, BDI, BDO, SPAN, BR, WBR, INS, DEL, IMG, IFRAME, EMBED, OBJECT,
                                 PARAM, VIDEO, AUDIO, SOURCE, TRACK, CANVAS, MAP, AREA, TABLE, CAPTION,
