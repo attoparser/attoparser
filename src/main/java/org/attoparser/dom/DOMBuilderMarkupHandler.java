@@ -229,7 +229,7 @@ public final class DOMBuilderMarkupHandler extends AbstractMarkupHandler {
 
         final XmlDeclaration xmlDeclaration = new XmlDeclaration(version, encoding, standalone);
         xmlDeclaration.setLine(Integer.valueOf(line));
-        xmlDeclaration.setLine(Integer.valueOf(col));
+        xmlDeclaration.setCol(Integer.valueOf(col));
 
         if (this.currentParent == null) {
             this.document.addChild(xmlDeclaration);
@@ -268,7 +268,7 @@ public final class DOMBuilderMarkupHandler extends AbstractMarkupHandler {
 
         final DocType docType = new DocType(elementName, publicId, systemId, internalSubset);
         docType.setLine(Integer.valueOf(outerLine));
-        docType.setLine(Integer.valueOf(outerCol));
+        docType.setCol(Integer.valueOf(outerCol));
 
         if (this.currentParent == null) {
             this.document.addChild(docType);
@@ -290,7 +290,7 @@ public final class DOMBuilderMarkupHandler extends AbstractMarkupHandler {
 
         final CDATASection cdataSection = new CDATASection(new String(buffer, contentOffset, contentLen));
         cdataSection.setLine(Integer.valueOf(line));
-        cdataSection.setLine(Integer.valueOf(col));
+        cdataSection.setCol(Integer.valueOf(col));
 
         if (this.currentParent == null) {
             this.document.addChild(cdataSection);
@@ -312,7 +312,7 @@ public final class DOMBuilderMarkupHandler extends AbstractMarkupHandler {
 
         final Comment comment = new Comment(new String(buffer, contentOffset, contentLen));
         comment.setLine(Integer.valueOf(line));
-        comment.setLine(Integer.valueOf(col));
+        comment.setCol(Integer.valueOf(col));
 
         if (this.currentParent == null) {
             this.document.addChild(comment);
@@ -333,7 +333,7 @@ public final class DOMBuilderMarkupHandler extends AbstractMarkupHandler {
 
         final Text text = new Text(new String(buffer, offset, len));
         text.setLine(Integer.valueOf(line));
-        text.setLine(Integer.valueOf(col));
+        text.setCol(Integer.valueOf(col));
 
         if (this.currentParent == null) {
             this.document.addChild(text);
@@ -371,7 +371,7 @@ public final class DOMBuilderMarkupHandler extends AbstractMarkupHandler {
         final Element element = new Element(this.currentElementName);
         element.addAttributes(this.currentElementAttributes);
         element.setLine(Integer.valueOf(this.currentElementLine));
-        element.setLine(Integer.valueOf(this.currentElementCol));
+        element.setCol(Integer.valueOf(this.currentElementCol));
 
         if (this.currentParent == null) {
             this.document.addChild(element);
@@ -409,7 +409,7 @@ public final class DOMBuilderMarkupHandler extends AbstractMarkupHandler {
         final Element element = new Element(this.currentElementName);
         element.addAttributes(this.currentElementAttributes);
         element.setLine(Integer.valueOf(this.currentElementLine));
-        element.setLine(Integer.valueOf(this.currentElementCol));
+        element.setCol(Integer.valueOf(this.currentElementCol));
 
         if (this.currentParent == null) {
             this.document.addChild(element);
@@ -448,7 +448,7 @@ public final class DOMBuilderMarkupHandler extends AbstractMarkupHandler {
         final Element element = new Element(this.currentElementName);
         element.addAttributes(this.currentElementAttributes);
         element.setLine(Integer.valueOf(this.currentElementLine));
-        element.setLine(Integer.valueOf(this.currentElementCol));
+        element.setCol(Integer.valueOf(this.currentElementCol));
 
         if (this.currentParent == null) {
             this.document.addChild(element);
@@ -604,7 +604,7 @@ public final class DOMBuilderMarkupHandler extends AbstractMarkupHandler {
         final ProcessingInstruction processingInstruction =
                 new ProcessingInstruction(target, content);
         processingInstruction.setLine(Integer.valueOf(line));
-        processingInstruction.setLine(Integer.valueOf(col));
+        processingInstruction.setCol(Integer.valueOf(col));
 
         if (this.currentParent == null) {
             this.document.addChild(processingInstruction);
