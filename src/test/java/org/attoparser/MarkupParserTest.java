@@ -20,6 +20,8 @@
 package org.attoparser;
 
 import java.io.CharArrayReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.io.StringWriter;
 import java.util.List;
 
@@ -1882,12 +1884,97 @@ public class MarkupParserTest {
                 noRestrictions);
         
         System.out.println("TOTAL Test executions: " + totalTestExecutions);
-        
-        
+
+
     }
-    
-    
-    
+
+
+    @Test
+    public void testHandlerExceptionLineColReporting() throws Exception {
+
+        // Regression test: when a handler throws an arbitrary (non-ParseException) exception
+        // mid-parse -- e.g. a NullPointerException coming from a Thymeleaf processor -- the
+        // resulting ParseException should report the actual line/column at which parsing was
+        // at the time of the failure, not (1,1) or a stale position left over from a previous
+        // buffer-fill pass.
+
+        final String input = "<html>\n<head></head>\n<body>\n<boom></boom>\n</body>\n</html>";
+        final Integer expectedLine = Integer.valueOf(4);
+        final Integer expectedCol = Integer.valueOf(6);
+
+        final ParseConfiguration configuration = ParseConfiguration.htmlConfiguration();
+
+        final IMarkupHandler handler = new AbstractMarkupHandler() {
+            @Override
+            public void handleOpenElementStart(
+                    final char[] buffer, final int nameOffset, final int nameLen, final int line, final int col) {
+                if (new String(buffer, nameOffset, nameLen).equals("boom")) {
+                    throw new RuntimeException("Simulated handler failure");
+                }
+            }
+        };
+
+        // char[]/String entry point: the whole document is parsed in a single buffer pass.
+        try {
+            new MarkupParser(configuration).parse(input, handler);
+            Assertions.fail("An exception should have happened");
+        } catch (final ParseException e) {
+            Assertions.assertEquals(expectedLine, e.getLine());
+            Assertions.assertEquals(expectedCol, e.getCol());
+        }
+
+        // Reader entry point, swept across many buffer sizes so the failure falls at a different
+        // position relative to each buffer-fill chunk's boundary: the reported line/col must stay
+        // correct no matter where that boundary falls.
+        for (int bufferSize = 1; bufferSize <= input.length() + 4; bufferSize++) {
+            final MarkupParser parser = new MarkupParser(configuration, 1, bufferSize);
+            try {
+                parser.parse(new CharArrayReader(input.toCharArray()), handler);
+                Assertions.fail("An exception should have happened (bufferSize=" + bufferSize + ")");
+            } catch (final ParseException e) {
+                Assertions.assertEquals(expectedLine, e.getLine(), "bufferSize=" + bufferSize);
+                Assertions.assertEquals(expectedCol, e.getCol(), "bufferSize=" + bufferSize);
+            }
+        }
+
+    }
+
+
+    @Test
+    public void testReaderIOExceptionHasNoLineCol() {
+
+        // Regression test: an IOException coming from the underlying Reader itself (e.g. a network
+        // or filesystem failure) is not a problem with a position in the parsed markup, so the
+        // resulting ParseException must NOT carry a line/col -- attaching one would misleadingly
+        // imply there's an issue with the document content at that exact spot.
+
+        final ParseConfiguration configuration = ParseConfiguration.htmlConfiguration();
+        final MarkupParser parser = new MarkupParser(configuration);
+        final IMarkupHandler handler = new AbstractMarkupHandler() { };
+
+        final Reader failingReader = new Reader() {
+            @Override
+            public int read(final char[] cbuf, final int off, final int len) throws IOException {
+                throw new IOException("Simulated I/O failure (e.g. network or filesystem issue)");
+            }
+            @Override
+            public void close() throws IOException {
+                // no-op
+            }
+        };
+
+        try {
+            parser.parse(failingReader, handler);
+            Assertions.fail("An exception should have happened");
+        } catch (final ParseException e) {
+            Assertions.assertNull(e.getLine());
+            Assertions.assertNull(e.getCol());
+            Assertions.assertInstanceOf(IOException.class, e.getCause());
+        }
+
+    }
+
+
     static void testDocError(final String input, final String outputBreakDown, final String outputSimple, final int errorLine, final int errorCol, final ParseConfiguration parseConfiguration) {
         try {
             testDoc(input, outputBreakDown, outputSimple, parseConfiguration);
