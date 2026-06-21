@@ -293,7 +293,7 @@ public final class ParsingDocTypeMarkupUtil {
         if (typeEnd == -1) {
             // The type is the last thing to appear in the structure
             
-            // When there is a type, there must be a at least a spec1,
+            // When there is a type, there must be at least a spec1,
             // so this is an error
             
             throw new ParseException(
@@ -344,7 +344,7 @@ public final class ParsingDocTypeMarkupUtil {
                 ParsingMarkupUtil.findNextNonWhitespaceCharWildcard(buffer, i, maxi, locator);
 
         if (spec1Start == -1) {
-            // When there is a type, there must be a at least a spec1,
+            // When there is a type, there must be at least a spec1,
             // so this is an error
             
             throw new ParseException(
@@ -379,7 +379,7 @@ public final class ParsingDocTypeMarkupUtil {
                 throw new ParseException(
                         "Could not parse as a well-formed DOCTYPE clause " +
                         "\"" + new String(buffer, outerOffset, outerLen) + "\"" +
-                        ": Public and Systen IDs must be surrounded by quotes (\")", 
+                        ": Public and System IDs must be surrounded by quotes (\")", 
                         line, col);
 
             }
@@ -445,7 +445,7 @@ public final class ParsingDocTypeMarkupUtil {
             throw new ParseException(
                     "Could not parse as a well-formed DOCTYPE clause " +
                     "\"" + new String(buffer, outerOffset, outerLen) + "\"" +
-                    ": Public and Systen IDs must be surrounded by quotes (\")", 
+                    ": Public and System IDs must be surrounded by quotes (\")", 
                     line, col);
             
         }
@@ -533,7 +533,7 @@ public final class ParsingDocTypeMarkupUtil {
                 throw new ParseException(
                         "Could not parse as a well-formed DOCTYPE clause " +
                         "\"" + new String(buffer, outerOffset, outerLen) + "\"" +
-                        ": Public and Systen IDs must be surrounded by quotes (\")", 
+                        ": Public and System IDs must be surrounded by quotes (\")", 
                         line, col);
                 
             }
@@ -588,7 +588,7 @@ public final class ParsingDocTypeMarkupUtil {
             throw new ParseException(
                     "Could not parse as a well-formed DOCTYPE clause " +
                     "\"" + new String(buffer, outerOffset, outerLen) + "\"" +
-                    ": Public and Systen IDs must be surrounded by quotes (\")", 
+                    ": Public and System IDs must be surrounded by quotes (\")", 
                     line, col);
 
         }

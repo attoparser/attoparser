@@ -725,7 +725,7 @@ final class MarkupEventProcessorHandler extends AbstractChainedMarkupHandler {
                 // If we have a DOCTYPE, we will have a root element name and therefore we will
                 // only allow one root element. But it seems there are several.
                 throw new ParseException(
-                        "Malformed markup: Only one root element (with name \"" + new String(this.rootElementName) + "\" is allowed",
+                        "Malformed markup: Only one root element (with name \"" + new String(this.rootElementName) + "\") is allowed",
                         line, col);
             }
 

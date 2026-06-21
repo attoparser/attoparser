@@ -165,7 +165,7 @@ public interface IMarkupHandler
      * </p>
      * <p>
      *   Note that this method can be <strong>safely ignored by most implementations</strong>, as there are
-     *   very few scenarios in which this kind of interaction would be consisdered relevant.
+     *   very few scenarios in which this kind of interaction would be considered relevant.
      * </p>
      *
      * @param parseConfiguration the configuration object.
@@ -203,7 +203,7 @@ public interface IMarkupHandler
      * </p>
      * <p>
      *   Note that this method can be <strong>safely ignored by most implementations</strong>, as there are
-     *   very few scenarios in which this kind of interaction would be consisdered relevant.
+     *   very few scenarios in which this kind of interaction would be considered relevant.
      * </p>
      *
      * @param selection the selection object.

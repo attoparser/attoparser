@@ -36,9 +36,9 @@ import java.util.Set;
  */
 final class HtmlNames {
 
-    // Set containing all the standard element names, for posible external reference
+    // Set containing all the standard element names, for possible external reference
     static final Set<String> ALL_STANDARD_ELEMENT_NAMES;
-    // Set containing all the standard attribute names, for posible external reference
+    // Set containing all the standard attribute names, for possible external reference
     static final Set<String> ALL_STANDARD_ATTRIBUTE_NAMES;
 
 

@@ -27,7 +27,7 @@ import org.attoparser.util.TextUtil;
 /**
  *
  * @author Daniel Fern&aacute;ndez
- * @since 3.0.0
+ * @since 2.0.0
  *
  */
 final class MarkupSelectorItem implements IMarkupSelectorItem {

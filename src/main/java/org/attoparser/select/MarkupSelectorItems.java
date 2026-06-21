@@ -52,7 +52,7 @@ final class MarkupSelectorItems {
             final boolean html, final String selector, final IMarkupSelectorReferenceResolver referenceResolver) {
 
         if (isEmptyOrWhitespace(selector)) {
-            throw new IllegalArgumentException("Selector cannot be null");
+            throw new IllegalArgumentException("Selector cannot be null or empty");
         }
 
         final ConcurrentHashMap<String,List<IMarkupSelectorItem>> map;
@@ -250,7 +250,7 @@ final class MarkupSelectorItems {
             path = path.substring(0, classModifierPos);
             if (isEmptyOrWhitespace(selectorPathClassModifier)) {
                 throw new IllegalArgumentException(
-                        "Empty id modifier in selector expression " +
+                        "Empty class modifier in selector expression " +
                                 "\"" + selector + "\", which is forbidden.");
             }
             final MarkupSelectorItem.AttributeCondition newAttributeCondition =
@@ -280,7 +280,7 @@ final class MarkupSelectorItems {
             path = path.substring(0, referenceModifierPos);
             if (isEmptyOrWhitespace(selectorPathReferenceModifier)) {
                 throw new IllegalArgumentException(
-                        "Empty id modifier in selector expression " +
+                        "Empty reference modifier in selector expression " +
                                 "\"" + selector + "\", which is forbidden.");
             }
         }
