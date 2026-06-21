@@ -140,8 +140,8 @@ final class MarkupEventProcessorHandler extends AbstractChainedMarkupHandler {
 
         this.validateProlog = this.prologParseConfiguration.isValidateProlog();
         this.prologPresenceForbidden = this.prologParseConfiguration.getPrologPresence().isForbidden();
-        this.xmlDeclarationPresenceForbidden = this.prologParseConfiguration.getXmlDeclarationPresence().isRequired();
-        this.doctypePresenceForbidden = this.prologParseConfiguration.getDoctypePresence().isRequired();
+        this.xmlDeclarationPresenceForbidden = this.prologParseConfiguration.getXmlDeclarationPresence().isForbidden();
+        this.doctypePresenceForbidden = this.prologParseConfiguration.getDoctypePresence().isForbidden();
 
         if (this.useStack) {
 
