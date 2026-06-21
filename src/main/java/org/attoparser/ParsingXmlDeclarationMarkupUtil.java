@@ -311,8 +311,8 @@ public final class ParsingXmlDeclarationMarkupUtil {
             if (!this.versionPresent) {
                 throw new ParseException(
                         "Attribute \"version\" is required in XML Declaration: " +
-                        "\"" + new String(buffer, this.outerOffset, this.outerLen) + "\"", 
-                        this.outerLine, this.outerLine);
+                        "\"" + new String(buffer, this.outerOffset, this.outerLen) + "\"",
+                        this.outerLine, this.outerCol);
             }
             if (!this.standalonePresent) {
                 this.standaloneLine = locator[0];
