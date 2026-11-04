@@ -67,6 +67,57 @@ public class OutputMarkupHandlerTest {
     }
 
 
+    /*
+     * OutputMarkupHandler must reconstruct the original markup character-for-character. This exercises
+     * that round-trip over a wide variety of constructs: attributes (double/single/unquoted, boolean,
+     * entity-bearing), namespaced names, CDATA sections, processing instructions, XML declarations,
+     * DOCTYPEs, comments (incl. multi-line), void/standalone elements, raw-text elements (script/style),
+     * and assorted whitespace. For every case the expected output is the input itself.
+     */
+    @Test
+    public void testRoundTripVariety() throws Exception {
+
+        final ParseConfiguration xmlConfig = ParseConfiguration.xmlConfiguration();
+        final ParseConfiguration htmlConfig = ParseConfiguration.htmlConfiguration();
+
+        // XML-mode round-trips.
+        checkRoundTrip(xmlConfig, "<a b=\"1\" c=\"2\">x</a>");
+        checkRoundTrip(xmlConfig, "<a b=\"1\"/>");
+        checkRoundTrip(xmlConfig, "<ns:a xmlns:ns=\"http://x\">y</ns:a>");
+        checkRoundTrip(xmlConfig, "<a>&amp;&lt;&gt;</a>");              // entities are not unescaped
+        checkRoundTrip(xmlConfig, "<a><![CDATA[ <b> & ]]></a>");       // CDATA kept verbatim
+        checkRoundTrip(xmlConfig, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<a>x</a>");
+        checkRoundTrip(xmlConfig, "<?target instruction?>");           // processing instruction
+        checkRoundTrip(xmlConfig, "<!-- a comment -->");
+        checkRoundTrip(xmlConfig, "<a><!-- inside --></a>");
+        checkRoundTrip(xmlConfig, "<a\n  b=\"1\"\n  c=\"2\"\n>x</a>"); // whitespace within a tag
+        checkRoundTrip(xmlConfig, "<a   >x</a>");
+        checkRoundTrip(xmlConfig, "<a b=\"x&amp;y\">z</a>");
+        checkRoundTrip(xmlConfig, "<!DOCTYPE html SYSTEM \"foo.dtd\">\n<html/>");
+        checkRoundTrip(xmlConfig, "<!-- multi\nline\ncomment -->");
+        checkRoundTrip(xmlConfig, "<a></a >");                         // whitespace in a close tag
+        checkRoundTrip(xmlConfig, "<a/><b/><c/>");
+
+        // HTML-mode round-trips.
+        checkRoundTrip(htmlConfig, "<div class=\"a\" id=\"b\">x</div>");
+        checkRoundTrip(htmlConfig, "<input type=\"text\" disabled>");  // void element, boolean attribute
+        checkRoundTrip(htmlConfig, "<img src=\"a.png\" alt=\"x\">");
+        checkRoundTrip(htmlConfig, "<a href='single'>y</a>");          // single-quoted attribute
+        checkRoundTrip(htmlConfig, "<a data-x=unquoted>y</a>");        // unquoted attribute
+        checkRoundTrip(htmlConfig, "<SELECT><OPTION>a</OPTION></SELECT>");
+        checkRoundTrip(htmlConfig, "<p>&nbsp;&copy;</p>");
+        checkRoundTrip(htmlConfig, "<script>var x = 1 < 2;</script>"); // raw-text: '<' inside is not a tag
+        checkRoundTrip(htmlConfig, "<style>a{color:red}</style>");
+        checkRoundTrip(htmlConfig, "<p>a<br>b</p>");
+
+    }
+
+
+    private static void checkRoundTrip(final ParseConfiguration configuration, final String input) throws Exception {
+        check(configuration, input, input);
+    }
+
+
     private static void check(final ParseConfiguration configuration, final String input, final String expectedOutput) throws Exception {
 
         final Writer writer = new StringWriter();

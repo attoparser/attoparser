@@ -2104,6 +2104,99 @@ public class MarkupParserTest {
     }
 
 
+    /*
+     * Further HTML5 tag-open-rules coverage: multi-line position tracking, mixed text/markup,
+     * void/standalone elements, '<' adjacent to comments, names with digits/hyphens/underscores
+     * after the first letter, and additional legacy-restore toggles. See testHtml5TagOpenRules().
+     */
+    @Test
+    public void testHtml5TagOpenRulesExtended() throws Exception {
+
+        final ParseConfiguration html = ParseConfiguration.htmlConfiguration();
+        html.setElementBalancing(ElementBalancing.NO_BALANCING);
+        final ParseConfiguration htmlLegacy = html.clone();
+        htmlLegacy.setHtml5TagOpenRules(false);
+
+        // ---- HTML5 rules enabled (default) ----
+
+        // Line/column tracking is preserved across text that contains a non-tag '<'.
+        testHtmlDoc("a\n<18", "[T(a\n<18){1,1}]", html);
+        testHtmlDoc(
+                "line1\nAge <18\n<b>y</b>",
+                "[T(line1\nAge <18\n){1,1}OES(b){3,1}OEE(b){3,3}T(y){3,4}CES(b){3,5}CEE(b){3,8}]",
+                html);
+
+        // Several non-tag '<' in a single run of text.
+        testHtmlDoc("x<1 y<2 z", "[T(x<1 y<2 z){1,1}]", html);
+
+        // Real tags and text-'<' interleaved.
+        testHtmlDoc(
+                "<a>t1</a><2<b>t2</b>",
+                "[OES(a){1,1}OEE(a){1,3}T(t1){1,4}CES(a){1,6}CEE(a){1,9}T(<2){1,10}OES(b){1,12}OEE(b){1,14}T(t2){1,15}CES(b){1,17}CEE(b){1,20}]",
+                html);
+        testHtmlDoc(
+                "<p>1 < 2 and 2 > 1</p>",
+                "[OES(p){1,1}OEE(p){1,3}T(1 < 2 and 2 > 1){1,4}CES(p){1,19}CEE(p){1,22}]",
+                html);
+
+        // '<' + ASCII letter still starts a tag even inside prose (as in browsers).
+        testHtmlDoc(
+                "i<j && k>l",
+                "[T(i){1,1}OES(j){1,2}IWS( ){1,4}A(&&){1,5}(){1,7}(){1,7}IWS( ){1,7}A(k){1,8}(){1,9}(){1,9}OEE(j){1,9}T(l){1,10}]",
+                html);
+
+        // Standalone / void elements are unaffected; surrounding text-'<' stays text.
+        testHtmlDoc(
+                "pre<img src=\"x\"/>post<9",
+                "[T(pre){1,1}SES(img){1,4}IWS( ){1,8}A(src){1,9}(=){1,12}(\"x\"){1,13}SEE(img){1,16}T(post<9){1,18}]",
+                html);
+        testHtmlDoc("<br/>",          "[SES(br){1,1}SEE(br){1,4}]", html);
+        testHtmlDoc("<img src=\"a\"/>", "[SES(img){1,1}IWS( ){1,5}A(src){1,6}(=){1,9}(\"a\"){1,10}SEE(img){1,13}]", html);
+        testHtmlDoc("<hr />",         "[SES(hr){1,1}IWS( ){1,4}SEE(hr){1,5}]", html);
+        testHtmlDoc("<x/>",           "[SES(x){1,1}SEE(x){1,3}]", html);
+        testHtmlDoc(
+                "<p>a<br>b</p>",
+                "[OES(p){1,1}OEE(p){1,3}T(a){1,4}NSES(br){1,5}NSEE(br){1,8}T(b){1,9}CES(p){1,10}CEE(p){1,13}]",
+                html);
+
+        // Attributes/tag after text-'<'.
+        testHtmlDoc(
+                "<18<b class=\"c\">m</b>",
+                "[T(<18){1,1}OES(b){1,4}IWS( ){1,6}A(class){1,7}(=){1,12}(\"c\"){1,13}OEE(b){1,16}T(m){1,17}CES(b){1,18}CEE(b){1,21}]",
+                html);
+
+        // Name continues past the first letter with digit/hyphen/underscore/colon.
+        testHtmlDoc("<a2>",  "[OES(a2){1,1}OEE(a2){1,4}]",   html);
+        testHtmlDoc("<a-b>", "[OES(a-b){1,1}OEE(a-b){1,5}]", html);
+        testHtmlDoc("<a_b>", "[OES(a_b){1,1}OEE(a_b){1,5}]", html);
+
+        // '<' immediately before a real tag, and a close tag right after text.
+        testHtmlDoc("<<b>>",  "[T(<){1,1}OES(b){1,2}OEE(b){1,4}T(>){1,5}]", html);
+        testHtmlDoc("a</b>",  "[T(a){1,1}CES(b){1,2}CEE(b){1,5}]",          html);
+        testHtmlDoc("text <> more", "[T(text <> more){1,1}]",               html);
+
+        // '<' + non-letter adjacent to a comment: the stray '<n' stays text, the comment is a comment.
+        testHtmlDoc("<1<!-- c -->2", "[T(<1){1,1}C( c ){1,3}T(2){1,13}]", html);
+        testHtmlDoc("<!-- c --><2",  "[C( c ){1,1}T(<2){1,11}]",          html);
+
+        // End-tag open with non-letter -> text (digit, whitespace, symbol).
+        testHtmlDoc("</99>", "[T(</99>){1,1}]", html);
+        testHtmlDoc("</\t>", "[T(</\t>){1,1}]", html);
+        testHtmlDoc("</=>",  "[T(</=>){1,1}]",  html);
+
+        // ---- HTML5 rules disabled: legacy behaviour restored ----
+        testHtmlDoc(
+                "<18<b class=\"c\">m</b>",
+                "[OES(18<b){1,1}IWS( ){1,6}A(class){1,7}(=){1,12}(\"c\"){1,13}OEE(18<b){1,16}T(m){1,17}CES(b){1,18}CEE(b){1,21}]",
+                htmlLegacy);
+        testHtmlDoc("</99>", "[CES(99){1,1}CEE(99){1,5}]",             htmlLegacy);
+        testHtmlDoc("<<b>>", "[OES(<b){1,1}OEE(<b){1,4}T(>){1,5}]",    htmlLegacy);
+        // A letter-led name behaves identically regardless of the flag.
+        testHtmlDoc("<a-b>", "[OES(a-b){1,1}OEE(a-b){1,5}]",           htmlLegacy);
+
+    }
+
+
     static void testDocError(final String input, final String outputBreakDown, final String outputSimple, final int errorLine, final int errorCol, final ParseConfiguration parseConfiguration) {
         try {
             testDoc(input, outputBreakDown, outputSimple, parseConfiguration);

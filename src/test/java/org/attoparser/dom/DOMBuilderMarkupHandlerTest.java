@@ -66,6 +66,45 @@ public class DOMBuilderMarkupHandlerTest {
     }
 
 
+    /*
+     * Broader coverage of the DOM build + serialize round-trip over attributes, namespaces, CDATA,
+     * processing instructions, comments, element siblings and mixed content (XML), and over HTML
+     * normalizations: void elements rendered self-closed, boolean attributes expanded to name="",
+     * single quotes normalized to double, and optional/void tags auto-closed.
+     */
+    @Test
+    public void testVariety() throws Exception {
+
+        final ParseConfiguration xmlConfig = ParseConfiguration.xmlConfiguration();
+        final ParseConfiguration htmlConfig = ParseConfiguration.htmlConfiguration();
+
+        // XML: these all reconstruct exactly...
+        check(xmlConfig, "<a b=\"1\" c=\"2\">x</a>",            "<a b=\"1\" c=\"2\">x</a>");
+        check(xmlConfig, "<a b=\"1\"/>",                        "<a b=\"1\"/>");
+        check(xmlConfig, "<ns:a xmlns:ns=\"http://x\">y</ns:a>", "<ns:a xmlns:ns=\"http://x\">y</ns:a>");
+        check(xmlConfig, "<a>&amp;&lt;</a>",                    "<a>&amp;&lt;</a>");
+        check(xmlConfig, "<root><?pi data?></root>",           "<root><?pi data?></root>");
+        check(xmlConfig, "<a><!-- c --></a>",                  "<a><!-- c --></a>");
+        check(xmlConfig, "<a><b/><c/></a>",                    "<a><b/><c/></a>");
+        check(xmlConfig, "<a>t1<b>t2</b>t3</a>",               "<a>t1<b>t2</b>t3</a>");
+        // CDATA sections keep their delimiters, so markup-like content inside stays literal text.
+        check(xmlConfig, "<a><![CDATA[ <b> ]]></a>",           "<a><![CDATA[ <b> ]]></a>");
+        check(xmlConfig, "<a>x<![CDATA[1 < 2 && 3]]>y</a>",    "<a>x<![CDATA[1 < 2 && 3]]>y</a>");
+        check(xmlConfig, "<a><![CDATA[]]></a>",                "<a><![CDATA[]]></a>");
+        check(htmlConfig, "<div><![CDATA[ <b> ]]></div>",      "<div><![CDATA[ <b> ]]></div>");
+
+        // HTML normalizations applied on serialization.
+        check(htmlConfig, "<div class=\"a\">x</div>",          "<div class=\"a\">x</div>");
+        check(htmlConfig, "<img src=\"a\">",                   "<img src=\"a\"/>");              // void -> self-closed
+        check(htmlConfig, "<input type=\"text\" disabled>",    "<input type=\"text\" disabled=\"\"/>"); // boolean attr
+        check(htmlConfig, "<p>a<br>b</p>",                     "<p>a<br/>b</p>");
+        check(htmlConfig, "<a href='single'>y</a>",            "<a href=\"single\">y</a>");      // quotes normalized
+        check(htmlConfig, "<SELECT><OPTION>a</OPTION></SELECT>", "<SELECT><OPTION>a</OPTION></SELECT>");
+        check(htmlConfig, "<table><tr><td>x</table>",          "<table><tr><td>x</td></tr></table>"); // auto-close
+
+    }
+
+
     private static void check(final ParseConfiguration configuration, final String input, final String expectedOutput) throws Exception {
 
         final IMarkupParser parser = new MarkupParser(configuration);
