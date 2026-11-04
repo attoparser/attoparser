@@ -2,22 +2,29 @@
 
 ## 1. Configuration
 
-Configure access to the snapshots and staging servers in `settings.xml`:
+Configure access to the Central Portal in `settings.xml`. `central` is used for
+publishing releases, and `central-portal-snapshots` for publishing snapshots:
 
 ```xml
   <servers>
     <server>
-      <id>sonatype-nexus-snapshots</id>
-      <username>[USER IN SONATYPE NEXUS]</username>
-      <password>[ENCODED PASSWORD IN SONATYPE NEXUS]</password>
+      <id>central</id>
+      <username>[USER TOKEN IN CENTRAL PORTAL]</username>
+      <password>[ENCODED PASSWORD TOKEN IN CENTRAL PORTAL]</password>
     </server>
     <server>
-      <id>sonatype-nexus-staging</id>
-      <username>[USER IN SONATYPE NEXUS]</username>
-      <password>[ENCODED PASSWORD IN SONATYPE NEXUS]</password>
+      <id>central-portal-snapshots</id>
+      <username>[USER TOKEN IN CENTRAL PORTAL]</username>
+      <password>[ENCODED PASSWORD TOKEN IN CENTRAL PORTAL]</password>
+      <repositoryOrigins>
+        <repositoryOrigin>https://central.sonatype.com</repositoryOrigin>
+      </repositoryOrigins>
     </server>
   </servers>
 ```
+
+`repositoryOrigins` (Maven 3.10+) binds the snapshot credentials to the Central Portal
+host, as the snapshots repository is declared in `pom.xml`.
 
 ## 2. Check dependency snapshots
 
