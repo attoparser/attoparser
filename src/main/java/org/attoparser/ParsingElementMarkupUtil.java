@@ -265,6 +265,51 @@ public final class ParsingElementMarkupUtil {
     }
 
 
+    static boolean isOpenElementStart(final char[] buffer, final int offset, final int maxi, final boolean html) {
+
+        if (!html) {
+            // Non-HTML mode: keep the (more lenient) element-name rules.
+            return isOpenElementStart(buffer, offset, maxi);
+        }
+
+        // HTML5 "tag open state": only an ASCII letter after '<' starts an element; anything else is text.
+        final int len = maxi - offset;
+
+        return (len > 1 &&
+                    buffer[offset] == '<' &&
+                    isHtmlTagNameStart(buffer[offset + 1]));
+
+    }
+
+
+    static boolean isCloseElementStart(final char[] buffer, final int offset, final int maxi, final boolean html) {
+
+        if (!html) {
+            // Non-HTML mode: keep the (more lenient) element-name rules.
+            return isCloseElementStart(buffer, offset, maxi);
+        }
+
+        // HTML5 "end tag open state": only an ASCII letter after '</' starts a closing element; anything else is text.
+        final int len = maxi - offset;
+
+        return (len > 2 &&
+                    buffer[offset] == '<' &&
+                    buffer[offset + 1] == '/' &&
+                    isHtmlTagNameStart(buffer[offset + 2]));
+
+    }
+
+
+    /*
+     * Per the HTML Living Standard (tag open / end tag open states), only an ASCII letter can start a
+     * tag name. Note Character.isLetter(...) must NOT be used here: non-ASCII letters (such as an
+     * accented letter like U+00E9) do not start a tag in HTML and must be reported as text, as browsers do.
+     */
+    private static boolean isHtmlTagNameStart(final char c) {
+        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+    }
+
+
     static boolean isElementEnd(final char[] buffer, final int offset, final int maxi, final boolean minimized) {
 
         final int len = maxi - offset;

@@ -113,6 +113,8 @@ public final class ParseConfiguration implements Serializable, Cloneable {
     private ParsingMode mode = ParsingMode.XML;
     private boolean caseSensitive = true;
 
+    private boolean html5TagOpenRules = true;
+
     private boolean textSplittable = false;
     
     private ElementBalancing elementBalancing = ElementBalancing.NO_BALANCING;
@@ -132,6 +134,7 @@ public final class ParseConfiguration implements Serializable, Cloneable {
 
         DEFAULT_HTML_PARSE_CONFIGURATION = new ParseConfiguration();
         DEFAULT_HTML_PARSE_CONFIGURATION.setMode(ParsingMode.HTML);
+        DEFAULT_HTML_PARSE_CONFIGURATION.setHtml5TagOpenRules(true);
         DEFAULT_HTML_PARSE_CONFIGURATION.setTextSplittable(false);
         DEFAULT_HTML_PARSE_CONFIGURATION.setElementBalancing(ElementBalancing.AUTO_CLOSE);
         DEFAULT_HTML_PARSE_CONFIGURATION.setNoUnmatchedCloseElementsRequired(false);
@@ -169,6 +172,7 @@ public final class ParseConfiguration implements Serializable, Cloneable {
      * </p>
      * <ul>
      *     <li>Mode: {@link org.attoparser.config.ParseConfiguration.ParsingMode#HTML}</li>
+     *     <li>HTML5 tag open rules: true</li>
      *     <li>Text splittable: false</li>
      *     <li>Element balancing: {@link org.attoparser.config.ParseConfiguration.ElementBalancing#AUTO_CLOSE}</li>
      *     <li>No unmatched close elements required: false</li>
@@ -312,6 +316,64 @@ public final class ParseConfiguration implements Serializable, Cloneable {
                     "Cannot set parser as case-sensitive for HTML mode. Use XML mode instead.");
         }
         this.caseSensitive = caseSensitive;
+    }
+
+
+
+
+    /**
+     * <p>
+     *   Returns whether the HTML5 <em>tag open</em> rules are applied when deciding whether a
+     *   <kbd>&lt;</kbd> character starts an element or should be considered mere text.
+     * </p>
+     * <p>
+     *   When enabled (the default), and only in <strong>HTML mode</strong>, a <kbd>&lt;</kbd> is
+     *   considered the start of an element only when it is immediately followed by an
+     *   <em>ASCII letter</em> (<kbd>[A-Za-z]</kbd>) &mdash;or by <kbd>/</kbd> plus an ASCII letter for a
+     *   closing tag&mdash;, mirroring the <em>tag open state</em> and <em>end tag open state</em> of the
+     *   <a href="https://html.spec.whatwg.org/multipage/parsing.html#tag-open-state">HTML Living Standard</a>.
+     *   Any other <kbd>&lt;</kbd> that does not start a comment, CDATA section, DOCTYPE, XML declaration or
+     *   processing instruction is reported as text, exactly as web browsers would do. So, for example,
+     *   <kbd>Age must be &lt;18</kbd>, <kbd>1&lt;2</kbd> or <kbd>&lt;@macro&gt;</kbd> are reported as text.
+     * </p>
+     * <p>
+     *   When disabled, the legacy (pre-2.0.10) lenient behaviour is restored: a <kbd>&lt;</kbd> starts an
+     *   element whenever the following character is not one of <kbd>-</kbd>, <kbd>!</kbd>, <kbd>/</kbd>,
+     *   <kbd>?</kbd>, <kbd>[</kbd> or whitespace.
+     * </p>
+     * <p>
+     *   This flag has <strong>no effect in XML mode</strong>, where element-name rules are always applied as before.
+     * </p>
+     * <p>
+     *   Default value is <b>true</b>.
+     * </p>
+     *
+     * @return whether the HTML5 <em>tag open</em> rules are applied (HTML mode only).
+     * @since 2.0.10
+     */
+    public boolean isHtml5TagOpenRules() {
+        return this.html5TagOpenRules;
+    }
+
+
+    /**
+     * <p>
+     *   Specify whether the HTML5 <em>tag open</em> rules should be applied when deciding whether a
+     *   <kbd>&lt;</kbd> character starts an element or should be considered mere text.
+     * </p>
+     * <p>
+     *   See {@link #isHtml5TagOpenRules()} for a complete description. This flag only has an effect in
+     *   <strong>HTML mode</strong>; in XML mode element-name rules are always applied as before.
+     * </p>
+     * <p>
+     *   Default value is <b>true</b>.
+     * </p>
+     *
+     * @param html5TagOpenRules whether the HTML5 <em>tag open</em> rules should be applied (HTML mode only).
+     * @since 2.0.10
+     */
+    public void setHtml5TagOpenRules(final boolean html5TagOpenRules) {
+        this.html5TagOpenRules = html5TagOpenRules;
     }
 
 

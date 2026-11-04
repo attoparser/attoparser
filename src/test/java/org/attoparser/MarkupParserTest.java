@@ -1975,6 +1975,135 @@ public class MarkupParserTest {
     }
 
 
+    /*
+     * Tests for the HTML5 "tag open" / "end tag open" rules (ParseConfiguration.setHtml5TagOpenRules).
+     *
+     * In HTML mode and with the rules enabled (the default), a '<' only starts an element when it is
+     * immediately followed by an ASCII letter (or '/' + ASCII letter for a close tag); every other '<'
+     * that does not begin a comment, CDATA section, DOCTYPE, XML declaration or processing instruction
+     * is reported as text, just as the HTML Living Standard tokenizer (and web browsers) do. When the
+     * rules are disabled, the legacy (pre-2.0.10) lenient behaviour is restored. XML mode is never affected.
+     *
+     * The '\u00e9' escapes below are the letter e-acute (a non-ASCII letter), which must NOT start a tag
+     * in HTML mode. Source encoding for this project is US-ASCII, hence the escape.
+     */
+    @Test
+    public void testHtml5TagOpenRules() throws Exception {
+
+        // The default HTML configuration must have the HTML5 tag-open rules enabled.
+        Assertions.assertTrue(ParseConfiguration.htmlConfiguration().isHtml5TagOpenRules());
+
+        // HTML mode with the HTML5 tag-open rules ENABLED (the default). NO_BALANCING to keep traces
+        // focused on tokenization (no auto-open/close noise).
+        final ParseConfiguration html = ParseConfiguration.htmlConfiguration();
+        html.setElementBalancing(ElementBalancing.NO_BALANCING);
+        Assertions.assertTrue(html.isHtml5TagOpenRules());
+
+        // HTML mode with the rules DISABLED: legacy lenient behaviour must be restored.
+        final ParseConfiguration htmlLegacy = html.clone();
+        htmlLegacy.setHtml5TagOpenRules(false);
+        Assertions.assertFalse(htmlLegacy.isHtml5TagOpenRules());
+
+        // XML mode: must be completely unaffected by the flag.
+        final ParseConfiguration xml = ParseConfiguration.xmlConfiguration();
+        xml.setElementBalancing(ElementBalancing.NO_BALANCING);
+        xml.setNoUnmatchedCloseElementsRequired(false);
+        xml.setUniqueAttributesInElementRequired(false);
+        xml.setXmlWellFormedAttributeValuesRequired(false);
+        xml.setUniqueRootElementPresence(UniqueRootElementPresence.NOT_VALIDATED);
+        xml.getPrologParseConfiguration().setValidateProlog(false);
+
+
+        /*
+         * ---------------------------------------------------------------------------------------------
+         * HTML5 rules ENABLED (default): a '<' not followed by an ASCII letter is text.
+         * Each case is also run through the buffer-size loop (1..length), because the decisive character
+         * may fall at the very start of the next buffer.
+         * ---------------------------------------------------------------------------------------------
+         */
+
+        // The motivating case: text that looks like markup is kept as text, real tags still parsed.
+        testHtmlDoc(
+                "Age must be <18 or <b>more</b>",
+                "[T(Age must be <18 or ){1,1}OES(b){1,20}OEE(b){1,22}T(more){1,23}CES(b){1,27}CEE(b){1,30}]",
+                html);
+
+        // '<' followed by a digit, symbol, whitespace or non-ASCII letter -> text.
+        testHtmlDoc("1<2<3",  "[T(1<2<3){1,1}]",   html);
+        testHtmlDoc("a <3 b", "[T(a <3 b){1,1}]",  html);
+        testHtmlDoc("x<-y",   "[T(x<-y){1,1}]",    html);
+        testHtmlDoc("<=",     "[T(<=){1,1}]",      html);
+        testHtmlDoc("<>",     "[T(<>){1,1}]",      html);
+        testHtmlDoc("< b>",   "[T(< b>){1,1}]",    html);
+        testHtmlDoc("<.x",    "[T(<.x){1,1}]",     html);
+        testHtmlDoc("<_x>",   "[T(<_x>){1,1}]",    html);
+        testHtmlDoc("<:x>",   "[T(<:x>){1,1}]",    html);
+        testHtmlDoc("<@x>",   "[T(<@x>){1,1}]",    html);
+        testHtmlDoc("<#x>",   "[T(<#x>){1,1}]",    html);
+        testHtmlDoc("<\u00e9>", "[T(<\u00e9>){1,1}]", html); // <e-acute> : non-ASCII letter -> text
+
+        // '<' (and '</') at the very end of the input/buffer -> text.
+        testHtmlDoc("a<",  "[T(a<){1,1}]",  html);
+        testHtmlDoc("a</", "[T(a</){1,1}]", html);
+
+        // End-tag open ('</') not followed by an ASCII letter -> text.
+        testHtmlDoc("</3",   "[T(</3){1,1}]",   html);
+        testHtmlDoc("</ b>", "[T(</ b>){1,1}]", html);
+        testHtmlDoc("</>",   "[T(</>){1,1}]",   html);
+
+        // '<!' not forming a comment/CDATA/DOCTYPE -> text (HTML5 bogus comment; we keep it as text).
+        testHtmlDoc("<!x>", "[T(<!x>){1,1}]", html);
+
+        // Comments, CDATA sections, DOCTYPEs and processing instructions are unchanged.
+        testHtmlDoc("<!-- c -->",      "[C( c ){1,1}]",  html);
+        testHtmlDoc("<![CDATA[ d ]]>", "[CD( d ){1,1}]", html);
+        testHtmlDoc("<!DOCTYPE html>",
+                "[DT(DOCTYPE){1,3}(html){1,11}(){1,15}(){1,15}(){1,15}(){1,15}]", html);
+        testHtmlDoc("<?pi?>", "[P(pi){1,3}(){1,5}]", html);
+
+        // Positive controls: '<' + ASCII letter still starts a tag (any case, hyphenated and namespaced).
+        testHtmlDoc("<b>",        "[OES(b){1,1}OEE(b){1,3}]",                 html);
+        testHtmlDoc("<B>",        "[OES(B){1,1}OEE(B){1,3}]",                 html);
+        testHtmlDoc("<h1>x</h1>", "[OES(h1){1,1}OEE(h1){1,4}T(x){1,5}CES(h1){1,6}CEE(h1){1,10}]", html);
+        testHtmlDoc("<my-el>",    "[OES(my-el){1,1}OEE(my-el){1,7}]",         html);
+        testHtmlDoc("<svg:rect>", "[OES(svg:rect){1,1}OEE(svg:rect){1,10}]",  html);
+        testHtmlDoc("<th:block>", "[OES(th:block){1,1}OEE(th:block){1,10}]",  html);
+        testHtmlDoc("</b>",       "[CES(b){1,1}CEE(b){1,4}]",                 html);
+        testHtmlDoc("</H1>",      "[CES(H1){1,1}CEE(H1){1,5}]",               html);
+
+
+        /*
+         * ---------------------------------------------------------------------------------------------
+         * HTML5 rules DISABLED: the legacy lenient behaviour is restored, so these '<' + non-letter
+         * sequences are parsed as elements again (exactly as in 2.0.9 and earlier).
+         * ---------------------------------------------------------------------------------------------
+         */
+        testHtmlDoc("<_x>",     "[OES(_x){1,1}OEE(_x){1,4}]",             htmlLegacy);
+        testHtmlDoc("<:x>",     "[OES(:x){1,1}OEE(:x){1,4}]",             htmlLegacy);
+        testHtmlDoc("<@x>",     "[OES(@x){1,1}OEE(@x){1,4}]",             htmlLegacy);
+        testHtmlDoc("<#x>",     "[OES(#x){1,1}OEE(#x){1,4}]",             htmlLegacy);
+        testHtmlDoc("<\u00e9>", "[OES(\u00e9){1,1}OEE(\u00e9){1,3}]",     htmlLegacy);
+        testHtmlDoc("<!x>",     "[OES(!x){1,1}OEE(!x){1,4}]",             htmlLegacy);
+        // Positive controls behave identically whether the rules are on or off.
+        testHtmlDoc("<b>",      "[OES(b){1,1}OEE(b){1,3}]",               htmlLegacy);
+        testHtmlDoc("</H1>",    "[CES(H1){1,1}CEE(H1){1,5}]",             htmlLegacy);
+
+
+        /*
+         * ---------------------------------------------------------------------------------------------
+         * XML mode is unaffected by the flag: '<' + non-letter still starts an element, just as today.
+         * (testDoc also asserts round-trip fidelity through the duplicating handler.)
+         * ---------------------------------------------------------------------------------------------
+         */
+        testDoc("<@x>",    "[OES(@x){1,1}OEE(@x){1,4}]",            null, xml);
+        testDoc("<_x>",    "[OES(_x){1,1}OEE(_x){1,4}]",            null, xml);
+        testDoc("<!x>",    "[OES(!x){1,1}OEE(!x){1,4}]",            null, xml);
+        testDoc("<b>",     "[OES(b){1,1}OEE(b){1,3}]",              null, xml);
+        testDoc("<my-el>", "[OES(my-el){1,1}OEE(my-el){1,7}]",      null, xml);
+
+    }
+
+
     static void testDocError(final String input, final String outputBreakDown, final String outputSimple, final int errorLine, final int errorCol, final ParseConfiguration parseConfiguration) {
         try {
             testDoc(input, outputBreakDown, outputSimple, parseConfiguration);

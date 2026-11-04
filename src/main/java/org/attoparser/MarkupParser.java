@@ -528,6 +528,12 @@ public final class MarkupParser implements IMarkupParser {
         int tagStart;
         int tagEnd;
 
+        // In HTML mode (unless explicitly disabled) the HTML5 "tag open" rules apply: a '<' only starts an
+        // element when followed by an ASCII letter (or '/' + ASCII letter for a close tag). Anything else is text.
+        final boolean html =
+                ParseConfiguration.ParsingMode.HTML.equals(this.configuration.getMode())
+                        && this.configuration.isHtml5TagOpenRules();
+
         try {
 
             while (i < maxi) {
@@ -599,9 +605,9 @@ public final class MarkupParser implements IMarkupParser {
     
                     }
     
-                    inOpenElement = ParsingElementMarkupUtil.isOpenElementStart(buffer, tagStart, maxi);
+                    inOpenElement = ParsingElementMarkupUtil.isOpenElementStart(buffer, tagStart, maxi, html);
                     if (!inOpenElement) {
-                        inCloseElement = ParsingElementMarkupUtil.isCloseElementStart(buffer, tagStart, maxi);
+                        inCloseElement = ParsingElementMarkupUtil.isCloseElementStart(buffer, tagStart, maxi, html);
                         if (!inCloseElement) {
                             inComment = ParsingCommentMarkupUtil.isCommentStart(buffer, tagStart, maxi);
                             if (!inComment) {
@@ -638,9 +644,9 @@ public final class MarkupParser implements IMarkupParser {
                             return;
                         }
     
-                        inOpenElement = ParsingElementMarkupUtil.isOpenElementStart(buffer, tagStart, maxi);
+                        inOpenElement = ParsingElementMarkupUtil.isOpenElementStart(buffer, tagStart, maxi, html);
                         if (!inOpenElement) {
-                            inCloseElement = ParsingElementMarkupUtil.isCloseElementStart(buffer, tagStart, maxi);
+                            inCloseElement = ParsingElementMarkupUtil.isCloseElementStart(buffer, tagStart, maxi, html);
                             if (!inCloseElement) {
                                 inComment = ParsingCommentMarkupUtil.isCommentStart(buffer, tagStart, maxi);
                                 if (!inComment) {
