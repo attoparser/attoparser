@@ -46,6 +46,11 @@ public final class DOMWriter {
             return;
         }
 
+        // CDATASection extends Text, so it must be checked before Text
+        if (node instanceof CDATASection) {
+            writeCDATASection((CDATASection)node, writer);
+            return;
+        }
         if (node instanceof Text) {
             writeText((Text)node, writer);
             return;
@@ -56,10 +61,6 @@ public final class DOMWriter {
         }
         if (node instanceof Comment) {
             writeComment((Comment)node, writer);
-            return;
-        }
-        if (node instanceof CDATASection) {
-            writeCDATASection((CDATASection)node, writer);
             return;
         }
         if (node instanceof DocType) {
